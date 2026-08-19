@@ -202,6 +202,31 @@
     .lead-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .lead-card-foot time{font-size:11px;color:var(--muted)}
     .open-link{font-size:12px;color:#ddd6fe;font-weight:800}
+    .delete-mini{
+      width:34px;
+      height:34px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      border:1px solid rgba(239,68,68,.22);
+      background:rgba(239,68,68,.10);
+      color:#fecaca;
+      font-size:15px;
+      line-height:1;
+      transition:background .2s,transform .15s,border-color .2s;
+    }
+    .delete-mini:hover{
+      background:rgba(239,68,68,.18);
+      border-color:rgba(239,68,68,.38);
+    }
+    .delete-mini:active{transform:scale(.94)}
+    .row-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:7px;
+    }
 
     .loading{
       padding:50px 20px;text-align:center;color:var(--muted)
@@ -414,7 +439,7 @@
       <table id="leadsTable" class="desktop-table hidden">
         <thead>
           <tr>
-            <th>סטטוס</th><th>שם</th><th>טלפון</th><th>הודעה</th><th>התקבל</th>
+            <th>סטטוס</th><th>שם</th><th>טלפון</th><th>הודעה</th><th>התקבל</th><th>פעולות</th>
           </tr>
         </thead>
         <tbody id="leadsTbody"></tbody>
@@ -541,6 +566,7 @@
 
   let leads = [];
   let activeLeadId = null;
+  let pendingDeleteId = null;
   let currentUser = null;
   let refreshTimer = null;
 
@@ -724,7 +750,25 @@
       tdDate.className='date-cell';
       tdDate.textContent=fmtDate(lead.created_at);
 
-      tr.append(tdStatus,tdName,tdPhone,tdMsg,tdDate);
+      const tdActions = document.createElement('td');
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-mini';
+      deleteBtn.type = 'button';
+      deleteBtn.setAttribute('aria-label', `מחיקת הליד של ${lead.name || 'הלקוח'}`);
+      deleteBtn.title = 'מחיקת ליד';
+      deleteBtn.textContent = '🗑';
+      deleteBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        openDeleteConfirm(lead.id);
+      });
+
+      actions.appendChild(deleteBtn);
+      tdActions.appendChild(actions);
+
+      tr.append(tdStatus,tdName,tdPhone,tdMsg,tdDate,tdActions);
       leadsTbody.appendChild(tr);
 
       // Mobile
@@ -748,8 +792,25 @@
 
       const foot=document.createElement('div'); foot.className='lead-card-foot';
       const time=document.createElement('time'); time.textContent=fmtDate(lead.created_at);
+
+      const footActions = document.createElement('div');
+      footActions.className = 'row-actions';
+
+      const deleteBtnMobile = document.createElement('button');
+      deleteBtnMobile.className = 'delete-mini';
+      deleteBtnMobile.type = 'button';
+      deleteBtnMobile.setAttribute('aria-label', `מחיקת הליד של ${lead.name || 'הלקוח'}`);
+      deleteBtnMobile.title = 'מחיקת ליד';
+      deleteBtnMobile.textContent = '🗑';
+      deleteBtnMobile.addEventListener('click', e => {
+        e.stopPropagation();
+        openDeleteConfirm(lead.id);
+      });
+
       const open=document.createElement('span'); open.className='open-link'; open.textContent='פתיחת ליד ←';
-      foot.append(time,open);
+      footActions.append(deleteBtnMobile, open);
+
+      foot.append(time,footActions);
       card.append(top,m,foot);
       mobileList.appendChild(card);
     }
@@ -815,10 +876,12 @@
   $('refreshBtn').addEventListener('click', loadLeads);
   $('refreshBtn2').addEventListener('click', loadLeads);
 
-  function openDeleteConfirm(){
-    if(activeLeadId == null) return;
-    const lead = leads.find(l => l.id === activeLeadId);
+  function openDeleteConfirm(leadId = activeLeadId){
+    if(leadId == null) return;
+    const lead = leads.find(l => l.id === leadId);
     if(!lead) return;
+
+    pendingDeleteId = leadId;
 
     $('deleteConfirmText').textContent =
       `למחוק את הליד של ${lead.name || 'הלקוח'}? הפעולה בלתי הפיכה.`;
@@ -829,12 +892,13 @@
 
   function closeDeleteConfirm(){
     hide($('deleteConfirmBackdrop'));
+    pendingDeleteId = null;
     if($('leadModalBackdrop').classList.contains('hidden')){
       document.body.style.overflow='';
     }
   }
 
-  $('deleteLeadBtn').addEventListener('click', openDeleteConfirm);
+  $('deleteLeadBtn').addEventListener('click', () => openDeleteConfirm(activeLeadId));
   $('cancelDeleteBtn').addEventListener('click', closeDeleteConfirm);
 
   $('deleteConfirmBackdrop').addEventListener('click', e => {
@@ -842,7 +906,10 @@
   });
 
   $('confirmDeleteBtn').addEventListener('click', async () => {
-    if(activeLeadId == null) return;
+    if(pendingDeleteId == null) return;
+
+    const deleteId = pendingDeleteId;
+    const wasLeadModalOpen = !$('leadModalBackdrop').classList.contains('hidden');
 
     const btn = $('confirmDeleteBtn');
     btn.disabled = true;
@@ -851,7 +918,7 @@
     const { error } = await supabase
       .from('leads')
       .delete()
-      .eq('id', activeLeadId);
+      .eq('id', deleteId);
 
     btn.disabled = false;
     btn.textContent = 'כן, למחוק';
@@ -863,7 +930,11 @@
     }
 
     closeDeleteConfirm();
-    closeLead();
+
+    if(wasLeadModalOpen && activeLeadId === deleteId){
+      closeLead();
+    }
+
     toast('הליד נמחק');
     await loadLeads();
   });
