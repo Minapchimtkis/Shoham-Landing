@@ -2214,6 +2214,7 @@ footer {
 }
 
 </style>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -2523,6 +2524,17 @@ footer {
         <input type="checkbox" id="fconsent" />
         <span class="consent-text">קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.</span>
       </label>
+      <div style="display:flex;justify-content:center;margin:18px 0 14px;">
+        <div
+          class="cf-turnstile"
+          data-sitekey="0x4AAAAAAEVsxsTTGUIyn4XY"
+          data-theme="dark"
+          data-language="he"
+          data-callback="onTurnstileSuccess"
+          data-expired-callback="onTurnstileExpired"
+          data-error-callback="onTurnstileError">
+        </div>
+      </div>
       <button class="btn-primary" id="submitBtn" onclick="submitForm()" disabled style="width:100%; justify-content:center;">
         מתחילים לצמוח ←
       </button>
@@ -2959,6 +2971,20 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePrivacy();
 });
 
+let turnstileToken = '';
+
+function onTurnstileSuccess(token) {
+  turnstileToken = token || '';
+}
+
+function onTurnstileExpired() {
+  turnstileToken = '';
+}
+
+function onTurnstileError() {
+  turnstileToken = '';
+}
+
 function submitForm() {
   const name = document.getElementById('fname').value.trim();
   const phone = document.getElementById('fphone').value.trim();
@@ -2981,6 +3007,13 @@ function submitForm() {
   }
   if (consentRow) consentRow.classList.remove('consent-error');
 
+  if (!turnstileToken) {
+    alert(document.documentElement.dir === 'ltr'
+      ? 'Please complete the security check.'
+      : 'יש להשלים את בדיקת האבטחה לפני השליחה.');
+    return;
+  }
+
   const submitBtn = document.querySelector('#contactForm .btn-primary');
   const originalBtnText = submitBtn ? submitBtn.textContent : '';
   if (submitBtn) {
@@ -2999,7 +3032,8 @@ function submitForm() {
     consent: true,
     consentText: consentLabel ? consentLabel.textContent.trim() : '',
     consentAt: new Date().toISOString(),
-    pageLang: document.documentElement.dir === 'ltr' ? 'en' : 'he'
+    pageLang: document.documentElement.dir === 'ltr' ? 'en' : 'he',
+    turnstileToken: turnstileToken
   };
 
   // Public Edge Function endpoint. No secret key is stored in this HTML file.
@@ -3018,6 +3052,10 @@ function submitForm() {
   })
   .catch(function(error) {
     console.error('Error sending form:', error);
+    turnstileToken = '';
+    if (window.turnstile) {
+      try { window.turnstile.reset(); } catch (_) {}
+    }
     alert('אירעה שגיאה בשליחה, נסה שוב.');
     if (submitBtn) {
       submitBtn.disabled = false;
