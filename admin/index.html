@@ -100,11 +100,11 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .confirm-backdrop,.settings-backdrop{position:fixed;inset:0;z-index:100;background:rgba(2,4,10,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .confirm-backdrop{display:grid;place-items:center;padding:20px}.confirm-dialog{width:min(100%,360px);border:1px solid var(--line2);border-radius:22px;background:linear-gradient(180deg,#161a29,#0e121e);padding:22px 18px 18px;box-shadow:var(--shadow);text-align:center}
 .confirm-icon{width:50px;height:50px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;border:1px solid rgba(255,77,90,.28);background:rgba(255,77,90,.07);color:#ff5a67;font-size:22px;font-weight:900}.confirm-dialog h2{margin:0;font-size:19px}.confirm-dialog p{margin:8px 0 0;color:#8f97aa;font-size:12px;line-height:1.65}.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
-.settings-backdrop{display:flex;align-items:flex-end;justify-content:center}.settings-sheet{width:100%;max-width:520px;border:1px solid var(--line2);border-radius:24px 24px 0 0;background:linear-gradient(180deg,#111626,#0b0f1b);padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.settings-backdrop{display:grid;place-items:center;padding:20px}.settings-sheet{width:min(100%,430px);border:1px solid var(--line2);border-radius:24px;background:linear-gradient(180deg,#161a29,#0e121e);padding:22px 18px 18px;box-shadow:var(--shadow)}
 .sheet-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:16px}.sheet-head h2{margin:0;font-size:20px}.sheet-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.close-btn{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:white}
 .toast{position:fixed;z-index:120;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));max-width:460px;margin:0 auto;background:#10241d;border:1px solid rgba(47,217,139,.28);color:#bdffdd;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;text-align:center}.toast.bad{background:#2a1116;border-color:rgba(255,77,90,.3);color:#ffc5ca}
 
-@media(min-width:720px){.app-shell{padding-left:22px;padding-right:22px}.list-head,.lead-row{grid-template-columns:minmax(180px,1.6fr) 120px minmax(150px,1fr) 110px;padding-left:18px;padding-right:18px}.settings-backdrop{align-items:center;padding:24px}.settings-sheet{border-radius:24px;padding:22px}}
+@media(min-width:720px){.app-shell{padding-left:22px;padding-right:22px}.list-head,.lead-row{grid-template-columns:minmax(180px,1.6fr) 120px minmax(150px,1fr) 110px;padding-left:18px;padding-right:18px}}
 @media(max-width:390px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.list-head,.lead-row{grid-template-columns:minmax(112px,1.42fr) 74px 88px 64px;gap:5px;padding-left:9px;padding-right:9px}.info-grid{grid-template-columns:1fr}.info-item:nth-child(odd){border-left:0}.detail-actions{grid-template-columns:1fr}}
 
 /* ===== תוספות: תגיות מהירות · סינון תאריכים · תזכורת ===== */
@@ -162,6 +162,17 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .ics-btn svg{width:16px;height:16px}
 .ics-btn:disabled{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted2)}
 .ics-hint{margin-top:9px;font-size:9px;line-height:1.6;color:var(--muted2)}
+/* ===== תפריט שלוש הנקודות ===== */
+.menu-wrap{position:relative}
+.detail-topbar .menu-wrap{width:40px;height:40px}
+.kebab-menu{position:absolute;top:46px;left:0;z-index:40;width:172px;padding:7px;display:none;background:#111626;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.42)}
+.kebab-menu.show{display:grid;gap:3px}
+.kebab-menu button{border:0;border-radius:10px;background:transparent;color:#cdd2dc;text-align:right;padding:11px 12px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:9px}
+.kebab-menu button:hover{background:rgba(255,255,255,.045)}
+.kebab-menu button svg{width:15px;height:15px;flex:0 0 auto;color:#8f97a8}
+.kebab-menu .danger{color:#ff8a93}.kebab-menu .danger svg{color:#ff6974}
+.kebab-menu .danger:hover{background:rgba(255,77,90,.07)}
+
 @media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:1fr 78px}}
 </style>
 </head>
@@ -188,7 +199,10 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <div class="top-actions">
     <button id="refreshBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M19 7v5h-5M5 17v-5h5M18.2 9A7 7 0 0 0 6.7 6.7L5 8M5.8 15A7 7 0 0 0 17.3 17.3L19 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
     <button id="exportCalBtn" class="icon-btn" title="ייצוא כל התזכורות ליומן"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17M12 13.2v4.4M9.9 15.5l2.1 2.1 2.1-2.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button id="settingsBtn" class="icon-btn avatar">ש</button>
+    <div class="menu-wrap">
+      <button id="settingsBtn" class="icon-btn" title="תפריט"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
+      <div id="settingsMenu" class="kebab-menu"><button type="button" data-act="password"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11.4 12H20M17.2 12v3M14.4 12v2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>שנה סיסמה</button><button type="button" data-act="logout" class="danger"><svg viewBox="0 0 24 24"><path d="M14.5 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v11.6a1.7 1.7 0 0 0 1.7 1.7h8.3M18 8.6 21.4 12 18 15.4M21 12h-9.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>התנתקות</button></div>
+    </div>
   </div>
 </header>
 
@@ -244,7 +258,10 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <header class="detail-topbar">
     <button id="backToDashboard" class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <div class="detail-title"><b>פרטי ליד</b><small id="detailReceived">—</small></div>
-    <button class="detail-menu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
+    <div class="menu-wrap">
+      <button id="detailMenuBtn" class="detail-menu" title="תפריט"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
+      <div id="detailMenu" class="kebab-menu"><button type="button" data-act="password"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11.4 12H20M17.2 12v3M14.4 12v2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>שנה סיסמה</button><button type="button" data-act="logout" class="danger"><svg viewBox="0 0 24 24"><path d="M14.5 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v11.6a1.7 1.7 0 0 0 1.7 1.7h8.3M18 8.6 21.4 12 18 15.4M21 12h-9.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>התנתקות</button></div>
+    </div>
   </header>
 
   <section class="hero">
@@ -302,7 +319,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 <div id="settingsBackdrop" class="settings-backdrop hidden">
   <div class="settings-sheet">
-    <div class="sheet-head"><div><h2>אבטחה והגדרות</h2><p>שינוי סיסמה או יציאה מהמערכת</p></div><button id="closeSettings" class="close-btn">×</button></div>
+    <div class="sheet-head"><div><h2>שינוי סיסמה</h2><p>יש להזין את הסיסמה הנוכחית לאימות</p></div><button id="closeSettings" class="close-btn">×</button></div>
     <form id="passwordForm">
       <div class="field"><label>סיסמה נוכחית</label><input id="currentPassword" class="input" type="password" required></div>
       <div class="field"><label>סיסמה חדשה</label><input id="newPassword" class="input" type="password" minlength="10" required></div>
@@ -310,7 +327,6 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
       <div id="passwordError" class="error hidden"></div>
       <button id="passwordBtn" class="btn btn-primary btn-block">שינוי סיסמה</button>
     </form>
-    <button id="logoutBtn" class="btn btn-danger btn-block">יציאה מהמערכת</button>
   </div>
 </div>
 
@@ -535,13 +551,28 @@ $('dateApply').addEventListener('click',()=>{
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
 $('refreshBtn').addEventListener('click',loadLeads);$('backToDashboard').addEventListener('click',back);
 
-$('settingsBtn').addEventListener('click',()=>{show($('settingsBackdrop'));document.body.classList.add('locked');$('passwordForm').reset();setError($('passwordError'),'')});
-$('closeSettings').addEventListener('click',()=>{hide($('settingsBackdrop'));document.body.classList.remove('locked')});
+/* ===== תפריט שלוש הנקודות · שינוי סיסמה / התנתקות ===== */
+function closeKebabs(){document.querySelectorAll('.kebab-menu.show').forEach(m=>m.classList.remove('show'))}
+function openSettings(){closeKebabs();show($('settingsBackdrop'));document.body.classList.add('locked');$('passwordForm').reset();setError($('passwordError'),'')}
+function closeSettings(){hide($('settingsBackdrop'));document.body.classList.remove('locked')}
+async function doLogout(){closeKebabs();await supabase.auth.signOut();closeSettings();setLoggedOut()}
+// Both kebabs — the dashboard topbar and the lead detail header — drive the
+// same two actions, so they are wired from one place.
+function wireKebab(btnId,menuId){
+  const btn=$(btnId),menu=$(menuId);
+  btn.addEventListener('click',e=>{e.stopPropagation();const wasOpen=menu.classList.contains('show');closeKebabs();$('filterMenu').classList.remove('show');$('dateMenu').classList.remove('show');menu.classList.toggle('show',!wasOpen)});
+  menu.addEventListener('click',e=>e.stopPropagation());
+  menu.querySelectorAll('[data-act]').forEach(item=>item.addEventListener('click',()=>{item.dataset.act==='logout'?doLogout():openSettings()}));
+}
+wireKebab('settingsBtn','settingsMenu');wireKebab('detailMenuBtn','detailMenu');
+document.addEventListener('click',closeKebabs);
+$('closeSettings').addEventListener('click',closeSettings);
+$('settingsBackdrop').addEventListener('click',e=>{if(e.target===$('settingsBackdrop'))closeSettings()});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;closeKebabs();if(!$('settingsBackdrop').classList.contains('hidden'))closeSettings()});
 $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();const current=$('currentPassword').value,next=$('newPassword').value,confirm=$('confirmPassword').value;setError($('passwordError'),'');if(next.length<10){setError($('passwordError'),'הסיסמה החדשה חייבת להכיל לפחות 10 תווים.');return}if(next!==confirm){setError($('passwordError'),'אימות הסיסמה החדשה אינו תואם.');return}
   const{error:reauth}=await supabase.auth.signInWithPassword({email:currentUser.email,password:current});if(reauth){setError($('passwordError'),'הסיסמה הנוכחית אינה נכונה.');return}
-  const{error}=await supabase.auth.updateUser({password:next});if(error){setError($('passwordError'),'לא ניתן לעדכן את הסיסמה כרגע.');return}hide($('settingsBackdrop'));document.body.classList.remove('locked');toast('הסיסמה שונתה בהצלחה')
+  const{error}=await supabase.auth.updateUser({password:next});if(error){setError($('passwordError'),'לא ניתן לעדכן את הסיסמה כרגע.');return}closeSettings();toast('הסיסמה שונתה בהצלחה')
 });
-$('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();hide($('settingsBackdrop'));document.body.classList.remove('locked');setLoggedOut()});
 supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')setLoggedOut();if(session?.user)currentUser=session.user});
 bootstrap();
 </script>
