@@ -106,6 +106,63 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 @media(min-width:720px){.app-shell{padding-left:22px;padding-right:22px}.list-head,.lead-row{grid-template-columns:minmax(180px,1.6fr) 120px minmax(150px,1fr) 110px;padding-left:18px;padding-right:18px}.settings-backdrop{align-items:center;padding:24px}.settings-sheet{border-radius:24px;padding:22px}}
 @media(max-width:390px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.list-head,.lead-row{grid-template-columns:minmax(112px,1.42fr) 74px 88px 64px;gap:5px;padding-left:9px;padding-right:9px}.info-grid{grid-template-columns:1fr}.info-item:nth-child(odd){border-left:0}.detail-actions{grid-template-columns:1fr}}
+
+/* ===== תוספות: תגיות מהירות · סינון תאריכים · תזכורת ===== */
+.toolbar{grid-template-columns:1fr 46px 46px}
+.date-wrap{position:relative}
+.date-icon-btn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;display:grid;place-items:center}
+.date-icon-btn svg{width:20px;height:20px}
+.date-icon-btn.active{color:#d7c6ff;border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.08)}
+.date-menu{position:absolute;top:52px;left:0;z-index:31;width:212px;padding:7px;display:none;background:#111626;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.42)}
+.date-menu.show{display:grid;gap:4px}
+.date-menu button[data-range]{border:0;border-radius:10px;background:transparent;color:#b8c0d0;text-align:right;padding:10px 11px;font-size:12px}
+.date-menu button[data-range].active{background:rgba(139,92,246,.11);color:#dacaff}
+.date-custom{display:none;gap:8px;margin-top:5px;padding:9px 4px 3px;border-top:1px solid var(--line)}
+.date-custom.show{display:grid}
+.date-custom label{display:block;color:#778095;font-size:9px;font-weight:800;margin-bottom:5px}
+.date-custom input{width:100%;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 10px;font-size:11px;outline:none;color-scheme:dark}
+.date-custom input:focus{border-color:rgba(139,92,246,.42)}
+.date-apply{min-height:37px;border-radius:11px;border:0;background:linear-gradient(145deg,var(--purple),var(--purple2));color:#fff;font-size:11px;font-weight:900}
+
+.row-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;padding-right:31px}
+.row-tag{border-radius:999px;border:1px solid rgba(139,92,246,.24);background:rgba(139,92,246,.11);color:#cfb8ff;font-size:8px;font-weight:900;padding:3px 7px;line-height:1.5;max-width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-tag.t-amber{color:#ffd57e;background:rgba(245,166,35,.11);border-color:rgba(245,166,35,.24)}
+.row-tag.t-green{color:#8cf0bc;background:rgba(47,217,139,.10);border-color:rgba(47,217,139,.23)}
+.row-tag.t-blue{color:#a9cdff;background:rgba(77,163,255,.10);border-color:rgba(77,163,255,.23)}
+.row-tag.t-red{color:#ff9aa2;background:rgba(255,77,90,.09);border-color:rgba(255,77,90,.25)}
+.row-tag.t-more{color:var(--muted2);background:rgba(255,255,255,.03);border-color:var(--line)}
+
+.fu-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:3px;border-radius:999px;border:1px solid;padding:3px 6px;font-size:8px;font-weight:900;white-space:nowrap}
+.fu-chip svg{width:9px;height:9px;flex:0 0 auto}
+.fu-due{color:#ff9aa2;background:rgba(255,77,90,.10);border-color:rgba(255,77,90,.26)}
+.fu-soon{color:#ffd57e;background:rgba(245,166,35,.11);border-color:rgba(245,166,35,.24)}
+.fu-next{color:#a9cdff;background:rgba(77,163,255,.09);border-color:rgba(77,163,255,.22)}
+
+.tags-wrap,.fu-wrap{padding:15px}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px}
+.tag-chip{border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:11px;font-weight:800;padding:8px 12px;display:inline-flex;align-items:center;gap:7px}
+.tag-chip.on{border-color:rgba(139,92,246,.42);background:rgba(139,92,246,.13);color:#dacaff}
+.tag-chip .x{font-weight:900;opacity:.65;font-size:12px;line-height:1}
+.tag-empty{color:var(--muted2);font-size:11px}
+.tag-add{display:grid;grid-template-columns:1fr 88px;gap:8px;margin-top:13px}
+.tag-add input{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 12px;font-size:12px;outline:none}
+.tag-add input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
+.tag-add button{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#e7e9ef;font-size:12px;font-weight:900}
+
+.fu-row{display:grid;grid-template-columns:1fr auto;gap:9px}
+.fu-input{width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.022);color:var(--text);padding:0 12px;outline:none;color-scheme:dark;font-size:13px}
+.fu-input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
+.fu-clear{height:46px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:12px;font-weight:800}
+.fu-note{margin-top:10px;font-size:10px;font-weight:800;color:var(--muted2)}
+.fu-note.due{color:#ff9aa2}.fu-note.soon{color:#ffd57e}.fu-note.next{color:#a9cdff}
+.fu-dur{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin-top:13px}
+.fu-dur .detail-label{margin:0;white-space:nowrap}
+.fu-dur select{height:42px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 10px;font-size:12px;outline:none}
+.ics-btn{width:100%;min-height:46px;margin-top:11px;border-radius:13px;border:1px solid transparent;background:linear-gradient(145deg,var(--purple),var(--purple2));color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+.ics-btn svg{width:16px;height:16px}
+.ics-btn:disabled{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted2)}
+.ics-hint{margin-top:9px;font-size:9px;line-height:1.6;color:var(--muted2)}
+@media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:1fr 78px}}
 </style>
 </head>
 <body>
@@ -130,6 +187,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <div class="brand"><div class="logo">◆</div><div class="brand-copy"><b>ניהול לידים</b><span id="adminEmail">—</span></div></div>
   <div class="top-actions">
     <button id="refreshBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M19 7v5h-5M5 17v-5h5M18.2 9A7 7 0 0 0 6.7 6.7L5 8M5.8 15A7 7 0 0 0 17.3 17.3L19 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    <button id="exportCalBtn" class="icon-btn" title="ייצוא כל התזכורות ליומן"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17M12 13.2v4.4M9.9 15.5l2.1 2.1 2.1-2.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button id="settingsBtn" class="icon-btn avatar">ש</button>
   </div>
 </header>
@@ -147,6 +205,21 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
     <button id="filterBtn" class="filter-icon-btn"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <div id="filterMenu" class="filter-menu">
       <button data-filter="all" class="active">הכל</button><button data-filter="new">חדש</button><button data-filter="contacted">נוצר קשר</button><button data-filter="closed">נסגר</button>
+    </div>
+  </div>
+  <div class="date-wrap">
+    <button id="dateBtn" class="date-icon-btn" title="סינון לפי טווח תאריכים"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    <div id="dateMenu" class="date-menu">
+      <button data-range="all" class="active">הכל</button>
+      <button data-range="today">היום</button>
+      <button data-range="7d">7 ימים אחרונים</button>
+      <button data-range="30d">30 ימים אחרונים</button>
+      <button data-range="custom">טווח מותאם</button>
+      <div id="dateCustom" class="date-custom">
+        <div><label for="dateFrom">מתאריך</label><input id="dateFrom" type="date"></div>
+        <div><label for="dateTo">עד תאריך</label><input id="dateTo" type="date"></div>
+        <button id="dateApply" class="date-apply">החל סינון</button>
+      </div>
     </div>
   </div>
 </section>
@@ -193,6 +266,27 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
   <section class="detail-section"><div class="detail-section-head"><strong>תוכן הליד</strong><span>ההודעה שנשלחה</span></div><div class="message-wrap"><label class="detail-label">הודעה</label><div id="detailMessage" class="message-full">—</div></div></section>
   <section class="detail-section"><div class="detail-section-head"><strong>סטטוס</strong><span>ניהול הטיפול</span></div><div class="status-wrap"><label class="detail-label">סטטוס נוכחי</label><select id="detailStatus" class="status-select"><option value="new">חדש</option><option value="contacted">נוצר קשר</option><option value="closed">נסגר</option></select></div></section>
+  <section class="detail-section"><div class="detail-section-head"><strong>תגיות מהירות</strong><span>סימון מצב הליד</span></div>
+    <div class="tags-wrap">
+      <label class="detail-label">תגיות פעילות</label>
+      <div id="tagList" class="tag-list"></div>
+      <div class="tag-add"><input id="tagInput" type="text" maxlength="24" placeholder="תגית מותאמת אישית…"><button id="tagAddBtn" type="button">הוספה</button></div>
+    </div>
+  </section>
+
+  <section class="detail-section"><div class="detail-section-head"><strong>תזכורת / Follow-Up</strong><span>מועד חזרה ללקוח</span></div>
+    <div class="fu-wrap">
+      <label class="detail-label" for="detailFollowUp">מועד תזכורת</label>
+      <div class="fu-row"><input id="detailFollowUp" class="fu-input" type="datetime-local"><button id="fuClearBtn" class="fu-clear" type="button">ניקוי</button></div>
+      <div id="fuNote" class="fu-note">לא הוגדרה תזכורת</div>
+      <div class="fu-dur"><label class="detail-label" for="fuDuration">משך הפגישה</label>
+        <select id="fuDuration"><option value="30">30 דקות</option><option value="45">45 דקות</option><option value="60" selected>שעה</option><option value="90">שעה וחצי</option><option value="120">שעתיים</option></select>
+      </div>
+      <button id="addToCalBtn" class="ics-btn" type="button" disabled><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17M12 13.5v4M10 15.5h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>הוספה ליומן</button>
+      <div class="ics-hint">הקובץ נפתח ישירות באפליקציית לוח השנה של האייפון. יש לאשר "הוסף לכל" כדי לשמור את האירוע.</div>
+    </div>
+  </section>
+
   <section class="detail-section"><div class="detail-section-head"><strong>הערות פנימיות</strong><span>לא מוצג ללקוח</span></div><div class="notes-wrap"><label class="detail-label">הערה</label><textarea id="detailNotes" class="notes" maxlength="5000"></textarea></div></section>
   <section class="detail-section"><div class="detail-section-head"><strong>הסכמה</strong><span>תיעוד הטופס</span></div><div class="consent-wrap"><div class="consent-line"><div id="detailConsentIcon" class="consent-check">✓</div><div><div id="detailConsentText" class="consent-text">—</div><div id="detailConsentMeta" class="consent-meta">—</div></div></div></div></section>
 
@@ -233,6 +327,27 @@ const $=id=>document.getElementById(id);
 let leads=[],currentUser=null,activeLeadId=null,currentFilter='all',selectedIds=new Set(),pendingDeleteIds=[],refreshTimer=null;
 const STATUS={new:{label:'חדש',cls:'status-new'},contacted:{label:'נוצר קשר',cls:'status-contacted'},closed:{label:'נסגר',cls:'status-closed'}};
 
+/* ===== תוספות: תגיות · טווח תאריכים · תזכורת ===== */
+const QUICK_TAGS=[{label:'לא ענה',cls:'t-amber'},{label:'פגישה נקבעה',cls:'t-green'},{label:'הצעה נשלחה',cls:'t-blue'},{label:'לא רלוונטי',cls:'t-red'}];
+const TAG_CLS=Object.fromEntries(QUICK_TAGS.map(t=>[t.label,t.cls]));
+const ICON_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.2v5l3 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ICON_CAL='<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[];
+function tagCls(t){return TAG_CLS[t]||''}
+function leadTags(l){return Array.isArray(l?.tags)?l.tags.filter(t=>String(t||'').trim()):[]}
+function dateRange(){
+  const now=new Date(),day0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(dateFilter==='today')return{from:day0,to:null};
+  if(dateFilter==='7d')return{from:new Date(day0.getTime()-6*864e5),to:null};
+  if(dateFilter==='30d')return{from:new Date(day0.getTime()-29*864e5),to:null};
+  if(dateFilter==='custom')return{from:dateFromVal?new Date(dateFromVal+'T00:00:00'):null,to:dateToVal?new Date(dateToVal+'T23:59:59.999'):null};
+  return{from:null,to:null}
+}
+function inDateRange(iso){const{from,to}=dateRange();if(!from&&!to)return true;if(!iso)return false;const d=new Date(iso);if(isNaN(d))return false;if(from&&d<from)return false;if(to&&d>to)return false;return true}
+function fuState(iso){if(!iso)return null;const d=new Date(iso);if(isNaN(d))return null;const now=new Date();if(d<now)return'due';const eod=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);return d<=eod?'soon':'next'}
+function toLocalInput(iso){if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+function fromLocalInput(v){if(!v)return null;const d=new Date(v);return isNaN(d)?null:d.toISOString()}
+
 function show(el){el.classList.remove('hidden')} function hide(el){el.classList.add('hidden')}
 function toast(msg,type='ok'){const t=$('toast');t.textContent=msg;t.className=`toast ${type==='bad'?'bad':''}`;show(t);clearTimeout(t._timer);t._timer=setTimeout(()=>hide(t),2200)}
 function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textContent=msg;show(el)}
@@ -247,11 +362,11 @@ $('loginForm').addEventListener('submit',async e=>{e.preventDefault();setError($
 
 async function loadLeads(){
   if(!currentUser)return;show($('loadingState'));hide($('emptyState'));
-  const{data,error}=await supabase.from('leads').select('id,name,phone,message,consent,consent_text,consent_at,page_lang,created_at,status,admin_notes,updated_at').order('created_at',{ascending:false});
+  const{data,error}=await supabase.from('leads').select('*').order('created_at',{ascending:false});
   hide($('loadingState'));if(error){console.error(error);toast('לא ניתן לטעון את הפניות','bad');return}
   leads=data||[];selectedIds=new Set([...selectedIds].filter(id=>leads.some(l=>l.id===id)));render();if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderDetail(activeLeadId)
 }
-function filtered(){const q=$('searchInput').value.trim().toLowerCase();return leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&(!q||[l.name,l.phone,l.message].some(v=>String(v||'').toLowerCase().includes(q))))}
+function filtered(){const q=$('searchInput').value.trim().toLowerCase();return leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))))}
 function updateStats(){$('statTotal').textContent=leads.length;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length}
 function syncSelection(){const n=selectedIds.size;$('bulkCount').textContent=`${n} נבחרו`;$('bulkBar').classList.toggle('show',n>0);const ids=filtered().map(l=>l.id);$('selectAll').checked=ids.length>0&&ids.every(id=>selectedIds.has(id))}
 function render(){
@@ -260,7 +375,16 @@ function render(){
     const row=document.createElement('div');row.className='lead-row';row.dataset.id=lead.id;
     const person=document.createElement('div');person.className='person-cell';const nameWrap=document.createElement('div');nameWrap.className='name';
     const cb=document.createElement('input');cb.type='checkbox';cb.className='lead-check';cb.checked=selectedIds.has(lead.id);cb.dataset.id=lead.id;cb.addEventListener('click',e=>e.stopPropagation());cb.addEventListener('change',()=>{cb.checked?selectedIds.add(lead.id):selectedIds.delete(lead.id);syncSelection()});
-    const name=document.createElement('span');name.className='name-text';name.textContent=lead.name||'—';nameWrap.append(cb,name);person.append(nameWrap);
+    const name=document.createElement('span');name.className='name-text';name.textContent=lead.name||'—';nameWrap.append(cb,name);
+    const fs=fuState(lead.follow_up_at);
+    if(fs){const chip=document.createElement('span');chip.className=`fu-chip fu-${fs}`;chip.title='תזכורת: '+parts(lead.follow_up_at).full;
+      chip.innerHTML=fs==='next'?ICON_CAL:ICON_CLOCK;const t=document.createElement('span');t.textContent=fs==='due'?'באיחור':fs==='soon'?'היום':parts(lead.follow_up_at).date;chip.append(t);nameWrap.append(chip)}
+    person.append(nameWrap);
+    const tags=leadTags(lead);
+    if(tags.length){const tw=document.createElement('div');tw.className='row-tags';
+      tags.slice(0,3).forEach(t=>{const b=document.createElement('span');b.className=`row-tag ${tagCls(t)}`.trim();b.textContent=t;b.title=t;tw.append(b)});
+      if(tags.length>3){const more=document.createElement('span');more.className='row-tag t-more';more.textContent=`+${tags.length-3}`;tw.append(more)}
+      person.append(tw)}
     const sCell=document.createElement('div');sCell.className='status-cell';const pill=document.createElement('span');pill.className=`status-pill ${statusClass(lead.status||'new')}`;pill.textContent=statusLabel(lead.status||'new');sCell.append(pill);
     const phone=document.createElement('div');phone.className='phone-cell';phone.textContent=lead.phone||'—';
     const p=parts(lead.created_at);const date=document.createElement('div');date.className='date-cell';date.innerHTML=`${p.date}<br>${p.time}`;
@@ -274,10 +398,100 @@ function renderDetail(id){
   const l=leads.find(x=>x.id===id);if(!l)return;const p=parts(l.created_at);
   $('detailReceived').textContent=p.full;$('detailName').textContent=l.name||'—';$('detailPhoneText').textContent=l.phone||'—';$('detailInfoName').textContent=l.name||'—';$('detailInfoPhone').textContent=l.phone||'—';$('detailDate').textContent=p.date;$('detailTime').textContent=p.time;$('detailLang').textContent=l.page_lang==='en'?'English':'עברית';$('detailMessage').textContent=l.message||'ללא הודעה';$('detailStatus').value=l.status||'new';$('detailNotes').value=l.admin_notes||'';
   $('detailStatusPill').className=`status-pill ${statusClass(l.status||'new')}`;$('detailStatusPill').textContent=statusLabel(l.status||'new');$('detailCall').href='tel:'+String(l.phone||'').replace(/[^\d+]/g,'');
-  $('detailConsentText').textContent=l.consent?'הלקוח אישר את תנאי מדיניות הפרטיות בעת שליחת הטופס.':'לא תועדה הסכמה.';$('detailConsentIcon').textContent=l.consent?'✓':'!';$('detailConsentMeta').textContent=l.consent_at?'אושר ב־'+parts(l.consent_at).full:'—'
+  $('detailConsentText').textContent=l.consent?'הלקוח אישר את תנאי מדיניות הפרטיות בעת שליחת הטופס.':'לא תועדה הסכמה.';$('detailConsentIcon').textContent=l.consent?'✓':'!';$('detailConsentMeta').textContent=l.consent_at?'אושר ב־'+parts(l.consent_at).full:'—';
+  draftTags=[...leadTags(l)];renderTags();$('tagInput').value='';$('detailFollowUp').value=toLocalInput(l.follow_up_at);updateFuNote()
 }
 
-$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null}).eq('id',activeLeadId);btn.disabled=false;if(error){toast('שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
+function renderTags(){
+  const box=$('tagList');box.replaceChildren();const seen=new Set();
+  const labels=[...QUICK_TAGS.map(t=>t.label),...draftTags];
+  for(const label of labels){
+    if(seen.has(label))continue;seen.add(label);
+    const on=draftTags.includes(label);
+    const chip=document.createElement('button');chip.type='button';chip.className='tag-chip'+(on?' on':'');
+    const txt=document.createElement('span');txt.textContent=label;chip.append(txt);
+    if(on){const x=document.createElement('span');x.className='x';x.textContent='×';chip.append(x)}
+    chip.addEventListener('click',()=>{const i=draftTags.indexOf(label);i>-1?draftTags.splice(i,1):draftTags.push(label);renderTags()});
+    box.append(chip)
+  }
+}
+function addCustomTag(){
+  const v=$('tagInput').value.trim();if(!v)return;
+  if(draftTags.includes(v)){toast('התגית כבר קיימת','bad');$('tagInput').value='';return}
+  draftTags.push(v);$('tagInput').value='';renderTags()
+}
+function updateFuNote(){
+  const iso=fromLocalInput($('detailFollowUp').value),st=fuState(iso),note=$('fuNote');
+  $('addToCalBtn').disabled=!iso;
+  if(!st){note.className='fu-note';note.textContent='לא הוגדרה תזכורת';return}
+  note.className='fu-note '+st;
+  note.textContent=(st==='due'?'התזכורת עברה · ':st==='soon'?'תזכורת להיום · ':'תזכורת עתידית · ')+parts(iso).full
+}
+$('tagAddBtn').addEventListener('click',addCustomTag);
+$('tagInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addCustomTag()}});
+$('detailFollowUp').addEventListener('change',updateFuNote);
+$('fuClearBtn').addEventListener('click',()=>{$('detailFollowUp').value='';updateFuNote()});
+
+/* ===== ייצוא ליומן (iCalendar) ===== */
+function icsEscape(v){return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function icsStamp(d){const p=n=>String(n).padStart(2,'0');return`${d.getUTCFullYear()}${p(d.getUTCMonth()+1)}${p(d.getUTCDate())}T${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}Z`}
+function icsFold(line){
+  const enc=new TextEncoder(),dec=new TextDecoder(),bytes=enc.encode(line);
+  if(bytes.length<=72)return line;
+  const out=[];let start=0,limit=72;
+  while(start<bytes.length){
+    let end=Math.min(start+limit,bytes.length);
+    while(end<bytes.length&&(bytes[end]&0xC0)===0x80)end--;
+    if(end<=start)end=Math.min(start+limit,bytes.length);
+    out.push(dec.decode(bytes.slice(start,end)));start=end;limit=71
+  }
+  return out.join('\r\n ')
+}
+function icsEvent(lead,minutes){
+  const iso=lead.follow_up_at;if(!iso)return null;
+  const start=new Date(iso);if(isNaN(start))return null;
+  const end=new Date(start.getTime()+(Number(minutes)||60)*60000),name=lead.name||'לקוח';
+  const desc=[];
+  if(lead.phone)desc.push('טלפון: '+lead.phone);
+  desc.push('סטטוס: '+statusLabel(lead.status||'new'));
+  const tg=leadTags(lead);if(tg.length)desc.push('תגיות: '+tg.join(', '));
+  if(lead.message)desc.push('','ההודעה שנשלחה:',lead.message);
+  if(lead.admin_notes)desc.push('','הערות פנימיות: '+lead.admin_notes);
+  desc.push('','נוצר ממערכת ניהול הלידים');
+  const rows=['BEGIN:VEVENT','UID:'+`lead-${lead.id}-${start.getTime()}@shoham-leads`,'DTSTAMP:'+icsStamp(new Date()),
+    'DTSTART:'+icsStamp(start),'DTEND:'+icsStamp(end),
+    'SUMMARY:'+icsEscape('פגישה: '+name),'DESCRIPTION:'+icsEscape(desc.join('\n')),
+    'STATUS:CONFIRMED','SEQUENCE:0','TRANSP:OPAQUE',
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEscape('תזכורת: פגישה עם '+name),'TRIGGER:-PT30M','END:VALARM','END:VEVENT'];
+  return rows
+}
+function icsFile(eventRows){
+  const rows=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Shoham Abu//Leads Dashboard//HE','CALSCALE:GREGORIAN','METHOD:PUBLISH',...eventRows,'END:VCALENDAR'];
+  return rows.map(icsFold).join('\r\n')+'\r\n'
+}
+function downloadIcs(text,filename){
+  const blob=new Blob(['\uFEFF'+text],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),6000)
+}
+$('addToCalBtn').addEventListener('click',()=>{
+  const l=leads.find(x=>x.id===activeLeadId);if(!l)return;
+  const iso=fromLocalInput($('detailFollowUp').value);
+  if(!iso){toast('יש לבחור מועד תזכורת תחילה','bad');return}
+  const rows=icsEvent({...l,follow_up_at:iso},$('fuDuration').value);
+  if(!rows){toast('המועד שנבחר אינו תקין','bad');return}
+  downloadIcs(icsFile(rows),`pgisha-${String(l.id).slice(0,8)}.ics`);
+  toast('האירוע נוצר · יש לאשר הוספה ביומן')
+});
+$('exportCalBtn').addEventListener('click',()=>{
+  const withFu=leads.filter(l=>l.follow_up_at&&!isNaN(new Date(l.follow_up_at)));
+  if(!withFu.length){toast('אין תזכורות לייצוא','bad');return}
+  const rows=withFu.flatMap(l=>icsEvent(l,60)||[]);
+  downloadIcs(icsFile(rows),'leads-followups.ics');
+  toast(`${withFu.length} תזכורות יוצאו ליומן`)
+});
+
+$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null,tags:[...new Set(draftTags.map(t=>String(t).trim()).filter(Boolean))],follow_up_at:fromLocalInput($('detailFollowUp').value)}).eq('id',activeLeadId);btn.disabled=false;if(error){toast('שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
 $('detailStatus').addEventListener('change',()=>{$('detailStatusPill').className=`status-pill ${statusClass($('detailStatus').value)}`;$('detailStatusPill').textContent=statusLabel($('detailStatus').value)});
 $('copyPhoneBtn').addEventListener('click',async()=>{const l=leads.find(x=>x.id===activeLeadId);if(!l)return;try{await navigator.clipboard.writeText(l.phone||'');toast('הטלפון הועתק')}catch{toast(l.phone||'')}});
 
@@ -292,8 +506,29 @@ $('selectAll').addEventListener('change',()=>{const ids=filtered().map(l=>l.id);
 $('clearSelection').addEventListener('click',()=>{selectedIds.clear();render()});
 $('searchInput').addEventListener('input',render);
 $('filterBtn').addEventListener('click',e=>{e.stopPropagation();$('filterMenu').classList.toggle('show')});
+$('filterBtn').addEventListener('click',()=>$('dateMenu').classList.remove('show'));
 document.querySelectorAll('#filterMenu [data-filter]').forEach(btn=>btn.addEventListener('click',()=>{currentFilter=btn.dataset.filter;document.querySelectorAll('#filterMenu [data-filter]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$('filterBtn').classList.toggle('active',currentFilter!=='all');$('filterMenu').classList.remove('show');render()}));
 document.addEventListener('click',()=>$('filterMenu').classList.remove('show'));
+
+const RANGE_LABEL={all:'הכל',today:'היום','7d':'7 ימים אחרונים','30d':'30 ימים אחרונים',custom:'טווח מותאם'};
+function syncDateBtn(){$('dateBtn').classList.toggle('active',dateFilter!=='all')}
+$('dateBtn').addEventListener('click',e=>{e.stopPropagation();$('filterMenu').classList.remove('show');$('dateMenu').classList.toggle('show')});
+$('dateMenu').addEventListener('click',e=>e.stopPropagation());
+document.querySelectorAll('#dateMenu [data-range]').forEach(btn=>btn.addEventListener('click',()=>{
+  const r=btn.dataset.range;
+  document.querySelectorAll('#dateMenu [data-range]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+  $('dateCustom').classList.toggle('show',r==='custom');
+  if(r==='custom'){dateFilter='custom';syncDateBtn();return}
+  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();
+  toast(r==='all'?'הסינון לפי תאריך בוטל':'מציג: '+RANGE_LABEL[r])
+}));
+$('dateApply').addEventListener('click',()=>{
+  dateFromVal=$('dateFrom').value;dateToVal=$('dateTo').value;
+  if(dateFromVal&&dateToVal&&dateFromVal>dateToVal){toast('תאריך ההתחלה מאוחר מתאריך הסיום','bad');return}
+  if(!dateFromVal&&!dateToVal){toast('יש לבחור לפחות תאריך אחד','bad');return}
+  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();toast('הסינון הוחל')
+});
+document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
 $('refreshBtn').addEventListener('click',loadLeads);$('backToDashboard').addEventListener('click',back);
 
 $('settingsBtn').addEventListener('click',()=>{show($('settingsBackdrop'));document.body.classList.add('locked');$('passwordForm').reset();setError($('passwordError'),'')});
