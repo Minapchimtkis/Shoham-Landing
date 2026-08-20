@@ -50,7 +50,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 .toolbar{display:grid;grid-template-columns:1fr 46px;gap:9px;margin-bottom:18px}
 .search-wrap{position:relative}.search-icon{position:absolute;top:50%;right:13px;transform:translateY(-50%);color:#747d91;pointer-events:none}
-.search{width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 38px 0 13px;outline:none;font-size:13px}
+.search{width:100%;min-width:0;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 38px 0 13px;outline:none;font-size:13px}
 .filter-wrap{position:relative}.filter-icon-btn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;display:grid;place-items:center}
 .filter-icon-btn svg{width:20px;height:20px}.filter-icon-btn.active{color:#d7c6ff;border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.08)}
 .filter-menu{position:absolute;top:52px;left:0;z-index:30;width:150px;padding:7px;display:none;background:#111626;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.42)}
@@ -108,7 +108,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 @media(max-width:390px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.list-head,.lead-row{grid-template-columns:minmax(112px,1.42fr) 74px 88px 64px;gap:5px;padding-left:9px;padding-right:9px}.info-grid{grid-template-columns:1fr}.info-item:nth-child(odd){border-left:0}.detail-actions{grid-template-columns:1fr}}
 
 /* ===== תוספות: תגיות מהירות · סינון תאריכים · תזכורת ===== */
-.toolbar{grid-template-columns:1fr 46px 46px}
+.toolbar{grid-template-columns:minmax(0,1fr) 46px 46px}
 .date-wrap{position:relative}
 .date-icon-btn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;display:grid;place-items:center}
 .date-icon-btn svg{width:20px;height:20px}
@@ -144,20 +144,20 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .tag-chip.on{border-color:rgba(139,92,246,.42);background:rgba(139,92,246,.13);color:#dacaff}
 .tag-chip .x{font-weight:900;opacity:.65;font-size:12px;line-height:1}
 .tag-empty{color:var(--muted2);font-size:11px}
-.tag-add{display:grid;grid-template-columns:1fr 88px;gap:8px;margin-top:13px}
-.tag-add input{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 12px;font-size:12px;outline:none}
+.tag-add{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px;margin-top:13px}
+.tag-add input{min-width:0;height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 12px;font-size:12px;outline:none}
 .tag-add input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
 .tag-add button{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#e7e9ef;font-size:12px;font-weight:900}
 
-.fu-row{display:grid;grid-template-columns:1fr auto;gap:9px}
-.fu-input{width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.022);color:var(--text);padding:0 12px;outline:none;color-scheme:dark;font-size:13px}
+.fu-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center}
+.fu-input{width:100%;min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;text-align:right;height:46px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.022);color:var(--text);padding:0 12px;outline:none;color-scheme:dark;font-size:13px}
 .fu-input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
-.fu-clear{height:46px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:12px;font-weight:800}
+.fu-clear{flex:0 0 auto;white-space:nowrap;height:46px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:12px;font-weight:800}
 .fu-note{margin-top:10px;font-size:10px;font-weight:800;color:var(--muted2)}
 .fu-note.due{color:#ff9aa2}.fu-note.soon{color:#ffd57e}.fu-note.next{color:#a9cdff}
-.fu-dur{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin-top:13px}
+.fu-dur{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin-top:13px}
 .fu-dur .detail-label{margin:0;white-space:nowrap}
-.fu-dur select{height:42px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 10px;font-size:12px;outline:none}
+.fu-dur select{min-width:0;width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 10px;font-size:12px;outline:none}
 .ics-btn{width:100%;min-height:46px;margin-top:11px;border-radius:13px;border:1px solid transparent;background:linear-gradient(145deg,var(--purple),var(--purple2));color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px}
 .ics-btn svg{width:16px;height:16px}
 .ics-btn:disabled{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted2)}
@@ -173,7 +173,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .kebab-menu .danger{color:#ff8a93}.kebab-menu .danger svg{color:#ff6974}
 .kebab-menu .danger:hover{background:rgba(255,77,90,.07)}
 
-@media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:1fr 78px}}
+@media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:minmax(0,1fr) 78px}}
+@media(max-width:340px){.fu-row{grid-template-columns:minmax(0,1fr)}.fu-clear{width:100%}}
 </style>
 </head>
 <body>
