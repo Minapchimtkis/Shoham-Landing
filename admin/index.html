@@ -347,6 +347,10 @@ function inDateRange(iso){const{from,to}=dateRange();if(!from&&!to)return true;i
 function fuState(iso){if(!iso)return null;const d=new Date(iso);if(isNaN(d))return null;const now=new Date();if(d<now)return'due';const eod=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);return d<=eod?'soon':'next'}
 function toLocalInput(iso){if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
 function fromLocalInput(v){if(!v)return null;const d=new Date(v);return isNaN(d)?null:d.toISOString()}
+// PostgREST reports an unknown column as 42703, or PGRST204 when its schema
+// cache is the stale one. The save is the only write that touches tags /
+// follow_up_at, so name the missing migration instead of failing generically.
+function missingColumn(err){const c=err&&err.code;return c==='42703'||c==='PGRST204'||/column .* does not exist/i.test((err&&err.message)||'')}
 
 function show(el){el.classList.remove('hidden')} function hide(el){el.classList.add('hidden')}
 function toast(msg,type='ok'){const t=$('toast');t.textContent=msg;t.className=`toast ${type==='bad'?'bad':''}`;show(t);clearTimeout(t._timer);t._timer=setTimeout(()=>hide(t),2200)}
@@ -491,7 +495,7 @@ $('exportCalBtn').addEventListener('click',()=>{
   toast(`${withFu.length} תזכורות יוצאו ליומן`)
 });
 
-$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null,tags:[...new Set(draftTags.map(t=>String(t).trim()).filter(Boolean))],follow_up_at:fromLocalInput($('detailFollowUp').value)}).eq('id',activeLeadId);btn.disabled=false;if(error){toast('שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
+$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null,tags:[...new Set(draftTags.map(t=>String(t).trim()).filter(Boolean))],follow_up_at:fromLocalInput($('detailFollowUp').value)}).eq('id',activeLeadId);btn.disabled=false;if(error){console.error(error);toast(missingColumn(error)?'השמירה נכשלה · חסרות העמודות tags / follow_up_at בטבלה':'שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
 $('detailStatus').addEventListener('change',()=>{$('detailStatusPill').className=`status-pill ${statusClass($('detailStatus').value)}`;$('detailStatusPill').textContent=statusLabel($('detailStatus').value)});
 $('copyPhoneBtn').addEventListener('click',async()=>{const l=leads.find(x=>x.id===activeLeadId);if(!l)return;try{await navigator.clipboard.writeText(l.phone||'');toast('הטלפון הועתק')}catch{toast(l.phone||'')}});
 
