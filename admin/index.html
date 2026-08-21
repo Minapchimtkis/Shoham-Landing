@@ -50,7 +50,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 .toolbar{display:grid;grid-template-columns:1fr 46px;gap:9px;margin-bottom:18px}
 .search-wrap{position:relative}.search-icon{position:absolute;top:50%;right:13px;transform:translateY(-50%);color:#747d91;pointer-events:none}
-.search{width:100%;min-width:0;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 38px 0 13px;outline:none;font-size:13px}
+.search{width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 38px 0 13px;outline:none;font-size:13px}
 .filter-wrap{position:relative}.filter-icon-btn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;display:grid;place-items:center}
 .filter-icon-btn svg{width:20px;height:20px}.filter-icon-btn.active{color:#d7c6ff;border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.08)}
 .filter-menu{position:absolute;top:52px;left:0;z-index:30;width:150px;padding:7px;display:none;background:#111626;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.42)}
@@ -100,15 +100,15 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .confirm-backdrop,.settings-backdrop{position:fixed;inset:0;z-index:100;background:rgba(2,4,10,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .confirm-backdrop{display:grid;place-items:center;padding:20px}.confirm-dialog{width:min(100%,360px);border:1px solid var(--line2);border-radius:22px;background:linear-gradient(180deg,#161a29,#0e121e);padding:22px 18px 18px;box-shadow:var(--shadow);text-align:center}
 .confirm-icon{width:50px;height:50px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;border:1px solid rgba(255,77,90,.28);background:rgba(255,77,90,.07);color:#ff5a67;font-size:22px;font-weight:900}.confirm-dialog h2{margin:0;font-size:19px}.confirm-dialog p{margin:8px 0 0;color:#8f97aa;font-size:12px;line-height:1.65}.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
-.settings-backdrop{display:grid;place-items:center;padding:20px}.settings-sheet{width:min(100%,430px);border:1px solid var(--line2);border-radius:24px;background:linear-gradient(180deg,#161a29,#0e121e);padding:22px 18px 18px;box-shadow:var(--shadow)}
+.settings-backdrop{display:flex;align-items:flex-end;justify-content:center}.settings-sheet{width:100%;max-width:520px;border:1px solid var(--line2);border-radius:24px 24px 0 0;background:linear-gradient(180deg,#111626,#0b0f1b);padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
 .sheet-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:16px}.sheet-head h2{margin:0;font-size:20px}.sheet-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.close-btn{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:white}
 .toast{position:fixed;z-index:120;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));max-width:460px;margin:0 auto;background:#10241d;border:1px solid rgba(47,217,139,.28);color:#bdffdd;border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;text-align:center}.toast.bad{background:#2a1116;border-color:rgba(255,77,90,.3);color:#ffc5ca}
 
-@media(min-width:720px){.app-shell{padding-left:22px;padding-right:22px}.list-head,.lead-row{grid-template-columns:minmax(180px,1.6fr) 120px minmax(150px,1fr) 110px;padding-left:18px;padding-right:18px}}
+@media(min-width:720px){.app-shell{padding-left:22px;padding-right:22px}.list-head,.lead-row{grid-template-columns:minmax(180px,1.6fr) 120px minmax(150px,1fr) 110px;padding-left:18px;padding-right:18px}.settings-backdrop{align-items:center;padding:24px}.settings-sheet{border-radius:24px;padding:22px}}
 @media(max-width:390px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.list-head,.lead-row{grid-template-columns:minmax(112px,1.42fr) 74px 88px 64px;gap:5px;padding-left:9px;padding-right:9px}.info-grid{grid-template-columns:1fr}.info-item:nth-child(odd){border-left:0}.detail-actions{grid-template-columns:1fr}}
 
 /* ===== תוספות: תגיות מהירות · סינון תאריכים · תזכורת ===== */
-.toolbar{grid-template-columns:minmax(0,1fr) 46px 46px}
+.toolbar{grid-template-columns:1fr 46px 46px}
 .date-wrap{position:relative}
 .date-icon-btn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;display:grid;place-items:center}
 .date-icon-btn svg{width:20px;height:20px}
@@ -144,37 +144,59 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .tag-chip.on{border-color:rgba(139,92,246,.42);background:rgba(139,92,246,.13);color:#dacaff}
 .tag-chip .x{font-weight:900;opacity:.65;font-size:12px;line-height:1}
 .tag-empty{color:var(--muted2);font-size:11px}
-.tag-add{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:8px;margin-top:13px}
-.tag-add input{min-width:0;height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 12px;font-size:12px;outline:none}
+.tag-add{display:grid;grid-template-columns:1fr 88px;gap:8px;margin-top:13px}
+.tag-add input{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);padding:0 12px;font-size:12px;outline:none}
 .tag-add input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
 .tag-add button{height:43px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#e7e9ef;font-size:12px;font-weight:900}
 
-.fu-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center}
-.fu-input{width:100%;min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;text-align:right;height:46px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.022);color:var(--text);padding:0 12px;outline:none;color-scheme:dark;font-size:13px}
+.fu-row{display:grid;grid-template-columns:1fr auto;gap:9px}
+.fu-input{width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.022);color:var(--text);padding:0 12px;outline:none;color-scheme:dark;font-size:13px}
 .fu-input:focus{border-color:rgba(139,92,246,.42);box-shadow:0 0 0 3px rgba(139,92,246,.07)}
-.fu-clear{flex:0 0 auto;white-space:nowrap;height:46px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:12px;font-weight:800}
+.fu-clear{height:46px;padding:0 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#b8c0d0;font-size:12px;font-weight:800}
 .fu-note{margin-top:10px;font-size:10px;font-weight:800;color:var(--muted2)}
 .fu-note.due{color:#ff9aa2}.fu-note.soon{color:#ffd57e}.fu-note.next{color:#a9cdff}
-.fu-dur{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin-top:13px}
+.fu-dur{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;margin-top:13px}
 .fu-dur .detail-label{margin:0;white-space:nowrap}
-.fu-dur select{min-width:0;width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 10px;font-size:12px;outline:none}
+.fu-dur select{height:42px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 10px;font-size:12px;outline:none}
 .ics-btn{width:100%;min-height:46px;margin-top:11px;border-radius:13px;border:1px solid transparent;background:linear-gradient(145deg,var(--purple),var(--purple2));color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px}
 .ics-btn svg{width:16px;height:16px}
 .ics-btn:disabled{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted2)}
 .ics-hint{margin-top:9px;font-size:9px;line-height:1.6;color:var(--muted2)}
-/* ===== תפריט שלוש הנקודות ===== */
-.menu-wrap{position:relative}
-.detail-topbar .menu-wrap{width:40px;height:40px}
-.kebab-menu{position:absolute;top:46px;left:0;z-index:40;width:172px;padding:7px;display:none;background:#111626;border:1px solid var(--line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.42)}
-.kebab-menu.show{display:grid;gap:3px}
-.kebab-menu button{border:0;border-radius:10px;background:transparent;color:#cdd2dc;text-align:right;padding:11px 12px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:9px}
-.kebab-menu button:hover{background:rgba(255,255,255,.045)}
-.kebab-menu button svg{width:15px;height:15px;flex:0 0 auto;color:#8f97a8}
-.kebab-menu .danger{color:#ff8a93}.kebab-menu .danger svg{color:#ff6974}
-.kebab-menu .danger:hover{background:rgba(255,77,90,.07)}
+@media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:1fr 78px}}
 
-@media(max-width:390px){.row-tags{padding-right:0}.date-menu{width:196px}.tag-add{grid-template-columns:minmax(0,1fr) 78px}}
-@media(max-width:340px){.fu-row{grid-template-columns:minmax(0,1fr)}.fu-clear{width:100%}}
+/* ===== וואטסאפ · שעון תגובה · התראות ===== */
+.row-tags{align-items:center;gap:5px}
+.wa-mini{flex:0 0 auto;width:27px;height:27px;border-radius:9px;border:1px solid rgba(47,217,139,.28);background:rgba(47,217,139,.11);color:#8cf0bc;display:grid;place-items:center;padding:0}
+.wa-mini svg{width:15px;height:15px}
+.wa-block{margin-top:13px}
+.wa-select{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#101523;color:#fff;padding:0 11px;font-size:12px;outline:none}
+.wa-preview{margin-top:9px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.022);padding:12px;color:#c8cedb;font-size:11px;line-height:1.75;white-space:pre-wrap;max-height:150px;overflow:auto}
+.wa-btn{width:100%;min-height:46px;margin-top:9px;border-radius:13px;border:1px solid rgba(47,217,139,.32);background:rgba(47,217,139,.13);color:#8cf0bc;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+.wa-btn svg{width:17px;height:17px}
+.wa-btn:disabled,.wa-mini:disabled{opacity:.4;border-color:var(--line);background:rgba(255,255,255,.03);color:var(--muted2)}
+
+.age-chip{flex:0 0 auto;border-radius:999px;border:1px solid;padding:3px 7px;font-size:8px;font-weight:900;line-height:1.5;white-space:nowrap}
+.age-fresh{color:#8cf0bc;background:rgba(47,217,139,.10);border-color:rgba(47,217,139,.23)}
+.age-warm{color:#ffd57e;background:rgba(245,166,35,.11);border-color:rgba(245,166,35,.24)}
+.age-late{color:#ff9aa2;background:rgba(255,77,90,.10);border-color:rgba(255,77,90,.26);animation:agepulse 2.4s ease-in-out infinite}
+.age-past{color:var(--muted2);background:rgba(255,255,255,.03);border-color:var(--line)}
+@keyframes agepulse{0%,100%{opacity:1}50%{opacity:.55}}
+.lead-row.unseen{box-shadow:inset -3px 0 0 var(--purple)}
+
+.stat.stat-wide{grid-column:1/-1;min-height:0;display:flex;align-items:center;justify-content:space-between;text-align:right;padding:11px 14px}
+.stat-wide .stat-top{justify-content:flex-start}
+.stat-wide b{margin:0;font-size:19px}
+
+.filter-menu .menu-sep{height:1px;margin:5px 3px;background:var(--line)}
+.filter-menu .menu-title{color:var(--muted2);font-size:9px;font-weight:800;padding:2px 11px 4px}
+
+#refreshBtn{position:relative}
+.refresh-badge{position:absolute;top:-6px;left:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--red);color:#fff;font-size:9px;font-weight:900;display:grid;place-items:center;border:2px solid var(--bg)}
+
+.notify-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;padding:12px 13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.022)}
+.notify-row b{display:block;font-size:12px}
+.notify-row span{display:block;margin-top:4px;color:var(--muted2);font-size:10px}
+.notify-row .btn{min-height:38px;padding:0 14px;font-size:12px}
 </style>
 </head>
 <body>
@@ -200,10 +222,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <div class="top-actions">
     <button id="refreshBtn" class="icon-btn"><svg viewBox="0 0 24 24"><path d="M19 7v5h-5M5 17v-5h5M18.2 9A7 7 0 0 0 6.7 6.7L5 8M5.8 15A7 7 0 0 0 17.3 17.3L19 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
     <button id="exportCalBtn" class="icon-btn" title="ייצוא כל התזכורות ליומן"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17M12 13.2v4.4M9.9 15.5l2.1 2.1 2.1-2.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <div class="menu-wrap">
-      <button id="settingsBtn" class="icon-btn" title="תפריט"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
-      <div id="settingsMenu" class="kebab-menu"><button type="button" data-act="password"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11.4 12H20M17.2 12v3M14.4 12v2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>שנה סיסמה</button><button type="button" data-act="logout" class="danger"><svg viewBox="0 0 24 24"><path d="M14.5 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v11.6a1.7 1.7 0 0 0 1.7 1.7h8.3M18 8.6 21.4 12 18 15.4M21 12h-9.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>התנתקות</button></div>
-    </div>
+    <button id="settingsBtn" class="icon-btn avatar">ש</button>
   </div>
 </header>
 
@@ -212,6 +231,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>חדשים</div><b id="statNew">0</b><small>ממתינים</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>נוצר קשר</div><b id="statContacted">0</b><small>בטיפול</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>נסגרו</div><b id="statClosed">0</b><small>טופלו</small></div>
+  <div class="stat stat-wide"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>זמן תגובה חציוני</div><b id="statResponse">—</b></div>
 </section>
 
 <section class="toolbar">
@@ -220,6 +240,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
     <button id="filterBtn" class="filter-icon-btn"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <div id="filterMenu" class="filter-menu">
       <button data-filter="all" class="active">הכל</button><button data-filter="new">חדש</button><button data-filter="contacted">נוצר קשר</button><button data-filter="closed">נסגר</button>
+      <div class="menu-sep"></div><div class="menu-title">מיון</div>
+      <button data-sort="new" class="active">חדשים ראשונים</button><button data-sort="waiting">הכי ממתינים</button>
     </div>
   </div>
   <div class="date-wrap">
@@ -259,16 +281,18 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
   <header class="detail-topbar">
     <button id="backToDashboard" class="back-btn"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <div class="detail-title"><b>פרטי ליד</b><small id="detailReceived">—</small></div>
-    <div class="menu-wrap">
-      <button id="detailMenuBtn" class="detail-menu" title="תפריט"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
-      <div id="detailMenu" class="kebab-menu"><button type="button" data-act="password"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11.4 12H20M17.2 12v3M14.4 12v2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>שנה סיסמה</button><button type="button" data-act="logout" class="danger"><svg viewBox="0 0 24 24"><path d="M14.5 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v11.6a1.7 1.7 0 0 0 1.7 1.7h8.3M18 8.6 21.4 12 18 15.4M21 12h-9.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>התנתקות</button></div>
-    </div>
+    <button class="detail-menu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg></button>
   </header>
 
   <section class="hero">
     <div class="hero-top"><div><div id="detailName" class="hero-name">—</div><div id="detailPhoneText" class="hero-phone">—</div></div><span id="detailStatusPill" class="status-pill status-new">חדש</span></div>
     <div class="quick-actions">
       <a id="detailCall" class="quick-btn primary" href="#">חיוג</a><button id="copyPhoneBtn" class="quick-btn">העתק טלפון</button>
+    </div>
+    <div class="wa-block">
+      <select id="waTemplate" class="wa-select"></select>
+      <div id="waPreview" class="wa-preview">—</div>
+      <button id="waSendBtn" class="wa-btn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.03c-.25.69-1.43 1.31-1.98 1.4-.53.08-1.19.11-1.92-.12-.44-.14-1.01-.33-1.74-.64-3.06-1.32-5.06-4.4-5.21-4.6-.15-.2-1.25-1.66-1.25-3.17s.79-2.25 1.07-2.56c.28-.31.61-.38.81-.38h.58c.19 0 .44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.5-.15.18-.31.39-.45.53-.15.15-.3.31-.13.61.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.3 2.36 1.45.3.15.47.13.65-.08.18-.2.75-.87.95-1.18.2-.3.4-.25.67-.15.28.1 1.76.83 2.06.98.3.15.5.23.57.35.08.13.08.71-.17 1.4z"/></svg>שליחה בוואטסאפ</button>
     </div>
   </section>
 
@@ -279,6 +303,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
       <div class="info-item"><label>תאריך</label><strong id="detailDate">—</strong></div>
       <div class="info-item"><label>שעה</label><strong id="detailTime">—</strong></div>
       <div class="info-item"><label>שפה</label><strong id="detailLang">—</strong></div>
+      <div class="info-item"><label>זמן תגובה</label><strong id="detailWait">—</strong></div>
+      <div class="info-item"><label>מקור</label><strong id="detailSource">—</strong></div>
     </div>
   </section>
 
@@ -320,7 +346,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 <div id="settingsBackdrop" class="settings-backdrop hidden">
   <div class="settings-sheet">
-    <div class="sheet-head"><div><h2>שינוי סיסמה</h2><p>יש להזין את הסיסמה הנוכחית לאימות</p></div><button id="closeSettings" class="close-btn">×</button></div>
+    <div class="sheet-head"><div><h2>אבטחה והגדרות</h2><p>שינוי סיסמה או יציאה מהמערכת</p></div><button id="closeSettings" class="close-btn">×</button></div>
+    <div id="notifyRow" class="notify-row"><div><b>התראות דפדפן</b><span id="notifyState">—</span></div><button id="notifyPermBtn" class="btn" type="button">הפעלה</button></div>
     <form id="passwordForm">
       <div class="field"><label>סיסמה נוכחית</label><input id="currentPassword" class="input" type="password" required></div>
       <div class="field"><label>סיסמה חדשה</label><input id="newPassword" class="input" type="password" minlength="10" required></div>
@@ -328,6 +355,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
       <div id="passwordError" class="error hidden"></div>
       <button id="passwordBtn" class="btn btn-primary btn-block">שינוי סיסמה</button>
     </form>
+    <button id="logoutBtn" class="btn btn-danger btn-block">יציאה מהמערכת</button>
   </div>
 </div>
 
@@ -350,6 +378,9 @@ const TAG_CLS=Object.fromEntries(QUICK_TAGS.map(t=>[t.label,t.cls]));
 const ICON_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.2v5l3 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICON_CAL='<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[];
+let currentSort='new',realtimeChannel=null,newCount=0,ageTimer=null;
+const openedIds=new Set();
+let seenBaseline='';try{seenBaseline=localStorage.getItem('leadsLastSeen')||''}catch{}
 function tagCls(t){return TAG_CLS[t]||''}
 function leadTags(l){return Array.isArray(l?.tags)?l.tags.filter(t=>String(t||'').trim()):[]}
 function dateRange(){
@@ -364,10 +395,6 @@ function inDateRange(iso){const{from,to}=dateRange();if(!from&&!to)return true;i
 function fuState(iso){if(!iso)return null;const d=new Date(iso);if(isNaN(d))return null;const now=new Date();if(d<now)return'due';const eod=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);return d<=eod?'soon':'next'}
 function toLocalInput(iso){if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
 function fromLocalInput(v){if(!v)return null;const d=new Date(v);return isNaN(d)?null:d.toISOString()}
-// PostgREST reports an unknown column as 42703, or PGRST204 when its schema
-// cache is the stale one. The save is the only write that touches tags /
-// follow_up_at, so name the missing migration instead of failing generically.
-function missingColumn(err){const c=err&&err.code;return c==='42703'||c==='PGRST204'||/column .* does not exist/i.test((err&&err.message)||'')}
 
 function show(el){el.classList.remove('hidden')} function hide(el){el.classList.add('hidden')}
 function toast(msg,type='ok'){const t=$('toast');t.textContent=msg;t.className=`toast ${type==='bad'?'bad':''}`;show(t);clearTimeout(t._timer);t._timer=setTimeout(()=>hide(t),2200)}
@@ -375,8 +402,8 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await loadLeads();if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000)}
-function setLoggedOut(){currentUser=null;hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await loadLeads();startRealtime();if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000)}
+function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();setError($('loginError'),'');$('loginBtn').disabled=true;$('loginBtn').textContent='מתחבר...';const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const{data,error}=await supabase.auth.signInWithPassword({email,password});$('loginBtn').disabled=false;$('loginBtn').textContent='כניסה למערכת';if(error){setError($('loginError'),'האימייל או הסיסמה אינם נכונים.');return}await setLoggedIn(data.user)});
@@ -387,8 +414,8 @@ async function loadLeads(){
   hide($('loadingState'));if(error){console.error(error);toast('לא ניתן לטעון את הפניות','bad');return}
   leads=data||[];selectedIds=new Set([...selectedIds].filter(id=>leads.some(l=>l.id===id)));render();if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderDetail(activeLeadId)
 }
-function filtered(){const q=$('searchInput').value.trim().toLowerCase();return leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))))}
-function updateStats(){$('statTotal').textContent=leads.length;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length}
+function filtered(){const q=$('searchInput').value.trim().toLowerCase();const out=leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))));if(currentSort==='waiting')out.sort((a,b)=>{const au=a.first_contact_at?1:0,bu=b.first_contact_at?1:0;return au!==bu?au-bu:new Date(a.created_at||0)-new Date(b.created_at||0)});return out}
+function updateStats(){$('statTotal').textContent=leads.length;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length;$('statResponse').textContent=medianResponse()}
 function syncSelection(){const n=selectedIds.size;$('bulkCount').textContent=`${n} נבחרו`;$('bulkBar').classList.toggle('show',n>0);const ids=filtered().map(l=>l.id);$('selectAll').checked=ids.length>0&&ids.every(id=>selectedIds.has(id))}
 function render(){
   updateStats();const items=filtered();$('leadList').replaceChildren();if(!items.length){show($('emptyState'));syncSelection();return}hide($('emptyState'));
@@ -401,26 +428,30 @@ function render(){
     if(fs){const chip=document.createElement('span');chip.className=`fu-chip fu-${fs}`;chip.title='תזכורת: '+parts(lead.follow_up_at).full;
       chip.innerHTML=fs==='next'?ICON_CAL:ICON_CLOCK;const t=document.createElement('span');t.textContent=fs==='due'?'באיחור':fs==='soon'?'היום':parts(lead.follow_up_at).date;chip.append(t);nameWrap.append(chip)}
     person.append(nameWrap);
+    const meta=document.createElement('div');meta.className='row-tags';
+    const waBtn=waMiniBtn(lead);if(waBtn)meta.append(waBtn);
+    const ac=ageChip(lead);if(ac)meta.append(ac);
     const tags=leadTags(lead);
-    if(tags.length){const tw=document.createElement('div');tw.className='row-tags';
-      tags.slice(0,3).forEach(t=>{const b=document.createElement('span');b.className=`row-tag ${tagCls(t)}`.trim();b.textContent=t;b.title=t;tw.append(b)});
-      if(tags.length>3){const more=document.createElement('span');more.className='row-tag t-more';more.textContent=`+${tags.length-3}`;tw.append(more)}
-      person.append(tw)}
+    tags.slice(0,3).forEach(t=>{const b=document.createElement('span');b.className=`row-tag ${tagCls(t)}`.trim();b.textContent=t;b.title=t;meta.append(b)});
+    if(tags.length>3){const more=document.createElement('span');more.className='row-tag t-more';more.textContent=`+${tags.length-3}`;meta.append(more)}
+    if(meta.childElementCount)person.append(meta);
+    if(isUnseen(lead))row.classList.add('unseen');
     const sCell=document.createElement('div');sCell.className='status-cell';const pill=document.createElement('span');pill.className=`status-pill ${statusClass(lead.status||'new')}`;pill.textContent=statusLabel(lead.status||'new');sCell.append(pill);
     const phone=document.createElement('div');phone.className='phone-cell';phone.textContent=lead.phone||'—';
     const p=parts(lead.created_at);const date=document.createElement('div');date.className='date-cell';date.innerHTML=`${p.date}<br>${p.time}`;
     row.append(person,sCell,phone,date);row.addEventListener('click',()=>openLead(lead.id));$('leadList').append(row);
-  }syncSelection()
+  }syncSelection();markSeen()
 }
 
-function openLead(id){activeLeadId=id;renderDetail(id);hide($('dashboardView'));show($('detailView'));window.scrollTo({top:0,behavior:'instant'})}
+function openLead(id){activeLeadId=id;openedIds.add(id);renderDetail(id);hide($('dashboardView'));show($('detailView'));window.scrollTo({top:0,behavior:'instant'})}
 function back(){activeLeadId=null;hide($('detailView'));show($('dashboardView'));window.scrollTo({top:0,behavior:'instant'})}
 function renderDetail(id){
   const l=leads.find(x=>x.id===id);if(!l)return;const p=parts(l.created_at);
   $('detailReceived').textContent=p.full;$('detailName').textContent=l.name||'—';$('detailPhoneText').textContent=l.phone||'—';$('detailInfoName').textContent=l.name||'—';$('detailInfoPhone').textContent=l.phone||'—';$('detailDate').textContent=p.date;$('detailTime').textContent=p.time;$('detailLang').textContent=l.page_lang==='en'?'English':'עברית';$('detailMessage').textContent=l.message||'ללא הודעה';$('detailStatus').value=l.status||'new';$('detailNotes').value=l.admin_notes||'';
   $('detailStatusPill').className=`status-pill ${statusClass(l.status||'new')}`;$('detailStatusPill').textContent=statusLabel(l.status||'new');$('detailCall').href='tel:'+String(l.phone||'').replace(/[^\d+]/g,'');
   $('detailConsentText').textContent=l.consent?'הלקוח אישר את תנאי מדיניות הפרטיות בעת שליחת הטופס.':'לא תועדה הסכמה.';$('detailConsentIcon').textContent=l.consent?'✓':'!';$('detailConsentMeta').textContent=l.consent_at?'אושר ב־'+parts(l.consent_at).full:'—';
-  draftTags=[...leadTags(l)];renderTags();$('tagInput').value='';$('detailFollowUp').value=toLocalInput(l.follow_up_at);updateFuNote()
+  draftTags=[...leadTags(l)];renderTags();$('tagInput').value='';$('detailFollowUp').value=toLocalInput(l.follow_up_at);updateFuNote();
+  $('detailWait').textContent=waitText(l);$('detailSource').textContent=l.source||'ישיר';syncWa(l)
 }
 
 function renderTags(){
@@ -512,7 +543,7 @@ $('exportCalBtn').addEventListener('click',()=>{
   toast(`${withFu.length} תזכורות יוצאו ליומן`)
 });
 
-$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null,tags:[...new Set(draftTags.map(t=>String(t).trim()).filter(Boolean))],follow_up_at:fromLocalInput($('detailFollowUp').value)}).eq('id',activeLeadId);btn.disabled=false;if(error){console.error(error);toast(missingColumn(error)?'השמירה נכשלה · חסרות העמודות tags / follow_up_at בטבלה':'שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
+$('saveLeadBtn').addEventListener('click',async()=>{if(activeLeadId==null)return;const btn=$('saveLeadBtn');btn.disabled=true;const{error}=await supabase.from('leads').update({status:$('detailStatus').value,admin_notes:$('detailNotes').value.trim()||null,tags:[...new Set(draftTags.map(t=>String(t).trim()).filter(Boolean))],follow_up_at:fromLocalInput($('detailFollowUp').value)}).eq('id',activeLeadId);btn.disabled=false;if(error){toast('שמירת השינויים נכשלה','bad');return}toast('השינויים נשמרו');await loadLeads()});
 $('detailStatus').addEventListener('change',()=>{$('detailStatusPill').className=`status-pill ${statusClass($('detailStatus').value)}`;$('detailStatusPill').textContent=statusLabel($('detailStatus').value)});
 $('copyPhoneBtn').addEventListener('click',async()=>{const l=leads.find(x=>x.id===activeLeadId);if(!l)return;try{await navigator.clipboard.writeText(l.phone||'');toast('הטלפון הועתק')}catch{toast(l.phone||'')}});
 
@@ -552,29 +583,187 @@ $('dateApply').addEventListener('click',()=>{
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
 $('refreshBtn').addEventListener('click',loadLeads);$('backToDashboard').addEventListener('click',back);
 
-/* ===== תפריט שלוש הנקודות · שינוי סיסמה / התנתקות ===== */
-function closeKebabs(){document.querySelectorAll('.kebab-menu.show').forEach(m=>m.classList.remove('show'))}
-function openSettings(){closeKebabs();show($('settingsBackdrop'));document.body.classList.add('locked');$('passwordForm').reset();setError($('passwordError'),'')}
-function closeSettings(){hide($('settingsBackdrop'));document.body.classList.remove('locked')}
-async function doLogout(){closeKebabs();await supabase.auth.signOut();closeSettings();setLoggedOut()}
-// Both kebabs — the dashboard topbar and the lead detail header — drive the
-// same two actions, so they are wired from one place.
-function wireKebab(btnId,menuId){
-  const btn=$(btnId),menu=$(menuId);
-  btn.addEventListener('click',e=>{e.stopPropagation();const wasOpen=menu.classList.contains('show');closeKebabs();$('filterMenu').classList.remove('show');$('dateMenu').classList.remove('show');menu.classList.toggle('show',!wasOpen)});
-  menu.addEventListener('click',e=>e.stopPropagation());
-  menu.querySelectorAll('[data-act]').forEach(item=>item.addEventListener('click',()=>{item.dataset.act==='logout'?doLogout():openSettings()}));
-}
-wireKebab('settingsBtn','settingsMenu');wireKebab('detailMenuBtn','detailMenu');
-document.addEventListener('click',closeKebabs);
-$('closeSettings').addEventListener('click',closeSettings);
-$('settingsBackdrop').addEventListener('click',e=>{if(e.target===$('settingsBackdrop'))closeSettings()});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;closeKebabs();if(!$('settingsBackdrop').classList.contains('hidden'))closeSettings()});
+$('settingsBtn').addEventListener('click',()=>{show($('settingsBackdrop'));document.body.classList.add('locked');$('passwordForm').reset();setError($('passwordError'),'')});
+$('closeSettings').addEventListener('click',()=>{hide($('settingsBackdrop'));document.body.classList.remove('locked')});
 $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();const current=$('currentPassword').value,next=$('newPassword').value,confirm=$('confirmPassword').value;setError($('passwordError'),'');if(next.length<10){setError($('passwordError'),'הסיסמה החדשה חייבת להכיל לפחות 10 תווים.');return}if(next!==confirm){setError($('passwordError'),'אימות הסיסמה החדשה אינו תואם.');return}
   const{error:reauth}=await supabase.auth.signInWithPassword({email:currentUser.email,password:current});if(reauth){setError($('passwordError'),'הסיסמה הנוכחית אינה נכונה.');return}
-  const{error}=await supabase.auth.updateUser({password:next});if(error){setError($('passwordError'),'לא ניתן לעדכן את הסיסמה כרגע.');return}closeSettings();toast('הסיסמה שונתה בהצלחה')
+  const{error}=await supabase.auth.updateUser({password:next});if(error){setError($('passwordError'),'לא ניתן לעדכן את הסיסמה כרגע.');return}hide($('settingsBackdrop'));document.body.classList.remove('locked');toast('הסיסמה שונתה בהצלחה')
 });
+$('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();hide($('settingsBackdrop'));document.body.classList.remove('locked');setLoggedOut()});
 supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')setLoggedOut();if(session?.user)currentUser=session.user});
+/* ==================================================================
+   תוספת: וואטסאפ מהיר · שעון זמן תגובה · התראה על ליד חדש
+   ================================================================== */
+
+/* --- 1. וואטסאפ --- */
+const WA_TEMPLATES=[
+  {name:'פנייה ראשונה',text:l=>`היי ${first(l)}, מדבר שוהם 👋\nראיתי שהשארת פרטים באתר, ואני חוזר אליך כמו שהבטחתי.\nמתי נוח לך שנדבר כמה דקות? אני פנוי היום ומחר.`},
+  {name:'תזכורת אחרי אי מענה',text:l=>`היי ${first(l)}, ניסיתי לתפוס אותך ולא הצלחתי.\nלא רוצה להעיק, רק לוודא שלא נפלת בין הכיסאות.\nאם עדיין רלוונטי, תכתוב לי מתי נוח ואתאים את עצמי.`},
+  {name:'שליחת הצעה',text:l=>`היי ${first(l)}, כמו שדיברנו אני שולח לך את הפרטים על הליווי.\nתעבור על זה בנחת, וכל שאלה שתעלה לך פשוט תכתוב לי לכאן.`}
+];
+function first(l){return String(l?.name||'').trim().split(/\s+/)[0]||'לך'}
+function waPhone(raw){
+  let d=String(raw||'').replace(/\D/g,'');
+  if(!d)return null;
+  if(d.startsWith('972'))d=d.slice(3).replace(/^0/,'');
+  else d=d.replace(/^0/,'');
+  if(d.length<8||d.length>9)return null;
+  return '972'+d
+}
+function waText(l,i){const t=WA_TEMPLATES[i]||WA_TEMPLATES[0];return t.text(l)}
+function openWa(lead,i){
+  const p=waPhone(lead?.phone);
+  if(!p){toast('מספר הטלפון אינו תקין לוואטסאפ','bad');return}
+  window.open(`https://wa.me/${p}?text=${encodeURIComponent(waText(lead,i))}`,'_blank','noopener');
+  stampFirstContact(lead)
+}
+function waMiniBtn(lead){
+  if(!waPhone(lead?.phone))return null;
+  const b=document.createElement('button');b.type='button';b.className='wa-mini';b.title='שליחת הודעת פתיחה בוואטסאפ';
+  b.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.03c-.25.69-1.43 1.31-1.98 1.4-.53.08-1.19.11-1.92-.12-.44-.14-1.01-.33-1.74-.64-3.06-1.32-5.06-4.4-5.21-4.6-.15-.2-1.25-1.66-1.25-3.17s.79-2.25 1.07-2.56c.28-.31.61-.38.81-.38h.58c.19 0 .44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.5-.15.18-.31.39-.45.53-.15.15-.3.31-.13.61.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.3 2.36 1.45.3.15.47.13.65-.08.18-.2.75-.87.95-1.18.2-.3.4-.25.67-.15.28.1 1.76.83 2.06.98.3.15.5.23.57.35.08.13.08.71-.17 1.4z"/></svg>';
+  b.addEventListener('click',e=>{e.stopPropagation();openWa(lead,0)});
+  return b
+}
+function syncWa(l){
+  const ok=!!waPhone(l?.phone);
+  $('waSendBtn').disabled=!ok;
+  $('waPreview').textContent=ok?waText(l,Number($('waTemplate').value)||0):'אין מספר טלפון תקין לשליחה בוואטסאפ';
+}
+WA_TEMPLATES.forEach((t,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=t.name;$('waTemplate').append(o)});
+$('waTemplate').addEventListener('change',()=>{const l=leads.find(x=>x.id===activeLeadId);if(l)syncWa(l)});
+$('waSendBtn').addEventListener('click',()=>{const l=leads.find(x=>x.id===activeLeadId);if(l)openWa(l,Number($('waTemplate').value)||0)});
+$('detailCall').addEventListener('click',()=>{const l=leads.find(x=>x.id===activeLeadId);if(l)stampFirstContact(l)});
+
+async function stampFirstContact(lead){
+  if(!lead||lead.first_contact_at)return;
+  const now=new Date().toISOString(),wasNew=(lead.status||'new')==='new';
+  lead.first_contact_at=now;if(wasNew)lead.status='contacted';
+  render();
+  if(activeLeadId===lead.id){
+    $('detailWait').textContent=waitText(lead);
+    if(wasNew){$('detailStatus').value='contacted';$('detailStatusPill').className='status-pill '+statusClass('contacted');$('detailStatusPill').textContent=statusLabel('contacted')}
+  }
+  const patch={first_contact_at:now};if(wasNew)patch.status='contacted';
+  const{error}=await supabase.from('leads').update(patch).eq('id',lead.id);
+  if(error){console.error(error);toast('לא ניתן לעדכן את זמן המגע','bad');return}
+  if(wasNew)toast('הסטטוס עודכן ל"נוצר קשר"')
+}
+
+/* --- 2. שעון זמן תגובה --- */
+function fmtDur(ms){
+  const m=Math.max(1,Math.round(ms/60000));
+  if(m<60)return`${m} דק'`;
+  const h=Math.round(m/60);if(h<24)return h===1?'שעה':`${h} שע'`;
+  const d=Math.round(h/24);return d===1?'יום':`${d} ימים`
+}
+function paintAge(el){
+  const c=el.dataset.created?new Date(el.dataset.created):null;
+  if(!c||isNaN(c))return false;
+  const f=el.dataset.contact?new Date(el.dataset.contact):null;
+  if(f&&!isNaN(f)){
+    const d=f-c;if(d<864e5)return false;
+    el.className='age-chip age-past';el.textContent='תגובה: '+fmtDur(d);return true
+  }
+  const d=Date.now()-c.getTime();
+  el.className='age-chip '+(d<36e5?'age-fresh':d<864e5?'age-warm':'age-late');
+  el.textContent='ממתין '+fmtDur(d);return true
+}
+function ageChip(lead){
+  const el=document.createElement('span');
+  el.dataset.created=lead.created_at||'';el.dataset.contact=lead.first_contact_at||'';
+  el.title='זמן מרגע קבלת הליד';
+  return paintAge(el)?el:null
+}
+function waitText(l){
+  if(!l?.created_at)return'—';
+  if(l.first_contact_at){const d=new Date(l.first_contact_at)-new Date(l.created_at);return d>=0?'תוך '+fmtDur(d):'—'}
+  return'ממתין '+fmtDur(Date.now()-new Date(l.created_at).getTime())
+}
+function medianResponse(){
+  const a=leads.map(l=>(l.first_contact_at&&l.created_at)?new Date(l.first_contact_at)-new Date(l.created_at):null).filter(v=>v!=null&&v>=0).sort((x,y)=>x-y);
+  if(!a.length)return'—';
+  const mid=Math.floor(a.length/2);
+  return fmtDur(a.length%2?a[mid]:(a[mid-1]+a[mid])/2)
+}
+if(!ageTimer)ageTimer=setInterval(()=>document.querySelectorAll('.age-chip[data-created]').forEach(paintAge),60000);
+document.querySelectorAll('#filterMenu [data-sort]').forEach(btn=>btn.addEventListener('click',()=>{
+  currentSort=btn.dataset.sort;
+  document.querySelectorAll('#filterMenu [data-sort]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+  $('filterMenu').classList.remove('show');render()
+}));
+
+/* --- 3. התראה על ליד חדש --- */
+function isUnseen(l){
+  if(!seenBaseline||!l?.created_at||openedIds.has(l.id))return false;
+  const t=new Date(l.created_at).getTime(),b=new Date(seenBaseline).getTime();
+  return !isNaN(t)&&!isNaN(b)&&t>b
+}
+function markSeen(){try{localStorage.setItem('leadsLastSeen',new Date().toISOString())}catch{}}
+function refreshBadge(){
+  const btn=$('refreshBtn');let b=btn.querySelector('.refresh-badge');
+  if(!newCount){b&&b.remove();return}
+  if(!b){b=document.createElement('span');b.className='refresh-badge';btn.append(b)}
+  b.textContent=newCount>9?'9+':String(newCount)
+}
+function beep(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.setValueAtTime(880,ctx.currentTime);o.frequency.setValueAtTime(1320,ctx.currentTime+.14);
+    g.gain.setValueAtTime(.0001,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.22,ctx.currentTime+.03);
+    g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.5);
+    o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.55);
+    setTimeout(()=>{try{ctx.close()}catch{}},900)
+  }catch{}
+}
+const NOTIFY_OK=(()=>{try{return typeof window.Notification==='function'&&typeof window.Notification.requestPermission==='function'}catch{return false}})();
+function notifyPerm(){try{return NOTIFY_OK?window.Notification.permission:'unsupported'}catch{return'unsupported'}}
+function notifyNewLead(row){
+  const name=row.name||'ללא שם';
+  toast('ליד חדש: '+name);
+  const t=$('toast');clearTimeout(t._timer);t._timer=setTimeout(()=>hide(t),6000);
+  beep();
+  try{
+    if(notifyPerm()==='granted'){
+      const n=new window.Notification('ליד חדש: '+name,{body:String(row.message||row.phone||'').split('\n')[0].slice(0,120),tag:'lead-'+row.id,lang:'he'});
+      n.onclick=()=>{window.focus();n.close()}
+    }
+  }catch{}
+}
+function startRealtime(){
+  if(realtimeChannel)return;
+  try{
+    realtimeChannel=supabase.channel('leads-live')
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'leads'},payload=>{
+        const row=payload?.new;if(!row||leads.some(l=>l.id===row.id))return;
+        leads.unshift(row);newCount++;refreshBadge();render();notifyNewLead(row)
+      }).subscribe()
+  }catch(e){console.error('realtime',e)}
+}
+function stopRealtime(){
+  if(!realtimeChannel)return;
+  try{supabase.removeChannel(realtimeChannel)}catch{}
+  realtimeChannel=null;newCount=0;refreshBadge()
+}
+$('refreshBtn').addEventListener('click',()=>{newCount=0;refreshBadge()});
+function syncNotifyRow(){
+  const row=$('notifyRow'),p=notifyPerm();
+  if(p==='unsupported'){hide(row);return}
+  show(row);
+  $('notifyState').textContent=p==='granted'?'פעילות · תקבל התראה על כל ליד חדש':p==='denied'?'חסומות בהגדרות הדפדפן':'עדיין לא הופעלו';
+  $('notifyPermBtn').disabled=p!=='default';
+  $('notifyPermBtn').textContent=p==='granted'?'פעיל':'הפעלה'
+}
+$('notifyPermBtn').addEventListener('click',async()=>{
+  if(!NOTIFY_OK)return;
+  try{await window.Notification.requestPermission()}catch{}
+  syncNotifyRow();
+  if(notifyPerm()==='granted')toast('ההתראות הופעלו')
+});
+$('settingsBtn').addEventListener('click',syncNotifyRow);
+syncNotifyRow();
+
 bootstrap();
 </script>
 </body>
