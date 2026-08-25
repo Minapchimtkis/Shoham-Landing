@@ -188,6 +188,9 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .qz-none{color:var(--muted2);font-size:11px}
 .row-src{flex:0 0 auto;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--muted2);font-size:8px;font-weight:900;padding:3px 7px;line-height:1.5;white-space:nowrap}
 .row-src.quiz{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
+.row-src.wa{color:#8cf0bc;border-color:rgba(47,217,139,.28);background:rgba(47,217,139,.11)}
+.wa-note{margin-bottom:14px;border:1px solid rgba(47,217,139,.22);border-radius:13px;background:rgba(47,217,139,.07);color:#8cf0bc;font-size:11px;font-weight:800;line-height:1.6;padding:11px 13px}
+.wa-line{display:flex;align-items:center;gap:8px;color:#8cf0bc;font-size:11.5px;font-weight:800;margin-top:11px;padding:10px 12px;border:1px solid rgba(47,217,139,.22);border-radius:12px;background:rgba(47,217,139,.06)}
 .row-src.dupe{color:#ffd57e;border-color:rgba(245,166,35,.26);background:rgba(245,166,35,.11)}
 .dupe-note{margin:0 0 11px;border:1px solid rgba(245,166,35,.24);border-radius:12px;background:rgba(245,166,35,.08);color:#ffd57e;font-size:10px;font-weight:800;line-height:1.6;padding:9px 11px}
 .link-btn{width:100%;min-height:44px;margin-top:11px;border-radius:13px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:#dce0e8;font-size:12px;font-weight:900}
@@ -274,6 +277,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 </div>
 
 <div id="leadsPane">
+<div id="waNote" class="wa-note hidden"></div>
 <section class="stats">
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>סה״כ</div><b id="statTotal">0</b><small>כל הלידים</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>חדשים</div><b id="statNew">0</b><small>ממתינים</small></div>
@@ -393,6 +397,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
     </div>
   </section>
 
+  <div id="detailWa" class="wa-line hidden"></div>
+
   <section class="detail-section"><div class="detail-section-head"><strong>תוצאות שאלון</strong><span>מה הוא ענה</span></div>
     <div class="qz-wrap">
       <div id="leadQuiz"></div>
@@ -445,7 +451,7 @@ const QUICK_TAGS=[{label:'לא ענה',cls:'t-amber'},{label:'פגישה נקב�
 const TAG_CLS=Object.fromEntries(QUICK_TAGS.map(t=>[t.label,t.cls]));
 const ICON_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.2v5l3 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICON_CAL='<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[];
+let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[],waClicks=[];
 let currentSort='new',realtimeChannel=null,newCount=0,ageTimer=null;
 const openedIds=new Set();
 let seenBaseline='';try{seenBaseline=localStorage.getItem('leadsLastSeen')||''}catch{}
@@ -470,7 +476,7 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz()]);startRealtime();if(!refreshTimer)refreshTimer=setInterval(()=>{loadLeads();loadQuiz()},60000)}
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa()]);startRealtime();if(!refreshTimer)refreshTimer=setInterval(()=>{loadLeads();loadQuiz();loadWa()},60000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -484,6 +490,33 @@ async function loadLeads(){
 }
 const QUIZ_KIND={single:'קצר · יחיד',couple:'קצר · זוג',assessment:'עומק'};
 function scoreClass(n){return n>=75?'s-hi':n>=50?'s-mid':n>=25?'s-low':'s-min'}
+
+// Someone who chose WhatsApp instead of the form leaves a click here. It
+// carries a lead when they gave their details, and nothing when they skipped.
+async function loadWa(){
+  if(!currentUser)return;
+  const{data,error}=await supabase.from('wa_clicks').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);return}
+  // The list may already have been drawn before these arrived, so redraw it
+  // to bring in the chips.
+  waClicks=data||[];renderWaNote();render();if(activeLeadId!=null)renderDetailWa(activeLeadId)
+}
+function waFor(id){const ids=partyOf(id).map(l=>l.id);return waClicks.filter(c=>ids.includes(c.lead_id))}
+function renderWaNote(){
+  const midnight=new Date();midnight.setHours(0,0,0,0);
+  const anon=waClicks.filter(c=>!c.lead_id&&new Date(c.created_at)>=midnight).length;
+  const box=$('waNote');
+  box.classList.toggle('hidden',anon===0);
+  if(anon)box.textContent=anon===1
+    ? 'פנייה אחת יצאה היום לוואטסאפ בלי להשאיר פרטים. ההודעה תגיע אליך בלי רשומה מקבילה כאן.'
+    : anon+' פניות יצאו היום לוואטסאפ בלי להשאיר פרטים. ההודעות יגיעו אליך בלי רשומה מקבילה כאן.';
+}
+function renderDetailWa(id){
+  const rows=waFor(id),box=$('detailWa');
+  box.classList.toggle('hidden',rows.length===0);
+  if(!rows.length)return;
+  box.textContent='יצא/ה לוואטסאפ '+(rows.length===1?'פעם אחת':rows.length+' פעמים')+' · אחרון ב־'+parts(rows[0].created_at).full;
+}
 
 async function loadQuiz(){
   if(!currentUser)return;
@@ -564,6 +597,7 @@ function render(){
     const party=partyOf(lead.id);
     const src=party.map(x=>x.source).find(Boolean);
     if(src){const c=document.createElement('span');c.className='row-src'+(String(src).toLowerCase()==='quiz'?' quiz':'');c.textContent=String(src).toLowerCase()==='quiz'?'שאלון':src;meta.append(c)}
+    if(waFor(lead.id).length){const c=document.createElement('span');c.className='row-src wa';c.textContent='וואטסאפ';c.title='פנה/תה דרך כפתור הוואטסאפ';meta.append(c)}
     if(party.length>1){const c=document.createElement('span');c.className='row-src dupe';c.textContent=party.length+' רשומות';c.title='אותו טלפון נרשם יותר מפעם אחת';meta.append(c)}
     const tags=leadTags(lead);
     tags.slice(0,3).forEach(t=>{const b=document.createElement('span');b.className=`row-tag ${tagCls(t)}`.trim();b.textContent=t;b.title=t;meta.append(b)});
@@ -585,7 +619,7 @@ function renderDetail(id){
   $('detailStatusPill').className=`status-pill ${statusClass(l.status||'new')}`;$('detailStatusPill').textContent=statusLabel(l.status||'new');$('detailCall').href='tel:'+String(l.phone||'').replace(/[^\d+]/g,'');
   $('detailConsentText').textContent=l.consent?'הלקוח אישר את תנאי מדיניות הפרטיות בעת שליחת הטופס.':'לא תועדה הסכמה.';$('detailConsentIcon').textContent=l.consent?'✓':'!';$('detailConsentMeta').textContent=l.consent_at?'אושר ב־'+parts(l.consent_at).full:'—';
   draftTags=[...leadTags(l)];renderTags();$('tagInput').value='';$('detailFollowUp').value=toLocalInput(l.follow_up_at);updateFuNote();
-  $('detailWait').textContent=waitText(l);$('detailSource').textContent=l.source||'ישיר';syncWa(l);renderLeadQuiz(id)
+  $('detailWait').textContent=waitText(l);$('detailSource').textContent=l.source||'ישיר';syncWa(l);renderLeadQuiz(id);renderDetailWa(id)
 }
 
 function renderTags(){
@@ -715,7 +749,7 @@ $('dateApply').addEventListener('click',()=>{
   dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{loadLeads();loadQuiz()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{loadLeads();loadQuiz();loadWa()});$('backToDashboard').addEventListener('click',back);
 
 function setTab(which){
   const onQuiz=which==='quiz';

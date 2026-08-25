@@ -879,6 +879,27 @@ const SENT_PROBLEM = {
   not_identified: 'לא הצלחנו לחבר את התשובות לפרטים שלך. אפשר לשלוח לי אותן כאן בוואטסאפ.'
 };
 
+// The WhatsApp buttons leave the site too. Here identity is usually already
+// known, so the click is recorded as it happens without interrupting anyone.
+function recordWaClick() {
+  try {
+    fetch(SUPABASE_URL + '/rest/v1/rpc/wa_click', {
+      method: 'POST', keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+      },
+      body: JSON.stringify({ p_page: 'quiz', p_token: identity.token, p_phone: identity.phone || null })
+    }).catch(function () {});
+  } catch (e) { /* never block the handoff */ }
+}
+
+['waBtn', 'aWaBtn'].forEach(function (id) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', recordWaClick);
+});
+
 // The only write path into Supabase. Identity comes from the details they
 // left here, or from the personal link they arrived on.
 function saveResult(type, score100, done) {
