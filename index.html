@@ -2607,6 +2607,14 @@ footer {
         <div class="faq-a">סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.</div>
       </div>
 
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>מה קורה ביום שאחרי?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ויהיה לכם את האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -3586,6 +3594,8 @@ const translations = {
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
     waInitial: 'ש',
+    q6: 'מה קורה ביום שאחרי?',
+    a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ויהיה לכם את האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
     dir: 'rtl'
   },
@@ -3658,6 +3668,8 @@ const translations = {
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
     waInitial: 'S',
+    q6: 'What happens the day after?',
+    a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
     dir: 'ltr'
   }
@@ -3750,8 +3762,8 @@ function setLang(lang) {
   const realFaq = document.querySelector('.faq-section:not(.process-section):not(.whatis-section)');
   const faqQs = realFaq.querySelectorAll('.faq-q span:first-child');
   const faqAs = realFaq.querySelectorAll('.faq-a');
-  const qs = ['q1','q2','q3','q4','q5'];
-  const as = ['a1','a2','a3','a4','a5'];
+  const qs = ['q1','q2','q3','q4','q5','q6'];
+  const as = ['a1','a2','a3','a4','a5','a6'];
   qs.forEach((k,i) => { if(faqQs[i]) faqQs[i].textContent = t[k]; });
   as.forEach((k,i) => { if(faqAs[i]) faqAs[i].textContent = t[k]; });
 
