@@ -3435,6 +3435,13 @@ const translations = {
     footerMain: '© 2026 שוהם אבו · מאמן כלכלי · כל הזכויות שמורות לשוהם אבו',
     mailLabel: 'אימייל', mailSubject: 'פנייה מהאתר', igPersonal: 'שוהם אבו', igBrand: 'מנפחים ת\'כיס',
     privacyLabel: 'מדיניות פרטיות', privacyTitle: 'מדיניות פרטיות', consentHTML: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.', formNote: 'הפרטים משמשים אך ורק ליצירת קשר איתך, ולא יימסרו לצד שלישי למטרות שיווק.',
+    successSub: 'הצעד הראשון כבר מאחורינו.',
+    quizLabel: 'או בדרך אחרת',
+    quizTitle: 'לא בטוח/ה מה לכתוב?',
+    quizText: 'ענה/י על חמש שאלות קצרות במקום. זה לוקח דקה, ובסוף תקבל/י תמונה ברורה של איפה את/ה עומד/ת — ואני אחזור אליך עם הכיוון הראשון.',
+    quizCta: 'לשאלון האישי ←',
+    waName: 'שוהם אבו',
+    waInitial: 'ש',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
     dir: 'rtl'
   },
@@ -3496,6 +3503,13 @@ const translations = {
     footerMain: '© 2026 Shoham Abo · Financial Coach · All rights reserved',
     mailLabel: 'Email', mailSubject: 'Enquiry from your website', igPersonal: 'Shoham Abo', igBrand: "Minapchim T'kis",
     privacyLabel: 'Privacy Policy', privacyTitle: 'Privacy Policy', consentHTML: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.', formNote: 'Your details are used only to contact you, and are never passed to third parties for marketing.',
+    successSub: 'The first step is already behind us.',
+    quizLabel: 'Another way in',
+    quizTitle: 'Not sure what to write?',
+    quizText: 'Answer five short questions instead. It takes a minute, and you will come away with a clear picture of where you stand — and I will get back to you with a first direction.',
+    quizCta: 'Take the quiz →',
+    waName: 'Shoham Abu',
+    waInitial: 'S',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
     dir: 'ltr'
   }
@@ -3631,6 +3645,16 @@ function setLang(lang) {
   if (fCopy) fCopy.textContent = t.footerMain;
   const fDisc = document.querySelector('.footer-disclaimer');
   if (fDisc) fDisc.textContent = t.footerDisclaimer;
+
+  // Everything below was left in Hebrew whichever language was chosen.
+  const set = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
+  set('#successMsg span', t.successSub);
+  set('.quiz-invite-label', t.quizLabel);
+  set('.quiz-invite h3', t.quizTitle);
+  set('.quiz-invite p', t.quizText);
+  set('#quizLink', t.quizCta);
+  set('.iphone-time', t.waName);
+  set('.iphone-avatar', t.waInitial);
   const fLabels = document.querySelectorAll('.footer-link-label');
   if (fLabels.length >= 3) {
     fLabels[0].textContent = t.mailLabel;
