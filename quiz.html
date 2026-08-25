@@ -366,6 +366,8 @@ h1 .accent {
   margin-top: 16px;
 }
 
+.hidden { display: none !important; }
+
 .done {
   text-align: center;
   padding: 30px 0;
@@ -403,24 +405,39 @@ h1 .accent {
   margin-bottom: 18px;
 }
 
-.score-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+.fb-group { margin-top: 24px; }
+
+.fb-head {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--p6);
   margin-bottom: 14px;
 }
 
-.score-num {
-  font-size: 46px;
-  font-weight: 900;
-  line-height: 1;
-  background: linear-gradient(135deg, var(--p5), var(--gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.fb-item {
+  border-right: 2px solid var(--p4);
+  padding-right: 14px;
+  margin-bottom: 17px;
 }
 
-.score-of { font-size: 14px; color: rgba(255,255,255,0.45); }
+.fb-item:last-child { margin-bottom: 0; }
+
+.fb-good .fb-item { border-right-color: rgba(37,211,102,0.55); }
+.fb-good .fb-head { color: #7ae0a0; }
+
+.fb-topic {
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.94);
+  margin-bottom: 5px;
+}
+
+.fb-line {
+  font-size: 14.5px;
+  line-height: 1.78;
+  color: rgba(255,255,255,0.7);
+}
 
 .locked {
   text-align: center;
@@ -523,10 +540,17 @@ h1 .accent {
   <!-- ── SCREEN: assessment result ── -->
   <section class="screen" id="scAssessResult">
     <div class="result-card">
-      <div class="result-tag" id="aTag"></div>
-      <div class="score-row"><span class="score-num" id="aScore">0</span><span class="score-of">מתוך 100</span></div>
+      <div class="result-tag">מה עולה מהתשובות שלך</div>
       <h2 class="result-title" id="aTitle"></h2>
       <div class="result-body" id="aBody"></div>
+      <div class="fb-group fb-good hidden" id="aGoodWrap">
+        <div class="fb-head">מה כבר עובד לך</div>
+        <div id="aGood"></div>
+      </div>
+      <div class="fb-group hidden" id="aFlagWrap">
+        <div class="fb-head">מה הכי שווה לגעת בו עכשיו</div>
+        <div id="aFlags"></div>
+      </div>
       <div class="recap">
         <div class="recap-head">מה שעניתם</div>
         <div id="aRecap"></div>
@@ -647,54 +671,85 @@ const TRACKS = {
   }
 };
 
+// The deeper questionnaire. Each question also carries the language used to
+// talk back about it: `topic` names the area, `flag` is what to say when the
+// answer shows strain, `good` is what to say when it is already handled.
+// The closing question is marked `driver` — it is not graded, it decides
+// where the conversation starts.
 TRACKS.assessment = {
   label: 'תמונת מצב',
   questions: [
     { q: 'מה המצב התעסוקתי שלך היום?',
+      topic: 'יציבות ההכנסה', rank: 8,
+      flag: 'כשההכנסה לא זהה בכל חודש, תקציב שנשען על הממוצע נשבר בדיוק בחודש החלש. הדרך שעובדת היא לבנות את החודש סביב ההכנסה הנמוכה ולהתייחס לעודף כבונוס.',
+      good: 'ההכנסה שלך יציבה, וזה הבסיס שהכי קל לתכנן עליו קדימה.',
       a: [['שכיר/ה במשרה יציבה', 0],
           ['שכיר/ה עם הכנסה שמשתנה', 1],
           ['עצמאי/ת', 1],
           ['בין עבודות כרגע', 2]] },
     { q: 'עד כמה ההכנסה החודשית שלך צפויה מראש?',
+      topic: 'הפער בין החודשים', rank: 9,
+      flag: 'הכנסה משתנה דורשת חיץ שמחליק בין חודש חזק לחלש. בלעדיו כל חודש חלש מרגיש כמו משבר, גם כשבתמונה השנתית הכול בסדר גמור.',
       a: [['קבועה, אני יודע/ת בדיוק', 0],
           ['משתנה במעט', 1],
           ['משתנה מאוד מחודש לחודש', 2]] },
     { q: 'איך נראה החשבון בסוף החודש, בממוצע?',
+      topic: 'סוף החודש', rank: 2,
+      flag: 'מינוס שחוזר על עצמו הוא כמעט אף פעם לא עניין של משמעת. הוא סימן שהמבנה של החודש לא מתאים להכנסה, וזה דבר שמסדרים במהלך אחד ולא בשנה של הסתפקות במועט.',
+      good: 'אתה מסיים את החודש בעודף. זה נותן חופש לקבל החלטות מתוך בחירה ולא מתוך לחץ.',
       a: [['נשאר עודף באופן קבוע', 0],
           ['מתאזן בדיוק', 1],
           ['נכנס למינוס לפעמים', 2],
           ['במינוס באופן קבוע', 2]] },
     { q: 'כמה חודשי הוצאות שמורים לך בצד למקרה חירום?',
+      topic: 'כרית ביטחון', rank: 1,
+      flag: 'בלי כרית, כל תקלה רגילה — רכב, שן, חודש בלי עבודה — הופכת אוטומטית להלוואה. זה השינוי הבודד שהכי משנה את התחושה, ובדרך כלל גם המהיר ביותר להשגה.',
+      good: 'יש לך כרית ביטחון. היא זו שמונעת מהוצאה מפתיעה להפוך לחוב שנגרר שנים.',
       a: [['שישה חודשים ומעלה', 0],
           ['בין שלושה לשישה', 1],
           ['פחות משלושה', 2],
           ['אין כרית ביטחון', 2]] },
     { q: 'מה מצב ההלוואות והחובות?',
+      topic: 'החזרי הלוואות', rank: 3,
+      flag: 'כשההחזרים מכבידים, כמעט תמיד אפשר לשנות את המבנה שלהם לפני שנוגעים בהרגלים. זה משחרר אוויר כבר בחודש הקרוב, בלי לוותר על שום דבר בחיים.',
       a: [['אין הלוואות', 0],
           ['משכנתא בלבד', 1],
           ['הלוואות בהחזר נוח', 1],
           ['החזרים שמכבידים על החודש', 2]] },
     { q: 'עד כמה את/ה מכיר/ה את תנאי הפנסיה וקרן ההשתלמות שלך?',
+      topic: 'פנסיה והשתלמות', rank: 4,
+      flag: 'זה הסכום הגדול ביותר שיהיה לך בחיים, והוא זז כל חודש בלי שאף אחד מסתכל. דמי ניהול ומסלול שלא מתאים לגיל שלך עולים מאות אלפי שקלים לאורך הדרך, והתיקון הוא שיחה אחת.',
+      good: 'בדקת את הפנסיה לאחרונה. רוב האנשים לא פותחים את זה אף פעם, וזה עולה להם ביוקר.',
       a: [['בדקתי אותם לאחרונה', 0],
           ['פתחתי פעם, לא זוכר/ת בדיוק', 1],
           ['יודע/ת שקיים ולא מעבר', 2],
           ['לא באמת מכיר/ה', 2]] },
     { q: 'יש לך כסף שמושקע מעבר לעובר ושב?',
+      topic: 'כסף שלא עובד', rank: 5,
+      flag: 'כסף שיושב בעובר ושב מאבד מהערך שלו בשקט, בלי שזה מרגיש כמו הפסד. לא צריך סכומים גדולים כדי להתחיל, צריך רק כיוון שמתאים לטווח הזמן שלך.',
+      good: 'יש לך כסף שעובד לפי תוכנית. זה בדיוק ההבדל בין לחסוך לבין להתקדם.',
       a: [['כן, לפי תוכנית שבניתי', 0],
           ['כן, אבל בלי תוכנית מסודרת', 1],
           ['התחלתי לבדוק את הנושא', 1],
           ['לא', 2]] },
     { q: 'יש מטרה כלכלית שאת/ה מתקדם/ת אליה?',
+      topic: 'מטרה עם תאריך', rank: 6,
+      flag: 'מטרה בלי תאריך נשארת משאלה. ברגע שמצמידים לה סכום וזמן, נהיה ברור מה עושים כבר החודש — וזה מה שהופך אותה למשהו שקורה.',
+      good: 'יש לך מטרה עם לוח זמנים, וזה מה שמחזיק תוכנית לאורך זמן.',
       a: [['כן, עם תאריך יעד ברור', 0],
           ['כן, בלי לוח זמנים', 1],
           ['רעיון כללי בלבד', 1],
           ['אין מטרה מוגדרת', 2]] },
     { q: 'איך מתקבלת אצלך החלטה כספית גדולה?',
+      topic: 'קבלת החלטות', rank: 7,
+      flag: 'ההחלטות היקרות ביותר הן אלה שמתקבלות בתחושה או נדחות, כי הן נעשות בדיוק כשהלחץ הכי גדול. עם מסגרת פשוטה להשוואה, ההחלטה מפסיקה להיות מלחיצה.',
+      good: 'את/ה בודק/ת ומשווה לפני שמחליט/ה. זה חוסך הרבה מאוד כסף לאורך השנים.',
       a: [['בודק/ת ומשווה לפני', 0],
           ['מתייעץ/ת עם מישהו קרוב', 1],
           ['לפי תחושת בטן', 2],
           ['נוטה לדחות את ההחלטה', 2]] },
     { q: 'מה הכי דחוף עבורך עכשיו?',
+      driver: true,
       a: [['לעשות סדר ולראות תמונה מלאה', 1],
           ['לצאת מהמינוס', 1],
           ['להתחיל לחסוך באמת', 1],
@@ -702,26 +757,6 @@ TRACKS.assessment = {
           ['להקטין חובות', 1]] }
   ]
 };
-
-// Bands for the assessment, read against the 0-100 score.
-const ASSESS_BANDS = [
-  { min: 75, tag: 'בסיס איתן',
-    title: 'התשתית שלך במקום טוב.',
-    body: ['התשובות מציירות מצב מסודר: יש שליטה על התזרים, יש כרית ביטחון, והכיוון ברור.',
-           'בשיחה בינינו נתמקד פחות בתיקון ויותר באופטימיזציה, כלומר איך להוציא מהכסף שכבר עובד בשבילך יותר.'] },
-  { min: 50, tag: 'יש על מה לבנות',
-    title: 'הבסיס קיים, חסרות עוד כמה חוליות.',
-    body: ['חלק מהדברים אצלך מסודרים היטב, ובחלק אחר יש פערים שמורגשים בעיקר כשמשהו לא צפוי קורה.',
-           'זה בדיוק המצב שבו שינוי קטן ומדויק עושה הבדל גדול, כי לא צריך לבנות הכל מהתחלה.'] },
-  { min: 25, tag: 'צריך סדר',
-    title: 'הרבה מהתמונה עדיין לא גלויה.',
-    body: ['התשובות מצביעות על ניהול שמגיב למה שקורה במקום להקדים אותו. זה עייף, וזה גם יקר לאורך זמן.',
-           'הצעד הראשון הוא לראות את המספרים במקום אחד. משם רוב ההחלטות נעשות הרבה יותר פשוטות.'] },
-  { min: 0,  tag: 'נתחיל מהיסודות',
-    title: 'יש כאן הרבה ערפל, ואפשר לפרק אותו.',
-    body: ['חשוב שתדע/י: המצב הזה לא מעיד על חוסר משמעת. הוא מעיד על כלים שאף אחד מעולם לא לימד אותך.',
-           'נתחיל מהדברים הבסיסיים ביותר, בקצב שלך. הבהירות מגיעה מהר יותר משנדמה.'] }
-];
 
 const RESULTS = [
   { max: 3,  tag: 'בסיס יציב',
@@ -822,21 +857,76 @@ function saveResult(type, score100, done) {
   .catch(function (err) { console.error('Supabase save failed:', err); if (done) done(false); });
 }
 
-function finishAssessment(questions) {
-  const pct = scoreOutOf100(questions, score);
-  const band = ASSESS_BANDS.find(b => pct >= b.min);
+// Reads the answers back as feedback rather than as a mark. Two things that
+// already work, up to three worth touching, and the closing question decides
+// where a conversation would start.
+function buildFeedback() {
+  const questions = TRACKS.assessment.questions;
+  const good = [], flags = [];
+  let driver = '';
 
-  $('aScore').textContent = pct;
-  $('aTag').textContent = band.tag;
-  $('aTitle').textContent = band.title;
-  $('aBody').innerHTML = band.body.map(t => `<p>${t}</p>`).join('');
+  answers.forEach(function (ans, i) {
+    const q = questions[i];
+    if (!q) return;
+    if (q.driver) { driver = ans.a; return; }
+    if (ans.w === 0 && q.good) good.push({ topic: q.topic, line: q.good });
+    else if (ans.w >= 1 && q.flag) flags.push({ topic: q.topic, line: q.flag, w: ans.w, rank: q.rank || 99 });
+  });
+
+  // Severity first, then which lever moves most for the least effort.
+  flags.sort((a, b) => (b.w - a.w) || (a.rank - b.rank));
+  return { good: good.slice(0, 2), flags: flags.slice(0, 3), driver: driver };
+}
+
+function fbList(box, items) {
+  box.replaceChildren();
+  items.forEach(function (item) {
+    const wrap = document.createElement('div');
+    wrap.className = 'fb-item';
+    const t = document.createElement('div');
+    t.className = 'fb-topic';
+    t.textContent = item.topic;
+    const l = document.createElement('div');
+    l.className = 'fb-line';
+    l.textContent = item.line;
+    wrap.append(t, l);
+    box.append(wrap);
+  });
+}
+
+function finishAssessment(questions) {
+  const fb = buildFeedback();
+
+  $('aTitle').textContent =
+    fb.flags.length === 0 ? 'התמונה שלך מסודרת יותר משל רוב האנשים.'
+    : fb.flags.length <= 2 ? 'רוב הדברים אצלך במקום, ויש מעט שמושך אחורה.'
+    : 'יש כאן כמה דברים שמושכים אותך אחורה, וכולם ניתנים לתיקון.';
+
+  const opening = fb.flags.length === 0
+    ? 'לא צף כאן שום דבר דחוף, וזה נדיר. מכאן השאלה כבר לא איך מתקנים, אלא איך גורמים לכסף שכבר מסודר לעבוד חזק יותר בשבילך.'
+    : 'שום דבר מהרשימה הזו לא מעיד על חוסר משמעת או על טעות שעשית. אלה דברים שאף אחד לא לימד אותנו, ולכן הם נראים מסובכים עד הרגע שמישהו עובר עליהם איתך.';
+
+  const closing = fb.driver
+    ? 'כתבת שהכי דחוף לך עכשיו ' + fb.driver + '. זה בדיוק המקום שממנו הייתי מתחיל, ובשיחה קצרה אפשר להפוך את זה לצעד ראשון קונקרטי.'
+    : 'בשיחה קצרה אפשר להפוך את התמונה הזו לצעד ראשון אחד וברור.';
+
+  $('aBody').innerHTML = '<p>' + opening + '</p><p>' + closing + '</p>';
+
+  $('aGoodWrap').classList.toggle('hidden', fb.good.length === 0);
+  $('aFlagWrap').classList.toggle('hidden', fb.flags.length === 0);
+  fbList($('aGood'), fb.good);
+  fbList($('aFlags'), fb.flags);
   $('aRecap').innerHTML = recapHtml();
-  $('aWaBtn').href = 'https://wa.me/' + WA_NUMBER + '?text=' +
-    encodeURIComponent(`היי שוהם, מילאתי גם את שאלון העומק. יצא לי ${pct} מתוך 100.`);
+
+  const topics = fb.flags.map(f => f.topic).join(', ');
+  $('aWaBtn').href = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(
+    topics ? `היי שוהם, מילאתי את שאלון העומק. מה שעלה לי: ${topics}. אשמח לדבר על זה.`
+           : 'היי שוהם, מילאתי את שאלון העומק ואשמח לעבור על התמונה יחד.');
 
   show('scAssessResult');
 
-  saveResult('assessment', pct, function (ok) {
+  // The number is still filed for Shoham, it is simply not shown to them.
+  saveResult('assessment', scoreOutOf100(questions, score), function (ok) {
     $('aSent').textContent = ok
       ? 'התשובות נשלחו לשוהם. בשיחה ביניכם הן כבר יהיו מולו.'
       : 'לא הצלחנו לשלוח את התשובות אוטומטית, אבל אפשר לשלוח לי אותן כאן בוואטסאפ.';
