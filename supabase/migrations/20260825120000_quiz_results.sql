@@ -26,8 +26,10 @@ update public.leads set quiz_token = gen_random_uuid() where quiz_token is null;
 create unique index if not exists leads_quiz_token_idx on public.leads (quiz_token);
 
 -- ── results ───────────────────────────────────────────────────────────
--- lead_id is declared with whatever type leads.id actually has, so this runs
--- correctly whether the table uses uuid or bigint keys.
+-- The table may already exist, created by hand with only the four content
+-- columns. In that case its rows are kept and just what is missing is added,
+-- lead_id above all — without it the dashboard cannot tie a result to anyone.
+-- lead_id takes whatever type leads.id actually has, uuid or bigint alike.
 do $$
 declare id_type text;
 begin
@@ -35,15 +37,35 @@ begin
     from pg_attribute a
    where a.attrelid = 'public.leads'::regclass and a.attname = 'id' and a.attnum > 0;
 
-  execute format($f$
-    create table if not exists public.quiz_results(
-      id           uuid primary key default gen_random_uuid(),
-      lead_id      %s references public.leads(id) on delete cascade,
-      quiz_type    text        not null,
-      quiz_score   integer,
-      quiz_answers jsonb       not null default '[]'::jsonb,
-      created_at   timestamptz not null default now()
-    )$f$, id_type);
+  if to_regclass('public.quiz_results') is null then
+    execute format($f$
+      create table public.quiz_results(
+        id           uuid primary key default gen_random_uuid(),
+        lead_id      %s references public.leads(id) on delete cascade,
+        quiz_type    text        not null,
+        quiz_score   integer,
+        quiz_answers jsonb       not null default '[]'::jsonb,
+        created_at   timestamptz not null default now()
+      )$f$, id_type);
+  else
+    execute format('alter table public.quiz_results add column if not exists lead_id %s', id_type);
+    alter table public.quiz_results add column if not exists id           uuid default gen_random_uuid();
+    alter table public.quiz_results add column if not exists quiz_type    text;
+    alter table public.quiz_results add column if not exists quiz_score   integer;
+    alter table public.quiz_results add column if not exists quiz_answers jsonb default '[]'::jsonb;
+    alter table public.quiz_results add column if not exists created_at   timestamptz default now();
+
+    -- PostgREST needs this key to embed the lead beside each result.
+    if not exists (
+      select 1 from pg_constraint
+       where conrelid = 'public.quiz_results'::regclass
+         and contype = 'f' and conname = 'quiz_results_lead_id_fkey'
+    ) then
+      alter table public.quiz_results
+        add constraint quiz_results_lead_id_fkey
+        foreign key (lead_id) references public.leads(id) on delete cascade;
+    end if;
+  end if;
 end $$;
 
 create index if not exists quiz_results_lead_idx    on public.quiz_results (lead_id);
@@ -131,3 +153,6 @@ end $$;
 
 revoke all on function public.quiz_identify(uuid) from public;
 grant execute on function public.quiz_identify(uuid) to anon, authenticated;
+
+-- Let PostgREST see the new column and key straight away.
+notify pgrst, 'reload schema';
