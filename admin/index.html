@@ -186,6 +186,10 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .qz-qa{font-size:11.5px;line-height:1.6;color:#c9cfdb;padding:6px 0;border-top:1px solid rgba(255,255,255,.05)}
 .qz-qa b{display:block;color:#eef0f5;font-weight:700;margin-top:2px}
 .qz-none{color:var(--muted2);font-size:11px}
+.row-src{flex:0 0 auto;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--muted2);font-size:8px;font-weight:900;padding:3px 7px;line-height:1.5;white-space:nowrap}
+.row-src.quiz{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
+.row-src.dupe{color:#ffd57e;border-color:rgba(245,166,35,.26);background:rgba(245,166,35,.11)}
+.dupe-note{margin:0 0 11px;border:1px solid rgba(245,166,35,.24);border-radius:12px;background:rgba(245,166,35,.08);color:#ffd57e;font-size:10px;font-weight:800;line-height:1.6;padding:9px 11px}
 .link-btn{width:100%;min-height:44px;margin-top:11px;border-radius:13px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:#dce0e8;font-size:12px;font-weight:900}
 
 /* ===== תפריט שלוש הנקודות ===== */
@@ -480,7 +484,6 @@ async function loadLeads(){
 }
 const QUIZ_KIND={single:'קצר · יחיד',couple:'קצר · זוג',assessment:'עומק'};
 function scoreClass(n){return n>=75?'s-hi':n>=50?'s-mid':n>=25?'s-low':'s-min'}
-function quizFor(id){return quizResults.filter(r=>r.lead_id===id)}
 
 async function loadQuiz(){
   if(!currentUser)return;
@@ -511,7 +514,10 @@ function renderQuiz(){
 
 function renderLeadQuiz(id){
   const box=$('leadQuiz');box.replaceChildren();
-  const rows=quizFor(id);
+  const ids=partyOf(id).map(l=>l.id);
+  if(ids.length>1){const n=document.createElement('div');n.className='dupe-note';
+    n.textContent='לאדם הזה יש '+ids.length+' רשומות עם אותו טלפון. הרשימה מציגה אותו פעם אחת, וכאן מוצגות התשובות מכולן. מחיקה תסיר את כולן יחד.';box.append(n)}
+  const rows=quizResults.filter(r=>ids.includes(r.lead_id));
   if(!rows.length){const p=document.createElement('div');p.className='qz-none';p.textContent='הליד עדיין לא מילא שאלון.';box.append(p);return}
   for(const r of rows){
     const card=document.createElement('div');card.className='qz-item';
@@ -529,8 +535,17 @@ function renderLeadQuiz(id){
   }
 }
 
-function filtered(){const q=$('searchInput').value.trim().toLowerCase();const out=leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))));if(currentSort==='waiting')out.sort((a,b)=>{const au=a.first_contact_at?1:0,bu=b.first_contact_at?1:0;return au!==bu?au-bu:new Date(a.created_at||0)-new Date(b.created_at||0)});return out}
-function updateStats(){$('tabLeadsCount').textContent=leads.length;$('statTotal').textContent=leads.length;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length;$('statResponse').textContent=medianResponse()}
+// The same person can end up with more than one row: quiz_submit matches an
+// existing phone, but the landing form's edge function cannot check for one.
+// Group by the phone so the list shows people rather than records.
+function normPhone(v){const d=String(v||'').replace(/\D/g,'');return d.length>=9?d.slice(-9):d}
+function partyKey(l){return normPhone(l.phone)||('#'+l.id)}
+function partyOf(id){const l=leads.find(x=>x.id===id);if(!l)return[];const k=partyKey(l);return leads.filter(x=>partyKey(x)===k)}
+function dedupe(list){const seen=new Set(),out=[];for(const l of list){const k=partyKey(l);if(seen.has(k))continue;seen.add(k);out.push(l)}return out}
+function peopleCount(){return new Set(leads.map(partyKey)).size}
+
+function filtered(){const q=$('searchInput').value.trim().toLowerCase();const out=leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))));if(currentSort==='waiting')out.sort((a,b)=>{const au=a.first_contact_at?1:0,bu=b.first_contact_at?1:0;return au!==bu?au-bu:new Date(a.created_at||0)-new Date(b.created_at||0)});return dedupe(out)}
+function updateStats(){const ppl=peopleCount();$('tabLeadsCount').textContent=ppl;$('statTotal').textContent=ppl;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length;$('statResponse').textContent=medianResponse()}
 function syncSelection(){const n=selectedIds.size;$('bulkCount').textContent=`${n} נבחרו`;$('bulkBar').classList.toggle('show',n>0);const ids=filtered().map(l=>l.id);$('selectAll').checked=ids.length>0&&ids.every(id=>selectedIds.has(id))}
 function render(){
   updateStats();const items=filtered();$('leadList').replaceChildren();if(!items.length){show($('emptyState'));syncSelection();return}hide($('emptyState'));
@@ -546,6 +561,10 @@ function render(){
     const meta=document.createElement('div');meta.className='row-tags';
     const waBtn=waMiniBtn(lead);if(waBtn)meta.append(waBtn);
     const ac=ageChip(lead);if(ac)meta.append(ac);
+    const party=partyOf(lead.id);
+    const src=party.map(x=>x.source).find(Boolean);
+    if(src){const c=document.createElement('span');c.className='row-src'+(String(src).toLowerCase()==='quiz'?' quiz':'');c.textContent=String(src).toLowerCase()==='quiz'?'שאלון':src;meta.append(c)}
+    if(party.length>1){const c=document.createElement('span');c.className='row-src dupe';c.textContent=party.length+' רשומות';c.title='אותו טלפון נרשם יותר מפעם אחת';meta.append(c)}
     const tags=leadTags(lead);
     tags.slice(0,3).forEach(t=>{const b=document.createElement('span');b.className=`row-tag ${tagCls(t)}`.trim();b.textContent=t;b.title=t;meta.append(b)});
     if(tags.length>3){const more=document.createElement('span');more.className='row-tag t-more';more.textContent=`+${tags.length-3}`;meta.append(more)}
@@ -664,8 +683,8 @@ $('copyPhoneBtn').addEventListener('click',async()=>{const l=leads.find(x=>x.id=
 
 function openDelete(ids){pendingDeleteIds=[...ids];$('deleteConfirmText').textContent=ids.length===1?`למחוק את הליד של ${leads.find(l=>l.id===ids[0])?.name||'הלקוח'}? הפעולה בלתי הפיכה.`:`למחוק ${ids.length} לידים? הפעולה בלתי הפיכה.`;show($('deleteConfirmBackdrop'));document.body.classList.add('locked')}
 function closeDelete(){hide($('deleteConfirmBackdrop'));document.body.classList.remove('locked');pendingDeleteIds=[]}
-$('deleteLeadBtn').addEventListener('click',()=>activeLeadId!=null&&openDelete([activeLeadId]));
-$('bulkDeleteBtn').addEventListener('click',()=>selectedIds.size&&openDelete([...selectedIds]));
+$('deleteLeadBtn').addEventListener('click',()=>activeLeadId!=null&&openDelete(partyOf(activeLeadId).map(l=>l.id)));
+$('bulkDeleteBtn').addEventListener('click',()=>selectedIds.size&&openDelete([...new Set([...selectedIds].flatMap(id=>partyOf(id).map(l=>l.id)))]));
 $('cancelDeleteBtn').addEventListener('click',closeDelete);
 $('confirmDeleteBtn').addEventListener('click',async()=>{if(!pendingDeleteIds.length)return;const ids=[...pendingDeleteIds];const btn=$('confirmDeleteBtn');btn.disabled=true;const{error}=await supabase.from('leads').delete().in('id',ids);btn.disabled=false;if(error){toast('מחיקת הלידים נכשלה','bad');return}const wasActive=activeLeadId!=null&&ids.includes(activeLeadId);ids.forEach(id=>selectedIds.delete(id));closeDelete();if(wasActive)back();toast(ids.length===1?'הליד נמחק':`${ids.length} לידים נמחקו`);await loadLeads()});
 

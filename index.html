@@ -1413,6 +1413,38 @@ section {
   color: var(--p6);
 }
 
+.quiz-invite {
+  margin-top: 22px;
+  padding: 28px 24px;
+  background: linear-gradient(158deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  border: 1px solid rgba(168,85,247,0.28);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.quiz-invite-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.quiz-invite h3 {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.quiz-invite p {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 22px;
+}
+
 /* ── FOOTER ── */
 footer {
   border-top: 1px solid rgba(255,255,255,0.06);
@@ -2544,6 +2576,12 @@ footer {
       🎉 קיבלתי! אחזור אליך בהקדם האפשרי.<br>
       <span style="font-size:14px; font-weight:300; color:rgba(255,255,255,0.75);">הצעד הראשון כבר מאחורינו.</span>
     </div>
+    <div class="quiz-invite" id="quizInvite">
+      <div class="quiz-invite-label">או בדרך אחרת</div>
+      <h3>לא בטוח/ה מה לכתוב?</h3>
+      <p>ענה/י על חמש שאלות קצרות במקום. זה לוקח דקה, ובסוף תקבל/י תמונה ברורה של איפה את/ה עומד/ת — ואני אחזור אליך עם הכיוון הראשון.</p>
+      <a class="btn-primary" id="quizLink" href="quiz.html">לשאלון האישי ←</a>
+    </div>
   </div>
 </section>
 
@@ -3049,6 +3087,8 @@ function submitForm() {
     // Show success
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
+    try { localStorage.setItem('shoham_lead_phone', phone); } catch (e) {}
+    setQuizPhone(phone);
   })
   .catch(function(error) {
     console.error('Error sending form:', error);
@@ -3063,6 +3103,27 @@ function submitForm() {
     }
   });
 }
+
+// ── QUIZ INVITE ──
+// The quiz is a second way in, open to anyone. For someone who has already
+// left details it carries their phone so the quiz recognises them and files
+// the answers against the lead that exists, instead of asking again and
+// creating a second record of the same person. The phone travels in the hash
+// rather than the query string, so it never reaches a server log or a
+// Referer header.
+function setQuizPhone(phone) {
+  const link = document.getElementById('quizLink');
+  if (!link || !phone) return;
+  link.href = 'quiz.html#p=' + encodeURIComponent(phone);
+}
+
+// Someone who registered on an earlier visit is still the same person.
+(function () {
+  try {
+    const saved = localStorage.getItem('shoham_lead_phone');
+    if (saved) setQuizPhone(saved);
+  } catch (e) { /* private browsing — the link simply carries no phone */ }
+})();
 
 // ── PARALLAX HERO ──
 window.addEventListener('scroll', () => {
