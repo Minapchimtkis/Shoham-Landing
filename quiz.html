@@ -871,6 +871,14 @@ function recapHtml() {
   return answers.map(x => `<div class="recap-item">${x.q}<br><b>${x.a}</b></div>`).join('');
 }
 
+// quiz_submit refuses a submission for a named reason, so the closing line
+// can say what actually happened instead of one message covering everything.
+const SENT_PROBLEM = {
+  too_many_attempts: 'כבר קיבלתי ממך תשובות היום, אז הן לא נשמרו שוב. אם יש משהו נוסף, פשוט כתוב/כתבי לי.',
+  busy: 'יש עומס על המערכת כרגע והתשובות לא נשמרו. אפשר לשלוח לי אותן כאן בוואטסאפ.',
+  not_identified: 'לא הצלחנו לחבר את התשובות לפרטים שלך. אפשר לשלוח לי אותן כאן בוואטסאפ.'
+};
+
 // The only write path into Supabase. Identity comes from the details they
 // left here, or from the personal link they arrived on.
 function saveResult(type, score100, done) {
@@ -882,8 +890,8 @@ function saveResult(type, score100, done) {
     p_name: identity.name || null,
     p_phone: identity.phone || null
   })
-  .then(function (res) { if (done) done(!!(res && res.ok)); })
-  .catch(function (err) { console.error('Supabase save failed:', err); if (done) done(false); });
+  .then(function (res) { if (done) done(!!(res && res.ok), res && res.reason); })
+  .catch(function (err) { console.error('Supabase save failed:', err); if (done) done(false, 'network'); });
 }
 
 // Reads the answers back as feedback rather than as a mark. Two things that
@@ -955,10 +963,10 @@ function finishAssessment(questions) {
   show('scAssessResult');
 
   // The number is still filed for Shoham, it is simply not shown to them.
-  saveResult('assessment', scoreOutOf100(questions, score), function (ok) {
+  saveResult('assessment', scoreOutOf100(questions, score), function (ok, reason) {
     $('aSent').textContent = ok
       ? 'התשובות נשלחו לשוהם. בשיחה ביניכם הן כבר יהיו מולו.'
-      : 'לא הצלחנו לשלוח את התשובות אוטומטית, אבל אפשר לשלוח לי אותן כאן בוואטסאפ.';
+      : (SENT_PROBLEM[reason] || 'לא הצלחנו לשלוח את התשובות אוטומטית, אבל אפשר לשלוח לי אותן כאן בוואטסאפ.');
   });
 }
 
