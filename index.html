@@ -3653,6 +3653,11 @@ function setLang(lang) {
   set('.quiz-invite h3', t.quizTitle);
   set('.quiz-invite p', t.quizText);
   set('#quizLink', t.quizCta);
+
+  // The quiz itself is Hebrew only, so an English visitor is not sent to it.
+  // Its strings stay in the dictionary above, ready if it is ever translated.
+  const invite = document.querySelector('.quiz-invite');
+  if (invite) invite.style.display = isEN ? 'none' : '';
   set('.iphone-time', t.waName);
   set('.iphone-avatar', t.waInitial);
   const fLabels = document.querySelectorAll('.footer-link-label');
