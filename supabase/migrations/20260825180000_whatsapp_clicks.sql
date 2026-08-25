@@ -19,7 +19,7 @@ begin
     execute format($f$
       create table public.wa_clicks(
         id         uuid primary key default gen_random_uuid(),
-        lead_id    %s references public.leads(id) on delete set null,
+        lead_id    %s references public.leads(id) on delete cascade,
         page       text        not null default 'landing',
         created_at timestamptz not null default now()
       )$f$, id_type);
