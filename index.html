@@ -3128,7 +3128,7 @@ function setQuizPhone(phone) {
 
 // ── PARALLAX HERO ──
 window.addEventListener('scroll', () => {
-  const y = window.scrollY;
+  const y = Math.min(window.scrollY, window.innerHeight);
   const hero = document.querySelector('.hero');
   if (hero) hero.style.transform = `translateY(${y * 0.2}px)`;
   // prevent horizontal shift
@@ -3238,8 +3238,9 @@ function closeIphone() {
     if (hero && scrollY > 2) {
       const heroEls = hero.querySelectorAll('.hero-logo, .hero-title, .hero-sub, .hero-cta, .license-badge');
       const fade = Math.max(0, 1 - scrollY / 600);
+      const travel = Math.min(scrollY, window.innerHeight);
       heroEls.forEach(el => {
-        el.style.transform = `translateY(${scrollY * 0.25}px)`;
+        el.style.transform = `translateY(${travel * 0.25}px)`;
         el.style.opacity = fade;
       });
     }
