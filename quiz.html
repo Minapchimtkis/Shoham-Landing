@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>5 שאלות שכדאי לשאול את עצמך | שוהם אבו</title>
+<meta name="description" content="שאלון קצר בן דקה שיעזור לך להבין איפה אתה עומד כלכלית. בלי שיפוט, בלי מספרים.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p1: #0a0015;
+  --p2: #12003a;
+  --p3: #3b0764;
+  --p4: #7c3aed;
+  --p5: #a855f7;
+  --p6: #d8b4fe;
+  --white: #ffffff;
+  --gold: #f0c040;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #23094a 0%, var(--p1) 55%);
+  color: var(--white);
+  direction: rtl;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Soft ambience, painted with gradients rather than blur filters so it
+   costs nothing while the screen animates between questions. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 40% at 50% 20%, rgba(124,58,237,0.22), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(109,40,217,0.14), transparent 65%);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 34px 22px 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.head { text-align: center; margin-bottom: 30px; }
+
+.brand {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--p6);
+  text-shadow: 0 0 18px rgba(168,85,247,0.5);
+  text-decoration: none;
+}
+
+/* ── PROGRESS ── */
+.progress {
+  height: 4px;
+  background: rgba(168,85,247,0.16);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 22px 0 34px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.progress.on { opacity: 1; }
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--p4), var(--p5));
+  transition: width 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── SCREENS ── */
+.screen { display: none; animation: rise 0.45s cubic-bezier(0.22,1,0.36,1); }
+.screen.on { display: block; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  font-size: clamp(27px, 6vw, 40px);
+  font-weight: 900;
+  line-height: 1.22;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+}
+
+h1 .accent {
+  background: linear-gradient(135deg, var(--p5), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lede {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 32px;
+}
+
+.step-count {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--p6);
+  margin-bottom: 12px;
+}
+
+.q-text {
+  font-size: clamp(21px, 4.6vw, 27px);
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 26px;
+}
+
+/* ── OPTIONS ── */
+.opts { display: flex; flex-direction: column; gap: 11px; }
+
+.opt {
+  width: 100%;
+  text-align: start;
+  font-family: 'Heebo', sans-serif;
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.86);
+  background: linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
+  border: 1px solid rgba(168,85,247,0.24);
+  border-radius: 14px;
+  padding: 17px 20px;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.opt:hover {
+  border-color: rgba(168,85,247,0.6);
+  background: rgba(168,85,247,0.12);
+  transform: translateY(-2px);
+}
+
+.opt:active { transform: translateY(0); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 17px 26px;
+  border: none;
+  border-radius: 99px;
+  font-family: 'Heebo', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--p4), var(--p5));
+  color: #fff;
+  box-shadow: 0 12px 34px -12px rgba(124,58,237,0.85);
+}
+
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: grayscale(0.5); }
+
+.btn-wa {
+  background: rgba(37,211,102,0.13);
+  border: 1px solid rgba(37,211,102,0.48);
+  color: #4ee07f;
+}
+
+.btn-wa:hover { background: rgba(37,211,102,0.2); transform: translateY(-2px); }
+
+.back {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Heebo', sans-serif;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.back:hover { color: rgba(255,255,255,0.75); }
+
+/* ── RESULT ── */
+.result-card {
+  background: linear-gradient(158deg, rgba(255,255,255,0.06), rgba(255,255,255,0.018));
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 18px;
+  padding: 30px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 22px 50px -24px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+.result-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.result-title {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-bottom: 14px;
+}
+
+.result-body {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.76);
+}
+
+.result-body p + p { margin-top: 13px; }
+
+.recap {
+  border-top: 1px solid rgba(168,85,247,0.2);
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.recap-head {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--p6);
+  margin-bottom: 12px;
+}
+
+.recap-item {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.55);
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.recap-item:last-child { border-bottom: none; }
+.recap-item b { color: rgba(255,255,255,0.82); font-weight: 600; }
+
+/* ── LEAD FORM ── */
+.form-intro {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 22px;
+}
+
+.field { margin-bottom: 13px; }
+
+.field input {
+  width: 100%;
+  background: rgba(168,85,247,0.06);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-family: 'Heebo', sans-serif;
+  font-size: 16px;
+  color: var(--white);
+  outline: none;
+  direction: rtl;
+  text-align: right;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.field input::placeholder { color: rgba(255,255,255,0.34); }
+.field input:focus { border-color: rgba(168,85,247,0.75); background: rgba(168,85,247,0.1); }
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0 18px;
+  cursor: pointer;
+}
+
+.consent input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+  border-radius: 5px;
+  border: 1px solid rgba(168,85,247,0.5);
+  background: rgba(168,85,247,0.08);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.consent input:checked { background: var(--p4); border-color: var(--p5); }
+
+.consent input:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.consent span { font-size: 13px; line-height: 1.55; color: rgba(255,255,255,0.66); }
+.consent a { color: var(--p6); text-underline-offset: 3px; }
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 17px 0 13px;
+  color: rgba(255,255,255,0.32);
+  font-size: 13px;
+}
+
+.or::before, .or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(168,85,247,0.2);
+}
+
+.note {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.36);
+  text-align: center;
+  margin-top: 16px;
+}
+
+.done {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.done-mark { font-size: 42px; margin-bottom: 14px; }
+
+.done h2 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+
+.done p { font-size: 15.5px; line-height: 1.75; color: rgba(255,255,255,0.7); }
+
+.foot {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 24px 22px 34px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+}
+
+.foot a { color: rgba(255,255,255,0.45); text-decoration: none; }
+
+.assess-cta {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(168,85,247,0.2);
+}
+
+.assess-cta h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+
+.assess-cta p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.62);
+  margin-bottom: 18px;
+}
+
+.score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.score-num {
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--p5), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.score-of { font-size: 14px; color: rgba(255,255,255,0.45); }
+
+.locked {
+  text-align: center;
+  padding: 26px 0;
+}
+
+.locked-mark { font-size: 38px; margin-bottom: 14px; }
+.locked h2 { font-size: 23px; font-weight: 800; margin-bottom: 12px; }
+
+.locked p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.68);
+  margin-bottom: 22px;
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 26px 18px 46px; }
+  .opt { font-size: 15px; padding: 16px 17px; }
+  .result-card { padding: 26px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="head">
+    <a class="brand" href="./">שוהם אבו · ליווי וייעוץ פיננסי</a>
+    <div class="progress" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- ── SCREEN: pick a track ── -->
+  <section class="screen on" id="scStart">
+    <h1>5 שאלות שכדאי<br><span class="accent">לשאול את עצמך.</span></h1>
+    <p class="lede">דקה אחת, בלי מספרים ובלי שיפוט. בסוף תקבל/י תמונה ברורה של איפה אתם עומדים ומה הצעד הראשון ההגיוני.</p>
+    <div class="opts">
+      <button class="opt" onclick="startTrack('single')">אני לבד</button>
+      <button class="opt" onclick="startTrack('couple')">אנחנו זוג</button>
+    </div>
+  </section>
+
+  <!-- ── SCREEN: questions ── -->
+  <section class="screen" id="scQuiz">
+    <div class="step-count" id="stepCount"></div>
+    <h2 class="q-text" id="qText"></h2>
+    <div class="opts" id="qOpts"></div>
+    <button class="back" id="backBtn" onclick="goBack()">← חזרה</button>
+  </section>
+
+  <!-- ── SCREEN: result ── -->
+  <section class="screen" id="scResult">
+    <div class="result-card">
+      <div class="result-tag" id="resTag"></div>
+      <h2 class="result-title" id="resTitle"></h2>
+      <div class="result-body" id="resBody"></div>
+      <div class="recap">
+        <div class="recap-head">מה שעניתם</div>
+        <div id="recap"></div>
+      </div>
+    </div>
+
+    <p class="form-intro">רוצה שנעבור על זה יחד? השאירו פרטים ואחזור אליכם עם הכיוון הראשון, בלי התחייבות.</p>
+
+    <div class="field"><input type="text" id="fname" placeholder="מה השם שלך?" autocomplete="name"></div>
+    <div class="field"><input type="tel" id="fphone" placeholder="מה מספר הטלפון שלך?" autocomplete="tel" inputmode="tel"></div>
+
+    <label class="consent" for="fconsent">
+      <input type="checkbox" id="fconsent">
+      <span>קראתי ואני מסכים/ה ל<a href="./#contact">מדיניות הפרטיות</a>.</span>
+    </label>
+
+    <button class="btn btn-primary" id="sendBtn" onclick="sendLead()" disabled>שלחו לי את הפרטים</button>
+
+    <div class="or"><span>או</span></div>
+
+    <a class="btn btn-wa" id="waBtn" href="#" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 0 1 8.24 8.25c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.16 0-.43.06-.65.31-.22.25-.85.84-.85 2.04s.87 2.37.99 2.53c.12.16 1.71 2.61 4.14 3.66.58.25 1.03.4 1.38.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+      שלחו לי הודעה בוואטסאפ
+    </a>
+
+    <p class="note">התשובות שלכם יגיעו אליי יחד עם הפרטים, כדי שנתחיל מהמקום הנכון.</p>
+  </section>
+
+  <!-- ── SCREEN: sent ── -->
+  <section class="screen" id="scDone">
+    <div class="done">
+      <div class="done-mark">🎉</div>
+      <h2>קיבלתי!</h2>
+      <p>אחזור אליכם בהקדם האפשרי, עם התשובות שלכם כבר מולי.</p>
+    </div>
+
+    <div class="assess-cta">
+      <h3>רוצה שנגיע לשיחה מוכנים?</h3>
+      <p>יש שאלון נוסף, מעמיק יותר, של כ־10 שאלות. הוא ייתן לך תמונה ברורה של איפה אתה עומד היום, ולי את הרקע כדי שהשיחה בינינו תתחיל מהמקום הנכון ולא מהתחלה.</p>
+      <button class="btn btn-primary" onclick="startAssessment()">למילוי שאלון העומק</button>
+      <p class="note">אפשר גם לדלג ולחזור לזה אחר כך · <a href="./" style="color:rgba(255,255,255,0.45)">חזרה לאתר</a></p>
+    </div>
+  </section>
+
+  <!-- ── SCREEN: assessment result ── -->
+  <section class="screen" id="scAssessResult">
+    <div class="result-card">
+      <div class="result-tag" id="aTag"></div>
+      <div class="score-row"><span class="score-num" id="aScore">0</span><span class="score-of">מתוך 100</span></div>
+      <h2 class="result-title" id="aTitle"></h2>
+      <div class="result-body" id="aBody"></div>
+      <div class="recap">
+        <div class="recap-head">מה שעניתם</div>
+        <div id="aRecap"></div>
+      </div>
+    </div>
+
+    <p class="form-intro" id="aSent">התשובות נשלחו לשוהם. בשיחה ביניכם הן כבר יהיו מולו.</p>
+
+    <a class="btn btn-wa" id="aWaBtn" href="#" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 0 1 8.24 8.25c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.16 0-.43.06-.65.31-.22.25-.85.84-.85 2.04s.87 2.37.99 2.53c.12.16 1.71 2.61 4.14 3.66.58.25 1.03.4 1.38.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+      לדבר עם שוהם בוואטסאפ
+    </a>
+
+    <p class="note"><a href="./" style="color:rgba(255,255,255,0.45)">חזרה לאתר</a></p>
+  </section>
+
+  <!-- ── SCREEN: assessment reached without an identity ── -->
+  <section class="screen" id="scLocked">
+    <div class="locked">
+      <div class="locked-mark">🔒</div>
+      <h2>השאלון הזה נפתח אחרי השאלון הקצר</h2>
+      <p>הוא מיועד למי שכבר השאיר פרטים, כדי שהתשובות יגיעו אליי מחוברות אליכם. זה לוקח דקה.</p>
+      <button class="btn btn-primary" onclick="show('scStart')">לשאלון הקצר</button>
+    </div>
+  </section>
+</div>
+
+<div class="foot">© 2026 שוהם אבו · <a href="./">לאתר הראשי</a></div>
+
+<script>
+const WEBHOOK = 'https://hook.eu1.make.com/i2dd8sa27ys2dqnpuf45jfgpm2haf9fm';
+const WA_NUMBER = '972507228755';
+
+// Same project and publishable key the dashboard uses. Nothing secret lives
+// here: every write goes through quiz_submit(), which is the only thing with
+// reach into the tables.
+const SUPABASE_URL = 'https://vplqocqmlquajwwnyeby.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
+
+function rpc(fn, body) {
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+    },
+    body: JSON.stringify(body)
+  }).then(function (r) {
+    if (!r.ok) throw new Error('rpc ' + fn + ' -> ' + r.status);
+    return r.json();
+  });
+}
+
+// Who is answering. Filled in when they leave details here, or when they
+// arrive on a personal link from the dashboard.
+let identity = { name: '', phone: '', token: null };
+
+// Two tracks, same machinery. Options carry a weight so the closing
+// message can respond to what they actually said rather than being generic.
+const TRACKS = {
+  single: {
+    label: 'יחיד',
+    questions: [
+      { q: 'איפה הכסף שלך נמצא בסוף החודש?',
+        a: [['נשאר משהו בצד, בערך כל חודש', 0],
+            ['בדיוק מתאזן, בלי עודף', 1],
+            ['נגמר לפני שהחודש נגמר', 2],
+            ['אין לי באמת מושג', 2]] },
+      { q: 'אם אשאל אותך עכשיו כמה הוצאת החודש, תדע/י לענות?',
+        a: [['כן, יש לי מעקב', 0],
+            ['בערך, בגדול', 1],
+            ['לא, אין לי מושג', 2]] },
+      { q: 'מה קורה כשמגיעה הוצאה גדולה שלא ציפית לה?',
+        a: [['יש לי כרית ביטחון לזה', 0],
+            ['מסתדר, אבל זה מלחיץ', 1],
+            ['נכנס למינוס או לוקח הלוואה', 2],
+            ['פונה להורים', 2]] },
+      { q: 'יש לך מטרה כלכלית שאת/ה מתקדם/ת אליה?',
+        a: [['כן, ואני יודע/ת בדיוק מתי אגיע', 0],
+            ['יש מטרה, אבל לא ברור איך מגיעים', 1],
+            ['אין באמת מטרה מוגדרת', 2]] },
+      { q: 'מה הכי היית רוצה שישתנה?',
+        a: [['שיהיה לי סדר ותמונה ברורה', 1],
+            ['שאפסיק להרגיש לחוץ מכסף', 1],
+            ['שאתחיל באמת לחסוך', 1],
+            ['שאבין מה עושים עם הכסף שיש', 1]] }
+    ]
+  },
+  couple: {
+    label: 'זוג',
+    questions: [
+      { q: 'כשעולה נושא של כסף בבית, מה קורה?',
+        a: [['מדברים על זה בנחת', 0],
+            ['מתחיל ויכוח', 2],
+            ['אחד מאיתנו נסגר', 2],
+            ['פשוט לא מדברים על זה', 2]] },
+      { q: 'איך אתם מנהלים את הכסף בפועל?',
+        a: [['חשבון משותף וברור לשנינו', 0],
+            ['כל אחד בנפרד, מתחלקים בהוצאות', 1],
+            ['אחד מנהל והשני פחות מעורב', 2],
+            ['אין באמת שיטה', 2]] },
+      { q: 'שניכם יודעים כמה נכנס וכמה יוצא כל חודש?',
+        a: [['כן, שנינו יודעים', 0],
+            ['אחד מאיתנו יודע', 1],
+            ['אף אחד לא באמת יודע', 2]] },
+      { q: 'יש לכם מטרה כלכלית משותפת?',
+        a: [['כן, ואנחנו מתקדמים אליה', 0],
+            ['יש מטרה, אבל תקועים', 1],
+            ['דיברנו על זה ולא סגרנו', 1],
+            ['לא באמת', 2]] },
+      { q: 'מה הכי מטריד אתכם היום?',
+        a: [['שאנחנו לא מתקדמים', 1],
+            ['המתחים סביב כסף בינינו', 1],
+            ['שאין לנו כרית ביטחון', 1],
+            ['שאנחנו לא מדברים על זה מספיק', 1]] }
+    ]
+  }
+};
+
+TRACKS.assessment = {
+  label: 'תמונת מצב',
+  questions: [
+    { q: 'מה המצב התעסוקתי שלך היום?',
+      a: [['שכיר/ה במשרה יציבה', 0],
+          ['שכיר/ה עם הכנסה שמשתנה', 1],
+          ['עצמאי/ת', 1],
+          ['בין עבודות כרגע', 2]] },
+    { q: 'עד כמה ההכנסה החודשית שלך צפויה מראש?',
+      a: [['קבועה, אני יודע/ת בדיוק', 0],
+          ['משתנה במעט', 1],
+          ['משתנה מאוד מחודש לחודש', 2]] },
+    { q: 'איך נראה החשבון בסוף החודש, בממוצע?',
+      a: [['נשאר עודף באופן קבוע', 0],
+          ['מתאזן בדיוק', 1],
+          ['נכנס למינוס לפעמים', 2],
+          ['במינוס באופן קבוע', 2]] },
+    { q: 'כמה חודשי הוצאות שמורים לך בצד למקרה חירום?',
+      a: [['שישה חודשים ומעלה', 0],
+          ['בין שלושה לשישה', 1],
+          ['פחות משלושה', 2],
+          ['אין כרית ביטחון', 2]] },
+    { q: 'מה מצב ההלוואות והחובות?',
+      a: [['אין הלוואות', 0],
+          ['משכנתא בלבד', 1],
+          ['הלוואות בהחזר נוח', 1],
+          ['החזרים שמכבידים על החודש', 2]] },
+    { q: 'עד כמה את/ה מכיר/ה את תנאי הפנסיה וקרן ההשתלמות שלך?',
+      a: [['בדקתי אותם לאחרונה', 0],
+          ['פתחתי פעם, לא זוכר/ת בדיוק', 1],
+          ['יודע/ת שקיים ולא מעבר', 2],
+          ['לא באמת מכיר/ה', 2]] },
+    { q: 'יש לך כסף שמושקע מעבר לעובר ושב?',
+      a: [['כן, לפי תוכנית שבניתי', 0],
+          ['כן, אבל בלי תוכנית מסודרת', 1],
+          ['התחלתי לבדוק את הנושא', 1],
+          ['לא', 2]] },
+    { q: 'יש מטרה כלכלית שאת/ה מתקדם/ת אליה?',
+      a: [['כן, עם תאריך יעד ברור', 0],
+          ['כן, בלי לוח זמנים', 1],
+          ['רעיון כללי בלבד', 1],
+          ['אין מטרה מוגדרת', 2]] },
+    { q: 'איך מתקבלת אצלך החלטה כספית גדולה?',
+      a: [['בודק/ת ומשווה לפני', 0],
+          ['מתייעץ/ת עם מישהו קרוב', 1],
+          ['לפי תחושת בטן', 2],
+          ['נוטה לדחות את ההחלטה', 2]] },
+    { q: 'מה הכי דחוף עבורך עכשיו?',
+      a: [['לעשות סדר ולראות תמונה מלאה', 1],
+          ['לצאת מהמינוס', 1],
+          ['להתחיל לחסוך באמת', 1],
+          ['להשקיע את מה שכבר יש', 1],
+          ['להקטין חובות', 1]] }
+  ]
+};
+
+// Bands for the assessment, read against the 0-100 score.
+const ASSESS_BANDS = [
+  { min: 75, tag: 'בסיס איתן',
+    title: 'התשתית שלך במקום טוב.',
+    body: ['התשובות מציירות מצב מסודר: יש שליטה על התזרים, יש כרית ביטחון, והכיוון ברור.',
+           'בשיחה בינינו נתמקד פחות בתיקון ויותר באופטימיזציה, כלומר איך להוציא מהכסף שכבר עובד בשבילך יותר.'] },
+  { min: 50, tag: 'יש על מה לבנות',
+    title: 'הבסיס קיים, חסרות עוד כמה חוליות.',
+    body: ['חלק מהדברים אצלך מסודרים היטב, ובחלק אחר יש פערים שמורגשים בעיקר כשמשהו לא צפוי קורה.',
+           'זה בדיוק המצב שבו שינוי קטן ומדויק עושה הבדל גדול, כי לא צריך לבנות הכל מהתחלה.'] },
+  { min: 25, tag: 'צריך סדר',
+    title: 'הרבה מהתמונה עדיין לא גלויה.',
+    body: ['התשובות מצביעות על ניהול שמגיב למה שקורה במקום להקדים אותו. זה עייף, וזה גם יקר לאורך זמן.',
+           'הצעד הראשון הוא לראות את המספרים במקום אחד. משם רוב ההחלטות נעשות הרבה יותר פשוטות.'] },
+  { min: 0,  tag: 'נתחיל מהיסודות',
+    title: 'יש כאן הרבה ערפל, ואפשר לפרק אותו.',
+    body: ['חשוב שתדע/י: המצב הזה לא מעיד על חוסר משמעת. הוא מעיד על כלים שאף אחד מעולם לא לימד אותך.',
+           'נתחיל מהדברים הבסיסיים ביותר, בקצב שלך. הבהירות מגיעה מהר יותר משנדמה.'] }
+];
+
+const RESULTS = [
+  { max: 3,  tag: 'בסיס יציב',
+    title: 'יש לכם בסיס טוב. עכשיו השאלה היא לאן מכאן.',
+    body: ['התשובות שלכם מראות שיש סדר ושליטה, וזה כבר יותר ממה שיש לרוב האנשים. אתם לא במצב של כיבוי שריפות.',
+           'הצעד הבא הוא לא לתקן משהו שבור, אלא להפוך את הסדר הזה למנוע. כלומר, להגדיר לאן אתם רוצים להגיע ולבנות מסלול ברור שמביא לשם.'] },
+  { max: 6,  tag: 'תמונה חלקית',
+    title: 'אתם מסתדרים, אבל בלי תמונה מלאה.',
+    body: ['התשובות מצביעות על מצב מוכר: הדברים עובדים, אבל יותר מתוך תחושה מאשר מתוך ידיעה. זה מחזיק כל עוד לא קורה משהו לא צפוי.',
+           'הצעד הראשון כאן הוא לא לחסוך יותר. הוא פשוט לראות את התמונה המלאה, כי אי אפשר לשנות משהו שלא רואים.'] },
+  { max: 99, tag: 'הזמן לעשות סדר',
+    title: 'יש כאן ערפל, וזה בדיוק מה שאפשר לפרק.',
+    body: ['התשובות שלכם מראות שהמצב מנוהל בעיקר בתגובה למה שקורה, ולא מראש. חשוב שתדעו: זה לא חוסר משמעת, וזה לא אומר שאתם עושים משהו לא בסדר.',
+           'זה אומר שחסרים כלים שאף אחד לא לימד אתכם. הדבר הראשון שעושים הוא לא תקציב נוקשה, אלא בהירות. משם הכל נהיה הרבה יותר פשוט.'] }
+];
+
+let track = null, step = 0, answers = [], score = 0;
+
+const $ = id => document.getElementById(id);
+const show = id => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+};
+
+function startTrack(t) {
+  track = t; step = 0; answers = []; score = 0;
+  $('progress').classList.add('on');
+  show('scQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const qs = TRACKS[track].questions;
+  const item = qs[step];
+  $('stepCount').textContent = `שאלה ${step + 1} מתוך ${qs.length}`;
+  $('qText').textContent = item.q;
+  $('progressFill').style.width = ((step) / qs.length * 100) + '%';
+
+  const box = $('qOpts');
+  box.innerHTML = '';
+  item.a.forEach(([label, weight]) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = label;
+    b.onclick = () => choose(label, weight);
+    box.appendChild(b);
+  });
+
+  $('backBtn').style.visibility = step === 0 ? 'hidden' : 'visible';
+}
+
+function choose(label, weight) {
+  const qs = TRACKS[track].questions;
+  answers[step] = { q: qs[step].q, a: label, w: weight };
+  step++;
+  if (step < qs.length) { renderQ(); }
+  else { finish(); }
+}
+
+function goBack() {
+  if (step === 0) return;
+  step--;
+  renderQ();
+}
+
+// Weights count problems, so invert them: 100 means nothing flagged.
+// A question whose options all carry the same weight is asking what someone
+// wants, not how they are doing, so it is left out of the grade entirely —
+// otherwise a flawless set of answers could never reach 100.
+function scoreOutOf100(questions, raw) {
+  let worst = 0, ungraded = 0;
+  questions.forEach(function (q) {
+    const weights = q.a.map(o => o[1]);
+    const lo = Math.min.apply(null, weights), hi = Math.max.apply(null, weights);
+    if (lo === hi) { ungraded += lo; return; }
+    worst += hi;
+  });
+  return worst ? Math.round((1 - (raw - ungraded) / worst) * 100) : 0;
+}
+
+function recapHtml() {
+  return answers.map(x => `<div class="recap-item">${x.q}<br><b>${x.a}</b></div>`).join('');
+}
+
+// The only write path into Supabase. Identity comes from the details they
+// left here, or from the personal link they arrived on.
+function saveResult(type, score100, done) {
+  rpc('quiz_submit', {
+    p_quiz_type: type,
+    p_quiz_score: score100,
+    p_quiz_answers: answers.map(x => ({ q: x.q, a: x.a })),
+    p_token: identity.token,
+    p_name: identity.name || null,
+    p_phone: identity.phone || null
+  })
+  .then(function (res) { if (done) done(!!(res && res.ok)); })
+  .catch(function (err) { console.error('Supabase save failed:', err); if (done) done(false); });
+}
+
+function finishAssessment(questions) {
+  const pct = scoreOutOf100(questions, score);
+  const band = ASSESS_BANDS.find(b => pct >= b.min);
+
+  $('aScore').textContent = pct;
+  $('aTag').textContent = band.tag;
+  $('aTitle').textContent = band.title;
+  $('aBody').innerHTML = band.body.map(t => `<p>${t}</p>`).join('');
+  $('aRecap').innerHTML = recapHtml();
+  $('aWaBtn').href = 'https://wa.me/' + WA_NUMBER + '?text=' +
+    encodeURIComponent(`היי שוהם, מילאתי גם את שאלון העומק. יצא לי ${pct} מתוך 100.`);
+
+  show('scAssessResult');
+
+  saveResult('assessment', pct, function (ok) {
+    $('aSent').textContent = ok
+      ? 'התשובות נשלחו לשוהם. בשיחה ביניכם הן כבר יהיו מולו.'
+      : 'לא הצלחנו לשלוח את התשובות אוטומטית, אבל אפשר לשלוח לי אותן כאן בוואטסאפ.';
+  });
+}
+
+// Only someone who left details here, or who arrived on a personal link,
+// has an identity to attach the answers to.
+function startAssessment() {
+  if (!identity.phone && !identity.token) { show('scLocked'); return; }
+  startTrack('assessment');
+}
+
+function finish() {
+  $('progressFill').style.width = '100%';
+  score = answers.reduce((s, x) => s + x.w, 0);
+
+  if (track === 'assessment') { finishAssessment(TRACKS.assessment.questions); return; }
+
+  const r = RESULTS.find(x => score <= x.max);
+
+  $('resTag').textContent = r.tag;
+  $('resTitle').textContent = r.title;
+  $('resBody').innerHTML = r.body.map(p => `<p>${p}</p>`).join('');
+  $('recap').innerHTML = answers
+    .map(x => `<div class="recap-item">${x.q}<br><b>${x.a}</b></div>`)
+    .join('');
+
+  // Pre-fill the WhatsApp message with their answers, so a person who
+  // skips the form still arrives with context instead of a blank "hi".
+  const lines = answers.map((x, i) => `${i + 1}. ${x.q}\n${x.a}`).join('\n\n');
+  const msg = `היי שוהם, מילאתי את השאלון (${TRACKS[track].label}) באתר.\n\n${lines}`;
+  $('waBtn').href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+
+  show('scResult');
+}
+
+// A link handed out from the dashboard identifies the person up front, so
+// they go directly to the assessment without leaving details again.
+(function boot() {
+  const token = new URLSearchParams(window.location.search).get('t');
+  if (!token) return;
+  rpc('quiz_identify', { p_token: token })
+    .then(function (res) {
+      if (!res || !res.ok) return;
+      identity = { name: res.name || '', phone: '', token: token };
+      startAssessment();
+    })
+    .catch(function (err) { console.error('identify failed:', err); });
+})();
+
+// Consent gates the submit button rather than warning after the click
+$('fconsent').addEventListener('change', e => {
+  $('sendBtn').disabled = !e.target.checked;
+});
+
+function sendLead() {
+  const name = $('fname').value.trim();
+  const phone = $('fphone').value.trim();
+  if (!name || !phone) { alert('אנא מלאו שם וטלפון'); return; }
+  if (!$('fconsent').checked) { alert('יש לאשר את מדיניות הפרטיות כדי להמשיך'); return; }
+
+  const btn = $('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'שולח...';
+
+  const payload = {
+    name: name,
+    phone: phone,
+    message: answers.map((x, i) => `${i + 1}. ${x.q}\n${x.a}`).join('\n\n'),
+    consent: true,
+    consentText: document.querySelector('.consent span').textContent.trim(),
+    consentAt: new Date().toISOString(),
+    pageLang: 'he',
+    source: 'quiz',
+    quiz_type: track,                 // 'single' | 'couple'
+    quiz_score: score,
+    quiz_answers: answers.map(x => ({ q: x.q, a: x.a }))
+  };
+
+  // Make keeps the raw weighted total it has always received; the 0-100
+  // reading is added beside it so both systems can use either.
+  payload.quiz_score_100 = scoreOutOf100(TRACKS[track].questions, score);
+
+  const toMake = fetch(WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const toSupabase = rpc('quiz_submit', {
+    p_quiz_type: track,
+    p_quiz_score: payload.quiz_score_100,
+    p_quiz_answers: payload.quiz_answers,
+    p_name: name,
+    p_phone: phone,
+    p_message: payload.message,
+    p_consent: true,
+    p_consent_text: payload.consentText,
+    p_page_lang: 'he'
+  });
+
+  // One destination failing must not cost the person their answers, so this
+  // only reports an error when both refused them.
+  Promise.allSettled([toMake, toSupabase]).then(function (r) {
+    const makeOk = r[0].status === 'fulfilled' && r[0].value.ok;
+    const dbOk   = r[1].status === 'fulfilled' && r[1].value && r[1].value.ok;
+
+    if (!makeOk) console.error('Make webhook failed:', r[0].reason || r[0].value.status);
+    if (!dbOk)   console.error('Supabase save failed:', r[1].reason || r[1].value);
+
+    if (!makeOk && !dbOk) {
+      alert('אירעה שגיאה בשליחה. אפשר לשלוח לי הודעה בוואטסאפ במקום.');
+      btn.disabled = false;
+      btn.textContent = 'שלחו לי את הפרטים';
+      return;
+    }
+
+    identity = { name: name, phone: phone, token: null };
+    show('scDone');
+  });
+}
+</script>
+
+</body>
+</html>
