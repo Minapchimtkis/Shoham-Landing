@@ -634,6 +634,37 @@ function rpc(fn, body) {
   });
 }
 
+// ── HOW FAR PEOPLE GET ──
+// Someone who gives up halfway used to leave nothing behind, so there was no
+// way to tell which question loses them. This records the furthest point of
+// each visit and nothing else — a random id per page load, no name, no phone,
+// no address. Going back never lowers what was recorded.
+const VISIT = (function () {
+  try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+})();
+
+let deepestStage = -1;
+function stage(name, index, ofTrack) {
+  if (index <= deepestStage) return;
+  deepestStage = index;
+  try {
+    fetch(SUPABASE_URL + '/rest/v1/rpc/quiz_stage', {
+      method: 'POST', keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+      },
+      body: JSON.stringify({ p_visit: VISIT, p_stage: name, p_index: index, p_track: ofTrack || null })
+    }).catch(function () {});
+  } catch (e) { /* measurement must never break the quiz */ }
+}
+stage('opened', 0);
+
 // Who is answering. Filled in when they leave details here, or when they
 // arrive on a personal link from the dashboard.
 let identity = { name: '', phone: '', token: null };
@@ -813,6 +844,8 @@ const show = id => {
 
 function startTrack(t) {
   track = t; step = 0; answers = []; score = 0;
+  if (t === 'assessment') stage('assess_start', 9);
+  else stage('started', 1, t);
   $('progress').classList.add('on');
   show('scQuiz');
   renderQ();
@@ -821,6 +854,8 @@ function startTrack(t) {
 function renderQ() {
   const qs = TRACKS[track].questions;
   const item = qs[step];
+  stage(track === 'assessment' ? 'assess_q' + (step + 1) : 'short_q' + (step + 1),
+        (track === 'assessment' ? 10 : 2) + step, track);
   $('stepCount').textContent = `שאלה ${step + 1} מתוך ${qs.length}`;
   $('qText').textContent = item.q;
   $('progressFill').style.width = ((step) / qs.length * 100) + '%';
@@ -981,6 +1016,7 @@ function finishAssessment(questions) {
     topics ? `היי שוהם, מילאתי את שאלון העומק. מה שעלה לי: ${topics}. אשמח לדבר על זה.`
            : 'היי שוהם, מילאתי את שאלון העומק ואשמח לעבור על התמונה יחד.');
 
+  stage('assess_done', 20, 'assessment');
   show('scAssessResult');
 
   // The number is still filed for Shoham, it is simply not shown to them.
@@ -1022,6 +1058,7 @@ function finish() {
   // Asking a known person for their details again is how the same human ends
   // up in the list twice. If we already know who this is, file the answers
   // against them and move on to the deeper questionnaire.
+  stage('short_result', 7, track);
   const known = !!(identity.phone || identity.token);
   $('leadCapture').classList.toggle('hidden', known);
   $('knownCta').classList.toggle('hidden', !known);
@@ -1117,6 +1154,7 @@ function sendLead() {
     }
 
     identity = { name: name, phone: phone, token: null };
+    stage('details', 8, track);
     show('scDone');
   });
 }

@@ -178,6 +178,18 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .qr-kind.deep{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
 .qr-score{justify-self:center;font-size:17px;font-weight:900}
 .s-hi{color:var(--green)}.s-mid{color:var(--blue)}.s-low{color:var(--amber)}.s-min{color:var(--red)}
+.fn-wrap{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.018);padding:15px;margin-bottom:18px}
+.fn-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+.fn-head strong{font-size:12px}.fn-head span{color:var(--muted2);font-size:9px}
+.fn-row{margin-bottom:9px}.fn-row:last-child{margin-bottom:0}
+.fn-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
+.fn-name{font-size:11px;font-weight:800;color:#cdd2dc}
+.fn-num{font-size:10px;font-weight:900;color:var(--muted)}
+.fn-num b{color:#e7eaf1;font-size:12px}
+.fn-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.05);overflow:hidden}
+.fn-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple2),var(--purple))}
+.fn-drop{color:#ff9aa2}
+.fn-empty{color:var(--muted2);font-size:11px;text-align:center;padding:18px 0}
 .qz-wrap{padding:15px}
 .qz-item{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.022);padding:13px;margin-bottom:9px}
 .qz-item:last-child{margin-bottom:0}
@@ -330,6 +342,10 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 </div>
 
 <div id="quizPane" class="hidden">
+  <div class="fn-wrap">
+    <div class="fn-head"><strong>עד לאן מגיעים</strong><span id="fnRange">—</span></div>
+    <div id="fnRows"></div>
+  </div>
   <div class="list-shell">
     <div class="list-head" style="grid-template-columns:minmax(0,1fr) 84px 58px">
       <span>מי ענה</span><span style="justify-self:center">שאלון</span><span style="justify-self:center">ציון</span>
@@ -451,7 +467,7 @@ const QUICK_TAGS=[{label:'לא ענה',cls:'t-amber'},{label:'פגישה נקב�
 const TAG_CLS=Object.fromEntries(QUICK_TAGS.map(t=>[t.label,t.cls]));
 const ICON_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.2v5l3 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICON_CAL='<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[],waClicks=[];
+let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[],waClicks=[],funnel=[];
 let currentSort='new',realtimeChannel=null,newCount=0,ageTimer=null;
 const openedIds=new Set();
 let seenBaseline='';try{seenBaseline=localStorage.getItem('leadsLastSeen')||''}catch{}
@@ -476,7 +492,7 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa()]);startRealtime();if(!refreshTimer)refreshTimer=setInterval(()=>{loadLeads();loadQuiz();loadWa()},60000)}
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel()]);startRealtime();if(!refreshTimer)refreshTimer=setInterval(()=>{loadLeads();loadQuiz();loadWa();loadFunnel()},60000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -516,6 +532,57 @@ function renderDetailWa(id){
   box.classList.toggle('hidden',rows.length===0);
   if(!rows.length)return;
   box.textContent='יצא/ה לוואטסאפ '+(rows.length===1?'פעם אחת':rows.length+' פעמים')+' · אחרון ב־'+parts(rows[0].created_at).full;
+}
+
+// Each visit leaves one row holding the furthest point it reached, so a
+// stage's count is every visit that got at least that far.
+const STAGES=[
+  {i:0, label:'פתחו את השאלון'},
+  {i:1, label:'בחרו מסלול'},
+  {i:2, label:'ענו על שאלה 1'},
+  {i:4, label:'ענו על שאלה 3'},
+  {i:6, label:'ענו על שאלה 5'},
+  {i:7, label:'הגיעו לתוצאה'},
+  {i:8, label:'השאירו פרטים'},
+  {i:9, label:'פתחו את שאלון העומק'},
+  {i:15,label:'הגיעו לשאלה 6 בעומק'},
+  {i:20,label:'סיימו הכול'}
+];
+
+async function loadFunnel(){
+  if(!currentUser)return;
+  const{data,error}=await supabase.from('quiz_funnel').select('stage_index,created_at').order('created_at',{ascending:false});
+  if(error){console.error(error);return}
+  funnel=data||[];renderFunnel()
+}
+
+function renderFunnel(){
+  const box=$('fnRows');box.replaceChildren();
+  const rows=funnel.filter(f=>inDateRange(f.created_at));
+  if(!rows.length){const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='עדיין אין ביקורים בשאלון בטווח שנבחר.';box.append(p);$('fnRange').textContent='—';return}
+  const total=rows.filter(r=>r.stage_index>=0).length;
+  $('fnRange').textContent=total+' ביקורים';
+  let prev=null;
+  STAGES.forEach(st=>{
+    const n=rows.filter(r=>r.stage_index>=st.i).length;
+    const row=document.createElement('div');row.className='fn-row';
+    const top=document.createElement('div');top.className='fn-top';
+    const nm=document.createElement('span');nm.className='fn-name';nm.textContent=st.label;
+    const num=document.createElement('span');num.className='fn-num';
+    const b=document.createElement('b');b.textContent=n;
+    num.append(b,document.createTextNode(' · '+(total?Math.round(n/total*100):0)+'%'));
+    // the biggest single fall is the one worth naming
+    if(prev!==null&&prev>0){const lost=prev-n;
+      if(lost>0){const d=document.createElement('span');d.className='fn-drop';
+        d.textContent='  −'+lost;num.append(d)}}
+    top.append(nm,num);
+    const bar=document.createElement('div');bar.className='fn-bar';
+    const fill=document.createElement('div');fill.className='fn-fill';
+    fill.style.width=(total?Math.round(n/total*100):0)+'%';
+    bar.append(fill);row.append(top,bar);box.append(row);
+    prev=n;
+  });
 }
 
 async function loadQuiz(){
@@ -739,17 +806,17 @@ document.querySelectorAll('#dateMenu [data-range]').forEach(btn=>btn.addEventLis
   document.querySelectorAll('#dateMenu [data-range]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
   $('dateCustom').classList.toggle('show',r==='custom');
   if(r==='custom'){dateFilter='custom';syncDateBtn();return}
-  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();
+  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();renderFunnel();
   toast(r==='all'?'הסינון לפי תאריך בוטל':'מציג: '+RANGE_LABEL[r])
 }));
 $('dateApply').addEventListener('click',()=>{
   dateFromVal=$('dateFrom').value;dateToVal=$('dateTo').value;
   if(dateFromVal&&dateToVal&&dateFromVal>dateToVal){toast('תאריך ההתחלה מאוחר מתאריך הסיום','bad');return}
   if(!dateFromVal&&!dateToVal){toast('יש לבחור לפחות תאריך אחד','bad');return}
-  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();toast('הסינון הוחל')
+  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();renderFunnel();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{loadLeads();loadQuiz();loadWa()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{loadLeads();loadQuiz();loadWa();loadFunnel()});$('backToDashboard').addEventListener('click',back);
 
 function setTab(which){
   const onQuiz=which==='quiz';
