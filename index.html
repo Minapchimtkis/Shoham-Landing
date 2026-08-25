@@ -3588,6 +3588,7 @@ const translations = {
     waSub: 'שם וטלפון, כדי שאדע מי פנה ואוכל לחזור אליך גם אם נתנתק באמצע.',
     waGo: 'המשך לוואטסאפ ←',
     waSkip: 'לדלג ולעבור ישירות',
+    waConsent: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.',
     quizLabel: 'או בדרך אחרת',
     quizTitle: 'לא בטוח/ה מה לכתוב?',
     quizText: 'ענה/י על חמש שאלות קצרות במקום. זה לוקח דקה, ובסוף תקבל/י תמונה ברורה של איפה את/ה עומד/ת — ואני אחזור אליך עם הכיוון הראשון.',
@@ -3662,6 +3663,7 @@ const translations = {
     waSub: 'Your name and phone, so I know who got in touch and can come back to you even if we lose the thread.',
     waGo: 'Continue to WhatsApp →',
     waSkip: 'Skip and go straight there',
+    waConsent: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.',
     quizLabel: 'Another way in',
     quizTitle: 'Not sure what to write?',
     quizText: 'Answer five short questions instead. It takes a minute, and you will come away with a clear picture of where you stand — and I will get back to you with a first direction.',
@@ -3822,6 +3824,8 @@ function setLang(lang) {
   set('#waSub', t.waSub);
   set('#waGo', t.waGo);
   set('#waSkip', t.waSkip);
+  const waC = document.getElementById('waConsentText');
+  if (waC) waC.innerHTML = t.waConsent;
   set('.iphone-time', t.waName);
   set('.iphone-avatar', t.waInitial);
   const fLabels = document.querySelectorAll('.footer-link-label');
