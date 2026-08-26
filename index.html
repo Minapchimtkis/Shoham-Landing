@@ -3076,6 +3076,15 @@ function openPrivacy(e) {
   document.body.style.overflow = 'hidden';   // stop the page scrolling behind it
 }
 
+// Someone arriving from the quiz's consent line, which links to #privacy,
+// should land on the policy itself rather than somewhere near it.
+(function () {
+  const openIfAsked = () => { if (window.location.hash === '#privacy') openPrivacy(); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', openIfAsked);
+  else openIfAsked();
+  window.addEventListener('hashchange', openIfAsked);
+})();
+
 function closePrivacy() {
   const ov = document.getElementById('privacyOverlay');
   if (!ov) return;
@@ -3898,22 +3907,29 @@ function setLang(lang) {
     <h3 class="privacy-title" id="privacyTitle">מדיניות פרטיות</h3>
 
     <div class="privacy-body" id="privacyHE">
-      <p><strong>עדכון אחרון:</strong> אוגוסט 2026</p>
+      <p><strong>עדכון אחרון:</strong> 26 באוגוסט 2026</p>
 
       <h4>1. מי אוסף את המידע</h4>
       <p>שוהם אבו, יועץ לכלכלת המשפחה. ליצירת קשר בכל נושא הקשור לפרטיות: shohamabo@gmail.com</p>
 
       <h4>2. איזה מידע נאסף</h4>
-      <p>בעת מילוי טופס יצירת הקשר נאספים: שם מלא, מספר טלפון, והתוכן החופשי שבחרת לכתוב בשדה ההודעה. בנוסף, כמו בכל אתר, עשויים להישמר נתוני גלישה טכניים כגון כתובת IP וסוג הדפדפן.</p>
+      <p><strong>בטופס יצירת הקשר:</strong> שם מלא, מספר טלפון, והתוכן החופשי שבחרת לכתוב בשדה ההודעה.</p>
+      <p><strong>בשאלונים שבאתר:</strong> התשובות שבחרת, וציון המחושב מהן לצורך הבנת התמונה לפני שיחה. אם הגעת לשאלון עם קישור אישי או לאחר שהשארת פרטים, התשובות נשמרות מקושרות לפנייה שלך.</p>
+      <p><strong>בלחיצה על כפתור הוואטסאפ:</strong> נשמר תיעוד של המעבר, ואם בחרת למלא — גם השם והטלפון. אם בחרת לדלג, נשמר רק שהמעבר קרה, בלי פרטים מזהים.</p>
+      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, לצורך שיפור השאלון. המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, ואינה כוללת שם, טלפון או כתובת.</p>
+      <p><strong>בדפדפן שלך:</strong> אם השארת פרטים, מספר הטלפון נשמר מקומית בדפדפן שלך כדי שלא תתבקש/י למלא אותו שוב. הוא נשאר במכשיר שלך וניתן למחיקה בכל עת דרך הגדרות הדפדפן.</p>
+      <p>בנוסף, כמו בכל אתר, עשויים להישמר נתוני גלישה טכניים כגון כתובת IP וסוג הדפדפן.</p>
 
       <h4>3. מטרת האיסוף</h4>
-      <p>המידע נאסף למטרה אחת בלבד: יצירת קשר חוזר איתך בעקבות פנייתך, ותיאום שיחת אפיון. המידע אינו נמכר, אינו מושכר ואינו מועבר לצדדים שלישיים למטרות שיווק.</p>
+      <p>המידע האישי נאסף לצורך יצירת קשר חוזר איתך בעקבות פנייתך, תיאום שיחת אפיון, והיערכות לשיחה על בסיס מה שסיפרת. המדידה האנונימית משמשת אך ורק לשיפור השאלונים שבאתר.</p>
+      <p>המידע אינו נמכר, אינו מושכר ואינו מועבר לצדדים שלישיים למטרות שיווק.</p>
 
       <h4>4. הבסיס החוקי</h4>
       <p>המידע נאסף על בסיס הסכמתך המפורשת, הניתנת בעת סימון תיבת האישור בטופס. ניתן לחזור בך מההסכמה בכל עת.</p>
 
       <h4>5. העברת מידע לצדדים שלישיים</h4>
-      <p>לצורך תפעול הטופס וניהול הפניות, פרטי הפנייה נשמרים בתשתית מסד הנתונים של <strong>Supabase</strong>. המידע משמש לצורך טיפול בפנייה וניהול הפניות בלבד, בהתאם למדיניות הפרטיות של האתר.</p>
+      <p>לצורך תפעול האתר נעשה שימוש בשירותים הבאים: <strong>Supabase</strong> לאחסון הפניות, <strong>Cloudflare Turnstile</strong> לבדיקה שהטופס לא מולא אוטומטית, <strong>Make</strong> להעברת פניות מהשאלון, ו-<strong>GitHub Pages</strong> לאירוח האתר.</p>
+      <p>פרטי הפנייה נשמרים בתשתית מסד הנתונים של <strong>Supabase</strong>. המידע משמש לצורך טיפול בפנייה וניהול הפניות בלבד, בהתאם למדיניות הפרטיות של האתר.</p>
 
       <h4>6. משך שמירת המידע</h4>
       <p>המידע נשמר כל עוד הוא נדרש למטרה שלשמה נאסף, או עד לבקשתך למחיקה, לפי המוקדם.</p>
@@ -3929,22 +3945,29 @@ function setLang(lang) {
     </div>
 
     <div class="privacy-body" id="privacyEN" hidden>
-      <p><strong>Last updated:</strong> August 2026</p>
+      <p><strong>Last updated:</strong> 26 August 2026</p>
 
       <h4>1. Who collects the information</h4>
       <p>Shoham Abo, family-economics advisor. For any privacy-related enquiry: shohamabo@gmail.com</p>
 
       <h4>2. What is collected</h4>
-      <p>When you submit the contact form: your full name, phone number, and whatever you choose to write in the message field. As with any website, technical browsing data such as IP address and browser type may also be recorded.</p>
+      <p><strong>Through the contact form:</strong> your full name, phone number, and whatever you choose to write in the message field.</p>
+      <p><strong>Through the questionnaires on this site:</strong> the answers you select, and a score derived from them so that a conversation can start from the right place. If you reached a questionnaire through a personal link or after leaving your details, the answers are stored alongside your enquiry.</p>
+      <p><strong>When you use the WhatsApp button:</strong> the handoff is recorded, along with your name and phone if you chose to give them. If you skipped that step, only the fact that it happened is recorded, with nothing identifying you.</p>
+      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got is recorded, so the questionnaires can be improved. It is identified by a random id created for that visit alone, and contains no name, phone or address.</p>
+      <p><strong>In your own browser:</strong> if you have left your details, your phone number is stored locally in your browser so you are not asked for it again. It stays on your device and can be cleared at any time through your browser settings.</p>
+      <p>As with any website, technical browsing data such as IP address and browser type may also be recorded.</p>
 
       <h4>3. Purpose</h4>
-      <p>The information is collected for one purpose only: to contact you following your enquiry and arrange an introductory call. It is never sold, rented, or passed to third parties for marketing.</p>
+      <p>Personal information is collected in order to contact you following your enquiry, arrange an introductory call, and prepare for that call based on what you have described. The anonymous measurement is used solely to improve the questionnaires on this site.</p>
+      <p>It is never sold, rented, or passed to third parties for marketing.</p>
 
       <h4>4. Legal basis</h4>
       <p>The information is collected on the basis of your explicit consent, given when you tick the confirmation box on the form. You may withdraw that consent at any time.</p>
 
       <h4>5. Third parties</h4>
-      <p>To operate the form and manage enquiries, enquiry details are stored using <strong>Supabase</strong> database infrastructure. The information is used only to handle and manage enquiries, in accordance with this site's privacy policy.</p>
+      <p>The following services are used to run this site: <strong>Supabase</strong> to store enquiries, <strong>Cloudflare Turnstile</strong> to check that a form was not filled in automatically, <strong>Make</strong> to pass on questionnaire submissions, and <strong>GitHub Pages</strong> for hosting.</p>
+      <p>Enquiry details are stored using <strong>Supabase</strong> database infrastructure. The information is used only to handle and manage enquiries, in accordance with this site's privacy policy.</p>
 
       <h4>6. Retention</h4>
       <p>Information is kept for as long as it is needed for the purpose it was collected for, or until you request its deletion, whichever comes first.</p>
