@@ -613,7 +613,6 @@ h1 .accent {
 <div class="foot">© 2026 שוהם אבו · <a href="./">לאתר הראשי</a></div>
 
 <script>
-const WEBHOOK = 'https://hook.eu1.make.com/i2dd8sa27ys2dqnpuf45jfgpm2haf9fm';
 const WA_NUMBER = '972507228755';
 
 // Same project and publishable key the dashboard uses. Nothing secret lives
@@ -1104,37 +1103,9 @@ function sendLead() {
   btn.disabled = true;
   btn.textContent = 'שולח...';
 
-  const payload = {
-    name: name,
-    phone: phone,
-    message: answers.map((x, i) => `${i + 1}. ${x.q}\n${x.a}`).join('\n\n'),
-    consent: true,
-    consentText: document.querySelector('.consent span').textContent.trim(),
-    consentAt: new Date().toISOString(),
-    pageLang: 'he',
-    source: 'quiz',
-    quiz_type: track,                 // 'single' | 'couple'
-    quiz_score: score,
-    quiz_answers: answers.map(x => ({ q: x.q, a: x.a }))
-  };
+  const message = answers.map((x, i) => `${i + 1}. ${x.q}\n${x.a}`).join('\n\n');
+  const consentText = document.querySelector('.consent span').textContent.trim();
 
-  // Make keeps the raw weighted total it has always received; the 0-100
-  // reading is added beside it so both systems can use either.
-  payload.quiz_score_100 = scoreOutOf100(TRACKS[track].questions, score);
-
-  // Supabase goes first, because it is the one with the rate limits. Anything
-  // it turns away — a replay, junk, a flood — must not reach Make either: the
-  // webhook has no protection of its own, and every call it takes costs an
-  // operation. A Supabase that cannot be reached at all is a different case;
-  // there Make is the fallback that keeps the person's answers.
-  function sendToMake() {
-    return fetch(WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      keepalive: true
-    });
-  }
   function done() {
     identity = { name: name, phone: phone, token: null };
     stage('details', 8, track);
@@ -1146,27 +1117,24 @@ function sendLead() {
     btn.textContent = 'שלחו לי את הפרטים';
   }
 
+  // Saving is the whole job now. The email used to be a second call from here
+  // straight to Make, which meant it only ever went out on this one route; the
+  // database sends it instead, for every way a person arrives.
   rpc('quiz_submit', {
     p_quiz_type: track,
-    p_quiz_score: payload.quiz_score_100,
-    p_quiz_answers: payload.quiz_answers,
+    p_quiz_score: scoreOutOf100(TRACKS[track].questions, score),
+    p_quiz_answers: answers.map(x => ({ q: x.q, a: x.a })),
     p_name: name,
     p_phone: phone,
-    p_message: payload.message,
+    p_message: message,
     p_consent: true,
-    p_consent_text: payload.consentText,
+    p_consent_text: consentText,
     p_page_lang: 'he'
   }).then(function (res) {
-    if (res && res.ok) {
-      // Nothing is waiting on Make, so the person stops waiting here.
-      sendToMake().catch(function (e) { console.error('Make webhook failed:', e); });
-      done();
-      return;
-    }
+    if (res && res.ok) { done(); return; }
     var reason = res && res.reason;
     console.error('Supabase refused the submission:', reason);
-    // Already saved from an earlier attempt — telling them it failed would be
-    // a lie, and sending it on to Make would just duplicate what is there.
+    // Already saved from an earlier attempt; telling them it failed is a lie.
     if (reason === 'too_many_attempts') { done(); return; }
     if (reason === 'busy') {
       fail('יש כרגע עומס על הטופס. אפשר לשלוח לי הודעה בוואטסאפ ואחזור אליך.');
@@ -1174,10 +1142,8 @@ function sendLead() {
     }
     fail();
   }).catch(function (e) {
-    // Supabase is unreachable, so Make is the only thing standing between this
-    // person and losing everything they just filled in.
     console.error('Supabase save failed:', e);
-    sendToMake().then(function (r) { r.ok ? done() : fail(); }).catch(fail);
+    fail();
   });
 }
 </script>
