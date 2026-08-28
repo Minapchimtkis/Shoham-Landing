@@ -1122,13 +1122,31 @@ function sendLead() {
   // reading is added beside it so both systems can use either.
   payload.quiz_score_100 = scoreOutOf100(TRACKS[track].questions, score);
 
-  const toMake = fetch(WEBHOOK, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  // Supabase goes first, because it is the one with the rate limits. Anything
+  // it turns away — a replay, junk, a flood — must not reach Make either: the
+  // webhook has no protection of its own, and every call it takes costs an
+  // operation. A Supabase that cannot be reached at all is a different case;
+  // there Make is the fallback that keeps the person's answers.
+  function sendToMake() {
+    return fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true
+    });
+  }
+  function done() {
+    identity = { name: name, phone: phone, token: null };
+    stage('details', 8, track);
+    show('scDone');
+  }
+  function fail(msg) {
+    alert(msg || 'אירעה שגיאה בשליחה. אפשר לשלוח לי הודעה בוואטסאפ במקום.');
+    btn.disabled = false;
+    btn.textContent = 'שלחו לי את הפרטים';
+  }
 
-  const toSupabase = rpc('quiz_submit', {
+  rpc('quiz_submit', {
     p_quiz_type: track,
     p_quiz_score: payload.quiz_score_100,
     p_quiz_answers: payload.quiz_answers,
@@ -1138,27 +1156,28 @@ function sendLead() {
     p_consent: true,
     p_consent_text: payload.consentText,
     p_page_lang: 'he'
-  });
-
-  // One destination failing must not cost the person their answers, so this
-  // only reports an error when both refused them.
-  Promise.allSettled([toMake, toSupabase]).then(function (r) {
-    const makeOk = r[0].status === 'fulfilled' && r[0].value.ok;
-    const dbOk   = r[1].status === 'fulfilled' && r[1].value && r[1].value.ok;
-
-    if (!makeOk) console.error('Make webhook failed:', r[0].reason || r[0].value.status);
-    if (!dbOk)   console.error('Supabase save failed:', r[1].reason || r[1].value);
-
-    if (!makeOk && !dbOk) {
-      alert('אירעה שגיאה בשליחה. אפשר לשלוח לי הודעה בוואטסאפ במקום.');
-      btn.disabled = false;
-      btn.textContent = 'שלחו לי את הפרטים';
+  }).then(function (res) {
+    if (res && res.ok) {
+      // Nothing is waiting on Make, so the person stops waiting here.
+      sendToMake().catch(function (e) { console.error('Make webhook failed:', e); });
+      done();
       return;
     }
-
-    identity = { name: name, phone: phone, token: null };
-    stage('details', 8, track);
-    show('scDone');
+    var reason = res && res.reason;
+    console.error('Supabase refused the submission:', reason);
+    // Already saved from an earlier attempt — telling them it failed would be
+    // a lie, and sending it on to Make would just duplicate what is there.
+    if (reason === 'too_many_attempts') { done(); return; }
+    if (reason === 'busy') {
+      fail('יש כרגע עומס על הטופס. אפשר לשלוח לי הודעה בוואטסאפ ואחזור אליך.');
+      return;
+    }
+    fail();
+  }).catch(function (e) {
+    // Supabase is unreachable, so Make is the only thing standing between this
+    // person and losing everything they just filled in.
+    console.error('Supabase save failed:', e);
+    sendToMake().then(function (r) { r.ok ? done() : fail(); }).catch(fail);
   });
 }
 </script>
