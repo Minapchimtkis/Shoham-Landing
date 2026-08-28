@@ -1238,18 +1238,24 @@ section {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin: 4px 0 18px;
+  /* The whole row is the label, so it is what gets tapped. One line of small
+     text left it 20px tall on a phone — under half the 44px a thumb needs,
+     and a miss reads as a submit button that does not work. */
+  padding: 12px 0;
+  margin: 0 0 8px;
+  min-height: 44px;
   cursor: pointer;
   text-align: start;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .consent-row input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   flex-shrink: 0;
-  width: 19px;
-  height: 19px;
-  margin: 1px 0 0;
+  width: 22px;
+  height: 22px;
+  margin: -1px 0 0;
   border-radius: 5px;
   border: 1px solid rgba(168,85,247,0.5);
   background: rgba(168,85,247,0.08);
@@ -1266,10 +1272,10 @@ section {
 .consent-row input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
   border: solid #fff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
