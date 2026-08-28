@@ -36,6 +36,12 @@ revoke all on table private.app_config from public, anon, authenticated;
 
 -- ---------------------------------------------------------------- payload --
 -- One shape, built in one place, whichever trigger is asking.
+--
+-- The rows are read as json rather than by column name on purpose. Not every
+-- install of this table has the same columns — source, for one, is not
+-- everywhere — and naming a column that is not there does not fail politely,
+-- it stops the whole thing from being created. Read as json, a column that
+-- does not exist simply comes back empty.
 create or replace function private.make_payload(
   p_lead   public.leads,
   p_result public.quiz_results,
@@ -45,22 +51,23 @@ language sql stable
 set search_path = public, pg_temp
 as $$
   select jsonb_build_object(
-    'name',        p_lead.name,
-    'phone',       p_lead.phone,
-    'message',     p_lead.message,
-    'consent',     coalesce(p_lead.consent, false),
-    'consentText', p_lead.consent_text,
-    'consentAt',   p_lead.consent_at,
-    'pageLang',    coalesce(p_lead.page_lang, 'he'),
-    'source',      coalesce(p_lead.source, 'direct'),
+    'name',        l->>'name',
+    'phone',       l->>'phone',
+    'message',     l->>'message',
+    'consent',     coalesce((l->'consent')::boolean, false),
+    'consentText', l->>'consent_text',
+    'consentAt',   l->'consent_at',
+    'pageLang',    coalesce(l->>'page_lang', 'he'),
+    'source',      coalesce(l->>'source', 'direct'),
     'route',       p_route,
-    'lead_id',     p_lead.id,
-    'created_at',  p_lead.created_at,
-    'quiz_type',     p_result.quiz_type,
-    'quiz_score',    p_result.quiz_score,
-    'quiz_score_100',p_result.quiz_score,
-    'quiz_answers',  p_result.quiz_answers
+    'lead_id',     l->'id',
+    'created_at',  l->'created_at',
+    'quiz_type',     r->>'quiz_type',
+    'quiz_score',    r->'quiz_score',
+    'quiz_score_100',r->'quiz_score',
+    'quiz_answers',  r->'quiz_answers'
   )
+  from (select to_jsonb(p_lead) as l, to_jsonb(p_result) as r) as j
 $$;
 
 create or replace function private.make_send(p_body jsonb)
