@@ -473,7 +473,12 @@ const QUICK_TAGS=[{label:'לא ענה',cls:'t-amber'},{label:'פגישה נקב�
 const TAG_CLS=Object.fromEntries(QUICK_TAGS.map(t=>[t.label,t.cls]));
 const ICON_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.2v5l3 1.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICON_CAL='<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.2v4M16 3.2v4M3.5 10.2h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[],waClicks=[],funnel=[];
+let dateFilter='all',dateFromVal='',dateToVal='',draftTags=[],quizResults=[];
+// Counts rather than rows: what the dashboard draws from these is a
+// handful of numbers, and downloading a row per visit to reach them is
+// what made the page slower every week.
+let waByLead=new Map(),waAnonToday=0,funnelCounts=[],waSummaryOk=true,funnelRpcOk=true,slowTimer=null;
+const quizAnswers=new Map();
 let currentSort='new',realtimeChannel=null,newCount=0,ageTimer=null;
 const openedIds=new Set();
 let seenBaseline='';try{seenBaseline=localStorage.getItem('leadsLastSeen')||''}catch{}
@@ -498,15 +503,39 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel()]);startRealtime();if(!refreshTimer)refreshTimer=setInterval(()=>{loadLeads();loadQuiz();loadWa();loadFunnel()},60000)}
-function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel()]);startRealtime();
+  // Leads are the live part and realtime already pushes new ones; the rest
+  // changes slowly and does not need a round trip every minute.
+  if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000);
+  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel()},300000)}
+function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}if(slowTimer){clearInterval(slowTimer);slowTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();setError($('loginError'),'');$('loginBtn').disabled=true;$('loginBtn').textContent='מתחבר...';const email=$('loginEmail').value.trim(),password=$('loginPassword').value;const{data,error}=await supabase.auth.signInWithPassword({email,password});$('loginBtn').disabled=false;$('loginBtn').textContent='כניסה למערכת';if(error){setError($('loginError'),'האימייל או הסיסמה אינם נכונים.');return}await setLoggedIn(data.user)});
 
+// Supabase caps a single response at 1000 rows, so a plain select stops
+// there without saying so. Walk the pages until one comes back short.
+const PAGE_SIZE=1000;
+async function fetchAll(build){
+  const out=[];
+  for(let from=0;;from+=PAGE_SIZE){
+    const{data,error}=await build().range(from,from+PAGE_SIZE-1);
+    if(error)return{data:null,error};
+    out.push(...(data||[]));
+    if((data||[]).length<PAGE_SIZE)return{data:out,error:null};
+  }
+}
+// True when the summary view or function has not been created yet, so the
+// dashboard can fall back to reading the tables directly.
+function schemaMissing(e){
+  const c=String(e?.code||'');
+  return c==='42P01'||c==='42883'||c.startsWith('PGRST2')||
+         /does not exist|could not find/i.test(e?.message||'');
+}
+
 async function loadLeads(){
   if(!currentUser)return;show($('loadingState'));hide($('emptyState'));
-  const{data,error}=await supabase.from('leads').select('*').order('created_at',{ascending:false});
+  const{data,error}=await fetchAll(()=>supabase.from('leads').select('*').order('created_at',{ascending:false}));
   hide($('loadingState'));if(error){console.error(error);toast('לא ניתן לטעון את הפניות','bad');return}
   leads=data||[];selectedIds=new Set([...selectedIds].filter(id=>leads.some(l=>l.id===id)));render();renderQuiz();if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderDetail(activeLeadId)
 }
@@ -518,24 +547,51 @@ function scoreClass(n){return n>=75?'s-hi':n>=50?'s-mid':n>=25?'s-low':'s-min'}
 // carries a lead when they gave their details, and nothing when they skipped.
 async function loadWa(){
   if(!currentUser)return;
-  const{data,error}=await supabase.from('wa_clicks').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return}
+  // How many times each lead went out, and when last — one row per lead
+  // instead of one per click.
+  if(waSummaryOk){
+    const{data,error}=await fetchAll(()=>supabase.from('wa_clicks_summary').select('lead_id,clicks,last_at'));
+    if(error){if(schemaMissing(error))waSummaryOk=false;else{console.error(error);return}}
+    else waByLead=new Map((data||[]).map(r=>[r.lead_id,{clicks:r.clicks,last:r.last_at}]));
+  }
+  if(!waSummaryOk){
+    const{data,error}=await fetchAll(()=>supabase.from('wa_clicks').select('lead_id,created_at'));
+    if(error){console.error(error);return}
+    const m=new Map();
+    for(const c of data||[]){
+      const cur=m.get(c.lead_id)||{clicks:0,last:null};
+      cur.clicks++;if(!cur.last||c.created_at>cur.last)cur.last=c.created_at;
+      m.set(c.lead_id,cur);
+    }
+    waByLead=m;
+  }
+  const midnight=new Date();midnight.setHours(0,0,0,0);
+  const{count,error:e2}=await supabase.from('wa_clicks').select('id',{count:'exact',head:true})
+    .is('lead_id',null).gte('created_at',midnight.toISOString());
+  if(e2)console.error(e2);else waAnonToday=count||0;
   // The list may already have been drawn before these arrived, so redraw it
   // to bring in the chips.
-  waClicks=data||[];renderWaNote();render();if(activeLeadId!=null)renderDetailWa(activeLeadId)
+  renderWaNote();render();if(activeLeadId!=null)renderDetailWa(activeLeadId)
 }
-function waFor(id){const ids=partyOf(id).map(l=>l.id);return waClicks.filter(c=>ids.includes(c.lead_id))}
+// One person can hold more than one lead row, so the counts add up across them.
+function waStat(id){
+  let clicks=0,last=null;
+  for(const l of partyOf(id)){
+    const s=waByLead.get(l.id);if(!s)continue;
+    clicks+=s.clicks;if(!last||s.last>last)last=s.last;
+  }
+  return{clicks,last}
+}
 function renderWaNote(){
-  const midnight=new Date();midnight.setHours(0,0,0,0);
-  const anon=waClicks.filter(c=>!c.lead_id&&new Date(c.created_at)>=midnight).length;
+  const anon=waAnonToday;
   $('waNote').classList.toggle('hidden',anon===0);
   $('waNoteCount').textContent=anon;
 }
 function renderDetailWa(id){
-  const rows=waFor(id),box=$('detailWa');
-  box.classList.toggle('hidden',rows.length===0);
-  if(!rows.length)return;
-  box.textContent='יצא/ה לוואטסאפ '+(rows.length===1?'פעם אחת':rows.length+' פעמים')+' · אחרון ב־'+parts(rows[0].created_at).full;
+  const{clicks,last}=waStat(id),box=$('detailWa');
+  box.classList.toggle('hidden',clicks===0);
+  if(!clicks)return;
+  box.textContent='יצא/ה לוואטסאפ '+(clicks===1?'פעם אחת':clicks+' פעמים')+' · אחרון ב־'+parts(last).full;
 }
 
 // Each visit leaves one row holding the furthest point it reached, so a
@@ -553,23 +609,38 @@ const STAGES=[
   {i:20,label:'סיימו הכול'}
 ];
 
+// The panel asks one thing of a table that grows with every visit: how many
+// visits reached each stage in the chosen range. The database answers that in
+// about twenty rows, so the range now goes down with the query.
 async function loadFunnel(){
   if(!currentUser)return;
-  const{data,error}=await supabase.from('quiz_funnel').select('stage_index,created_at').order('created_at',{ascending:false});
+  const{from,to}=dateRange();
+  if(funnelRpcOk){
+    const{data,error}=await supabase.rpc('quiz_funnel_counts',
+      {p_from:from?from.toISOString():null,p_to:to?to.toISOString():null});
+    if(error){if(schemaMissing(error))funnelRpcOk=false;else{console.error(error);return}}
+    else{funnelCounts=(data||[]).map(r=>({stage:r.stage_index,visits:r.visits}));renderFunnel();return}
+  }
+  const{data,error}=await fetchAll(()=>supabase.from('quiz_funnel').select('stage_index,created_at'));
   if(error){console.error(error);return}
-  funnel=data||[];renderFunnel()
+  const m=new Map();
+  for(const r of data||[]){
+    if(!inDateRange(r.created_at))continue;
+    m.set(r.stage_index,(m.get(r.stage_index)||0)+1);
+  }
+  funnelCounts=[...m].map(([stage,visits])=>({stage,visits}));renderFunnel()
 }
 
 function renderFunnel(){
   const box=$('fnRows');box.replaceChildren();
-  const rows=funnel.filter(f=>inDateRange(f.created_at));
-  if(!rows.length){const p=document.createElement('div');p.className='fn-empty';
+  const atLeast=i=>funnelCounts.reduce((n,r)=>n+(r.stage>=i?r.visits:0),0);
+  const total=atLeast(0);
+  if(!total){const p=document.createElement('div');p.className='fn-empty';
     p.textContent='עדיין אין ביקורים בשאלון בטווח שנבחר.';box.append(p);$('fnRange').textContent='—';return}
-  const total=rows.filter(r=>r.stage_index>=0).length;
   $('fnRange').textContent=total+' ביקורים';
   let prev=null;
   STAGES.forEach(st=>{
-    const n=rows.filter(r=>r.stage_index>=st.i).length;
+    const n=atLeast(st.i);
     const row=document.createElement('div');row.className='fn-row';
     const top=document.createElement('div');top.className='fn-top';
     const nm=document.createElement('span');nm.className='fn-name';nm.textContent=st.label;
@@ -589,12 +660,27 @@ function renderFunnel(){
   });
 }
 
+// The answers are the bulk of a result and the list never shows them, so the
+// list asks only for what it draws. They come down for one lead at a time,
+// when that lead is opened.
+const QUIZ_LIST_COLS='id,lead_id,quiz_type,quiz_score,created_at,leads(name,phone)';
 async function loadQuiz(){
   if(!currentUser)return;
   // The embedded lead lets the list show who answered without a second query.
-  const{data,error}=await supabase.from('quiz_results').select('*, leads(name,phone)').order('created_at',{ascending:false});
+  const{data,error}=await fetchAll(()=>supabase.from('quiz_results').select(QUIZ_LIST_COLS).order('created_at',{ascending:false}));
   if(error){console.error(error);return}
   quizResults=data||[];renderQuiz();if(activeLeadId!=null)renderLeadQuiz(activeLeadId)
+}
+async function loadAnswers(ids){
+  const missing=ids.filter(id=>!quizAnswers.has(id));
+  if(!missing.length)return false;
+  const{data,error}=await fetchAll(()=>supabase.from('quiz_results').select('id,quiz_answers').in('id',missing));
+  if(error){console.error(error);return false}
+  for(const r of data||[])quizAnswers.set(r.id,Array.isArray(r.quiz_answers)?r.quiz_answers:[]);
+  // A result that came back empty must still be marked as fetched, or the
+  // detail view would ask for it again on every redraw.
+  for(const id of missing)if(!quizAnswers.has(id))quizAnswers.set(id,[]);
+  return true
 }
 
 function renderQuiz(){
@@ -631,12 +717,17 @@ function renderLeadQuiz(id){
     const sc=document.createElement('div');sc.className='qr-score '+scoreClass(r.quiz_score??0);sc.textContent=(r.quiz_score??'—')+' / 100';
     const when=document.createElement('div');when.className='qz-when';when.textContent=parts(r.created_at).full;
     right.append(sc,when);top.append(kind,right);card.append(top);
-    (Array.isArray(r.quiz_answers)?r.quiz_answers:[]).forEach(a=>{
+    const answers=quizAnswers.get(r.id);
+    if(answers===undefined){const w=document.createElement('div');w.className='qz-none';
+      w.textContent='טוען תשובות…';card.append(w)}
+    else answers.forEach(a=>{
       const qa=document.createElement('div');qa.className='qz-qa';qa.textContent=a?.q||'';
       const b=document.createElement('b');b.textContent=a?.a||'';qa.append(b);card.append(qa)
     });
     box.append(card)
   }
+  const pending=rows.filter(r=>!quizAnswers.has(r.id)).map(r=>r.id);
+  if(pending.length)loadAnswers(pending).then(ok=>{if(ok&&activeLeadId===id)renderLeadQuiz(id)});
 }
 
 // The same person can end up with more than one row: quiz_submit matches an
@@ -672,7 +763,7 @@ function render(){
       c.className='row-src'+(srcKey==='quiz'?' quiz':srcKey==='whatsapp'?' wa':'');
       c.textContent=SRC_LABEL[srcKey]||src;meta.append(c)}
     // Only worth a chip when it says something the source chip does not.
-    if(srcKey!=='whatsapp'&&waFor(lead.id).length){const c=document.createElement('span');
+    if(srcKey!=='whatsapp'&&waStat(lead.id).clicks){const c=document.createElement('span');
       c.className='row-src wa';c.textContent='וואטסאפ';c.title='פנה/תה דרך כפתור הוואטסאפ';meta.append(c)}
     if(party.length>1){const c=document.createElement('span');c.className='row-src dupe';c.textContent=party.length+' רשומות';c.title='אותו טלפון נרשם יותר מפעם אחת';meta.append(c)}
     const tags=leadTags(lead);
@@ -885,22 +976,27 @@ const BACKUP_COLS=[
   ['הערות פנימיות',30,l=>l.admin_notes],
   ['הסכמה',9,l=>l.consent?'כן':'לא'],
   ['מועד הסכמה',17,l=>xlDate(l.consent_at)],
-  ['שאלונים',9,l=>quizResults.filter(r=>r.lead_id===l.id).length||''],
-  ['יציאות לוואטסאפ',15,l=>waClicks.filter(c=>c.lead_id===l.id).length||''],
+  ['שאלונים',9,(l,x)=>x.quiz.get(l.id)||''],
+  ['יציאות לוואטסאפ',15,(l,x)=>x.wa.get(l.id)||''],
   ['מזהה',38,l=>String(l.id)]
 ];
 const BACKUP_MAPPED=['name','phone','status','source','page_lang','created_at','first_contact_at','follow_up_at','tags','message','admin_notes','consent','consent_at','id'];
 function backupExtras(){return[...new Set(leads.flatMap(Object.keys))].filter(k=>!BACKUP_MAPPED.includes(k)).sort()}
 function cellText(v){return v==null?'':typeof v==='object'?JSON.stringify(v):String(v)}
-function leadsSheet(){
-  const extras=backupExtras();
+// The backup is the one place that does want every row, answers included, so
+// it fetches its own copy rather than leaning on what the list holds.
+function leadsSheet(quizFull,waRaw){
+  const quiz=new Map(),wa=new Map();
+  for(const r of quizFull)quiz.set(r.lead_id,(quiz.get(r.lead_id)||0)+1);
+  for(const c of waRaw)wa.set(c.lead_id,(wa.get(c.lead_id)||0)+1);
+  const x={quiz,wa},extras=backupExtras();
   const rows=[[...BACKUP_COLS.map(c=>c[0]),...extras]];
-  for(const l of leads)rows.push([...BACKUP_COLS.map(c=>c[2](l)),...extras.map(k=>cellText(l[k]))]);
+  for(const l of leads)rows.push([...BACKUP_COLS.map(c=>c[2](l,x)),...extras.map(k=>cellText(l[k]))]);
   return{name:'לידים',rows,widths:[...BACKUP_COLS.map(c=>c[1]),...extras.map(()=>18)],wrap:[9,10]};
 }
-function quizSheet(){
+function quizSheet(quizFull){
   const rows=[['שם','טלפון','סוג שאלון','ציון','תאריך','שאלה','תשובה']];
-  for(const r of quizResults){
+  for(const r of quizFull){
     const l=leads.find(x=>x.id===r.lead_id);
     const head=[r.leads?.name||l?.name||'ליד שנמחק',r.leads?.phone||l?.phone||'',QUIZ_KIND[r.quiz_type]||r.quiz_type||'',r.quiz_score??'',xlDate(r.created_at)];
     const answers=Array.isArray(r.quiz_answers)?r.quiz_answers:[];
@@ -910,9 +1006,9 @@ function quizSheet(){
   return{name:'תשובות שאלון',rows,widths:[18,14,12,7,17,46,40],wrap:[5,6]};
 }
 const WA_PAGE={landing:'דף הבית',quiz:'שאלון'};
-function waSheet(){
+function waSheet(waRaw){
   const rows=[['תאריך','שם','טלפון','מהיכן']];
-  for(const c of waClicks){
+  for(const c of waRaw){
     const l=leads.find(x=>x.id===c.lead_id);
     rows.push([xlDate(c.created_at),l?.name||'ללא פרטים',l?.phone||'',WA_PAGE[c.page]||c.page||'']);
   }
@@ -936,7 +1032,12 @@ async function exportBackup(){
     // מרעננים קודם, כדי שהעותק שיורד יהיה מה שיש עכשיו ולא מה שנטען לפני שעה
     await Promise.all([loadLeads(),loadQuiz(),loadWa()]);
     if(!leads.length){toast('אין לידים לגיבוי','bad');return}
-    const blob=xlsxBlob([leadsSheet(),quizSheet(),waSheet()]);
+    const[q,w]=await Promise.all([
+      fetchAll(()=>supabase.from('quiz_results').select('*, leads(name,phone)').order('created_at',{ascending:false})),
+      fetchAll(()=>supabase.from('wa_clicks').select('*').order('created_at',{ascending:false}))
+    ]);
+    if(q.error||w.error)throw q.error||w.error;
+    const blob=xlsxBlob([leadsSheet(q.data,w.data),quizSheet(q.data),waSheet(w.data)]);
     const d=new Date(),p=n=>String(n).padStart(2,'0');
     saveBlob(blob,`leads-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.xlsx`);
     try{localStorage.setItem(BACKUP_KEY,d.toISOString())}catch{}
@@ -975,17 +1076,17 @@ document.querySelectorAll('#dateMenu [data-range]').forEach(btn=>btn.addEventLis
   document.querySelectorAll('#dateMenu [data-range]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
   $('dateCustom').classList.toggle('show',r==='custom');
   if(r==='custom'){dateFilter='custom';syncDateBtn();return}
-  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();renderFunnel();
+  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();
   toast(r==='all'?'הסינון לפי תאריך בוטל':'מציג: '+RANGE_LABEL[r])
 }));
 $('dateApply').addEventListener('click',()=>{
   dateFromVal=$('dateFrom').value;dateToVal=$('dateTo').value;
   if(dateFromVal&&dateToVal&&dateFromVal>dateToVal){toast('תאריך ההתחלה מאוחר מתאריך הסיום','bad');return}
   if(!dateFromVal&&!dateToVal){toast('יש לבחור לפחות תאריך אחד','bad');return}
-  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();renderFunnel();toast('הסינון הוחל')
+  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{loadLeads();loadQuiz();loadWa();loadFunnel()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();loadLeads();loadQuiz();loadWa();loadFunnel()});$('backToDashboard').addEventListener('click',back);
 
 function setTab(which){
   const onQuiz=which==='quiz';
