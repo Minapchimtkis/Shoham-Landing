@@ -545,8 +545,7 @@ section {
   margin: 0 auto;
 }
 
-.section-label,
-.deliver-label {
+.section-label {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 4px;
@@ -672,15 +671,13 @@ section {
   text-align: center;
 }
 
-.method-title,
-.deliver-title {
+.method-title {
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 800;
   margin-bottom: 20px;
 }
 
-.method-sub,
-.deliver-sub {
+.method-sub {
   font-size: 17px;
   font-weight: 300;
   color: rgba(255,255,255,0.78);
@@ -724,15 +721,13 @@ section {
 }
 
 .step-content {}
-.step-title,
-.deliver-t {
+.step-title {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 8px;
   color: var(--white);
 }
-.step-desc,
-.deliver-d {
+.step-desc {
   font-size: 15px;
   font-weight: 300;
   color: rgba(255,255,255,0.78);
@@ -2586,39 +2581,6 @@ footer {
   </div>
 </section>
 
-<!-- WHAT YOU WALK AWAY WITH -->
-<section class="method" id="deliver">
-  <div class="method-inner">
-    <div class="deliver-label reveal" id="dLabel">מה נשאר לכם</div>
-    <h2 class="deliver-title reveal" id="dTitle">ומה יוצא לכם מזה בסוף?</h2>
-    <p class="deliver-sub reveal" id="dSub">לא הרצאה ולא תיאוריה. שלושה דברים שנשארים אצלכם גם אחרי שהליווי נגמר.</p>
-
-    <div class="steps">
-      <div class="step" style="transition-delay:0.0s">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <div class="deliver-t" id="d1t">קובץ התקציב שלכם</div>
-          <div class="deliver-d" id="d1d">אקסל מפורט שבונים יחד, מותאם לחיים שלכם ולא תבנית שהורדתם מהאינטרנט. הוא מכסה כל שקל שנכנס ויוצא — מהמשכורת ועד הביטוחים, מהמכולת ועד החיסכון לילדים. הוא נשאר אצלכם, ואתם יודעים לתפעל אותו לבד.</div>
-        </div>
-      </div>
-      <div class="step" style="transition-delay:0.1s">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <div class="deliver-t" id="d2t">היכולת לנהל בעצמכם</div>
-          <div class="deliver-d" id="d2d">המטרה שלי היא לא שתהיו תלויים בי. עד סוף הדרך אתם יודעים לקרוא את המצב שלכם, לזהות מה לא עובד ולתקן אותו בעצמכם, בלי לחכות שמישהו יגיד לכם מה לעשות.</div>
-        </div>
-      </div>
-      <div class="step" style="transition-delay:0.2s">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <div class="deliver-t" id="d3t">הביטחון שאפשר גם אחרת</div>
-          <div class="deliver-d" id="d3d">זה החלק שהכי קשה למדוד, והוא הכי חשוב. ההבנה שהמצב שלכם היום הוא לא גזרה, ושהעתיד שלכם ושל הילדים נקבע בהחלטות שאתם מקבלים — לא במזל ולא בבנק.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- FAQ -->
 <section class="faq-section">
   <div class="faq-inner">
@@ -3624,15 +3586,6 @@ const translations = {
     p1t: 'משחררים את הלחץ', p1d: 'הניסיון מהצבא לימד אותי שהכול מתחיל בחוסן מנטלי. לפני שנוגעים במספרים, נבנה שקט נפשי וסדר בראש.',
     p2t: 'כלים שבאמת עובדים', p2d: 'נמאס לך ממושגים מסובכים? גם לי. אלמד אותך איך לנהל את הכסף בדרך פשוטה וחכמה שמתאימה לחיים ולרצונות שלך בלבד.',
     p3t: 'מפענחים את התמונה', p3d: 'נעבור יחד על קרן הפנסיה, קרן ההשתלמות ואפיקי החיסכון, ונבין מה כל אחד מהם ואיך הוא עובד, כדי שתדעו בדיוק מה יש לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.',
-    dLabel: 'מה נשאר לכם',
-    dTitle: 'ומה יוצא לכם מזה בסוף?',
-    dSub: 'לא הרצאה ולא תיאוריה. שלושה דברים שנשארים אצלכם גם אחרי שהליווי נגמר.',
-    d1t: 'קובץ התקציב שלכם',
-    d1d: 'אקסל מפורט שבונים יחד, מותאם לחיים שלכם ולא תבנית שהורדתם מהאינטרנט. הוא מכסה כל שקל שנכנס ויוצא — מהמשכורת ועד הביטוחים, מהמכולת ועד החיסכון לילדים. הוא נשאר אצלכם, ואתם יודעים לתפעל אותו לבד.',
-    d2t: 'היכולת לנהל בעצמכם',
-    d2d: 'המטרה שלי היא לא שתהיו תלויים בי. עד סוף הדרך אתם יודעים לקרוא את המצב שלכם, לזהות מה לא עובד ולתקן אותו בעצמכם, בלי לחכות שמישהו יגיד לכם מה לעשות.',
-    d3t: 'הביטחון שאפשר גם אחרת',
-    d3d: 'זה החלק שהכי קשה למדוד, והוא הכי חשוב. ההבנה שהמצב שלכם היום הוא לא גזרה, ושהעתיד שלכם ושל הילדים נקבע בהחלטות שאתם מקבלים — לא במזל ולא בבנק.',
     missionLabel: 'השליחות שלי',
     siteLink: 'לאתר מנפחים ת׳כיס',
     missionText: 'הקמתי את מנפחים ת׳כיס, פלטפורמה חינמית שמלמדת בני נוער בישראל להתנהל עם כסף, עוד לפני המשכורת הראשונה. בניתי אותה כי בסיס פיננסי איתן מגיע לכל אחד מההתחלה, ולא רק למי שנולד לתוכו. היא באוויר, פתוחה לכולם, ואין בה שקל אחד לשלם.',
@@ -3709,15 +3662,6 @@ const translations = {
     p1t: 'Releasing the pressure', p1d: 'My military experience taught me everything starts with mental resilience. Before touching the numbers, we build inner calm and clarity.',
     p2t: 'Tools that actually work', p2d: 'Tired of complicated jargon? So am I. I will teach you how to manage money in a simple, smart way that fits your life and your goals only.',
     p3t: 'Making sense of the picture', p3d: 'We go through your pension fund, savings fund and other channels together, so you understand what each one is, how it works and exactly what you have. I explain and lay out the options; the decision is always yours, and anything requiring a license gets referred to a licensed professional.',
-    dLabel: 'What you keep',
-    dTitle: 'And what do you walk away with?',
-    dSub: 'Not a lecture and not theory. Three things that stay with you long after the work together ends.',
-    d1t: 'Your own budget file',
-    d1d: 'A detailed spreadsheet we build together, fitted to your life rather than downloaded off the internet. It covers every shekel in and out, from salary to insurance, from groceries to the children\'s savings. It stays yours, and you know how to run it on your own.',
-    d2t: 'Being able to do it yourselves',
-    d2d: 'The goal is not for you to depend on me. By the end you can read your own situation, spot what is not working and fix it yourselves, without waiting for anyone to tell you what to do.',
-    d3t: 'The confidence that it can be different',
-    d3d: 'This is the hardest part to measure and the most important one. Understanding that where you are today is not a verdict, and that your future and your children\'s is decided by the choices you make, not by luck and not by the bank.',
     missionLabel: 'My Mission',
     siteLink: "Visit Minapchim T'kis",
     missionText: "I founded Minapchim T'kis, a free platform that teaches teenagers in Israel to handle money, before their first payslip. I built it because a solid financial footing should belong to everyone from the start, not only to whoever was born into one. It is live, open to anyone, and there is nothing to pay.",
@@ -3838,9 +3782,6 @@ function setLang(lang) {
 
   // FAQ
   sectionLabels[5].textContent = t.processLabel;
-  for (const k of ['dLabel','dTitle','dSub','d1t','d1d','d2t','d2d','d3t','d3d']) {
-    const el = document.getElementById(k); if (el) el.textContent = t[k];
-  }
   document.querySelector('.process-section .faq-title').textContent = t.processTitle;
   const procTitles = document.querySelectorAll('.process-title');
   const procDescs = document.querySelectorAll('.process-desc');
