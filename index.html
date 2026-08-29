@@ -1447,9 +1447,14 @@ section {
   color: var(--p6);
 }
 
+.quiz-section {
+  padding: 10px 20px 46px;
+}
+
 .quiz-invite {
-  margin-top: 22px;
-  padding: 28px 24px;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 30px 26px;
   background: linear-gradient(158deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
   border: 1px solid rgba(168,85,247,0.28);
   border-radius: 16px;
@@ -2463,6 +2468,16 @@ footer {
   </div>
 </section>
 
+<!-- QUIZ — a way in for someone not ready to leave a number yet -->
+<section class="quiz-section reveal">
+  <div class="quiz-invite" id="quizInvite">
+    <div class="quiz-invite-label">או בדרך אחרת</div>
+    <h3>ואיפה את/ה עומד/ת היום?</h3>
+    <p>חמש שאלות קצרות, דקה אחת, בלי להשאיר טלפון. בסוף תקבל/י תמונה ברורה של המצב שלך — ואם תרצה/י, אחזור אליך עם הכיוון הראשון.</p>
+    <a class="btn-primary" id="quizLink" href="quiz.html">לשאלון האישי ←</a>
+  </div>
+</section>
+
 <!-- ABOUT -->
 <section class="about">
   <div class="section-label reveal" style="text-align:center; margin-bottom:28px;">אז מי אני?</div>
@@ -2668,12 +2683,6 @@ footer {
     <div class="success-msg" id="successMsg">
       🎉 קיבלתי! אחזור אליך בהקדם האפשרי.<br>
       <span style="font-size:14px; font-weight:300; color:rgba(255,255,255,0.75);">הצעד הראשון כבר מאחורינו.</span>
-    </div>
-    <div class="quiz-invite" id="quizInvite">
-      <div class="quiz-invite-label">או בדרך אחרת</div>
-      <h3>לא בטוח/ה מה לכתוב?</h3>
-      <p>ענה/י על חמש שאלות קצרות במקום. זה לוקח דקה, ובסוף תקבל/י תמונה ברורה של איפה את/ה עומד/ת — ואני אחזור אליך עם הכיוון הראשון.</p>
-      <a class="btn-primary" id="quizLink" href="quiz.html">לשאלון האישי ←</a>
     </div>
   </div>
 </section>
@@ -3607,8 +3616,8 @@ const translations = {
     waSkip: 'לדלג ולעבור ישירות',
     waConsent: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.',
     quizLabel: 'או בדרך אחרת',
-    quizTitle: 'לא בטוח/ה מה לכתוב?',
-    quizText: 'ענה/י על חמש שאלות קצרות במקום. זה לוקח דקה, ובסוף תקבל/י תמונה ברורה של איפה את/ה עומד/ת — ואני אחזור אליך עם הכיוון הראשון.',
+    quizTitle: 'ואיפה את/ה עומד/ת היום?',
+    quizText: 'חמש שאלות קצרות, דקה אחת, בלי להשאיר טלפון. בסוף תקבל/י תמונה ברורה של המצב שלך — ואם תרצה/י, אחזור אליך עם הכיוון הראשון.',
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
     waInitial: 'ש',
@@ -3682,8 +3691,8 @@ const translations = {
     waSkip: 'Skip and go straight there',
     waConsent: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.',
     quizLabel: 'Another way in',
-    quizTitle: 'Not sure what to write?',
-    quizText: 'Answer five short questions instead. It takes a minute, and you will come away with a clear picture of where you stand — and I will get back to you with a first direction.',
+    quizTitle: 'And where do you stand today?',
+    quizText: 'Five short questions, one minute, no phone number needed. You will come away with a clear picture of where you stand — and if you want, I will get back to you with a first direction.',
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
     waInitial: 'S',
