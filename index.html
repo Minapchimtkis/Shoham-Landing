@@ -325,6 +325,7 @@ section {
 }
 
 .navbar-inner {
+  position: relative;
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
@@ -365,6 +366,11 @@ section {
 }
 
 .nav-cta {
+  /* Centred in the bar rather than tucked beside the toggle, so it reads as
+     the one thing to press. Absolute, so the logo on one side and the
+     language toggle on the other cannot pull it off centre. */
+  position: absolute;
+  left: 50%;
   display: inline-flex;
   align-items: center;
   min-height: 40px;
@@ -378,22 +384,19 @@ section {
   text-decoration: none;
   box-shadow: 0 6px 20px rgba(124,58,237,0.32);
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translate(-50%, -8px);
   pointer-events: none;
   transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
 .navbar.logo-visible .nav-cta {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
   pointer-events: auto;
 }
 
 .nav-cta:hover { filter: brightness(1.08); }
 
-@media (max-width: 420px) {
-  .nav-cta { font-size: 12px; padding: 0 13px; }
-}
 
 .hero-logo {
   height: 190px;
@@ -413,6 +416,21 @@ section {
   .navbar-logo { height: 46px; }
   .hero { padding: 88px 20px 56px; }
   .hero-logo { height: 124px; margin-bottom: 26px; }
+}
+
+/* On a narrow phone the logo and the toggle close in on the middle, so the
+   button gives back what it can rather than sit under either of them. */
+@media (max-width: 420px) {
+  .navbar-inner { padding: 0 14px; gap: 8px; }
+  .nav-cta { font-size: 12px; padding: 0 11px; }
+  .navbar-logo { height: 48px; }
+}
+
+/* At 320px the toggle reached into the middle, so both sides give a little. */
+@media (max-width: 340px) {
+  .navbar-inner { padding: 0 10px; }
+  .nav-cta { font-size: 11px; padding: 0 9px; }
+  .lang-btn { padding: 5px 9px; letter-spacing: 0.5px; }
 }
 
 .navbar-brand {
