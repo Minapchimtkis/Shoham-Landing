@@ -325,7 +325,6 @@ section {
 }
 
 .navbar-inner {
-  position: relative;
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
@@ -355,49 +354,6 @@ section {
   pointer-events: auto;
 }
 
-/* Between the hero and the form there were ten screens with no way to act.
-   This rides the same handoff as the logo: while the hero is on screen its
-   own big button is there, and the moment it scrolls away this takes over. */
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.nav-cta {
-  /* Centred in the bar rather than tucked beside the toggle, so it reads as
-     the one thing to press. Absolute, so the logo on one side and the
-     language toggle on the other cannot pull it off centre. */
-  position: absolute;
-  left: 50%;
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--p4), var(--p5));
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(124,58,237,0.32);
-  opacity: 0;
-  transform: translate(-50%, -8px);
-  pointer-events: none;
-  transition: opacity 0.45s ease, transform 0.45s ease;
-}
-
-.navbar.logo-visible .nav-cta {
-  opacity: 1;
-  transform: translate(-50%, 0);
-  pointer-events: auto;
-}
-
-.nav-cta:hover { filter: brightness(1.08); }
-
-
 .hero-logo {
   height: 190px;
   width: auto;
@@ -418,20 +374,6 @@ section {
   .hero-logo { height: 124px; margin-bottom: 26px; }
 }
 
-/* On a narrow phone the logo and the toggle close in on the middle, so the
-   button gives back what it can rather than sit under either of them. */
-@media (max-width: 420px) {
-  .navbar-inner { padding: 0 14px; gap: 8px; }
-  .nav-cta { font-size: 12px; padding: 0 11px; }
-  .navbar-logo { height: 48px; }
-}
-
-/* At 320px the toggle reached into the middle, so both sides give a little. */
-@media (max-width: 340px) {
-  .navbar-inner { padding: 0 10px; }
-  .nav-cta { font-size: 11px; padding: 0 9px; }
-  .lang-btn { padding: 5px 9px; letter-spacing: 0.5px; }
-}
 
 .navbar-brand {
   font-size: 14px;
@@ -2401,12 +2343,9 @@ footer {
   <div class="navbar-inner">
     <img class="navbar-logo" src="assets/logo.webp" alt="שוהם אבו — ליווי וייעוץ פיננסי">
     <div class="navbar-brand">שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי</div>
-    <div class="navbar-actions">
-      <a class="nav-cta" id="navCta" href="#contact">לתיאום פגישה</a>
-      <div class="lang-toggle" id="langToggle">
-        <button class="lang-btn active" id="btnHE" onclick="setLang('he')">HE</button>
-        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
-      </div>
+    <div class="lang-toggle" id="langToggle">
+      <button class="lang-btn active" id="btnHE" onclick="setLang('he')">HE</button>
+      <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </nav>
@@ -3610,7 +3549,6 @@ const translations = {
     heroLine3: 'הוא בחירה.',
     heroSub: 'לא משנה מאיפה התחלת. הגיע הזמן לשנות מסלול.',
     heroCta: 'מתחילים לצמוח · לתיאום פגישה',
-    navCta: 'לתיאום פגישה',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
     licenseSub: 'בפיקוח אוניברסיטת אריאל',
     painLabel: 'השדים שבראש',
@@ -3686,7 +3624,6 @@ const translations = {
     heroLine3: "It's a choice.",
     heroSub: 'It doesn\'t matter where you start. It\'s time to change direction.',
     heroCta: "Let's Grow · Book a Meeting",
-    navCta: 'Book a Meeting',
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
     licenseSub: 'Under Ariel University supervision',
     painLabel: 'The mental blocks',
@@ -3785,7 +3722,6 @@ function setLang(lang) {
   if (line3[1]) line3[1].innerHTML = isEN ? "It's a <span class='accent'>choice.</span>" : 'הוא <span class="accent">בחירה.</span>';
   document.querySelector('.hero-sub').textContent = t.heroSub;
   document.querySelector('.hero-cta a').textContent = t.heroCta;
-  document.getElementById('navCta').textContent = t.navCta;
   document.querySelector('.license-title').textContent = t.licenseTitle;
   document.querySelector('.license-sub').textContent = t.licenseSub;
 
