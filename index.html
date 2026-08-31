@@ -189,7 +189,8 @@ body::before {
     0 20px 44px -20px rgba(0,0,0,0.8),
     0 3px 10px rgba(0,0,0,0.28),
     inset 0 1px 0 rgba(255,255,255,0.075);
-  transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+  transition: border-color 0.4s, box-shadow 0.4s, background 0.4s,
+              opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 
 /* Alternating depth levels so the stack reads as a composition
@@ -273,6 +274,14 @@ body::before {
   .whatis-section::before, .whatis-section::after,
   .method::before {
     transform: none !important;
+  }
+  /* Someone who asked the operating system for less movement was still
+     getting all of it: forty-six elements sliding and scaling on scroll.
+     They fade, and nothing travels. */
+  .reveal, .reveal-left, .reveal-scale, .step {
+    transform: none !important;
+    transition: opacity 0.2s linear !important;
+    transition-delay: 0s !important;
   }
 }
 
@@ -699,8 +708,8 @@ section {
   padding: 36px 0;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   opacity: 0;
-  transform: translateX(30px);
-  transition: opacity 0.6s, transform 0.6s;
+  transform: translateX(20px);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 
 .step.visible {
@@ -898,7 +907,8 @@ section {
   padding: 32px 28px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.4s, transform 0.4s, background 0.4s;
+  transition: border-color 0.4s, background 0.4s,
+              opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 
 .phil-card::after {
@@ -1688,8 +1698,8 @@ footer {
 
 .reveal {
   opacity: 0;
-  transform: translateY(65px);
-  transition: opacity 1.3s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1);
+  transform: translateY(24px);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 .reveal.visible {
   opacity: 1;
@@ -1698,8 +1708,8 @@ footer {
 
 .reveal-left {
   opacity: 0;
-  transform: translateX(-65px);
-  transition: opacity 1.3s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1);
+  transform: translateX(-24px);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 .reveal-left.visible {
   opacity: 1;
@@ -1708,8 +1718,8 @@ footer {
 
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.82);
-  transition: opacity 1.2s cubic-bezier(0.22,1,0.36,1), transform 1.2s cubic-bezier(0.22,1,0.36,1);
+  transform: scale(0.94);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 .reveal-scale.visible {
   opacity: 1;
@@ -2030,7 +2040,8 @@ footer {
 .faq-item {
   border-bottom: 1px solid rgba(168,85,247,0.12);
   border-radius: 12px;
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  transition: background 0.4s ease, box-shadow 0.4s ease,
+              opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
   padding: 0 8px;
 }
 
@@ -3014,7 +3025,9 @@ const observer = new IntersectionObserver(entries => {
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  // Start as the element is about to enter rather than once it is in:
+  // the animation should be finished by the time it is being read.
+}, { threshold: 0, rootMargin: '0px 0px 120px 0px' });
 
 reveals.forEach(el => observer.observe(el));
 
@@ -3390,8 +3403,15 @@ function closeIphone() {
   if (isTouch) return; // skip on touch devices
 
   tiltCards.forEach(card => {
-    card.style.transition = 'transform 0.15s ease-out, border-color 0.4s, background 0.4s';
     card.style.transformStyle = 'preserve-3d';
+
+    // The tilt wants a fast transform to feel attached to the pointer, but
+    // setting that inline at load also overrode the scroll reveal: these
+    // cards snapped in at 0.15s with no fade while everything else eased in
+    // over 0.55s. Apply it on entry and hand the element back on the way out.
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.15s ease-out, border-color 0.4s, background 0.4s';
+    });
 
     card.addEventListener('mousemove', e => {
       const rect = card.getBoundingClientRect();
@@ -3406,6 +3426,8 @@ function closeIphone() {
 
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
+      // once the tilt has settled, let the stylesheet own it again
+      setTimeout(() => { card.style.transition = ''; }, 200);
     });
   });
 })();
