@@ -170,8 +170,8 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 @media(max-width:340px){.fu-row{grid-template-columns:minmax(0,1fr)}.fu-clear{width:100%}}
 
 /* ===== תוצאות שאלון ===== */
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.tab{min-height:43px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:7px}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:16px}
+.tab{min-height:43px;padding:0 6px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;font-size:11.5px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .tab.on{color:#dacaff;border-color:rgba(139,92,246,.36);background:rgba(139,92,246,.1)}
 .tab .count{min-width:20px;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.06);font-size:9px}
 .qr-row{display:grid;grid-template-columns:minmax(0,1fr) 84px 58px;align-items:center;gap:8px;padding:13px 12px;border-bottom:1px solid rgba(255,255,255,.055);cursor:pointer}
@@ -243,8 +243,46 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .stat.stat-wide{grid-column:1/-1;min-height:0;display:flex;align-items:center;justify-content:space-between;text-align:right;padding:11px 14px}
 .stat-wide .stat-top{justify-content:flex-start}
 .stat-wide b{margin:0;font-size:19px}
-#backupNote{font:inherit;color:inherit;cursor:pointer}
-#backupNote:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
+
+/* ===== סדר קבוע בכל טאב: התראות, מספרים, ואז התוכן =====
+   The three panes used to each look like their own idea, and the leads pane
+   in particular had seven boxes of three different kinds sitting in one grid:
+   four counts, a timing, and two notices that only appear sometimes. Nothing
+   said which of them was asking for something to be done. Now anything that
+   wants an action is a notice at the top, the numbers are the row under it,
+   and the tab's actual content is below that, the same way on all three. */
+.alerts{display:grid;gap:8px;margin-bottom:14px}
+.alerts:empty{display:none}
+.alert{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;text-align:right;padding:11px 13px;border:1px solid var(--line);
+  border-radius:14px;background:rgba(255,255,255,.022);font:inherit;color:inherit;
+  box-shadow:inset -3px 0 0 var(--amber)}
+.alert.alert-info{box-shadow:inset -3px 0 0 var(--green)}
+.alert-label{display:flex;align-items:center;gap:7px;color:#cdd2dc;font-size:11.5px;font-weight:800}
+.alert-value{color:var(--muted);font-size:11px;font-weight:800;white-space:nowrap}
+.alert-value b{color:#e7eaf1;font-size:14px}
+button.alert{cursor:pointer}
+button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
+
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.metric{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:11px 13px;border:1px solid var(--line);border-radius:14px;
+  background:rgba(255,255,255,.018)}
+.metric span{color:var(--muted);font-size:10.5px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.metric b{font-size:17px;white-space:nowrap}
+
+.pane-note{color:var(--muted2);font-size:10px;line-height:1.6;margin:-8px 2px 16px}
+
+/* מקורות התנועה */
+.src-head,.src-row{display:grid;grid-template-columns:minmax(0,1fr) 52px 52px 52px;gap:6px;
+  align-items:center;padding:9px 13px}
+.src-head{color:var(--muted2);font-size:9px;font-weight:800;border-bottom:1px solid var(--line)}
+.src-row{border-bottom:1px solid var(--line);font-size:11px}
+.src-row:last-child{border-bottom:0}
+.src-name{font-weight:800;color:#cdd2dc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-head span:not(:first-child),.src-row span:not(:first-child){justify-self:center;text-align:center}
+.src-n{font-weight:900;color:#e7eaf1}
+.src-zero{color:var(--muted2)}
 
 .filter-menu .menu-sep{height:1px;margin:5px 3px;background:var(--line)}
 .filter-menu .menu-title{color:var(--muted2);font-size:9px;font-weight:800;padding:2px 11px 4px}
@@ -290,18 +328,26 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 
 <div class="tabs">
   <button id="tabLeads" class="tab on">לידים <span class="count" id="tabLeadsCount">0</span></button>
-  <button id="tabQuiz" class="tab">תוצאות שאלון <span class="count" id="tabQuizCount">0</span></button>
+  <button id="tabQuiz" class="tab">שאלון <span class="count" id="tabQuizCount">0</span></button>
+  <button id="tabPage" class="tab">דף הנחיתה <span class="count" id="tabPageCount">0</span></button>
 </div>
 
 <div id="leadsPane">
+<section class="alerts">
+  <button type="button" class="alert hidden" id="backupNote" title="לחיצה מורידה עותק מלא של כל הלידים"><span class="alert-label"><i class="stat-dot" style="background:var(--amber)"></i>גיבוי אחרון</span><span class="alert-value" id="backupNoteText">—</span></button>
+  <div class="alert alert-info hidden" id="waNote"><span class="alert-label"><i class="stat-dot" style="background:var(--green)"></i>וואטסאפ ללא פרטים · היום</span><span class="alert-value"><b id="waNoteCount">0</b></span></div>
+</section>
+
 <section class="stats">
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>סה״כ</div><b id="statTotal">0</b><small>כל הלידים</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>חדשים</div><b id="statNew">0</b><small>ממתינים</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>נוצר קשר</div><b id="statContacted">0</b><small>בטיפול</small></div>
   <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>נסגרו</div><b id="statClosed">0</b><small>טופלו</small></div>
-  <div class="stat stat-wide"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>זמן תגובה חציוני</div><b id="statResponse">—</b></div>
-  <button type="button" class="stat stat-wide hidden" id="backupNote" title="לחיצה מורידה עותק מלא של כל הלידים"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>גיבוי אחרון</div><b id="backupNoteText">—</b></button>
-  <div class="stat stat-wide hidden" id="waNote"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>וואטסאפ ללא פרטים · היום</div><b id="waNoteCount">0</b></div>
+</section>
+
+<section class="metrics">
+  <div class="metric"><span>זמן תגובה חציוני</span><b id="statResponse">—</b></div>
+  <div class="metric"><span>לידים ב־7 ימים</span><b id="statWeek">0</b></div>
 </section>
 
 <section class="toolbar">
@@ -348,8 +394,12 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 </div>
 
 <div id="quizPane" class="hidden">
+  <section class="metrics">
+    <div class="metric"><span>שאלונים שהושלמו</span><b id="quizDone">0</b></div>
+    <div class="metric"><span>ציון ממוצע</span><b id="quizAvg">—</b></div>
+  </section>
   <div class="fn-wrap">
-    <div class="fn-head"><strong>עד לאן מגיעים</strong><span id="fnRange">—</span></div>
+    <div class="fn-head"><strong>עד לאן מגיעים בשאלון</strong><span id="fnRange">—</span></div>
     <div id="fnRows"></div>
   </div>
   <div class="list-shell">
@@ -358,6 +408,25 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
     </div>
     <div id="quizEmpty" class="empty hidden">אין עדיין תוצאות שאלון</div>
     <div id="quizList"></div>
+  </div>
+</div>
+
+<div id="pagePane" class="hidden">
+  <section class="stats">
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>כניסות</div><b id="pgVisits">0</b><small>לדף הנחיתה</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>הגיעו לשאלון</div><b id="pgQuiz">0</b><small>אמצע הדף</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>הגיעו לטופס</div><b id="pgForm">0</b><small>סוף הדף</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>השאירו פרטים</div><b id="pgLeads">0</b><small id="pgRate">—</small></div>
+  </section>
+  <div class="fn-wrap">
+    <div class="fn-head"><strong>עד לאן מגיעים בדף</strong><span id="pgRange">—</span></div>
+    <div id="pgRows"></div>
+  </div>
+  <p class="pane-note">כניסה נספרת בשלב מסוים אם אותו חלק של הדף עלה מעל אמצע המסך ונשאר שם רגע, כך שגלילה מהירה עד למטה לא נספרת כקריאה. מי שהדפדפן שלו מבקש לא להיעקב לא נספר כאן כלל.</p>
+  <div class="list-shell">
+    <div class="src-head"><span>מאיפה הגיעו</span><span>כניסות</span><span>לטופס</span><span>פרטים</span></div>
+    <div id="pgSrcEmpty" class="empty hidden">עדיין אין תנועה בטווח שנבחר</div>
+    <div id="pgSources"></div>
   </div>
 </div>
 </section>
@@ -503,11 +572,11 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel()]);startRealtime();
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage()]);startRealtime();
   // Leads are the live part and realtime already pushes new ones; the rest
   // changes slowly and does not need a round trip every minute.
   if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000);
-  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel()},300000)}
+  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage()},300000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}if(slowTimer){clearInterval(slowTimer);slowTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -631,15 +700,18 @@ async function loadFunnel(){
   funnelCounts=[...m].map(([stage,visits])=>({stage,visits}));renderFunnel()
 }
 
-function renderFunnel(){
-  const box=$('fnRows');box.replaceChildren();
-  const atLeast=i=>funnelCounts.reduce((n,r)=>n+(r.stage>=i?r.visits:0),0);
+// Both funnels draw the same thing from the same shape, so they draw it with
+// the same code: a stage's count is every visit that got at least that far,
+// and the fall from the row above is what is worth naming.
+function drawFunnel(box, rangeEl, stages, counts, emptyText, unit){
+  box.replaceChildren();
+  const atLeast=i=>counts.reduce((n,r)=>n+(r.stage>=i?r.visits:0),0);
   const total=atLeast(0);
   if(!total){const p=document.createElement('div');p.className='fn-empty';
-    p.textContent='עדיין אין ביקורים בשאלון בטווח שנבחר.';box.append(p);$('fnRange').textContent='—';return}
-  $('fnRange').textContent=total+' ביקורים';
+    p.textContent=emptyText;box.append(p);rangeEl.textContent='—';return}
+  rangeEl.textContent=total+' '+unit;
   let prev=null;
-  STAGES.forEach(st=>{
+  stages.forEach(st=>{
     const n=atLeast(st.i);
     const row=document.createElement('div');row.className='fn-row';
     const top=document.createElement('div');top.className='fn-top';
@@ -647,7 +719,6 @@ function renderFunnel(){
     const num=document.createElement('span');num.className='fn-num';
     const b=document.createElement('b');b.textContent=n;
     num.append(b,document.createTextNode(' · '+(total?Math.round(n/total*100):0)+'%'));
-    // the biggest single fall is the one worth naming
     if(prev!==null&&prev>0){const lost=prev-n;
       if(lost>0){const d=document.createElement('span');d.className='fn-drop';
         d.textContent='  −'+lost;num.append(d)}}
@@ -658,6 +729,92 @@ function renderFunnel(){
     bar.append(fill);row.append(top,bar);box.append(row);
     prev=n;
   });
+}
+
+function renderFunnel(){
+  drawFunnel($('fnRows'),$('fnRange'),STAGES,funnelCounts,
+    'עדיין אין ביקורים בשאלון בטווח שנבחר.','ביקורים');
+}
+
+// Same idea, one step earlier in the journey: how far down the landing page a
+// visit got before it left. The indices are the ten sections of the page in
+// order, plus 10 for leaving details. Ten rows is more than anyone reads at a
+// glance, so the panel shows the eight that a decision would turn on.
+const PAGE_STAGES=[
+  {i:0, label:'נכנסו לדף'},
+  {i:1, label:'הגיעו לכאב'},
+  {i:3, label:'הגיעו לשיטה'},
+  {i:4, label:'הגיעו לשאלון'},
+  {i:6, label:'הגיעו לתפיסה'},
+  {i:8, label:'הגיעו לשאלות הנפוצות'},
+  {i:9, label:'הגיעו לטופס'},
+  {i:10,label:'השאירו פרטים'}
+];
+let pageCounts=[], pageSources=[], pageRpcOk=true;
+
+async function loadPage(){
+  if(!currentUser||!pageRpcOk)return;
+  const{from,to}=dateRange();
+  const f=from?from.toISOString():null, t=to?to.toISOString():null;
+  const[c,s]=await Promise.all([
+    supabase.rpc('page_funnel_counts',{p_from:f,p_to:t,p_page:'landing'}),
+    supabase.rpc('page_sources',{p_from:f,p_to:t,p_page:'landing'})
+  ]);
+  // The table is not there until the migration is run, and the panel should
+  // say so plainly rather than sit blank or fill the console with errors.
+  if(c.error||s.error){
+    const e=c.error||s.error;
+    if(schemaMissing(e)){pageRpcOk=false;renderPage();return}
+    console.error(e);return;
+  }
+  pageCounts=(c.data||[]).map(r=>({stage:r.stage_index,visits:Number(r.visits)}));
+  pageSources=(s.data||[]).map(r=>({ref:r.ref||'',visits:Number(r.visits),
+    form:Number(r.reached_form),leads:Number(r.converted)}));
+  renderPage();
+}
+
+function renderPage(){
+  const atLeast=i=>pageCounts.reduce((n,r)=>n+(r.stage>=i?r.visits:0),0);
+  const total=atLeast(0);
+  $('tabPageCount').textContent=total;
+  $('pgVisits').textContent=total;
+  $('pgQuiz').textContent=atLeast(4);
+  $('pgForm').textContent=atLeast(9);
+  const conv=atLeast(10);
+  $('pgLeads').textContent=conv;
+  $('pgRate').textContent=total?Math.round(conv/total*100)+'% מהכניסות':'—';
+
+  if(!pageRpcOk){
+    const box=$('pgRows');box.replaceChildren();
+    const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='המדידה עוד לא הופעלה. יש להריץ את קובץ ה־SQL האחרון בסופאבייס.';
+    box.append(p);$('pgRange').textContent='—';
+    hide($('pgSources'));show($('pgSrcEmpty'));
+    $('pgSrcEmpty').textContent='אין נתונים להצגה עד להפעלת המדידה.';
+    return;
+  }
+  drawFunnel($('pgRows'),$('pgRange'),PAGE_STAGES,pageCounts,
+    'עדיין אין כניסות לדף בטווח שנבחר.','כניסות');
+  renderSources();
+}
+
+function renderSources(){
+  const box=$('pgSources');box.replaceChildren();
+  const rows=pageSources.filter(r=>r.visits>0);
+  $('pgSrcEmpty').textContent='עדיין אין תנועה בטווח שנבחר';
+  $('pgSrcEmpty').classList.toggle('hidden',rows.length>0);
+  for(const r of rows){
+    const row=document.createElement('div');row.className='src-row';
+    const nm=document.createElement('span');nm.className='src-name';
+    // no referrer means they typed it in or came from a message: still a source
+    nm.textContent=r.ref||'ישיר';
+    row.append(nm);
+    for(const v of [r.visits,r.form,r.leads]){
+      const c=document.createElement('span');
+      c.className=v?'src-n':'src-zero';c.textContent=v;row.append(c);
+    }
+    box.append(row);
+  }
 }
 
 // The answers are the bulk of a result and the list never shows them, so the
@@ -685,6 +842,9 @@ async function loadAnswers(ids){
 
 function renderQuiz(){
   $('tabQuizCount').textContent=quizResults.length;$('tabLeadsCount').textContent=leads.length;
+  $('quizDone').textContent=quizResults.length;
+  const scored=quizResults.map(r=>Number(r.quiz_score)).filter(n=>Number.isFinite(n));
+  $('quizAvg').textContent=scored.length?Math.round(scored.reduce((a,b)=>a+b,0)/scored.length):'—';
   const box=$('quizList');box.replaceChildren();
   if(!quizResults.length){show($('quizEmpty'));return}
   hide($('quizEmpty'));
@@ -740,7 +900,13 @@ function dedupe(list){const seen=new Set(),out=[];for(const l of list){const k=p
 function peopleCount(){return new Set(leads.map(partyKey)).size}
 
 function filtered(){const q=$('searchInput').value.trim().toLowerCase();const out=leads.filter(l=>(currentFilter==='all'||(l.status||'new')===currentFilter)&&inDateRange(l.created_at)&&(!q||[l.name,l.phone,l.message,...leadTags(l)].some(v=>String(v||'').toLowerCase().includes(q))));if(currentSort==='waiting')out.sort((a,b)=>{const au=a.first_contact_at?1:0,bu=b.first_contact_at?1:0;return au!==bu?au-bu:new Date(a.created_at||0)-new Date(b.created_at||0)});return dedupe(out)}
-function updateStats(){const ppl=peopleCount();$('tabLeadsCount').textContent=ppl;$('statTotal').textContent=ppl;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length;$('statResponse').textContent=medianResponse();renderBackupNote()}
+// The running total only ever grows, so it says nothing about this week.
+function leadsSince(days){
+  const cut=Date.now()-days*864e5;
+  return leads.filter(l=>new Date(l.created_at).getTime()>=cut).length;
+}
+
+function updateStats(){const ppl=peopleCount();$('tabLeadsCount').textContent=ppl;$('statTotal').textContent=ppl;$('statNew').textContent=leads.filter(l=>(l.status||'new')==='new').length;$('statContacted').textContent=leads.filter(l=>l.status==='contacted').length;$('statClosed').textContent=leads.filter(l=>l.status==='closed').length;$('statResponse').textContent=medianResponse();$('statWeek').textContent=leadsSince(7);renderBackupNote()}
 function syncSelection(){const n=selectedIds.size;$('bulkCount').textContent=`${n} נבחרו`;$('bulkBar').classList.toggle('show',n>0);const ids=filtered().map(l=>l.id);$('selectAll').checked=ids.length>0&&ids.every(id=>selectedIds.has(id))}
 function render(){
   updateStats();const items=filtered();$('leadList').replaceChildren();if(!items.length){show($('emptyState'));syncSelection();return}hide($('emptyState'));
@@ -1076,27 +1242,31 @@ document.querySelectorAll('#dateMenu [data-range]').forEach(btn=>btn.addEventLis
   document.querySelectorAll('#dateMenu [data-range]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
   $('dateCustom').classList.toggle('show',r==='custom');
   if(r==='custom'){dateFilter='custom';syncDateBtn();return}
-  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();
+  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();
   toast(r==='all'?'הסינון לפי תאריך בוטל':'מציג: '+RANGE_LABEL[r])
 }));
 $('dateApply').addEventListener('click',()=>{
   dateFromVal=$('dateFrom').value;dateToVal=$('dateTo').value;
   if(dateFromVal&&dateToVal&&dateFromVal>dateToVal){toast('תאריך ההתחלה מאוחר מתאריך הסיום','bad');return}
   if(!dateFromVal&&!dateToVal){toast('יש לבחור לפחות תאריך אחד','bad');return}
-  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();toast('הסינון הוחל')
+  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();loadLeads();loadQuiz();loadWa();loadFunnel()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();loadLeads();loadQuiz();loadWa();loadFunnel();loadPage()});$('backToDashboard').addEventListener('click',back);
 
+// The three tabs are the three stages of the same journey, read in order:
+// who came to the page, who answered the questionnaire, who is now a lead.
+// Leads is first because that is the one he opens the dashboard to work in.
+const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane'};
+const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage'};
 function setTab(which){
-  const onQuiz=which==='quiz';
-  $('leadsPane').classList.toggle('hidden',onQuiz);
-  $('quizPane').classList.toggle('hidden',!onQuiz);
-  $('tabLeads').classList.toggle('on',!onQuiz);
-  $('tabQuiz').classList.toggle('on',onQuiz);
+  if(!PANES[which])which='leads';
+  for(const k in PANES){
+    $(PANES[k]).classList.toggle('hidden',k!==which);
+    $(TABS[k]).classList.toggle('on',k===which);
+  }
 }
-$('tabLeads').addEventListener('click',()=>setTab('leads'));
-$('tabQuiz').addEventListener('click',()=>setTab('quiz'));
+for(const k in TABS)$(TABS[k]).addEventListener('click',()=>setTab(k));
 
 // The link identifies the lead, so they reach the deep questionnaire without
 // filling in the short one again.

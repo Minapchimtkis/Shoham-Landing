@@ -2369,7 +2369,7 @@ footer {
 <canvas id="bg"></canvas>
 
 <!-- HERO -->
-<section class="hero">
+<section data-stage="hero" data-stage-i="0" class="hero">
   <img class="hero-logo" id="heroLogo" fetchpriority="high" decoding="async" alt="שוהם אבו · ליווי וייעוץ פיננסי">
   <h1 class="hero-title">
     <span class="line1">הכסף שלך הוא</span>
@@ -2389,7 +2389,7 @@ footer {
 </section>
 
 <!-- PAIN -->
-<section class="pain">
+<section data-stage="pain" data-stage-i="1" class="pain">
   <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">השדים שבראש</div>
   <h2 class="pain-title reveal">הבעיה האמיתית היא לא המספרים.<br>היא מה שאנחנו מאמינים עליהם.</h2>
   <div class="demons">
@@ -2406,7 +2406,7 @@ footer {
 </section>
 
 <!-- WHAT IS -->
-<section class="faq-section whatis-section">
+<section data-stage="whatis" data-stage-i="2" class="faq-section whatis-section">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">לפני שמתחילים</div>
     <h2 class="faq-title reveal" style="margin-bottom:24px;">מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?</h2>
@@ -2439,7 +2439,7 @@ footer {
 </section>
 
 <!-- METHOD -->
-<section class="method">
+<section data-stage="method" data-stage-i="3" class="method">
   <div class="method-inner">
     <div class="section-label reveal">הגישה שלי</div>
     <h2 class="method-title reveal">קודם הראש, אחר כך הכסף.</h2>
@@ -2479,7 +2479,7 @@ footer {
 </section>
 
 <!-- QUIZ — a way in for someone not ready to leave a number yet -->
-<section class="quiz-section reveal">
+<section data-stage="quiz" data-stage-i="4" class="quiz-section reveal">
   <div class="quiz-invite" id="quizInvite">
     <div class="quiz-invite-label">או בדרך אחרת</div>
     <h3>ואיפה אתם עומדים היום?</h3>
@@ -2489,7 +2489,7 @@ footer {
 </section>
 
 <!-- ABOUT -->
-<section class="about">
+<section data-stage="about" data-stage-i="5" class="about">
   <div class="section-label reveal" style="text-align:center; margin-bottom:28px;">אז מי אני?</div>
   <div class="about-quote reveal" style="text-align:center; padding-right:0;">
     אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.
@@ -2501,7 +2501,7 @@ footer {
 </section>
 
 <!-- PHILOSOPHY -->
-<section class="proof" id="philosophy">
+<section data-stage="philosophy" data-stage-i="6" class="proof" id="philosophy">
   <div class="proof-inner">
     <div class="divider"></div>
     <div class="section-label reveal" style="text-align:center; margin-bottom:12px;">הפילוסופיה שלי</div>
@@ -2548,7 +2548,7 @@ footer {
 </section>
 
 <!-- PROCESS -->
-<section class="faq-section process-section">
+<section data-stage="process" data-stage-i="7" class="faq-section process-section">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">איך זה עובד</div>
     <h2 class="faq-title reveal" style="margin-bottom:56px;">התהליך, צעד אחר צעד.</h2>
@@ -2593,7 +2593,7 @@ footer {
 </section>
 
 <!-- FAQ -->
-<section class="faq-section">
+<section data-stage="faq" data-stage-i="8" class="faq-section">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">שאלות ותשובות</div>
     <h2 class="faq-title reveal">שאלות שכדאי לשאול.</h2>
@@ -2653,7 +2653,7 @@ footer {
 </section>
 
 <!-- CTA -->
-<section class="cta-section" id="contact">
+<section data-stage="contact" data-stage-i="9" class="cta-section" id="contact">
   <div class="cta-glow"></div>
   <div class="section-label reveal">בואו נדבר</div>
   <h2 class="cta-title reveal">מוכנים לשנות מסלול?</h2>
@@ -3210,6 +3210,7 @@ function submitForm() {
     // Show success
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
+    try { window.trackStage('lead', 10, true); } catch (e) {}
     try { localStorage.setItem('shoham_lead_phone', phone); } catch (e) {}
     setQuizPhone(phone);
   })
@@ -3228,10 +3229,128 @@ function submitForm() {
 }
 
 // Same project and publishable key the other pages use. Nothing secret: the
-// only thing this page calls is wa_click(), which is SECURITY DEFINER and
-// cannot read anything back out.
+// only two things this page calls are wa_click() and page_stage(), both
+// SECURITY DEFINER, and neither can read anything back out.
 const SUPABASE_URL = 'https://vplqocqmlquajwwnyeby.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
+
+// ── HOW FAR DOWN THE PAGE PEOPLE GET ──
+// The questionnaire has always said which question loses people. This page
+// said nothing at all: twelve screens on a phone with one place to leave
+// details near the bottom, and no way to know whether anyone reaches it.
+//
+// What is recorded is the furthest section each visit scrolled to, and
+// nothing else. A random id made up on load and forgotten when the tab
+// closes, so nobody is followed between visits. No cookie, no storage, no
+// name, no address, and the referrer is cut down to its host before it
+// leaves the browser: instagram.com, never which post.
+window.trackStage = function () {};
+(function () {
+  const VISIT = (function () {
+    try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  })();
+
+  // Whoever asked not to be counted is not counted, not even anonymously.
+  if (navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
+      navigator.globalPrivacyControl === true) return;
+
+  const refHost = (function () {
+    try {
+      if (!document.referrer) return null;
+      const h = new URL(document.referrer).hostname.replace(/^www\./, '');
+      // arriving from the site's own pages is not a source
+      return h && h !== location.hostname ? h : null;
+    } catch (e) { return null; }
+  })();
+  const device = matchMedia('(max-width: 820px)').matches ? 'mobile' : 'desktop';
+
+  let deepest = -1;
+  let pending = null, timer = null;
+
+  const post = body => {
+    try {
+      fetch(SUPABASE_URL + '/rest/v1/rpc/page_stage', {
+        method: 'POST', keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify(body)
+      }).catch(function () {});
+    } catch (e) { /* measurement must never break the page */ }
+  };
+
+  // Someone scrolling fast passes six sections in a second. Sending six
+  // requests for that would be six times the noise for one number, so the
+  // deepest one so far is held briefly and sent once.
+  const flush = () => {
+    timer = null;
+    if (!pending) return;
+    const body = pending; pending = null;
+    post(body);
+  };
+  const send = (name, index, converted) => {
+    if (index <= deepest && !converted) return;
+    if (index > deepest) deepest = index;
+    pending = {
+      p_visit: VISIT, p_stage: name, p_index: index, p_page: 'landing',
+      p_lang: document.documentElement.dir === 'ltr' ? 'en' : 'he',
+      p_device: device, p_ref: refHost, p_converted: !!converted
+    };
+    // leaving details is worth its own request straight away
+    if (converted) { if (timer) { clearTimeout(timer); } flush(); return; }
+    if (!timer) timer = setTimeout(flush, 1200);
+  };
+  window.trackStage = send;
+
+  const start = () => {
+    const sections = [...document.querySelectorAll('[data-stage]')];
+    if (!sections.length) return;
+    send('hero', 0);
+
+    // A section counts as reached when its top has come up past the middle of
+    // the screen, which is about when a person has actually read into it
+    // rather than merely having its first pixel appear at the bottom. That is
+    // what cutting the lower half off the root does: nothing registers until
+    // it has climbed into the top half.
+    //
+    // It also has to stay there for a moment. Someone flinging the page to
+    // the bottom in two seconds passes every section on the way and has read
+    // none of them; without this they would be counted as having reached the
+    // form, and the panel would say the page works when it does not.
+    const held = new WeakMap();
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        const el = e.target;
+        if (e.isIntersecting) {
+          if (held.has(el)) continue;
+          held.set(el, setTimeout(() => {
+            send(el.dataset.stage, Number(el.dataset.stageI));
+          }, 700));
+        } else {
+          clearTimeout(held.get(el));
+          held.delete(el);
+        }
+      }
+    }, { rootMargin: '0px 0px -50% 0px', threshold: 0 });
+    sections.forEach(s => io.observe(s));
+
+    // Anything still held when the tab goes away still goes out: keepalive
+    // is what the request was made with, so it survives the page closing.
+    addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flush();
+    });
+  };
+
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start);
+  else start();
+})();
 
 // ── WHATSAPP HANDOFF ──
 // The button used to leave the site with nothing recorded, so a person who
@@ -3950,7 +4069,7 @@ function setLang(lang) {
     <h3 class="privacy-title" id="privacyTitle">מדיניות פרטיות</h3>
 
     <div class="privacy-body" id="privacyHE">
-      <p><strong>עדכון אחרון:</strong> 26 באוגוסט 2026</p>
+      <p><strong>עדכון אחרון:</strong> 5 בספטמבר 2026</p>
 
       <h4>1. מי אוסף את המידע</h4>
       <p>שוהם אבו, יועץ לכלכלת המשפחה. ליצירת קשר בכל נושא הקשור לפרטיות: shohamabo@gmail.com</p>
@@ -3959,7 +4078,7 @@ function setLang(lang) {
       <p><strong>בטופס יצירת הקשר:</strong> שם מלא, מספר טלפון, והתוכן החופשי שבחרת לכתוב בשדה ההודעה.</p>
       <p><strong>בשאלונים שבאתר:</strong> התשובות שבחרת, וציון המחושב מהן לצורך הבנת התמונה לפני שיחה. אם הגעת לשאלון עם קישור אישי או לאחר שהשארת פרטים, התשובות נשמרות מקושרות לפנייה שלך.</p>
       <p><strong>בלחיצה על כפתור הוואטסאפ:</strong> נשמר תיעוד של המעבר, ואם בחרת למלא, גם השם והטלפון. אם בחרת לדלג, נשמר רק שהמעבר קרה, בלי פרטים מזהים.</p>
-      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, לצורך שיפור השאלון. המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, ואינה כוללת שם, טלפון או כתובת.</p>
+      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, ועד לאיזה חלק של דף הנחיתה הגיעה הגלילה, לצורך שיפור השאלון והדף. לצד זה נשמרים שפת הדף, האם הגלישה מהנייד או מהמחשב, והאתר שממנו הגעתם ברמת שם האתר בלבד (לדוגמה instagram.com, ולא הכתובת המלאה). המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, נמחק כשסוגרים את הלשונית, ואינה כוללת שם, טלפון או כתובת. אם הדפדפן שלכם שולח בקשה שלא לעקוב (Do Not Track או Global Privacy Control), לא נשמרת מדידה כלל.</p>
       <p><strong>בדפדפן שלך:</strong> אם השארתם פרטים, מספר הטלפון נשמר מקומית בדפדפן שלכם כדי שלא תתבקשו למלא אותו שוב. הוא נשאר במכשיר שלכם וניתן למחיקה בכל עת דרך הגדרות הדפדפן.</p>
       <p>בנוסף, כמו בכל אתר, עשויים להישמר נתוני גלישה טכניים כגון כתובת IP וסוג הדפדפן.</p>
 
@@ -3988,7 +4107,7 @@ function setLang(lang) {
     </div>
 
     <div class="privacy-body" id="privacyEN" hidden>
-      <p><strong>Last updated:</strong> 26 August 2026</p>
+      <p><strong>Last updated:</strong> 5 September 2026</p>
 
       <h4>1. Who collects the information</h4>
       <p>Shoham Abo, family-economics advisor. For any privacy-related enquiry: shohamabo@gmail.com</p>
@@ -3997,12 +4116,12 @@ function setLang(lang) {
       <p><strong>Through the contact form:</strong> your full name, phone number, and whatever you choose to write in the message field.</p>
       <p><strong>Through the questionnaires on this site:</strong> the answers you select, and a score derived from them so that a conversation can start from the right place. If you reached a questionnaire through a personal link or after leaving your details, the answers are stored alongside your enquiry.</p>
       <p><strong>When you use the WhatsApp button:</strong> the handoff is recorded, along with your name and phone if you chose to give them. If you skipped that step, only the fact that it happened is recorded, with nothing identifying you.</p>
-      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got is recorded, so the questionnaires can be improved. It is identified by a random id created for that visit alone, and contains no name, phone or address.</p>
+      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got, and how far down the landing page it scrolled, are recorded so that both can be improved. Alongside this: the language of the page, whether the visit was from a phone or a computer, and the site you arrived from as a host name only (instagram.com, for example, never the full address). It is identified by a random id created for that visit alone, discarded when the tab is closed, and contains no name, phone or address. If your browser sends a do-not-track request (Do Not Track or Global Privacy Control), nothing is measured at all.</p>
       <p><strong>In your own browser:</strong> if you have left your details, your phone number is stored locally in your browser so you are not asked for it again. It stays on your device and can be cleared at any time through your browser settings.</p>
       <p>As with any website, technical browsing data such as IP address and browser type may also be recorded.</p>
 
       <h4>3. Purpose</h4>
-      <p>Personal information is collected in order to contact you following your enquiry, arrange an introductory call, and prepare for that call based on what you have described. The anonymous measurement is used solely to improve the questionnaires on this site.</p>
+      <p>Personal information is collected in order to contact you following your enquiry, arrange an introductory call, and prepare for that call based on what you have described. The anonymous measurement is used solely to improve the questionnaires and the pages of this site.</p>
       <p>It is never sold, rented, or passed to third parties for marketing.</p>
 
       <h4>4. Legal basis</h4>
