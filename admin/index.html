@@ -787,7 +787,7 @@ function renderPage(){
   if(!pageRpcOk){
     const box=$('pgRows');box.replaceChildren();
     const p=document.createElement('div');p.className='fn-empty';
-    p.textContent='המדידה עוד לא הופעלה. יש להריץ את קובץ ה־SQL האחרון בסופאבייס.';
+    p.textContent='המדידה עוד לא הופעלה. יש להריץ את קובץ ה־SQL האחרון בסופאבייס, ואז ללחוץ שוב על הטאב הזה.';
     box.append(p);$('pgRange').textContent='—';
     hide($('pgSources'));show($('pgSrcEmpty'));
     $('pgSrcEmpty').textContent='אין נתונים להצגה עד להפעלת המדידה.';
@@ -1252,7 +1252,7 @@ $('dateApply').addEventListener('click',()=>{
   dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();loadLeads();loadQuiz();loadWa();loadFunnel();loadPage()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true;loadLeads();loadQuiz();loadWa();loadFunnel();loadPage()});$('backToDashboard').addEventListener('click',back);
 
 // The three tabs are the three stages of the same journey, read in order:
 // who came to the page, who answered the questionnaire, who is now a lead.
@@ -1265,6 +1265,11 @@ function setTab(which){
     $(PANES[k]).classList.toggle('hidden',k!==which);
     $(TABS[k]).classList.toggle('on',k===which);
   }
+  // Opening the tab is the natural way to ask again, and the answer changes
+  // the moment the migration is run in another window. Without this the pane
+  // stays dark for the life of the page and nothing short of a full reload
+  // brings it back.
+  if(which==='page'&&!pageRpcOk){pageRpcOk=true;loadPage()}
 }
 for(const k in TABS)$(TABS[k]).addEventListener('click',()=>setTab(k));
 
