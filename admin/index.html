@@ -572,11 +572,11 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage()]);startRealtime();
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage()]);markTabsLoaded();startRealtime();
   // Leads are the live part and realtime already pushes new ones; the rest
   // changes slowly and does not need a round trip every minute.
   if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000);
-  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage()},300000)}
+  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage();markTabsLoaded()},300000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}if(slowTimer){clearInterval(slowTimer);slowTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -1252,24 +1252,39 @@ $('dateApply').addEventListener('click',()=>{
   dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true;loadLeads();loadQuiz();loadWa();loadFunnel();loadPage()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true;loadLeads();loadQuiz();loadWa();loadFunnel();loadPage();markTabsLoaded()});$('backToDashboard').addEventListener('click',back);
 
 // The three tabs are the three stages of the same journey, read in order:
 // who came to the page, who answered the questionnaire, who is now a lead.
 // Leads is first because that is the one he opens the dashboard to work in.
 const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane'};
 const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage'};
+// Realtime carries new leads and nothing else, so the panels behind the two
+// slower tabs are only refetched on login, on the refresh button, and once
+// every five minutes. Opening a tab is a request to see what is in it now,
+// not what it held when the timer last ran. The floor keeps flipping between
+// tabs from costing a query per tap.
+const tabLoaded={quiz:0,page:0};
+function freshenTab(which){
+  if(!(which in tabLoaded))return;
+  if(Date.now()-tabLoaded[which]<30000)return;
+  tabLoaded[which]=Date.now();
+  if(which==='quiz'){loadQuiz();loadFunnel()}else{loadPage()}
+}
+function markTabsLoaded(){const n=Date.now();tabLoaded.quiz=n;tabLoaded.page=n}
+
 function setTab(which){
   if(!PANES[which])which='leads';
   for(const k in PANES){
     $(PANES[k]).classList.toggle('hidden',k!==which);
     $(TABS[k]).classList.toggle('on',k===which);
   }
-  // Opening the tab is the natural way to ask again, and the answer changes
-  // the moment the migration is run in another window. Without this the pane
-  // stays dark for the life of the page and nothing short of a full reload
-  // brings it back.
-  if(which==='page'&&!pageRpcOk){pageRpcOk=true;loadPage()}
+  // The measurement can be switched on in another window while this page sits
+  // open. Without this the pane stays dark for the life of the page and
+  // nothing short of a full reload brings it back, so it asks again straight
+  // away rather than waiting out the floor.
+  if(which==='page'&&!pageRpcOk){pageRpcOk=true;tabLoaded.page=Date.now();loadPage();return}
+  freshenTab(which);
 }
 for(const k in TABS)$(TABS[k]).addEventListener('click',()=>setTab(k));
 
