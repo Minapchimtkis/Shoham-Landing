@@ -83,6 +83,26 @@ body {
 }
 
 /* ── CANVAS BG ── */
+/* Off screen until a keyboard lands on it, then it comes into view. Not
+   display:none, which would take it out of the tab order and defeat it. */
+.skip-link {
+  position: fixed;
+  top: -60px;
+  inset-inline-start: 16px;
+  z-index: 10000;
+  padding: 12px 20px;
+  border-radius: 0 0 12px 12px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus { top: 0; }
+
+main { display: block; }
+
 canvas#bg {
   position: fixed;
   inset: -10% 0;
@@ -2353,6 +2373,11 @@ footer {
 </head>
 <body>
 
+<!-- Someone using a keyboard reaches the page and has to tab through the
+     navbar and the language switch before anything they came for. This is
+     the standard way out: hidden until it is focused, first thing in the
+     tab order. -->
+<a class="skip-link" href="#main" id="skipLink">דלג לתוכן הראשי</a>
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
@@ -2366,7 +2391,9 @@ footer {
   </div>
 </nav>
 
-<canvas id="bg"></canvas>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<main id="main">
 
 <!-- HERO -->
 <section data-stage="hero" data-stage-i="0" class="hero">
@@ -2697,6 +2724,8 @@ footer {
   </div>
 </section>
 
+</main>
+
 <!-- ── IPHONE STICKY WIDGET ── -->
 <div class="iphone-wrap" id="iphoneWidget">
   <div class="iphone-body">
@@ -2762,6 +2791,7 @@ footer {
     <div class="footer-meta">
       <p class="footer-copy">© 2026 שוהם אבו · יועץ כלכלי · כל הזכויות שמורות לשוהם אבו</p>
       <a class="footer-privacy-link" href="#" onclick="openPrivacy(event)">מדיניות פרטיות</a>
+      <a class="footer-privacy-link" href="#" id="a11yLink" onclick="openA11y(event)">הצהרת נגישות</a>
     </div>
   </div>
   <p class="footer-disclaimer">התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.</p>
@@ -3123,12 +3153,43 @@ function closePrivacy() {
   document.body.style.overflow = '';
 }
 
+// ── ACCESSIBILITY STATEMENT ──
+// Same panel, same behaviour as the policy. Kept separate rather than folded
+// into it because the law treats them as two different documents, and someone
+// looking for one should not have to read the other.
+function openA11y(e) {
+  if (e) e.preventDefault();
+  const ov = document.getElementById('a11yOverlay');
+  if (!ov) return;
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeA11y() {
+  const ov = document.getElementById('a11yOverlay');
+  if (!ov) return;
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeA11yOutside(e) {
+  if (e.target && e.target.id === 'a11yOverlay') closeA11y();
+}
+
+(function () {
+  const openIfAsked = () => { if (window.location.hash === '#accessibility') openA11y(); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', openIfAsked);
+  else openIfAsked();
+  window.addEventListener('hashchange', openIfAsked);
+})();
+
 // Clicking the backdrop closes; clicking inside the panel must not.
 function closePrivacyOutside(e) {
   if (e.target && e.target.id === 'privacyOverlay') closePrivacy();
 }
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeA11y();
   if (e.key === 'Escape') closePrivacy();
 });
 
@@ -3749,6 +3810,7 @@ const translations = {
     iphoneGreet: 'שלום, נדבר?', iphoneSub: 'תיאום שיחת ייעוץ חינמית', iphoneWa: 'מעדיפים בווטסאפ? בואו נדבר', navBrand: 'שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי',
     footerMain: '© 2026 שוהם אבו · יועץ כלכלי · כל הזכויות שמורות לשוהם אבו',
     mailLabel: 'אימייל', mailSubject: 'פנייה מהאתר', igPersonal: 'שוהם אבו', igBrand: 'מנפחים ת\'כיס',
+    a11yLabel: 'הצהרת נגישות', a11yTitle: 'הצהרת נגישות', skipLink: 'דלג לתוכן הראשי',
     privacyLabel: 'מדיניות פרטיות', privacyTitle: 'מדיניות פרטיות', consentHTML: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.', formNote: 'הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.',
     successSub: 'הצעד הראשון כבר מאחורינו.',
     waTitle: 'רגע לפני שעוברים',
@@ -3825,6 +3887,7 @@ const translations = {
     iphoneGreet: 'Hello, shall we talk?', iphoneSub: 'Book a free advisory call', iphoneWa: 'Prefer WhatsApp? Let\'s talk', navBrand: 'Shoham Abo <span class="navbar-sep">|</span> Financial Coach',
     footerMain: '© 2026 Shoham Abo · Financial Coach · All rights reserved',
     mailLabel: 'Email', mailSubject: 'Enquiry from your website', igPersonal: 'Shoham Abo', igBrand: "Minapchim T'kis",
+    a11yLabel: 'Accessibility Statement', a11yTitle: 'Accessibility Statement', skipLink: 'Skip to main content',
     privacyLabel: 'Privacy Policy', privacyTitle: 'Privacy Policy', consentHTML: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.', formNote: 'Your details are used only to contact you, and are never passed to third parties for marketing.',
     successSub: 'The first step is already behind us.',
     waTitle: 'One moment before we move',
@@ -4017,8 +4080,16 @@ function setLang(lang) {
   const pHE = document.getElementById('privacyHE');
   const pEN = document.getElementById('privacyEN');
   if (pHE && pEN) { pHE.hidden = isEN; pEN.hidden = !isEN; }
-  const pModal = document.querySelector('.privacy-modal');
-  if (pModal) pModal.style.direction = isEN ? 'ltr' : 'rtl';
+  const aLink = document.getElementById('a11yLink');
+  if (aLink) aLink.textContent = t.a11yLabel;
+  const aTitle = document.getElementById('a11yTitle');
+  if (aTitle) aTitle.textContent = t.a11yTitle;
+  const aHE = document.getElementById('a11yHE');
+  const aEN = document.getElementById('a11yEN');
+  if (aHE && aEN) { aHE.hidden = isEN; aEN.hidden = !isEN; }
+  const sLink = document.getElementById('skipLink');
+  if (sLink) sLink.textContent = t.skipLink;
+  document.querySelectorAll('.privacy-modal').forEach(m => { m.style.direction = isEN ? 'ltr' : 'rtl'; });
   const fTop = document.querySelector('.footer-top');
   if (fTop) fTop.style.direction = isEN ? 'ltr' : 'rtl';
 
@@ -4060,6 +4131,59 @@ function setLang(lang) {
     </label>
     <button class="btn-primary" id="waGo" style="width:100%; justify-content:center;">המשך לוואטסאפ ←</button>
     <button class="wa-skip" id="waSkip" type="button">לדלג ולעבור ישירות</button>
+  </div>
+</div>
+
+<div class="privacy-overlay" id="a11yOverlay" onclick="closeA11yOutside(event)">
+  <div class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="a11yTitle">
+    <button class="privacy-close" onclick="closeA11y()" aria-label="סגור">&#10005;</button>
+    <h3 class="privacy-title" id="a11yTitle">הצהרת נגישות</h3>
+
+    <div class="privacy-body" id="a11yHE">
+      <p><strong>עדכון אחרון:</strong> 17 בספטמבר 2026</p>
+
+      <h4>1. המחויבות שלנו</h4>
+      <p>אני מאמין שהמידע באתר הזה צריך להיות פתוח לכל אחד, לרבות אנשים עם מוגבלות. השקעתי מאמץ בהנגשת האתר, ואני ממשיך לשפר אותו.</p>
+
+      <h4>2. מה נעשה באתר</h4>
+      <p>האתר נבנה במבנה סמנטי תקני, עם כותרות בהיררכיה רציפה ואזורי ניווט מסומנים. לכל התמונות יש טקסט חלופי, ולכל שדה בטופס יש תווית.</p>
+      <p>האתר ניתן להפעלה מלאה באמצעות מקלדת בלבד, עם סימון ברור של הרכיב שבמיקוד, וקיים קישור דילוג ישיר לתוכן הראשי.</p>
+      <p>שפת הדף וכיוון הכתיבה מוגדרים בקוד, כדי שקוראי מסך יקראו את התוכן בעברית ובכיוון הנכון.</p>
+      <p>מי שהגדיר במערכת ההפעלה שלו בקשה לצמצום אנימציות, יקבל את האתר כמעט ללא תנועה. הטקסט ניתן להגדלה בדפדפן, והאתר מותאם למסכים בכל הגדלים.</p>
+
+      <h4>3. מגבלות ידועות</h4>
+      <p>חשוב לי להיות מדויק: האתר <strong>לא עבר בדיקת נגישות על ידי מורשה נגישות מוסמך</strong>, ולכן אינני מצהיר על עמידה מלאה בתקן הישראלי 5568. ההנגשה שבוצעה נשענת על עקרונות מקובלים ועל בדיקות שביצעתי בעצמי.</p>
+      <p>השאלונים שבאתר קיימים בעברית בלבד.</p>
+      <p>רכיב אבטחה של ספק חיצוני (Cloudflare Turnstile) מוטמע בטופס יצירת הקשר, ורמת הנגישות שלו אינה בשליטתי.</p>
+
+      <h4>4. נתקלתם בבעיה?</h4>
+      <p>אם נתקלתם בקושי כלשהו בשימוש באתר, או שיש דרך שבה אוכל להנגיש עבורכם את המידע טוב יותר, אשמח מאוד לשמוע. אתייחס לכל פנייה ואשתדל לתקן.</p>
+      <p><strong>שוהם אבו</strong><br>דואר אלקטרוני: shohamabo@gmail.com</p>
+      <p>ואם יש משהו שאתם צריכים ולא הצלחתם לקבל מהאתר, כתבו לי ואספק לכם אותו בדרך שנוחה לכם.</p>
+    </div>
+
+    <div class="privacy-body" id="a11yEN" hidden>
+      <p><strong>Last updated:</strong> 17 September 2026</p>
+
+      <h4>1. Our commitment</h4>
+      <p>I believe the information on this site should be open to everyone, including people with disabilities. Effort has gone into making it accessible, and I continue to improve it.</p>
+
+      <h4>2. What has been done</h4>
+      <p>The site is built with standard semantic structure, an unbroken heading hierarchy and marked navigation regions. Every image has alternative text and every form field has a label.</p>
+      <p>The site can be operated entirely by keyboard, the focused element is clearly marked, and a skip link leads straight to the main content.</p>
+      <p>The page language and writing direction are declared in the code, so screen readers read the content correctly.</p>
+      <p>Anyone whose system asks for reduced motion gets the site with almost no movement. Text can be enlarged in the browser, and the site adapts to screens of any size.</p>
+
+      <h4>3. Known limitations</h4>
+      <p>To be precise about this: the site <strong>has not been audited by a certified accessibility professional</strong>, so I do not claim full conformance with Israeli Standard 5568. What has been done rests on accepted principles and on testing I carried out myself.</p>
+      <p>The questionnaires on this site are in Hebrew only.</p>
+      <p>A third-party security component (Cloudflare Turnstile) is embedded in the contact form, and its level of accessibility is outside my control.</p>
+
+      <h4>4. Found a problem?</h4>
+      <p>If you ran into any difficulty using this site, or there is a way I could make the information more accessible to you, I would genuinely like to hear about it. I will look at every message and do my best to fix it.</p>
+      <p><strong>Shoham Abo</strong><br>Email: shohamabo@gmail.com</p>
+      <p>And if there is something you needed from the site and could not get, write to me and I will get it to you in whatever way suits you.</p>
+    </div>
   </div>
 </div>
 
