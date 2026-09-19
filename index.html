@@ -529,6 +529,44 @@ section {
   animation: fadeUp 0.9s 0.6s forwards;
 }
 
+.hero-audience {
+  margin: 18px auto 0;
+  max-width: 34ch;
+  color: #c9a8ff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.5s forwards;
+}
+
+/* The hero is one full screen tall, but its contents were a fixed height, so
+   on a short phone they simply overflowed it. On an iPhone SE the call to
+   action ended 15px below the fold and the licence badge never appeared at
+   all: the one screen that most visitors never scroll past had nothing on it
+   to press. Adding the audience line made that worse.
+
+   These come after every other hero rule on purpose. A media query carries no
+   extra weight of its own, so a later plain rule would win the tie and none
+   of this would apply. */
+@media (max-width: 820px) and (max-height: 820px) {
+  .hero { padding-top: 88px; padding-bottom: 40px; }
+  .hero-logo { height: 104px; margin-bottom: 18px; }
+  .hero-title { font-size: 44px; margin-bottom: 22px; }
+  .hero-sub { margin-bottom: 30px; }
+  .license-badge { margin-top: 22px; }
+}
+
+@media (max-width: 820px) and (max-height: 700px) {
+  .hero { padding-top: 74px; padding-bottom: 18px; }
+  .hero-logo { height: 76px; margin-bottom: 10px; }
+  .hero-title { font-size: 34px; margin-bottom: 14px; }
+  .hero-audience { font-size: 13px; margin-top: 9px; }
+  .hero-sub { font-size: 14px; margin-bottom: 18px; }
+  .license-badge { margin-top: 14px; }
+}
+
 .hero-cta {
   opacity: 0;
   animation: fadeUp 0.9s 0.8s forwards;
@@ -566,6 +604,13 @@ section {
   box-shadow: 0 0 70px rgba(168,85,247,0.6);
 }
 .btn-primary:hover::before { opacity: 1; }
+
+/* 44px of padding on each side is more than a 360px phone can spare, so the
+   main call to action wrapped onto two lines on the two narrowest handsets
+   in common use and on no others. */
+@media (max-width: 385px) {
+  .hero-cta .btn-primary { padding-left: 26px; padding-right: 26px; font-size: 16px; }
+}
 
 /* ── PAIN SECTION ── */
 .pain {
@@ -2403,6 +2448,7 @@ footer {
     <span class="line2">לא <span class="accent">גזירת גורל</span></span>
     <span class="line2">הוא <span class="accent">בחירה.</span></span>
   </h1>
+  <p class="hero-audience">ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך</p>
   <p class="hero-sub">לא משנה מאיפה התחלת. הגיע הזמן לשנות מסלול.</p>
   <div class="hero-cta">
     <a href="#contact" class="btn-primary">מתחילים לצמוח · לתיאום פגישה</a>
@@ -3795,6 +3841,7 @@ const translations = {
     heroLine1: 'הכסף שלך הוא',
     heroLine2: 'לא גזירת גורל',
     heroLine3: 'הוא בחירה.',
+    heroAudience: 'ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך',
     heroSub: 'לא משנה מאיפה התחלת. הגיע הזמן לשנות מסלול.',
     heroCta: 'מתחילים לצמוח · לתיאום פגישה',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
@@ -3871,6 +3918,7 @@ const translations = {
     heroLine1: 'Your money is',
     heroLine2: 'not fate',
     heroLine3: "It's a choice.",
+    heroAudience: 'Financial guidance for young families and individuals starting out',
     heroSub: 'It doesn\'t matter where you start. It\'s time to change direction.',
     heroCta: "Let's Grow · Book a Meeting",
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
@@ -3963,8 +4011,10 @@ function setLang(lang) {
   // Hero
   const heroTitle = document.querySelector('.hero-title');
   const heroSub = document.querySelector('.hero-sub');
+  const heroAud = document.querySelector('.hero-audience');
   heroTitle.dir = isEN ? 'ltr' : 'rtl';
   heroSub.dir = isEN ? 'ltr' : 'rtl';
+  if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.textContent = t.heroAudience; }
   document.querySelector('.hero-title .line1').textContent = t.heroLine1;
   document.querySelector('.hero-title .line2').innerHTML = 'לא <span class="accent">גזירת גורל</span>';
   if (isEN) document.querySelector('.hero-title .line2').innerHTML = 'not <span class="accent">fate</span>';
