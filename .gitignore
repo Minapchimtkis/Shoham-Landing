@@ -1,0 +1,5 @@
+# Screenshots taken while checking a change belong in the scratchpad, not in
+# the repo: anything committed here is also served publicly by GitHub Pages.
+# The site's own images live in assets/ and are not covered by this.
+/*.png
+/*.jpg
