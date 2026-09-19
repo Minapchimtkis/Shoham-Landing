@@ -3305,6 +3305,27 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY
 // closes, so nobody is followed between visits. No cookie, no storage, no
 // name, no address, and the referrer is cut down to its host before it
 // leaves the browser: instagram.com, never which post.
+// Setting the flag has no visible effect by itself, and it is being set on a
+// phone. Without a word back there is no way to know it worked.
+function notrackToast(on) {
+  const show = () => {
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.textContent = on
+      ? 'הביקורים שלך מהמכשיר הזה לא ייספרו יותר.'
+      : 'הביקורים שלך מהמכשיר הזה נספרים שוב.';
+    el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:24px;' +
+      'z-index:10001;max-width:88vw;padding:13px 20px;border-radius:14px;' +
+      'background:rgba(20,8,40,.96);border:1px solid rgba(168,85,247,.45);' +
+      'color:#efe7ff;font-size:14px;font-weight:700;text-align:center;' +
+      'box-shadow:0 10px 40px rgba(0,0,0,.5)';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  };
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', show);
+  else show();
+}
+
 window.trackStage = function () {};
 (function () {
   const VISIT = (function () {
@@ -3318,6 +3339,23 @@ window.trackStage = function () {};
   // Whoever asked not to be counted is not counted, not even anonymously.
   if (navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
       navigator.globalPrivacyControl === true) return;
+
+  // His own phone. Every time he opens his own page to check something it
+  // reads as a visitor who arrived and left at the first screen — and since
+  // he checks it often, the one number he makes decisions from is largely
+  // him. Opening the page once with ?notrack=1 marks this browser and it
+  // stops being counted for good; ?notrack=0 undoes it.
+  //
+  // What is stored is the opting out itself, nothing else. If storage is
+  // unavailable the visit is simply counted, which is the safe way to fail.
+  if (!(function () {
+    try {
+      const q = new URLSearchParams(location.search).get('notrack');
+      if (q === '1') { localStorage.setItem('shoham_notrack', '1'); notrackToast(true); }
+      else if (q === '0') { localStorage.removeItem('shoham_notrack'); notrackToast(false); }
+      return localStorage.getItem('shoham_notrack') !== '1';
+    } catch (e) { return true; }
+  })()) return;
 
   const refHost = (function () {
     try {
@@ -3806,7 +3844,6 @@ const translations = {
     ctaSub: 'השאירו פרטים ואחזור אליכם בהקדם האפשרי. ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד, מה הכי מעיק עליכם כלכלית?',
-    formNote: 'המידע שלך נשמר בסודיות מלאה.',
     iphoneGreet: 'שלום, נדבר?', iphoneSub: 'תיאום שיחת ייעוץ חינמית', iphoneWa: 'מעדיפים בווטסאפ? בואו נדבר', navBrand: 'שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי',
     footerMain: '© 2026 שוהם אבו · יועץ כלכלי · כל הזכויות שמורות לשוהם אבו',
     mailLabel: 'אימייל', mailSubject: 'פנייה מהאתר', igPersonal: 'שוהם אבו', igBrand: 'מנפחים ת\'כיס',
@@ -3883,7 +3920,6 @@ const translations = {
     ctaSub: "Leave your details and I'll get back to you as soon as possible. No commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence, what worries you most financially?',
-    formNote: 'Your information is kept completely confidential.',
     iphoneGreet: 'Hello, shall we talk?', iphoneSub: 'Book a free advisory call', iphoneWa: 'Prefer WhatsApp? Let\'s talk', navBrand: 'Shoham Abo <span class="navbar-sep">|</span> Financial Coach',
     footerMain: '© 2026 Shoham Abo · Financial Coach · All rights reserved',
     mailLabel: 'Email', mailSubject: 'Enquiry from your website', igPersonal: 'Shoham Abo', igBrand: "Minapchim T'kis",
@@ -4022,7 +4058,6 @@ function setLang(lang) {
   document.getElementById('fname').placeholder = t.namePh;
   document.getElementById('fphone').placeholder = t.phonePh;
   document.getElementById('fmsg').placeholder = t.msgPh;
-  document.querySelector('.form-note').textContent = t.formNote;
 
   // iPhone
   const ipGreet = document.querySelector('.iphone-greeting');
@@ -4202,7 +4237,7 @@ function setLang(lang) {
       <p><strong>בטופס יצירת הקשר:</strong> שם מלא, מספר טלפון, והתוכן החופשי שבחרת לכתוב בשדה ההודעה.</p>
       <p><strong>בשאלונים שבאתר:</strong> התשובות שבחרת, וציון המחושב מהן לצורך הבנת התמונה לפני שיחה. אם הגעת לשאלון עם קישור אישי או לאחר שהשארת פרטים, התשובות נשמרות מקושרות לפנייה שלך.</p>
       <p><strong>בלחיצה על כפתור הוואטסאפ:</strong> נשמר תיעוד של המעבר, ואם בחרת למלא, גם השם והטלפון. אם בחרת לדלג, נשמר רק שהמעבר קרה, בלי פרטים מזהים.</p>
-      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, ועד לאיזה חלק של דף הנחיתה הגיעה הגלילה, לצורך שיפור השאלון והדף. לצד זה נשמרים שפת הדף, האם הגלישה מהנייד או מהמחשב, והאתר שממנו הגעתם ברמת שם האתר בלבד (לדוגמה instagram.com, ולא הכתובת המלאה). המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, נמחק כשסוגרים את הלשונית, ואינה כוללת שם, טלפון או כתובת. אם הדפדפן שלכם שולח בקשה שלא לעקוב (Do Not Track או Global Privacy Control), לא נשמרת מדידה כלל.</p>
+      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, ועד לאיזה חלק של דף הנחיתה הגיעה הגלילה, לצורך שיפור השאלון והדף. לצד זה נשמרים שפת הדף, האם הגלישה מהנייד או מהמחשב, והאתר שממנו הגעתם ברמת שם האתר בלבד (לדוגמה instagram.com, ולא הכתובת המלאה). המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, נמחק כשסוגרים את הלשונית, ואינה כוללת שם, טלפון או כתובת. אם הדפדפן שלכם שולח בקשה שלא לעקוב (Do Not Track או Global Privacy Control), לא נשמרת מדידה כלל. ניתן גם לבטל את הספירה ידנית בכניסה לכתובת <code>?notrack=1</code>; במקרה כזה נשמרת בדפדפן שלכם רק העובדה שביקשתם לא להיספר, ושום דבר נוסף.</p>
       <p><strong>בדפדפן שלך:</strong> אם השארתם פרטים, מספר הטלפון נשמר מקומית בדפדפן שלכם כדי שלא תתבקשו למלא אותו שוב. הוא נשאר במכשיר שלכם וניתן למחיקה בכל עת דרך הגדרות הדפדפן.</p>
       <p>בנוסף, כמו בכל אתר, עשויים להישמר נתוני גלישה טכניים כגון כתובת IP וסוג הדפדפן.</p>
 
@@ -4240,7 +4275,7 @@ function setLang(lang) {
       <p><strong>Through the contact form:</strong> your full name, phone number, and whatever you choose to write in the message field.</p>
       <p><strong>Through the questionnaires on this site:</strong> the answers you select, and a score derived from them so that a conversation can start from the right place. If you reached a questionnaire through a personal link or after leaving your details, the answers are stored alongside your enquiry.</p>
       <p><strong>When you use the WhatsApp button:</strong> the handoff is recorded, along with your name and phone if you chose to give them. If you skipped that step, only the fact that it happened is recorded, with nothing identifying you.</p>
-      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got, and how far down the landing page it scrolled, are recorded so that both can be improved. Alongside this: the language of the page, whether the visit was from a phone or a computer, and the site you arrived from as a host name only (instagram.com, for example, never the full address). It is identified by a random id created for that visit alone, discarded when the tab is closed, and contains no name, phone or address. If your browser sends a do-not-track request (Do Not Track or Global Privacy Control), nothing is measured at all.</p>
+      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got, and how far down the landing page it scrolled, are recorded so that both can be improved. Alongside this: the language of the page, whether the visit was from a phone or a computer, and the site you arrived from as a host name only (instagram.com, for example, never the full address). It is identified by a random id created for that visit alone, discarded when the tab is closed, and contains no name, phone or address. If your browser sends a do-not-track request (Do Not Track or Global Privacy Control), nothing is measured at all. You can also switch counting off by hand by visiting the page with <code>?notrack=1</code>; in that case the only thing stored in your browser is the fact that you asked not to be counted, and nothing else.</p>
       <p><strong>In your own browser:</strong> if you have left your details, your phone number is stored locally in your browser so you are not asked for it again. It stays on your device and can be cleared at any time through your browser settings.</p>
       <p>As with any website, technical browsing data such as IP address and browser type may also be recorded.</p>
 
