@@ -1157,6 +1157,39 @@ section {
     url("assets/mission-texture.webp");
 }
 
+/* The claim he wanted, with the place he learned it sitting right under it.
+   On its own a statement about your own emotional intelligence reads as a
+   boast; with the evidence attached it reads as a fact. Last in the section
+   and directly above the signature, which then reads as signing it. */
+.eq-block {
+  max-width: 620px;
+  margin: 44px auto 0;
+  padding: 26px 28px;
+  border: 1px solid rgba(168,85,247,0.30);
+  border-radius: 16px;
+  background: linear-gradient(158deg, rgba(22,5,48,0.72), rgba(11,2,28,0.86));
+  text-align: center;
+}
+.eq-title {
+  margin: 0 0 12px;
+  color: var(--p6);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+.eq-body {
+  margin: 0;
+  color: rgba(255,255,255,0.80);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+}
+@media (max-width: 480px) {
+  .eq-block { padding: 22px 20px; margin-top: 34px; }
+  .eq-title { font-size: 16.5px; }
+  .eq-body  { font-size: 14px; }
+}
+
 .mission-block {
   /* The neon mark's own backdrop, reused as texture: darkened heavily and
      pulled from teal toward violet so it belongs to this palette. The
@@ -2708,8 +2741,12 @@ footer {
     אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.
   </div>
   <p class="about-body reveal" style="text-align:center;">
-    קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות. בדיוק כמו שיצאתי לקורס מפקדים בצבא כדי להיות אוזן קשבת וכתף תומכת ללוחמים שלי, כך אני פועל גם באזרחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיה שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>ניהול פיננסי הוא לא שיעור במתמטיקה הוא שיעור בהתנהגות. המחסום האמיתי הוא לא המספרים בחשבון, אלא מה שקורה בראש, והמטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.
+    קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיה שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>ניהול פיננסי הוא לא שיעור במתמטיקה הוא שיעור בהתנהגות. המחסום האמיתי הוא לא המספרים בחשבון, אלא מה שקורה בראש, והמטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.
   </p>
+  <div class="eq-block reveal">
+    <p class="eq-title">האינטליגנציה הרגשית היא הכלי הראשון שאני מביא לחדר.</p>
+    <p class="eq-body">למדתי אותה בקורס מפקדים, מול לוחמים שהיו צריכים אוזן לפני שהיו צריכים פקודה. מול כסף זה בדיוק אותו דבר: לפני שנוגעים במספרים, צריך מישהו שמבין למה קשה לכם להסתכל עליהם.</p>
+  </div>
   <img decoding="async" src="assets/signature.webp" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy" />
 </section>
 
@@ -4008,7 +4045,9 @@ const translations = {
     s4t: 'מעקב וצמיחה', s4d: 'אני לא נעלם אחרי הפגישה הראשונה. אני כאן כדי להוביל אותך עד שהכסף מתחיל לשרת את החיים שלך.',
     aboutLabel: 'אז מי אני?',
     aboutQuote: 'אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.',
-    aboutBody: 'קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות. בדיוק כמו שיצאתי לקורס מפקדים בצבא כדי להיות אוזן קשבת וכתף תומכת ללוחמים שלי, כך אני פועל גם באזרחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיה שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>ניהול פיננסי הוא לא שיעור במתמטיקה הוא שיעור בהתנהגות. המחסום האמיתי הוא לא המספרים בחשבון, אלא מה שקורה בראש, והמטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.',
+    eqTitle: 'האינטליגנציה הרגשית היא הכלי הראשון שאני מביא לחדר.',
+    eqBody: 'למדתי אותה בקורס מפקדים, מול לוחמים שהיו צריכים אוזן לפני שהיו צריכים פקודה. מול כסף זה בדיוק אותו דבר: לפני שנוגעים במספרים, צריך מישהו שמבין למה קשה לכם להסתכל עליהם.',
+    aboutBody: 'קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיה שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>ניהול פיננסי הוא לא שיעור במתמטיקה הוא שיעור בהתנהגות. המחסום האמיתי הוא לא המספרים בחשבון, אלא מה שקורה בראש, והמטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.',
     aboutSig: 'שוהם אבו | יועץ כלכלי',
     philLabel: 'הפילוסופיה שלי', philTitle: 'צמיחה בונים מהיסודות',
     philIntro: 'בתור לוחם ומפקד לשעבר בחטיבת גבעתי, למדתי שאין קיצורי דרך. החתירה למגע והנחישות להמשיך גם כשקשה. אלו הערכים שאני מביא לעולם הפיננסי.',
@@ -4087,7 +4126,9 @@ const translations = {
     s4t: 'Follow-up & Growth', s4d: "I don't disappear after the first meeting. I'm here to guide you until money starts serving your life.",
     aboutLabel: 'So who am I?',
     aboutQuote: "",
-    aboutBody: "My name is Shoham Abo. I am 23, born and raised in Tiberias, and I am here to prove that where you started does not decide where you end up.<br><br>Financial guidance is not just another profession to me, it is a calling. Exactly as I went to commanders' course in the army to be a listening ear and a shoulder for my soldiers, that is how I work in civilian life too.<br><br>The fact that I am at the start of my own financial road is your greatest advantage: I arrive with an uncompromising hunger for your success, full energy and complete focus on every person I guide.<br><br>Managing money is not a lesson in mathematics, it is a lesson in behaviour. The real barrier is not the numbers in the account, it is what happens in your head, and my aim is to build you an environment where money stops frightening you and starts serving your financial goals.",
+    eqTitle: "Emotional intelligence is the first tool I bring into the room.",
+    eqBody: "I learned it on a commanders course in the army, in front of soldiers who needed an ear before they needed an order. Money is no different: before anyone touches the numbers, there has to be someone who understands why they are hard for you to look at.",
+    aboutBody: "My name is Shoham Abo. I am 23, born and raised in Tiberias, and I am here to prove that where you started does not decide where you end up.<br><br>Financial guidance is not just another profession to me, it is a calling.<br><br>The fact that I am at the start of my own financial road is your greatest advantage: I arrive with an uncompromising hunger for your success, full energy and complete focus on every person I guide.<br><br>Managing money is not a lesson in mathematics, it is a lesson in behaviour. The real barrier is not the numbers in the account, it is what happens in your head, and my aim is to build you an environment where money stops frightening you and starts serving your financial goals.",
     aboutSig: 'Shoham Abo | Financial Coach',
     philLabel: 'My Philosophy', philTitle: 'Growth is built from the ground up.',
     philIntro: 'As a Givati Brigade veteran and former commander, I learned there are no shortcuts. The drive and determination to keep going even when it\'s hard are the values I bring to the financial world.',
@@ -4195,6 +4236,10 @@ function setLang(lang) {
   sectionLabels[3].textContent = t.aboutLabel;
   document.querySelector('.about-quote').innerHTML = t.aboutQuote;
   document.querySelector('.about-body').innerHTML = t.aboutBody;
+  const eqT = document.querySelector('.eq-title');
+  const eqB = document.querySelector('.eq-body');
+  if (eqT) eqT.textContent = t.eqTitle;
+  if (eqB) eqB.textContent = t.eqBody;
   const aboutSigEl = document.querySelector('.about-sig');
   if (aboutSigEl) aboutSigEl.textContent = t.aboutSig;
 
