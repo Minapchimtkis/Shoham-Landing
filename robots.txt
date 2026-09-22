@@ -1,0 +1,8 @@
+# Everything here is meant to be found.
+User-agent: *
+Allow: /
+
+# The dashboard is behind a login and has nothing to offer a search engine.
+Disallow: /admin/
+
+Sitemap: https://shohamfinance.co.il/sitemap.xml
