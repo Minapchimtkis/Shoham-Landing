@@ -648,19 +648,8 @@ section {
   filter: drop-shadow(0 2px 20px rgba(168,85,247,0.45));
 }
 
-.hero-sub {
-  font-size: clamp(16px, 2.5vw, 22px);
-  font-weight: 300;
-  color: rgba(255,255,255,0.82);
-  max-width: 560px;
-  line-height: 1.7;
-  margin-bottom: 52px;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.6s forwards;
-}
-
 .hero-audience {
-  margin: 18px auto 0;
+  margin: 18px auto 52px;
   max-width: 34ch;
   color: #c9a8ff;
   font-size: 15px;
@@ -684,7 +673,7 @@ section {
   .hero { padding-top: 88px; padding-bottom: 40px; }
   .hero-logo { height: 104px; margin-bottom: 18px; }
   .hero-title { font-size: 44px; margin-bottom: 22px; }
-  .hero-sub { margin-bottom: 30px; }
+  .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 22px; }
 }
 
@@ -692,8 +681,7 @@ section {
   .hero { padding-top: 74px; padding-bottom: 18px; }
   .hero-logo { height: 76px; margin-bottom: 10px; }
   .hero-title { font-size: 34px; margin-bottom: 14px; }
-  .hero-audience { font-size: 13px; margin-top: 9px; }
-  .hero-sub { font-size: 14px; margin-bottom: 18px; }
+  .hero-audience { font-size: 13px; margin-top: 9px; margin-bottom: 18px; }
   .license-badge { margin-top: 14px; }
 }
 
@@ -2612,7 +2600,6 @@ footer {
     <span class="line2">הוא <span class="accent">בחירה.</span></span>
   </h1>
   <p class="hero-audience">ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך</p>
-  <p class="hero-sub">לא משנה מאיפה התחלת. הגיע הזמן לשנות מסלול.</p>
   <div class="hero-cta">
     <a href="#contact" class="btn-primary">מתחילים לצמוח · לתיאום פגישה</a>
   </div>
@@ -3918,7 +3905,7 @@ function closeIphone() {
     // so it doesn't fight the entrance fadeUp animations on load
     const hero = document.querySelector('.hero');
     if (hero && scrollY > 2) {
-      const heroEls = hero.querySelectorAll('.hero-logo, .hero-title, .hero-sub, .hero-cta, .license-badge');
+      const heroEls = hero.querySelectorAll('.hero-logo, .hero-title, .hero-audience, .hero-cta, .license-badge');
       const fade = Math.max(0, 1 - scrollY / 600);
       const travel = Math.min(scrollY, window.innerHeight);
       heroEls.forEach(el => {
@@ -4019,7 +4006,6 @@ const translations = {
     heroLine2: 'לא גזירת גורל',
     heroLine3: 'הוא בחירה.',
     heroAudience: 'ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך',
-    heroSub: 'לא משנה מאיפה התחלת. הגיע הזמן לשנות מסלול.',
     heroCta: 'מתחילים לצמוח · לתיאום פגישה',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
     licenseSub: 'בפיקוח אוניברסיטת אריאל',
@@ -4100,7 +4086,6 @@ const translations = {
     heroLine2: 'not fate',
     heroLine3: "It's a choice.",
     heroAudience: 'Financial guidance for young families and individuals starting out',
-    heroSub: 'It doesn\'t matter where you start. It\'s time to change direction.',
     heroCta: "Let's Grow · Book a Meeting",
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
     licenseSub: 'Under Ariel University supervision',
@@ -4195,17 +4180,14 @@ function setLang(lang) {
 
   // Hero
   const heroTitle = document.querySelector('.hero-title');
-  const heroSub = document.querySelector('.hero-sub');
   const heroAud = document.querySelector('.hero-audience');
   heroTitle.dir = isEN ? 'ltr' : 'rtl';
-  heroSub.dir = isEN ? 'ltr' : 'rtl';
   if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.textContent = t.heroAudience; }
   document.querySelector('.hero-title .line1').textContent = t.heroLine1;
   document.querySelector('.hero-title .line2').innerHTML = 'לא <span class="accent">גזירת גורל</span>';
   if (isEN) document.querySelector('.hero-title .line2').innerHTML = 'not <span class="accent">fate</span>';
   const line3 = document.querySelectorAll('.hero-title .line2');
   if (line3[1]) line3[1].innerHTML = isEN ? "It's a <span class='accent'>choice.</span>" : 'הוא <span class="accent">בחירה.</span>';
-  document.querySelector('.hero-sub').textContent = t.heroSub;
   document.querySelector('.hero-cta a').textContent = t.heroCta;
   document.querySelector('.license-title').textContent = t.licenseTitle;
   document.querySelector('.license-sub').textContent = t.licenseSub;
