@@ -166,7 +166,7 @@
 
 :root {
   --p1: #0c0b11;
-  --p2: #161322
+  --p2: #161322;
   --p3: #2e1148;
   --p4: #7c3aed;
   --p5: #a855f7;
@@ -1940,28 +1940,29 @@ footer {
    gold — it pulled the eye to the least important thing here. So the address
    itself is what is shown: a quiet label on the start side, the real address
    on the end side, a hairline between the rows. */
+/* No rules between the rows. What holds the block together instead is the
+   column the addresses line up in, which is why the label sits in a track of
+   a fixed width rather than being pushed to the far edge with a hole in the
+   middle of the line. The address is the link, so the address is what carries
+   the page's own bright purple; the label stays out of its way. */
 .footer-channels {
   list-style: none;
   margin: 0;
   padding: 0;
-  width: 100%;
-  max-width: 330px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: fit-content;
 }
-
-.footer-channels li { border-bottom: 1px solid rgba(255,255,255,0.08); }
 
 .footer-channel {
-  display: flex;
+  display: grid;
+  grid-template-columns: 106px auto;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 11px 4px;
+  gap: 14px;
+  padding: 2px 0;
   text-decoration: none;
-  transition: background 0.25s;
 }
-
-.footer-channel:hover { background: rgba(168,85,247,0.05); }
 
 .footer-link-label {
   font-size: 11px;
@@ -1969,7 +1970,7 @@ footer {
   letter-spacing: 1.5px;
   /* 0.34 was the weight this wanted to be, and it measured 3.05 against the
      page behind it — under the 4.5 a small label has to clear. 0.5 measures
-     4.9 and still sits well under the address beside it, which is 0.7. */
+     4.9 and still sits well under the address beside it. */
   color: rgba(255,255,255,0.5);
   white-space: nowrap;
   transition: color 0.25s;
@@ -1978,19 +1979,23 @@ footer {
 /* An address is Latin text inside a right-to-left line, so the markup marks
    it as such — otherwise the @ and the dots wander to the wrong end of it. */
 .footer-channel-value {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   letter-spacing: 0.2px;
-  color: rgba(255,255,255,0.7);
-  transition: color 0.25s;
+  color: var(--p5);
+  transition: color 0.25s, text-shadow 0.25s;
 }
 
-.footer-channel:hover .footer-channel-value { color: #fff; }
-.footer-channel:hover .footer-link-label { color: rgba(216,180,254,0.8); }
+.footer-channel:hover .footer-channel-value {
+  color: var(--p6);
+  text-shadow: 0 0 15px rgba(168,85,247,0.6);
+}
+
+.footer-channel:hover .footer-link-label { color: rgba(255,255,255,0.75); }
 
 @media (max-width: 480px) {
-  .footer-channel { padding: 10px 2px; }
-  .footer-channel-value { font-size: 13px; }
+  .footer-channel { grid-template-columns: 96px auto; gap: 12px; }
+  .footer-channel-value { font-size: 14px; }
   .footer-link-label { font-size: 10px; letter-spacing: 1.2px; }
 }
 
