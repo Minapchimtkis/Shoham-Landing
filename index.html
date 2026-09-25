@@ -3297,20 +3297,11 @@ document.addEventListener('visibilitychange', () => {
   if (running) requestAnimationFrame(animate);
 });
 
-// Nor should it repaint the whole canvas mid-gesture. Redrawing the drifting
-// field costs more than everything else on the page put together, and while a
-// finger is moving it is the one thing nobody is looking at. It stops for the
-// length of the gesture and picks up again a moment after it ends.
-let scrollIdle;
-addEventListener('scroll', () => {
-  if (running && !document.hidden) { running = false; }
-  clearTimeout(scrollIdle);
-  scrollIdle = setTimeout(() => {
-    if (document.hidden || reduceMotion) return;
-    running = true;
-    requestAnimationFrame(animate);
-  }, 160);
-}, { passive: true });
+// The field was stopped for the length of a scroll gesture here, to save the
+// cost of redrawing it. On a real iPhone that was plainly visible: the stars
+// went out, the backdrop flattened, and they came back a second and a half
+// later when the momentum finally settled. Not worth it — it draws straight
+// through a scroll again.
 
 const starBuckets     = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 const particleBuckets = Array.from({ length: 4 }, () => ({ p: null, g: null }));
