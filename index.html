@@ -262,6 +262,14 @@ body::before {
    Parallax drives translate3d only, via --d1 / --d2 set in JS.
    ═══════════════════════════════════════════════════════════ */
 
+/* --d1 and --d2 carry the drift. A custom property is inherited by default,
+   so writing one on a section made the browser recompute the style of every
+   element inside it, on every frame of a scroll — and the demon cards and the
+   questions are a lot of elements. Declared this way the value stops at the
+   section, and each plane below asks for it explicitly. */
+@property --d1 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --d2 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+
 .hero::before, .hero::after,
 .pain::before, .pain::after,
 .whatis-section::before, .whatis-section::after,
@@ -290,6 +298,7 @@ body::before {
   background:
     radial-gradient(ellipse 60% 42% at 50% 40%,
       rgba(124,58,237,0.10), rgba(109,40,217,0.04) 45%, transparent 72%);
+  --d1: inherit;
   transform: translate3d(0, var(--d1, 0px), 0);
 }
 
@@ -303,6 +312,7 @@ body::before {
   box-shadow:
     inset 0 0 90px rgba(124,58,237,0.10),
     0 0 60px rgba(124,58,237,0.05);
+  --d2: inherit;
   transform: translate3d(-50%, calc(-50% + var(--d2, 0px)), 0);
 }
 
@@ -315,6 +325,7 @@ body::before {
   background:
     radial-gradient(ellipse 50% 40% at 50% 55%,
       rgba(124,58,237,0.06), transparent 68%);
+  --d1: inherit;
   transform: translate3d(0, var(--d1, 0px), 0);
 }
 
@@ -326,6 +337,7 @@ body::before {
   border-radius: 50%;
   background: linear-gradient(180deg,
     transparent, rgba(168,85,247,0.07) 35%, rgba(168,85,247,0.05) 60%, transparent);
+  --d2: inherit;
   transform: translate3d(-50%, var(--d2, 0px), 0);
 }
 
@@ -368,6 +380,7 @@ body::before {
   background:
     radial-gradient(ellipse 42% 34% at 22% 26%, rgba(124,58,237,0.06), transparent 62%),
     radial-gradient(ellipse 32% 26% at 82% 72%, rgba(109,40,217,0.05), transparent 60%);
+  --d1: inherit;
   transform: translate3d(0, var(--d1, 0px), 0);
 }
 
@@ -378,6 +391,7 @@ body::before {
   height: 180px;
   background: linear-gradient(180deg,
     transparent, rgba(168,85,247,0.055), transparent);
+  --d2: inherit;
   transform: translate3d(0, var(--d2, 0px), 0);
 }
 
@@ -394,6 +408,7 @@ body::before {
   background:
     radial-gradient(ellipse 60% 45% at 50% 38%,
       rgba(139,92,246,0.08), rgba(88,28,135,0.04) 48%, transparent 74%);
+  --d1: inherit;
   transform: translate3d(0, var(--d1, 0px), 0);
 }
 
@@ -3270,6 +3285,21 @@ document.addEventListener('visibilitychange', () => {
   if (running) requestAnimationFrame(animate);
 });
 
+// Nor should it repaint the whole canvas mid-gesture. Redrawing the drifting
+// field costs more than everything else on the page put together, and while a
+// finger is moving it is the one thing nobody is looking at. It stops for the
+// length of the gesture and picks up again a moment after it ends.
+let scrollIdle;
+addEventListener('scroll', () => {
+  if (running && !document.hidden) { running = false; }
+  clearTimeout(scrollIdle);
+  scrollIdle = setTimeout(() => {
+    if (document.hidden || reduceMotion) return;
+    running = true;
+    requestAnimationFrame(animate);
+  }, 160);
+}, { passive: true });
+
 const starBuckets     = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 const particleBuckets = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 
@@ -3878,14 +3908,12 @@ function setQuizPhone(phone) {
   } catch (e) { /* private browsing — the link simply carries no phone */ }
 })();
 
-// ── PARALLAX HERO ──
-window.addEventListener('scroll', () => {
-  const y = Math.min(window.scrollY, window.innerHeight);
-  const hero = document.querySelector('.hero');
-  if (hero) hero.style.transform = `translateY(${y * 0.2}px)`;
-  // prevent horizontal shift
-  document.body.style.overflowX = 'hidden';
-});
+// The hero used to be moved a second time from here, by a listener with no
+// frame throttling that also wrote to the body's style on every scroll event.
+// It dragged the whole section down over the one below it while the parallax
+// further down was already moving the same things, so the two fought and the
+// boundary between the sections slid about. Removed: the parallax below owns
+// the hero, and overflow-x is set in the stylesheet, where it belongs.
 // ── IPHONE WIDGET ──
 (function() {
   const widget = document.getElementById('iphoneWidget');
@@ -3961,6 +3989,7 @@ function closeIphone() {
   const bg = document.getElementById('bg');
   const heroContent = document.querySelector('.hero > *:not(#bg)');
   let ticking = false;
+  let lastFade = 1;
 
   // ── DEPTH PLANES ──
   // Each section's background plane drifts at 6% of scroll and its
@@ -3970,6 +3999,15 @@ function closeIphone() {
   const depthSections = [...document.querySelectorAll('.hero, .pain, .whatis-section, .method')];
   const prefersStill = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // A phone browser grows and shrinks its own toolbar as you scroll, and
+  // window.innerHeight changes with it — mid-gesture, by some 60px. Reading it
+  // per frame fed that step straight into the planes below, which is why the
+  // background appeared to jump between two positions. Read once, and again
+  // only on a real resize.
+  let vh = window.innerHeight;
+  addEventListener('resize', () => { vh = window.innerHeight; }, { passive: true });
+  addEventListener('orientationchange', () => { vh = window.innerHeight; });
+
   // Only sections near the viewport get updated, so off-screen ones
   // cost nothing on a page this tall.
   const inView = new Set();
@@ -3978,16 +4016,25 @@ function closeIphone() {
   }, { rootMargin: '15% 0px' });
   depthSections.forEach(s => depthWatcher.observe(s));
 
+  // Measuring and then writing, section by section, made the browser redo the
+  // page's layout once per section. All the measuring happens first now.
   function applyDepth() {
-    const mid = window.innerHeight / 2;
+    const mid = vh / 2;
+    const offsets = [];
     inView.forEach(section => {
       const rect = section.getBoundingClientRect();
       // Distance of the section's centre from the viewport's centre:
       // zero as it passes through, so layers never jump on entry.
-      const offset = (rect.top + rect.height / 2) - mid;
-      section.style.setProperty('--d1', (offset * -0.06).toFixed(1) + 'px');
-      section.style.setProperty('--d2', (offset * -0.14).toFixed(1) + 'px');
+      offsets.push([section, (rect.top + rect.height / 2) - mid]);
     });
+    for (const [section, offset] of offsets) {
+      // Writing a value the section already has still costs a style pass, and
+      // a tenth of a pixel of drift is not worth one.
+      const d1 = Math.round(offset * -0.06) + 'px';
+      const d2 = Math.round(offset * -0.14) + 'px';
+      if (section.__d1 !== d1) { section.style.setProperty('--d1', d1); section.__d1 = d1; }
+      if (section.__d2 !== d2) { section.style.setProperty('--d2', d2); section.__d2 = d2; }
+    }
   }
 
   function applyParallax() {
@@ -3999,11 +4046,16 @@ function closeIphone() {
     if (hero && scrollY > 2) {
       const heroEls = hero.querySelectorAll('.hero-logo, .hero-title, .hero-audience, .hero-cta, .license-badge');
       const fade = Math.max(0, 1 - scrollY / 600);
-      const travel = Math.min(scrollY, window.innerHeight);
-      heroEls.forEach(el => {
-        el.style.transform = `translateY(${travel * 0.25}px)`;
-        el.style.opacity = fade;
-      });
+      const travel = Math.min(scrollY, vh);
+      // Past the fade the hero is invisible and its pieces have stopped
+      // moving, so the rest of the page is scrolled without touching them.
+      if (fade > 0 || lastFade !== 0) {
+        heroEls.forEach(el => {
+          el.style.transform = `translateY(${travel * 0.25}px)`;
+          el.style.opacity = fade;
+        });
+        lastFade = fade;
+      }
       // The view is the far thing, so it moves least — and it does not fade,
       // because the section below slides over it rather than replacing it.
       const view = hero.querySelector('.hero-view-img');
