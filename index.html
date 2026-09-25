@@ -589,6 +589,9 @@ section {
 .hero {
   --band: clamp(120px, 20vh, 230px);
   min-height: 100vh;
+  /* The picture moves with the scroll, and without this it slides out of the
+     bottom of the hero and over the section beneath it. */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -662,18 +665,20 @@ section {
   background:
     linear-gradient(to bottom,
       var(--p1) 0%,
-      var(--p1) 26%,
-      rgba(12,11,17,0.94) 40%,
-      rgba(12,11,17,0.86) 50%,
-      rgba(12,11,17,0.74) 60%,
-      rgba(12,11,17,0.52) 72%,
-      rgba(12,11,17,0.42) 100%),
+      var(--p1) 55%,
+      rgba(12,11,17,0.96) 62%,
+      rgba(12,11,17,0.86) 70%,
+      rgba(12,11,17,0.70) 78%,
+      rgba(12,11,17,0.54) 86%,
+      rgba(12,11,17,0.62) 93%,
+      rgba(12,11,17,0.86) 98%,
+      var(--p1) 100%),
     linear-gradient(to bottom,
-      rgba(46,17,72,0) 30%,
-      rgba(46,17,72,0.55) 58%,
-      rgba(46,17,72,0.34) 80%,
-      rgba(46,17,72,0.20) 100%),
-    url(assets/hero-view.jpg) center bottom / 175% auto no-repeat;
+      rgba(46,17,72,0) 56%,
+      rgba(46,17,72,0.46) 74%,
+      rgba(46,17,72,0.30) 88%,
+      rgba(46,17,72,0.18) 100%),
+    url(assets/hero-view.jpg) center bottom / 185% auto no-repeat;
   pointer-events: none;
   z-index: 0;
 }
@@ -3989,6 +3994,10 @@ function closeIphone() {
         el.style.transform = `translateY(${travel * 0.25}px)`;
         el.style.opacity = fade;
       });
+      // The view is the far thing, so it moves least — and it does not fade,
+      // because the section below slides over it rather than replacing it.
+      const view = hero.querySelector('.hero-view');
+      if (view) view.style.transform = `translateY(${travel * 0.09}px)`;
     }
 
     if (!prefersStill) applyDepth();
