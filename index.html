@@ -641,7 +641,11 @@ section {
 .hero-title .line1 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
 .hero-title .line2 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
 .hero-title .accent {
-  color: var(--gold);
+  background: linear-gradient(135deg, var(--p5), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 20px rgba(168,85,247,0.45));
 }
 
 .hero-audience {
