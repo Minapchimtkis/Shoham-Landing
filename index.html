@@ -3429,14 +3429,19 @@ reveals.forEach(el => observer.observe(el));
 (function () {
   const EMAIL = 'shohamfinance23@gmail.com';
   const link = document.getElementById('mailLink');
-  const toast = document.getElementById('copyToast');
-  if (!link || !toast) return;
+  if (!link) return;
 
   const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (!isDesktop) return;
 
   let toastTimer;
   function showToast(msg) {
+    // The toast sits further down the page than this script does, so it does
+    // not exist yet while this runs. Looking it up here rather than up there
+    // is what makes any of this work: the old lookup found nothing, the guard
+    // beside it returned, and the click was never wired up at all.
+    const toast = document.getElementById('copyToast');
+    if (!toast) return;
     toast.textContent = msg;
     toast.classList.add('show');
     clearTimeout(toastTimer);
