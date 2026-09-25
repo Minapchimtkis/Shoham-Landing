@@ -1940,63 +1940,39 @@ footer {
    gold — it pulled the eye to the least important thing here. So the address
    itself is what is shown: a quiet label on the start side, the real address
    on the end side, a hairline between the rows. */
-/* No rules between the rows. What holds the block together instead is the
-   column the addresses line up in, which is why the label sits in a track of
-   a fixed width rather than being pushed to the far edge with a hole in the
-   middle of the line. The address is the link, so the address is what carries
-   the page's own bright purple; the label stays out of its way. */
+/* Three addresses, one per line, and nothing else — no rules, no labels,
+   no second column. White rather than the page's purple: against a backdrop
+   this dark the purple sinks into it, and white is the one colour here that
+   cannot. Each address is written left-to-right inside a right-to-left page,
+   so the @ and the dots stay where they belong. */
 .footer-channels {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 11px;
   width: fit-content;
+  /* The footer centres its text, which would leave these three ragged on both
+     sides. They share one edge instead. */
+  text-align: start;
 }
 
 .footer-channel {
-  display: grid;
-  grid-template-columns: 106px auto;
-  align-items: baseline;
-  gap: 14px;
-  padding: 2px 0;
-  text-decoration: none;
-}
-
-.footer-link-label {
-  font-size: 11px;
+  display: inline-block;
+  font-size: 15px;
   font-weight: 500;
-  letter-spacing: 1.5px;
-  /* 0.34 was the weight this wanted to be, and it measured 3.05 against the
-     page behind it — under the 4.5 a small label has to clear. 0.5 measures
-     4.9 and still sits well under the address beside it. */
-  color: rgba(255,255,255,0.5);
-  white-space: nowrap;
+  letter-spacing: 0.2px;
+  color: #fff;
+  text-decoration: none;
   transition: color 0.25s;
 }
 
-/* An address is Latin text inside a right-to-left line, so the markup marks
-   it as such — otherwise the @ and the dots wander to the wrong end of it. */
-.footer-channel-value {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  color: var(--p5);
-  transition: color 0.25s, text-shadow 0.25s;
-}
-
-.footer-channel:hover .footer-channel-value {
-  color: var(--p6);
-  text-shadow: 0 0 15px rgba(168,85,247,0.6);
-}
-
-.footer-channel:hover .footer-link-label { color: rgba(255,255,255,0.75); }
+.footer-channel:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 @media (max-width: 480px) {
-  .footer-channel { grid-template-columns: 96px auto; gap: 12px; }
-  .footer-channel-value { font-size: 14px; }
-  .footer-link-label { font-size: 10px; letter-spacing: 1.2px; }
+  .footer-channel { font-size: 14px; }
+  .footer-channels { gap: 10px; }
 }
 
 .footer-disclaimer {
@@ -3098,24 +3074,9 @@ footer {
 <footer>
   <div class="footer-top">
   <ul class="footer-channels">
-    <li>
-      <a class="footer-channel" href="mailto:shohamabo@gmail.com?subject=%D7%A4%D7%A0%D7%99%D7%99%D7%94%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8" id="mailLink">
-        <span class="footer-link-label">אימייל</span>
-        <span class="footer-channel-value" dir="ltr">shohamabo@gmail.com</span>
-      </a>
-    </li>
-    <li>
-      <a class="footer-channel" href="https://www.instagram.com/shoham._abo" target="_blank" rel="noopener noreferrer">
-        <span class="footer-link-label">אינסטגרם</span>
-        <span class="footer-channel-value" dir="ltr">@shoham._abo</span>
-      </a>
-    </li>
-    <li>
-      <a class="footer-channel" href="https://www.instagram.com/minapchim_tkis" target="_blank" rel="noopener noreferrer">
-        <span class="footer-link-label">מנפחים ת'כיס</span>
-        <span class="footer-channel-value" dir="ltr">@minapchim_tkis</span>
-      </a>
-    </li>
+    <li><a class="footer-channel" dir="ltr" href="mailto:shohamabo@gmail.com?subject=%D7%A4%D7%A0%D7%99%D7%99%D7%94%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8" id="mailLink">shohamabo@gmail.com</a></li>
+    <li><a class="footer-channel" dir="ltr" href="https://www.instagram.com/shoham._abo" target="_blank" rel="noopener noreferrer">@shoham._abo</a></li>
+    <li><a class="footer-channel" dir="ltr" href="https://www.instagram.com/minapchim_tkis" target="_blank" rel="noopener noreferrer">@minapchim_tkis</a></li>
   </ul>
     <div class="footer-meta">
       <p class="footer-copy">© 2026 שוהם אבו · יועץ כלכלי · כל הזכויות שמורות לשוהם אבו</p>
@@ -4225,7 +4186,7 @@ const translations = {
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
     iphoneGreet: 'שלום, נדבר?', iphoneSub: 'תיאום שיחת ייעוץ חינמית', iphoneWa: 'מעדיפים בווטסאפ? בואו נדבר', navBrand: 'שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי',
     footerMain: '© 2026 שוהם אבו · יועץ כלכלי · כל הזכויות שמורות לשוהם אבו',
-    mailLabel: 'אימייל', mailSubject: 'פנייה מהאתר', igPersonal: 'אינסטגרם', igBrand: 'מנפחים ת\'כיס',
+    mailSubject: 'פנייה מהאתר',
     a11yLabel: 'הצהרת נגישות', a11yTitle: 'הצהרת נגישות', skipLink: 'דלג לתוכן הראשי',
     privacyLabel: 'מדיניות פרטיות', privacyTitle: 'מדיניות פרטיות', consentHTML: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.', formNote: 'הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.',
     successSub: 'הצעד הראשון כבר מאחורינו.',
@@ -4305,7 +4266,7 @@ const translations = {
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
     iphoneGreet: 'Hello, shall we talk?', iphoneSub: 'Book a free advisory call', iphoneWa: 'Prefer WhatsApp? Let\'s talk', navBrand: 'Shoham Abo <span class="navbar-sep">|</span> Financial Coach',
     footerMain: '© 2026 Shoham Abo · Financial Coach · All rights reserved',
-    mailLabel: 'Email', mailSubject: 'Enquiry from your website', igPersonal: 'Instagram', igBrand: "Minapchim T'kis",
+    mailSubject: 'Enquiry from your website',
     a11yLabel: 'Accessibility Statement', a11yTitle: 'Accessibility Statement', skipLink: 'Skip to main content',
     privacyLabel: 'Privacy Policy', privacyTitle: 'Privacy Policy', consentHTML: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.', formNote: 'Your details are used only to contact you, and are never passed to third parties for marketing.',
     successSub: 'The first step is already behind us.',
@@ -4483,12 +4444,6 @@ function setLang(lang) {
   if (waC) waC.innerHTML = t.waConsent;
   set('.iphone-time', t.waName);
   set('.iphone-avatar', t.waInitial);
-  const fLabels = document.querySelectorAll('.footer-link-label');
-  if (fLabels.length >= 3) {
-    fLabels[0].textContent = t.mailLabel;
-    fLabels[1].textContent = t.igPersonal;
-    fLabels[2].textContent = t.igBrand;
-  }
   const pLink = document.querySelector('.footer-privacy-link');
   if (pLink) pLink.textContent = t.privacyLabel;
   const mLink = document.getElementById('mailLink');
