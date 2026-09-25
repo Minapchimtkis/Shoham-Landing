@@ -675,20 +675,22 @@ section {
   position: absolute;
   inset: -90px 0;
   background:
-    url(assets/hero-view.jpg) center bottom / 185% auto no-repeat,
+    url(assets/hero-view.jpg) center 88% / 205% auto no-repeat,
     linear-gradient(to bottom,
       #0c0b11 0%,
-      #11142a 34%,
-      #1d2c55 48%,
-      #293f79 58%,
+      #11142a 20%,
+      #1d2c55 32%,
+      #293f79 42%,
       #293f79 100%);
   will-change: transform;
 }
 
 /* The blend, on the frame rather than on the picture, so it stays where the
    hero ends however far the picture has travelled. Solid at the top where
-   the headline sits, letting the frame through in the middle, and back to
-   the page's own colour before the last row. */
+   the headline sits, and it starts opening at the line that says who this is
+   for, which on every handset sits between 46% and 49% of the hero. From
+   there down the view comes up gradually, and it is back to the page's own
+   colour before the last row. */
 .hero-view::after {
   content: '';
   position: absolute;
@@ -696,18 +698,19 @@ section {
   background:
     linear-gradient(to bottom,
       var(--p1) 0%,
-      rgba(12,11,17,0.99) 34%,
-      rgba(12,11,17,0.95) 46%,
-      rgba(12,11,17,0.86) 56%,
-      rgba(12,11,17,0.64) 66%,
-      rgba(12,11,17,0.42) 76%,
-      rgba(12,11,17,0.26) 86%,
-      rgba(12,11,17,0.21) 100%),
+      rgba(12,11,17,0.99) 26%,
+      rgba(12,11,17,0.95) 40%,
+      rgba(12,11,17,0.87) 47%,
+      rgba(12,11,17,0.70) 56%,
+      rgba(12,11,17,0.52) 65%,
+      rgba(12,11,17,0.34) 75%,
+      rgba(12,11,17,0.24) 86%,
+      rgba(12,11,17,0.20) 100%),
     linear-gradient(to bottom,
-      rgba(46,17,72,0) 44%,
-      rgba(46,17,72,0.22) 66%,
-      rgba(46,17,72,0.24) 80%,
-      rgba(46,17,72,0.14) 100%);
+      rgba(46,17,72,0) 38%,
+      rgba(46,17,72,0.20) 58%,
+      rgba(46,17,72,0.22) 78%,
+      rgba(46,17,72,0.13) 100%);
 }
 
 /* Everything the reader came for sits over it — without disturbing the
@@ -782,6 +785,14 @@ section {
   .hero-title { font-size: 34px; margin-bottom: 14px; }
   .hero-audience { font-size: 13px; margin-top: 9px; margin-bottom: 18px; }
   .license-badge { margin-top: 14px; }
+}
+
+/* A handset is a tall narrow slot, so the picture has to be blown up to fill
+   it side to side. A desktop window is not: at that same enlargement all you
+   see is a shoulder. Here the frame is wide enough to carry the picture at
+   close to its own width, which is the view the picture is of. */
+@media (min-width: 900px) {
+  .hero-view-img { background-size: 115% auto, auto; background-position: center bottom, center; }
 }
 
 .hero-cta {
