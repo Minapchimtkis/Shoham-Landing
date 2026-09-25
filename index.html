@@ -3225,8 +3225,20 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => { resize(); build(); }, 200);
 }, { passive: true });
 
+// Where the pool of light is heading, and where it actually is.
 let mouseX = W / 2, mouseY = H / 2;
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
+let glowX = mouseX, glowY = mouseY;
+
+// A touch screen has no pointer to follow. iOS synthesises a mousemove at the
+// point of every tap, so opening a question threw this pool of light across
+// the screen: the backdrop went dark on one side and lit up on the other,
+// which is not something anyone asked for by tapping a question. Only a real
+// mouse moves it now, and it glides rather than jumps, so even on a desktop a
+// pointer that leaves the window and comes back somewhere else does not snap.
+document.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  mouseX = e.clientX; mouseY = e.clientY;
+}, { passive: true });
 
 // ── Connections via a spatial grid ──
 // The old version compared every particle to every other one (O(n^2) — over
@@ -3306,7 +3318,9 @@ const particleBuckets = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 function drawScene() {
   ctx.clearRect(0, 0, W, H);
 
-  const grad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 550);
+  glowX += (mouseX - glowX) * 0.1;
+  glowY += (mouseY - glowY) * 0.1;
+  const grad = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 550);
   grad.addColorStop(0, 'rgba(124,58,237,0.22)');
   grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
