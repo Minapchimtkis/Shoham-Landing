@@ -1039,6 +1039,43 @@ section {
 }
 
 /* ── ABOUT ── */
+
+/* The photograph's own backdrop is very nearly the page's purple, which is
+   what makes this possible: the edges are dissolved rather than cropped, so
+   there is no rectangle anywhere — a face coming out of the dark, the same
+   thing the first screen does. It stands beside the opening line rather than
+   sitting above it in a block of its own. */
+.about-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  margin-bottom: 44px;
+}
+
+.about-head-copy { flex: 1 1 auto; text-align: center; }
+
+/* Beside the picture the line has a narrower column than it had across the
+   whole section, and at its full size it broke onto a third line. */
+.about-head .about-quote { font-size: clamp(22px, 3vw, 34px); margin-top: 0; margin-bottom: 0; }
+
+.about-portrait {
+  flex: none;
+  width: clamp(190px, 23vw, 258px);
+  height: auto;
+  /* He is cut out of his backdrop in the file itself, so there is no frame to
+     hide and no mask on the sides or the top. The only edge left is where the
+     picture stops across his chest, and that one fades. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+}
+
+/* On a narrow screen it goes above the line instead of beside it, and the
+   section keeps the centred rhythm it already had. */
+@media (max-width: 820px) {
+  .about-head { flex-direction: column; gap: 4px; margin-bottom: 34px; }
+  .about-portrait { width: min(235px, 62vw); }
+}
 .about {
   padding: 120px 24px;
   max-width: 800px;
@@ -2840,9 +2877,15 @@ footer {
 
 <!-- ABOUT -->
 <section data-stage="about" data-stage-i="5" class="about">
-  <div class="section-label reveal" style="text-align:center; margin-bottom:28px;">אז מי אני?</div>
-  <div class="about-quote reveal" style="text-align:center; padding-right:0;">
-    אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.
+  <div class="about-head">
+    <img class="about-portrait reveal" src="assets/shoham.webp" width="896" height="1195" loading="lazy" decoding="async"
+         alt="שוהם אבו, יועץ כלכלי">
+    <div class="about-head-copy">
+      <div class="section-label reveal" style="margin-bottom:28px;">אז מי אני?</div>
+      <div class="about-quote reveal" style="padding-right:0;">
+        אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.
+      </div>
+    </div>
   </div>
   <p class="about-body reveal" style="text-align:center;">
     קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיה שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>ניהול פיננסי הוא לא שיעור במתמטיקה הוא שיעור בהתנהגות. המחסום האמיתי הוא לא המספרים בחשבון, אלא מה שקורה בראש, והמטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.
