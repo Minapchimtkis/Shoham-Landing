@@ -144,7 +144,12 @@
 <link rel="icon" href="assets/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="manifest" href="assets/site.webmanifest">
-<meta name="theme-color" content="#0a0015">
+<!-- No theme-color on purpose. iOS Safari paints its own toolbars with this
+     colour, and #0a0015 is nearly black while the page behind the bottom bar
+     is lit purple — which is the flat black band with the hard edge across
+     the screen. Left unset, Safari samples the page at the edges instead and
+     tints the bars to match as it scrolls. The installed app still takes its
+     colours from the manifest, which keeps its own theme_color. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="שוהם אבו · ליווי וייעוץ פיננסי">
 <meta property="og:locale" content="he_IL">
