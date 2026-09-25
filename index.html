@@ -2263,19 +2263,18 @@ footer {
   text-align: center;
 }
 
+/* A real face where an initial used to be. The gradient stays underneath as
+   what shows if the picture has not arrived yet, and the ring keeps it
+   belonging to the page rather than floating on the glass. */
 .iphone-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  object-fit: cover;
+  display: block;
   background: linear-gradient(135deg, #7c3aed, #a855f7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 900;
-  color: white;
   margin: 0 auto 10px;
-  box-shadow: 0 0 16px rgba(168,85,247,0.5);
+  box-shadow: 0 0 16px rgba(168,85,247,0.5), 0 0 0 1.5px rgba(168,85,247,0.55);
 }
 
 .iphone-greeting {
@@ -3122,7 +3121,7 @@ footer {
       </div>
 
       <div class="iphone-content">
-        <div class="iphone-avatar">ש</div>
+        <img class="iphone-avatar" src="assets/shoham-avatar.webp" width="160" height="160" loading="lazy" decoding="async" alt="שוהם אבו">
         <p class="iphone-greeting">שלום, נדבר?</p>
         <p class="iphone-sub">תיאום שיחת ייעוץ חינמית</p>
 
@@ -4294,7 +4293,6 @@ const translations = {
     quizText: 'חמש שאלות קצרות, דקה אחת, בלי להשאיר טלפון. בסוף תקבלו תמונה ברורה של המצב שלכם. ואם תרצו, אחזור אליכם עם הכיוון הראשון.',
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
-    waInitial: 'ש',
     q6: 'מה קורה ביום שאחרי?',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ויהיה לכם את האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
@@ -4374,7 +4372,6 @@ const translations = {
     quizText: 'Five short questions, one minute, no phone number needed. You will come away with a clear picture of where you stand, and if you want, I will get back to you with a first direction.',
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
-    waInitial: 'S',
     q6: 'What happens the day after?',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
@@ -4537,7 +4534,10 @@ function setLang(lang) {
   const waC = document.getElementById('waConsentText');
   if (waC) waC.innerHTML = t.waConsent;
   set('.iphone-time', t.waName);
-  set('.iphone-avatar', t.waInitial);
+  // it is a photograph now, so what changes with the language is its
+  // description, not its contents
+  const waFace = document.querySelector('.iphone-avatar');
+  if (waFace) waFace.alt = t.waName;
   const fLabels = document.querySelectorAll('.footer-link-label');
   if (fLabels.length >= 3) {
     fLabels[0].textContent = t.mailLabel;
