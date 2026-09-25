@@ -1063,11 +1063,20 @@ section {
   flex: none;
   width: clamp(190px, 23vw, 258px);
   height: auto;
-  /* He is cut out of his backdrop in the file itself, so there is no frame to
-     hide and no mask on the sides or the top. The only edge left is where the
-     picture stops across his chest, and that one fades. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
-          mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+  /* He is cut out of his backdrop in the file itself, so nothing needs hiding
+     — except where the frame runs out. His shoulders reach the foot of the
+     picture and both its sides, and stopping there made them read as a block
+     someone had cut through. They fade out in all three directions instead.
+     His head sits between a fifth and four fifths of the width, so the side
+     fades never touch it. */
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 0%, #000 66%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(to bottom, #000 0%, #000 66%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+          mask-composite: intersect;
 }
 
 /* On a narrow screen it goes above the line instead of beside it, and the
