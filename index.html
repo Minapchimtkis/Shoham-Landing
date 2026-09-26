@@ -1358,7 +1358,11 @@ section {
   border: 1px solid rgba(168,85,247,0.28);
   border-radius: 16px;
   padding: 52px 40px;
-  margin-top: 80px;
+  /* It had no width of its own, so on a desktop it ran the whole way across —
+     1392px, against the 620 to 720 every other box on this page keeps to, and
+     a line of text 150 characters long. Nobody reads a line that wide. */
+  max-width: 720px;
+  margin: 80px auto 0;
   text-align: center;
   position: relative;
   overflow: hidden;
