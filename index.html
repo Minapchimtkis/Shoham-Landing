@@ -141,17 +141,19 @@
 }
 </script>
 
-<!-- Google reads the icon beside a search result from here. It shrinks it to
-     around 24 pixels, and at that size the wordmark is an illegible smear, so
-     these point at the mark on its own — the ring and the arrow, square, on
-     the logo's own dark ground. Google works in multiples of 48, hence the
-     192 and the 512 alongside the .ico that browsers want. The ?v= is each
-     file's checksum: the names have not changed, and without it a browser
-     holding the old icon would never ask for the new one. -->
-<link rel="icon" href="assets/favicon.ico?v=1367b5d9" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/png" href="assets/icon-192.png?v=2a16eb2d" sizes="192x192">
-<link rel="icon" type="image/png" href="assets/icon-512.png?v=ef654f4b" sizes="512x512">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2a16eb2d">
+<!-- Google reads the icon beside a search result from here, and iOS takes the
+     home-screen icon from the same place. It is his face: he is what this
+     practice is, and a person is what someone scanning a page of results is
+     looking for. Cropped closer than the avatar in the phone mockup, which is
+     shown at 58px and can afford the whole photograph — these are seen at 16
+     to 48, where a pixel not spent on the face is wasted. Google works in
+     multiples of 48, hence the 192 and the 512 beside the .ico that browsers
+     want. The ?v= is each file's checksum: the names have not changed, and
+     without it a browser holding the old icon would never ask for these. -->
+<link rel="icon" href="assets/favicon.ico?v=d8ae4264" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="assets/icon-192.png?v=db36579a" sizes="192x192">
+<link rel="icon" type="image/png" href="assets/icon-512.png?v=0b6b0379" sizes="512x512">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=db36579a">
 <link rel="manifest" href="assets/site.webmanifest">
 <meta name="theme-color" content="#0a0015">
 <meta property="og:type" content="website">
