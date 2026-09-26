@@ -925,6 +925,30 @@ section {
   flex: 1;
 }
 
+/* On a desktop these were three strips 680 wide and 142 tall — a ratio of
+   nearly five to one, and narrowing them barely helped, because their height
+   comes from the icon beside the text rather than from the text. Standing
+   them side by side turns the same three strips into three cards taller than
+   they are wide, with the icon over the words the way the narrow screens have
+   always shown them. The middle one no longer shrinks either: staggered depth
+   reads as composition in a stack and as a mistake in a row. */
+@media (min-width: 861px) {
+  .demons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    gap: 18px;
+    max-width: 100%;
+  }
+  .demon-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 18px;
+    padding: 32px 24px;
+  }
+  .demon-card:nth-child(even) { transform: none; }
+}
+
 @media (max-width: 560px) {
   .demon-card {
     flex-direction: column;
@@ -1317,7 +1341,9 @@ section {
    boast; with the evidence attached it reads as a fact. Last in the section
    and directly above the signature, which then reads as signing it. */
 .eq-block {
-  max-width: 620px;
+  /* 620 made this three-and-a-half times wider than tall. At 520 the words
+     wrap once more and it reads as a block rather than a strip. */
+  max-width: 520px;
   margin: 44px auto 0;
   padding: 26px 28px;
   border: 1px solid rgba(168,85,247,0.30);
