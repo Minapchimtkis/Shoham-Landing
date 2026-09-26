@@ -709,6 +709,9 @@ section {
 .hero-view-img {
   position: absolute;
   inset: -90px 0;
+  /* it grows from the foot of the frame as the page scrolls, not from its
+     middle, so the ground stays put and the horizon is what rises */
+  transform-origin: center bottom;
   background:
     url(assets/hero-view.jpg) center 88% / 205% auto no-repeat,
     linear-gradient(to bottom,
@@ -4175,8 +4178,17 @@ function closeIphone() {
       }
       // The view is the far thing, so it moves least — and it does not fade,
       // because the section below slides over it rather than replacing it.
+      // It also grows a tenth over one screen of scrolling, which is what
+      // turns sliding past a photograph into walking into a place. It grows
+      // from the foot of the frame, where the ground is, so the horizon rises
+      // as it comes. Someone who asked their system for less movement gets
+      // the travel without the growth.
       const view = hero.querySelector('.hero-view-img');
-      if (view) view.style.transform = `translateY(${travel * 0.09}px)`;
+      if (view) {
+        const dolly = prefersStill ? 1 : 1 + (travel / vh) * 0.10;
+        view.style.transform =
+          `translateY(${travel * 0.09}px) scale(${dolly.toFixed(4)})`;
+      }
     }
 
     if (!prefersStill) applyDepth();
