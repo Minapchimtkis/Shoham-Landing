@@ -141,8 +141,17 @@
 }
 </script>
 
-<link rel="icon" href="assets/favicon.ico" sizes="48x48">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<!-- Google reads the icon beside a search result from here. It shrinks it to
+     around 24 pixels, and at that size the wordmark is an illegible smear, so
+     these point at the mark on its own — the ring and the arrow, square, on
+     the logo's own dark ground. Google works in multiples of 48, hence the
+     192 and the 512 alongside the .ico that browsers want. The ?v= is each
+     file's checksum: the names have not changed, and without it a browser
+     holding the old icon would never ask for the new one. -->
+<link rel="icon" href="assets/favicon.ico?v=5cdc8b21" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="assets/icon-192.png?v=25f22e40" sizes="192x192">
+<link rel="icon" type="image/png" href="assets/icon-512.png?v=9237deb2" sizes="512x512">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=25f22e40">
 <link rel="manifest" href="assets/site.webmanifest">
 <meta name="theme-color" content="#0a0015">
 <meta property="og:type" content="website">
