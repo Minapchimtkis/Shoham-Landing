@@ -680,7 +680,16 @@ section {
 .hero-title .line1 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
 .hero-title .line2 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
 .hero-title .accent {
-  background: linear-gradient(135deg, var(--p5), var(--gold));
+  /* Violet and gold sit almost opposite each other, so mixing them in a
+     straight line runs the middle of the word through grey — a dull brown
+     landed on exactly the words that carry the sentence. These two stops
+     walk the colour round through rose and warm orange instead, which keeps
+     the ends where they were and the middle alive. */
+  background: linear-gradient(135deg,
+    var(--p5) 0%,
+    #e0649b 42%,
+    #f28a4c 70%,
+    var(--gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
