@@ -185,6 +185,120 @@
   --gold: #f0c040;
 }
 
+/* ── THE OPENING ─────────────────────────────────────────────────────── */
+/* The ground and the mark are separate layers. The ground fades to reveal
+   the page; the mark does not fade at all — it travels to the exact box the
+   hero's logo occupies and is swapped for it on arrival, so one logo becomes
+   the other rather than two logos dissolving into each other. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: grid;
+  place-items: center;
+  /* Interactive on purpose: a tap lands here and ends the opening rather
+     than reaching a button behind the curtain. */
+  animation: introSafety 0s 5s forwards;   /* if the script never runs */
+}
+@keyframes introSafety { to { opacity: 0; visibility: hidden; } }
+.intro.done { display: none; }
+
+.intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--p1);          /* the page's own ground: no flash between */
+  transition: opacity 520ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.intro.lifting::before { opacity: 0; }
+
+.intro-mark {
+  position: relative;
+  width: min(232px, 52vw);
+  opacity: 0;
+  transform: scale(0.95);
+  animation: introIn 400ms cubic-bezier(0.22, 1, 0.36, 1) 40ms forwards;
+}
+@keyframes introIn { to { opacity: 1; transform: scale(1); } }
+/* The flight. A uniform scale and a translation, so the mark's proportions
+   are identical at every moment of it. The keyframes above are cleared
+   before this is set — an animation's fill outranks an inline style. */
+.intro-mark.flying {
+  animation: none;
+  opacity: 1;
+  transition: transform 560ms cubic-bezier(0.6, 0, 0.25, 1);
+}
+.intro-logo { width: 100%; height: auto; display: block; }
+
+/* A band of light above the mark, cut to the mark's own shape, so it reads
+   as light catching the metal rather than as a stripe crossing a box. It
+   never touches the pixels underneath — it is a layer of its own. */
+.intro-shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  -webkit-mask-image: url(assets/logo.webp);
+          mask-image: url(assets/logo.webp);
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+}
+.intro-shine::before {
+  content: '';
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  width: 42%;
+  background: linear-gradient(to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.10) 34%,
+    rgba(255,255,255,0.70) 50%,
+    rgba(255,255,255,0.10) 66%,
+    rgba(255,255,255,0) 100%);
+  transform: translateX(300%) skewX(-14deg);
+}
+/* Right to left, the way the lettering is read. */
+.intro.shine .intro-shine::before {
+  animation: introShine 640ms cubic-bezier(0.38, 0, 0.2, 1) forwards;
+}
+@keyframes introShine {
+  0%   { transform: translateX(300%) skewX(-14deg); }
+  100% { transform: translateX(-320%) skewX(-14deg); }
+}
+
+/* The hero holds its entrance until the ground starts to clear, so the copy
+   rises as the page is revealed rather than having played out behind it. */
+html.intro-open .hero-badge,
+html.intro-open .hero-title,
+html.intro-open .hero-audience,
+html.intro-open .hero-cta,
+html.intro-open .license-badge { animation-play-state: paused; }
+/* Those entrances were written with their own staggered delays, which would
+   otherwise be spent after the hold is released — leaving the revealed hero
+   empty for another four tenths of a second. Held back is not the same as
+   postponed: the moment the ground clears, they go. */
+html.intro-flying .hero-badge, html.intro-landed .hero-badge,
+html.intro-flying .hero-title, html.intro-landed .hero-title,
+html.intro-flying .hero-audience, html.intro-landed .hero-audience,
+html.intro-flying .hero-cta, html.intro-landed .hero-cta,
+html.intro-flying .license-badge, html.intro-landed .license-badge { animation-delay: 0s !important; }
+/* The hero's own logo is what the mark is flying towards, so it is not
+   there until the mark has arrived on it — and then it simply is. */
+html.intro-open .hero-logo,
+html.intro-flying .hero-logo { opacity: 0 !important; animation: none !important; }
+/* Nothing holds it once it has landed — the scroll writes this element's
+   opacity, and a rule with !important here would outrank that. */
+
+@media (prefers-reduced-motion: reduce) {
+  /* No flight and no light: the mark is shown, and then it is not. */
+  .intro-mark { animation: none; opacity: 1; transform: none; }
+  .intro-mark.flying { transition: none; }
+  .intro-shine { display: none; }
+}
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
@@ -2821,11 +2935,143 @@ footer {
 </head>
 <body>
 
+<!-- THE OPENING
+     The mark alone on the page's own background, a light passing over it,
+     and then it carries itself up to the place it occupies in the hero and
+     the page is simply there behind it. The logo is never stretched, tinted
+     or masked: the light is a separate layer above it, cut to its shape, and
+     every movement is a uniform scale or a translation. -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-mark" id="introMark">
+    <img class="intro-logo" src="assets/logo.webp" width="370" height="240" alt=""
+         decoding="sync" fetchpriority="high">
+    <span class="intro-shine"></span>
+  </div>
+</div>
+
 <!-- Someone using a keyboard reaches the page and has to tab through the
      navbar and the language switch before anything they came for. This is
      the standard way out: hidden until it is focused, first thing in the
      tab order. -->
 <a class="skip-link" href="#main" id="skipLink">דלג לתוכן הראשי</a>
+
+<script>
+/* The opening runs here rather than at the foot of the page, so the hero is
+   held back from its very first frame and never plays out behind the curtain.
+
+   The beats, about 1.7 seconds in all:
+     0.04s  the mark settles
+     0.42s  a light crosses it, cut to its shape
+     1.10s  it travels to the box the hero's logo occupies, while the ground
+            beneath it clears and the hero's copy begins to rise
+     1.66s  it arrives, and is exchanged for the hero's own logo
+
+   A tap, a key, a wheel or a touch ends it on the spot. Nobody is ever made
+   to wait for an animation to finish. */
+(function () {
+  var el = document.getElementById('intro');
+  if (!el) return;
+  var mark = document.getElementById('introMark');
+  var html = document.documentElement;
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timers = [];
+  html.classList.add('intro-open');
+
+  // Each of these carries `animation: fadeUp ... forwards`, and a filling
+  // animation outranks an inline style — so the scroll loop's writes to
+  // their opacity and transform have never had any effect and the hero has
+  // never faded or travelled as the code below plainly intends. Frozen into
+  // ordinary styles the moment each entrance finishes, they become the
+  // scroll's to move.
+  function handOver(e) {
+    if (!e) return;
+    e.style.animation = 'none';
+    e.style.opacity = '1';
+    e.style.transform = 'translateY(0)';
+  }
+  // Armed when the hold is released rather than here: this script runs at the
+  // head of the body, and the hero has not been parsed yet.
+  var armed = false;
+  function armHandover() {
+    if (armed) return;
+    armed = true;
+    ['.hero-badge', '.hero-title', '.hero-audience', '.hero-cta', '.license-badge']
+      .forEach(function (sel) {
+        var e = document.querySelector(sel);
+        if (!e) return;
+        e.addEventListener('animationend', function () { handOver(e); }, { once: true });
+        // Should one never run — already finished, or never started — it is
+        // handed over anyway rather than left stuck to its keyframes.
+        timers.push(setTimeout(function () { handOver(e); }, 1600));
+      });
+  }
+
+  var over = false;
+  // The ground clears while the mark is still on its way across it, and the
+  // hero's copy starts rising at the same moment, so the page is coming to
+  // life underneath the mark rather than waiting for it to arrive.
+  function clearGround() {
+    if (over) return;
+    el.classList.add('lifting');
+    html.classList.remove('intro-open');
+    html.classList.add('intro-flying');
+    armHandover();
+  }
+  // The mark arrives and the hero's logo takes its place in the same frame.
+  function land() {
+    if (over) return;
+    over = true;
+    timers.forEach(clearTimeout);
+    timers = [];
+    armHandover();
+    html.classList.remove('intro-open', 'intro-flying');
+    html.classList.add('intro-landed');
+    // The hero's logo never ran its entrance — the mark arrived in its place
+    // — so it is handed straight over.
+    handOver(document.querySelector('.hero-logo'));
+    el.classList.add('lifting', 'done');
+    ['keydown', 'pointerdown', 'wheel', 'touchstart']
+      .forEach(function (e) { window.removeEventListener(e, skip); });
+  }
+  function skip() { if (mark) mark.style.transition = 'none'; land(); }
+  ['keydown', 'pointerdown', 'wheel', 'touchstart'].forEach(function (e) {
+    window.addEventListener(e, skip, { once: true, passive: e !== 'keydown' });
+  });
+
+  if (still) { timers.push(setTimeout(land, 650)); return; }
+
+  timers.push(setTimeout(function () { el.classList.add('shine'); }, 420));
+
+  timers.push(setTimeout(function () {
+    if (over) return;
+    // Measured, not assumed: where the hero's logo sits moves with the
+    // viewport, the language and the font.
+    var target = document.querySelector('.hero-logo');
+    var flew = false;
+    if (target && mark) {
+      var a = mark.getBoundingClientRect(), b = target.getBoundingClientRect();
+      if (b.width > 2 && a.width > 2) {
+        // Clearing the entrance keyframes first: their forwards fill would
+        // otherwise outrank the inline transform and nothing would move.
+        mark.classList.add('flying');
+        void mark.offsetWidth;
+        mark.style.transform =
+          'translate(' + ((b.left + b.width / 2) - (a.left + a.width / 2)).toFixed(1) + 'px,' +
+                         ((b.top + b.height / 2) - (a.top + a.height / 2)).toFixed(1) + 'px) ' +
+          'scale(' + (b.width / a.width).toFixed(4) + ')';
+        flew = true;
+        // Land on the frame the flight actually settles, not on a timer that
+        // can run a frame early and leave the swap visible as a small jump.
+        mark.addEventListener('transitionend', function (ev) {
+          if (ev.propertyName === 'transform') land();
+        }, { once: true });
+      }
+    }
+    clearGround();
+    timers.push(setTimeout(land, flew ? 760 : 300));   // in case it never fires
+  }, 1100));
+})();
+</script>
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
