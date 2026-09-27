@@ -295,6 +295,14 @@ body::before {
   z-index: 0;
 }
 
+/* A section that is on its way out is scaled from the edge it shares with
+   the one arriving, so that edge holds still and the section appears to
+   settle backwards rather than to shrink in place. */
+.pain, .whatis-section, .method, .quiz-section,
+.about, .proof, .process-section, .faq-section {
+  transform-origin: center bottom;
+}
+
 /* Content must sit above the new planes */
 .hero > *,
 .pain > *,
@@ -4145,6 +4153,41 @@ function closeIphone() {
   }, { rootMargin: '15% 0px' });
   depthSections.forEach(s => depthWatcher.observe(s));
 
+  // ── THE SECTION YOU ARE LEAVING GOES BACK INTO THE DECK ──────────────
+  // Scrolling a page normally slides flat panels past a window. This gives
+  // the leaving section somewhere to go: once it is more than half gone it
+  // settles back and dims, and the next one arrives in front of it rather
+  // than merely after it. It is driven by where the section is, not by a
+  // timer, so it tracks the finger exactly and reverses on the way back up.
+  //
+  // The hero has its own movement, and the last section never leaves the
+  // screen — and it holds the floating widget, which is fixed and would be
+  // trapped by a transform on an ancestor.
+  const exitSections = [...document.querySelectorAll(
+    '.pain, .whatis-section, .method, .quiz-section, .about, .proof, .process-section, .faq-section')];
+  const exiting = new Set();
+  const exitWatcher = new IntersectionObserver(entries => {
+    entries.forEach(e => e.isIntersecting ? exiting.add(e.target) : exiting.delete(e.target));
+  }, { rootMargin: '0px' });
+  exitSections.forEach(el => exitWatcher.observe(el));
+
+  function applyExit() {
+    const reads = [];
+    exiting.forEach(el => reads.push([el, el.getBoundingClientRect().bottom]));
+    for (const [el, bottom] of reads) {
+      // Nothing happens while the section still has more than half the
+      // screen below it: text being read is never shrunk.
+      const gate = vh * 0.55;
+      const out = Math.min(1, Math.max(0, (gate - bottom) / gate));
+      const key = Math.round(out * 100);
+      if (el.__out === key) continue;
+      el.__out = key;
+      if (key === 0) { el.style.transform = ''; el.style.opacity = ''; continue; }
+      el.style.transform = `scale(${(1 - out * 0.07).toFixed(4)})`;
+      el.style.opacity = (1 - out * 0.45).toFixed(3);
+    }
+  }
+
   // Measuring and then writing, section by section, made the browser redo the
   // page's layout once per section. All the measuring happens first now.
   function applyDepth() {
@@ -4200,12 +4243,12 @@ function closeIphone() {
       }
     }
 
-    if (!prefersStill) applyDepth();
+    if (!prefersStill) { applyDepth(); applyExit(); }
 
     ticking = false;
   }
 
-  if (!prefersStill) applyDepth();
+  if (!prefersStill) { applyDepth(); applyExit(); }
 
   window.addEventListener('scroll', () => {
     if (!ticking) {
