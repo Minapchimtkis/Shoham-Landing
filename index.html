@@ -214,7 +214,7 @@
 
 .intro-mark {
   position: relative;
-  width: min(360px, 72vw);
+  width: min(420px, 80vw);
   opacity: 0;
   transform: scale(0.95);
   animation: introIn 400ms cubic-bezier(0.22, 1, 0.36, 1) 40ms forwards;
@@ -239,8 +239,12 @@
   overflow: hidden;
   pointer-events: none;
   mix-blend-mode: screen;
-  -webkit-mask-image: url(assets/logo.webp);
-          mask-image: url(assets/logo.webp);
+  /* The mark's silhouette only — a tenth of the mark's weight, and a
+     mask has no use for its colour or its resolution. Fetched as a
+     stylesheet resource, it would otherwise be a second copy of the
+     whole logo alongside the one the page already has. */
+  -webkit-mask-image: url(assets/logo-shape.webp?v=39f175d1);
+          mask-image: url(assets/logo-shape.webp?v=39f175d1);
   -webkit-mask-size: 100% 100%;
           mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
@@ -2943,7 +2947,7 @@ footer {
      every movement is a uniform scale or a translation. -->
 <div class="intro" id="intro" aria-hidden="true">
   <div class="intro-mark" id="introMark">
-    <img class="intro-logo" src="assets/logo.webp" width="370" height="240" alt=""
+    <img class="intro-logo" src="assets/logo.webp?v=862dbcdb" width="600" height="389" alt=""
          decoding="sync" fetchpriority="high">
     <span class="intro-shine"></span>
   </div>
@@ -3076,7 +3080,7 @@ footer {
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <div class="navbar-inner">
-    <img class="navbar-logo" src="assets/logo.webp" alt="שוהם אבו · ליווי וייעוץ פיננסי">
+    <img class="navbar-logo" src="assets/logo.webp?v=862dbcdb" width="600" height="389" alt="שוהם אבו · ליווי וייעוץ פיננסי">
     <div class="navbar-brand">שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי</div>
     <div class="lang-toggle" id="langToggle">
       <button class="lang-btn active" id="btnHE" onclick="setLang('he')">HE</button>
