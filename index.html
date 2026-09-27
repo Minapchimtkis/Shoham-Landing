@@ -284,6 +284,10 @@ body::before {
    section, and each plane below asks for it explicitly. */
 @property --d1 { syntax: '<length>'; inherits: false; initial-value: 0px; }
 @property --d2 { syntax: '<length>'; inherits: false; initial-value: 0px; }
+/* How near a step is to the middle of the screen — its turn to be read. */
+@property --focus { syntax: '<number>'; inherits: false; initial-value: 0; }
+/* How far down a segment of the process line the reader has got. */
+@property --fill  { syntax: '<number>'; inherits: false; initial-value: 0; }
 
 .hero::before, .hero::after,
 .pain::before, .pain::after,
@@ -471,6 +475,9 @@ body::before {
     transition: opacity 0.2s linear !important;
     transition-delay: 0s !important;
   }
+  /* The scroll never runs for them, so every step keeps the lit default.
+     Only the bead has nowhere to be. */
+  .process-line::after { display: none; }
 }
 
 /* ── OFF-SCREEN SECTIONS ──
@@ -1064,6 +1071,25 @@ section {
 .step.visible {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* Four steps that all arrive inside three tenths of a second read as one
+   event, and none of them gets looked at. So no step ever finishes
+   arriving: the one in the middle of the screen is the one that is lit,
+   and the light walks down the list as the page is scrolled. It is not a
+   delay and not an animation — stop scrolling and it holds, scroll back
+   and it walks up again. --focus is 1 in the middle of the screen and 0
+   two fifths of a screen away. */
+.step { --focus: 1; }
+.step > * { --focus: inherit; }
+.step.visible > * { opacity: calc(0.4 + 0.6 * var(--focus)); }
+
+.step-num {
+  /* The number is what announces whose turn it is, so it takes the light
+     rather than merely brightening with the rest. */
+  color: rgba(196,132,252, calc(0.2 + 0.75 * var(--focus)));
+  text-shadow: 0 0 calc(var(--focus) * 24px) rgba(168,85,247, calc(var(--focus) * 0.5));
+  transform: scale(calc(1 + var(--focus) * 0.07));
 }
 
 .step:last-child { border-bottom: none; }
@@ -2701,6 +2727,7 @@ footer {
 }
 
 .process-step {
+  --focus: 1;
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -2723,7 +2750,12 @@ footer {
   font-size: 22px;
   font-weight: 900;
   font-family: 'Frank Ruhl Libre', serif;
-  box-shadow: 0 0 20px rgba(168,85,247,0.5);
+  /* Dim until the line reaches it, then it takes the light — so the
+     numbers come on one at a time, in order, as the page is read. */
+  --focus: inherit;
+  box-shadow: 0 0 calc(6px + var(--focus) * 20px) rgba(168,85,247, calc(0.18 + var(--focus) * 0.45));
+  /* set on .process-step, inherited here; 1 until the scroll says otherwise */
+  transform: scale(calc(0.93 + var(--focus) * 0.07));
   position: relative;
   z-index: 2;
 }
@@ -2734,7 +2766,15 @@ footer {
   inset-inline-start: 25px;
   width: 2px;
   height: calc(100% - 52px);
-  background: linear-gradient(180deg, rgba(168,85,247,0.5), rgba(168,85,247,0.1));
+  /* The line fills to wherever the reader has got, rather than glowing
+     evenly whether or not anyone is there. Full by default, so a browser
+     that cannot follow along still shows a finished line. */
+  --fill: 1;
+  background: linear-gradient(180deg,
+    rgba(168,85,247,0.55) 0%,
+    rgba(168,85,247,0.55) calc(var(--fill) * 100%),
+    rgba(168,85,247,0.09) calc(var(--fill) * 100%),
+    rgba(168,85,247,0.09) 100%);
   z-index: 1;
   overflow: hidden;
 }
@@ -2749,17 +2789,12 @@ footer {
   background: linear-gradient(180deg, transparent, #c084fc, #e9d5ff, #c084fc, transparent);
   border-radius: 4px;
   box-shadow: 0 0 12px rgba(192,132,252,0.9), 0 0 24px rgba(168,85,247,0.6);
-  animation: lightTravel 3s ease-in-out infinite;
-}
-
-.process-step:nth-child(2) .process-line::after { animation-delay: 0.6s; }
-.process-step:nth-child(3) .process-line::after { animation-delay: 1.2s; }
-
-@keyframes lightTravel {
-  0%   { top: -40px; opacity: 0; }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  /* The bead is the head of the fill, so it sits exactly where the reader
+     has got to and stops when they stop. It used to run a three second
+     loop whether anyone was looking or not, which is the tell of a
+     template rather than of a page that answers you. */
+  top: calc(var(--fill) * 100% - 40px);
+  opacity: var(--fill);
 }
 
 .process-content {
@@ -2901,28 +2936,28 @@ footer {
     <p class="method-sub reveal">ניהול כסף הוא לא משחק של מספרים. הוא ברוב רובו עניין של התנהגות, ידע והרגלים נכונים. אקסל יבנה לכם תקציב מצוין, ו־AI יבנה לכם אותו בשלוש שניות. מה שאין להם הוא מישהו שיושב מולכם כשאתם נבהלים מהמספר שיצא, ויודע למה נבהלתם. את זה אי אפשר לשכפל.</p>
 
     <div class="steps">
-      <div class="step" style="transition-delay:0.0s">
+      <div class="step">
         <div class="step-num">01</div>
         <div class="step-content">
           <div class="step-title">פסיכולוגיה פיננסית</div>
           <div class="step-desc">מזהים יחד את האמונות, הפחדים וההרגלים שמונעים ממך להתקדם. בלי שיפוט. בלי בושה.</div>
         </div>
       </div>
-      <div class="step" style="transition-delay:0.1s">
+      <div class="step">
         <div class="step-num">02</div>
         <div class="step-content">
           <div class="step-title">בניית תמונה ברורה</div>
           <div class="step-desc">מסתכלים על המצב הפיננסי שלך כמו שהוא: הכנסות, הוצאות, חובות, מטרות. ללא פחד.</div>
         </div>
       </div>
-      <div class="step" style="transition-delay:0.2s">
+      <div class="step">
         <div class="step-num">03</div>
         <div class="step-content">
           <div class="step-title">תוכנית פעולה מעשית</div>
           <div class="step-desc">צעד אחר צעד, לאט ובבטחה. כלים טכניים שמותאמים לך, לא לאף אחד אחר.</div>
         </div>
       </div>
-      <div class="step" style="transition-delay:0.30000000000000004s">
+      <div class="step">
         <div class="step-num">04</div>
         <div class="step-content">
           <div class="step-title">מעקב וצמיחה</div>
@@ -4173,6 +4208,47 @@ function closeIphone() {
   }, { rootMargin: '0px' });
   exitSections.forEach(el => exitWatcher.observe(el));
 
+  // ── EACH STEP GETS ITS OWN TURN ──────────────────────────────────────
+  // The reading line: a little below the middle of the screen, which is
+  // where the eye actually sits when scrolling rather than at the centre.
+  const stepEls = [...document.querySelectorAll('.method .step')];
+  const procEls = [...document.querySelectorAll('.process-step')];
+  const litInView = new Set();
+  const litWatcher = new IntersectionObserver(entries => {
+    entries.forEach(e => e.isIntersecting ? litInView.add(e.target) : litInView.delete(e.target));
+    requestAnimationFrame(applySteps);
+  }, { rootMargin: '20% 0px' });
+  [...stepEls, ...procEls].forEach(el => litWatcher.observe(el));
+
+  function applySteps() {
+    const line = vh * 0.58;
+    const writes = [];
+    litInView.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (el.classList.contains('step')) {
+        // Full in the middle of the screen, gone two fifths of a screen away,
+        // which is wide enough that one step is always lit and narrow enough
+        // that two are never lit equally.
+        const away = Math.abs((r.top + r.height / 2) - vh / 2) / (vh * 0.42);
+        writes.push([el, '--focus', Math.max(0, 1 - away)]);
+      } else {
+        const seg = el.querySelector('.process-line');
+        if (seg) {
+          const s = seg.getBoundingClientRect();
+          writes.push([seg, '--fill', Math.min(1, Math.max(0, (line - s.top) / (s.height || 1)))]);
+        }
+        // The number lights over the last 70px of the line's approach to it.
+        writes.push([el, '--focus', Math.min(1, Math.max(0, (line - r.top + 30) / 70))]);
+      }
+    });
+    for (const [el, prop, raw] of writes) {
+      const v = raw.toFixed(2);
+      if (el.__lit === prop + v) continue;
+      el.__lit = prop + v;
+      el.style.setProperty(prop, v);
+    }
+  }
+
   function applyExit() {
     const reads = [];
     exiting.forEach(el => {
@@ -4256,12 +4332,12 @@ function closeIphone() {
       }
     }
 
-    if (!prefersStill) { applyDepth(); applyExit(); }
+    if (!prefersStill) { applyDepth(); applyExit(); applySteps(); }
 
     ticking = false;
   }
 
-  if (!prefersStill) { applyDepth(); applyExit(); }
+  if (!prefersStill) { applyDepth(); applyExit(); applySteps(); }
 
   window.addEventListener('scroll', () => {
     if (!ticking) {
