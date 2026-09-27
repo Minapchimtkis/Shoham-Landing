@@ -4153,12 +4153,14 @@ function closeIphone() {
   }, { rootMargin: '15% 0px' });
   depthSections.forEach(s => depthWatcher.observe(s));
 
-  // ── THE SECTION YOU ARE LEAVING GOES BACK INTO THE DECK ──────────────
-  // Scrolling a page normally slides flat panels past a window. This gives
-  // the leaving section somewhere to go: once it is more than half gone it
-  // settles back and dims, and the next one arrives in front of it rather
-  // than merely after it. It is driven by where the section is, not by a
-  // timer, so it tracks the finger exactly and reverses on the way back up.
+  // ── SECTIONS ARRIVE IN FRONT AND LEAVE BEHIND ────────────────────────
+  // Scrolling a page normally slides flat panels past a window: one section
+  // ends, the next begins, and nothing connects them. Here a section rises
+  // into place as it arrives and settles backwards as it goes, so a boundary
+  // is something passing in front of something else rather than a join.
+  //
+  // Both halves are driven by where the section is, never by a timer, so
+  // they track the finger exactly and reverse on the way back up.
   //
   // The hero has its own movement, and the last section never leaves the
   // screen — and it holds the floating widget, which is fixed and would be
@@ -4173,18 +4175,29 @@ function closeIphone() {
 
   function applyExit() {
     const reads = [];
-    exiting.forEach(el => reads.push([el, el.getBoundingClientRect().bottom]));
-    for (const [el, bottom] of reads) {
-      // Nothing happens while the section still has more than half the
-      // screen below it: text being read is never shrunk.
-      const gate = vh * 0.55;
-      const out = Math.min(1, Math.max(0, (gate - bottom) / gate));
-      const key = Math.round(out * 100);
-      if (el.__out === key) continue;
-      el.__out = key;
-      if (key === 0) { el.style.transform = ''; el.style.opacity = ''; continue; }
-      el.style.transform = `scale(${(1 - out * 0.07).toFixed(4)})`;
-      el.style.opacity = (1 - out * 0.45).toFixed(3);
+    exiting.forEach(el => {
+      const r = el.getBoundingClientRect();
+      reads.push([el, r.top, r.bottom]);
+    });
+    for (const [el, top, bottom] of reads) {
+      // Arriving: full while the section's head is still at the foot of the
+      // screen, spent by the time that head reaches halfway up. It lags the
+      // scroll by a few dozen pixels and catches up, which is what makes it
+      // look like it is coming forward.
+      const enter = Math.min(1, Math.max(0, (top - vh * 0.5) / (vh * 0.5)));
+      // Leaving: begins as the section's foot comes onto the screen, so the
+      // movement is spent over a whole screen of scrolling and is visible
+      // while there is still something left to see.
+      const out = Math.min(1, Math.max(0, (vh - bottom) / vh));
+      const key = Math.round(enter * 100) * 1000 + Math.round(out * 100);
+      if (el.__key === key) continue;
+      el.__key = key;
+      if (!enter && !out) { el.style.transform = ''; el.style.opacity = ''; continue; }
+      // Scaled from the edge it shares with the section after it, so that
+      // edge holds still and the movement reads as depth, not as shrinkage.
+      el.style.transform =
+        `translateY(${(enter * 42).toFixed(1)}px) scale(${(1 - out * 0.12).toFixed(4)})`;
+      el.style.opacity = ((1 - enter * 0.55) * (1 - out * 0.42)).toFixed(3);
     }
   }
 
