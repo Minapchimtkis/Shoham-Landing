@@ -3307,6 +3307,33 @@ glowSprite.width = glowSprite.height = GLOW_R * 2;
   g.fillRect(0, 0, GLOW_R * 2, GLOW_R * 2);
 })();
 
+// ── THE FIELD ANSWERS THE SCROLL ───────────────────────────────────────
+// The canvas is fixed to the viewport, so the sky sat perfectly still while
+// the whole page slid over it. On its own that passed unnoticed; now that
+// sections go translucent as they arrive and leave, far more of it shows
+// through, and a backdrop that never budges reads as a sticker rather than
+// as something the page is moving in front of.
+//
+// Each layer is carried by a different fraction of the scroll — the big dim
+// ones least, the small bright ones most — which is the whole of what makes
+// them read as being at different distances.
+let lastScrollY = window.scrollY;
+let scrollDY = 0;
+function readScroll() {
+  const y = window.scrollY;
+  // A jump rather than a scroll — a link to an anchor, a reload partway
+  // down — should not fling the entire sky across the screen.
+  scrollDY = Math.max(-140, Math.min(140, y - lastScrollY));
+  lastScrollY = y;
+}
+// Carried off one edge, a star returns on the other at a fresh x. Throwing
+// it away and starting it somewhere random, which is what happens when one
+// merely drifts out, would thin the field out wherever the reader has been.
+function wrapY(o) {
+  if (o.y < -60) { o.y += H + 120; o.x = Math.random() * W; }
+  else if (o.y > H + 60) { o.y -= H + 120; o.x = Math.random() * W; }
+}
+
 class Particle {
   constructor() { this.reset(); }
   reset() {
@@ -3323,8 +3350,8 @@ class Particle {
   }
   update() {
     this.x += this.speedX;
-    this.y += this.speedY;
-    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    this.y += this.speedY - scrollDY * 0.16;   // the nearest layer, so the fastest
+    if (this.x < 0 || this.x > W) this.reset(); else wrapY(this);
   }
 }
 
@@ -3343,9 +3370,9 @@ class Star {
   }
   update() {
     this.x += this.speedX;
-    this.y += this.speedY;
+    this.y += this.speedY - scrollDY * 0.09;
     this.phase += this.twinkleSpeed;
-    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    if (this.x < 0 || this.x > W) this.reset(); else wrapY(this);
   }
 }
 
@@ -3363,9 +3390,9 @@ class DeepStar {
   }
   update() {
     this.x += this.speedX;
-    this.y += this.speedY;
+    this.y += this.speedY - scrollDY * 0.04;   // the furthest, so barely at all
     this.phase += this.twinkleSpeed;
-    if (this.x < -50 || this.x > W + 50 || this.y < -50 || this.y > H + 50) this.reset();
+    if (this.x < -50 || this.x > W + 50) this.reset(); else wrapY(this);
   }
 }
 
@@ -3469,6 +3496,7 @@ const starBuckets     = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 const particleBuckets = Array.from({ length: 4 }, () => ({ p: null, g: null }));
 
 function drawScene() {
+  readScroll();
   ctx.clearRect(0, 0, W, H);
 
   glowX += (mouseX - glowX) * 0.1;
