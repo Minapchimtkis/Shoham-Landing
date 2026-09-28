@@ -4297,6 +4297,65 @@ window.trackStage = function () {};
   else start();
 })();
 
+// ── TAPPING THE NUMBER ──
+// A telephone call used to arrive with nothing behind it: no record that the
+// site sent it, and no way to tell it from a cold call. The tap is now a lead
+// like any other, labelled 'call'.
+//
+// The caller's number cannot be read from here — a tel: link hands it to the
+// dialler and the page learns nothing back. What it can pass on is a number
+// this person already typed on this device, into the form or the WhatsApp
+// panel, in which case the lead arrives complete. Otherwise it arrives as a
+// call at a time, and the number is on his phone, where it does exist.
+(function () {
+  const link = document.getElementById('callLink');
+  if (!link) return;
+
+  // Anyone who asked not to be measured is not measured here either. Read at
+  // the moment of the tap rather than at load, so the answer is the current
+  // one however the setting was reached.
+  const allowed = function () {
+    try { return localStorage.getItem('shoham_notrack') !== '1'; } catch (e) { return true; }
+  };
+
+  // One id per browser, so tapping twice is one person deciding to call.
+  const client = (function () {
+    try {
+      let c = localStorage.getItem('shoham_client');
+      if (!c) {
+        c = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + '-' +
+             Math.random().toString(16).slice(2));
+        localStorage.setItem('shoham_client', c);
+      }
+      return c;
+    } catch (e) { return null; }
+  })();
+
+  link.addEventListener('click', function () {
+    // Never prevented: the call is the point, and it must not wait on a
+    // network request. keepalive lets this finish after the dialler opens.
+    if (!allowed()) return;
+    let phone = null;
+    try { phone = localStorage.getItem('shoham_lead_phone') || null; } catch (e) {}
+    try {
+      fetch(SUPABASE_URL + '/rest/v1/rpc/call_click', {
+        method: 'POST', keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({
+          p_page: 'landing',
+          p_client: client,
+          p_phone: phone,
+          p_page_lang: (document.documentElement.lang || 'he')
+        })
+      }).catch(function () {});
+    } catch (e) { /* a call must never be blocked by measurement */ }
+  }, { passive: true });
+})();
+
 // ── WHATSAPP HANDOFF ──
 // The button used to leave the site with nothing recorded, so a person who
 // preferred WhatsApp never reached the dashboard at all. Now their details
