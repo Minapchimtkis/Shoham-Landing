@@ -1752,6 +1752,48 @@ section {
   pointer-events: none;
 }
 
+/* The quieter of the two ways to reach him: the form is the one being asked
+   for, this is the one for someone who has already decided. Deliberately not
+   a second bright button — two of those compete and neither is chosen. */
+.call-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 32px auto 0;
+}
+.call-or {
+  font-size: 13px;
+  font-weight: 300;
+  /* 4.7:1 on this ground — the footer's own small print is what fails the
+     contrast report, and this is not going to join it. */
+  color: rgba(255,255,255,0.62);
+  letter-spacing: 0.3px;
+}
+.call-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  /* 48px tall, which is a thumb rather than a cursor. */
+  padding: 13px 26px;
+  border-radius: 100px;
+  border: 1px solid rgba(216,180,254,0.30);
+  background: rgba(168,85,247,0.07);
+  color: var(--p6);
+  font-family: 'Heebo', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  transition: border-color 0.3s, background 0.3s, transform 0.3s;
+}
+.call-link:hover, .call-link:focus-visible {
+  border-color: rgba(216,180,254,0.6);
+  background: rgba(168,85,247,0.14);
+  transform: translateY(-2px);
+}
+.call-link svg { opacity: 0.75; flex: none; }
+
 .cta-title {
   font-size: clamp(32px, 5vw, 64px);
   font-weight: 900;
@@ -3455,6 +3497,21 @@ footer {
       <span style="font-size:14px; font-weight:300; color:rgba(255,255,255,0.75);">הצעד הראשון כבר מאחורינו.</span>
     </div>
   </div>
+
+  <!-- Someone who has decided should not have to fill in a form to reach a
+       person. It sits outside the form block on purpose, so it is still there
+       after the form has been sent. -->
+  <div class="call-row reveal">
+    <span class="call-or" id="callOr">או פשוט תרימו טלפון</span>
+    <a class="call-link" id="callLink" href="tel:+972507228755"
+       aria-label="התקשרו לשוהם אבו, 050-722-8755">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      <bdi>050-722-8755</bdi>
+    </a>
+  </div>
 </section>
 
 </main>
@@ -4371,21 +4428,34 @@ function setQuizPhone(phone) {
 // ── IPHONE WIDGET ──
 (function() {
   const widget = document.getElementById('iphoneWidget');
-  const philSection = document.getElementById('contact');
+  // It was keyed to the contact section — the comment below it said philosophy,
+  // but the element fetched was #contact — and it only ever appeared, never
+  // went away. So it arrived exactly where the form is and then sat on top of
+  // it: fixed to the corner, over the button, the small print and the number.
+  //
+  // Its job is to offer a way to make contact while someone is reading
+  // something else. At the contact section there is nothing left to offer, so
+  // now it comes up over the long middle of the page and steps aside once the
+  // section it is advertising is actually on screen.
+  const from = document.getElementById('philosophy');
+  const upTo = document.getElementById('contact');
   let shown = false;
-  let closed = false;
 
   function checkScroll() {
-    if (closed || !philSection) return;
-    const rect = philSection.getBoundingClientRect();
-    // Show when philosophy section is within viewport
-    if (rect.top < window.innerHeight * 0.6 && !shown) {
-      shown = true;
-      setTimeout(() => widget.classList.add('visible'), 600);
+    if (!widget.isConnected || !from || !upTo) return;
+    const reached = from.getBoundingClientRect().top < window.innerHeight * 0.6;
+    const arrived = upTo.getBoundingClientRect().top < window.innerHeight * 0.55;
+    if (reached && !arrived) {
+      if (!shown) { shown = true; setTimeout(() => {
+        if (widget.isConnected) widget.classList.add('visible'); }, 600); }
+      else widget.classList.add('visible');
+    } else {
+      widget.classList.remove('visible');
     }
   }
 
   window.addEventListener('scroll', checkScroll, { passive: true });
+  window.addEventListener('resize', checkScroll, { passive: true });
   checkScroll();
 })();
 
@@ -4755,6 +4825,7 @@ const translations = {
     q4: 'מה ההבדל בינך לבין יועץ בבנק?', a4: 'יועץ בבנק מוגבל למוצרים של הבנק ויש לו אינטרס של הגוף עצמו. אני יועץ עצמאי. המשימה שלי היא לנתח את התמונה המלאה ולהתאים לך פתרון שתפור אישית אליך. האינטרס היחיד שלי הוא ההצלחה של שנינו במסע הזה.',
     q5: 'תוך כמה זמן רואים תוצאות?', a5: 'סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.',
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
+    callOr: 'או פשוט תרימו טלפון',
     ctaSub: 'השאירו פרטים ואחזור אליכם בהקדם האפשרי. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
@@ -4834,6 +4905,7 @@ const translations = {
     q4: "What's the difference between you and a bank advisor?", a4: 'A bank advisor is limited to the bank\'s products and serves the bank\'s interests. I\'m an independent coach. My mission is to analyze the full picture and tailor a personal solution for you. My only interest is our shared success.',
     q5: 'How long until I see results?', a5: "You'll gain clarity and structure from the first month. Significant financial results are built over time with consistency. I don't make empty promises. I build a real process with you, step by step.",
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
+    callOr: 'Or simply pick up the phone',
     ctaSub: "Leave your details and I'll get back to you as soon as possible. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
@@ -4974,6 +5046,11 @@ function setLang(lang) {
   // CTA
   sectionLabels[7].textContent = t.ctaLabel;
   document.querySelector('.cta-title').textContent = t.ctaTitle;
+  const callOr = document.getElementById('callOr');
+  if (callOr) callOr.textContent = t.callOr;
+  const callLink = document.getElementById('callLink');
+  if (callLink) callLink.setAttribute('aria-label',
+    isEN ? 'Call Shoham Abu, 050-722-8755' : 'התקשרו לשוהם אבו, 050-722-8755');
   document.querySelector('.cta-sub').textContent = t.ctaSub;
   document.querySelector('#contactForm .btn-primary').textContent = t.ctaBtn;
   document.getElementById('fname').placeholder = t.namePh;
