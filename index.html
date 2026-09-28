@@ -170,6 +170,7 @@
 <meta name="twitter:title" content="הכסף שלך הוא לא גזירת גורל">
 <meta name="twitter:description" content="ליווי וייעוץ פיננסי אישי לצעירים, לזוגות ולמשפחות צעירות. יועץ כלכלי מוסמך מטעם חברת UNI פיננסים, בפיקוח אוניברסיטת אריאל.">
 <meta name="twitter:image" content="https://shohamfinance.co.il/assets/share-home.jpg">
+<link rel="preload" as="image" href="assets/logo.webp?v=7ad752ae" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2997,7 +2998,7 @@ footer {
 <div class="intro" id="intro" aria-hidden="true">
   <div class="intro-mark" id="introMark">
     <img class="intro-logo" src="assets/logo.webp?v=7ad752ae" width="600" height="415" alt=""
-         decoding="sync" fetchpriority="high">
+         decoding="async" fetchpriority="high">
     <span class="intro-shine"></span>
   </div>
 </div>
@@ -3093,9 +3094,16 @@ footer {
 
   if (still) { timers.push(setTimeout(land, 650)); return; }
 
-  timers.push(setTimeout(function () { el.classList.add('shine'); }, 420));
-
-  timers.push(setTimeout(function () {
+  // On a slow connection the mark had not arrived by the time the curtain
+  // lifted, so the opening was a blank dark screen and nothing else — 2.2
+  // seconds of it on a weak 4G, 3.4 on 3G, which reads exactly like a page
+  // that has frozen. The sequence now waits for the mark, and if it has not
+  // come in time there is no opening at all: the page is simply shown.
+  //
+  // Either a proper opening or none. Never a wait in front of nothing.
+  // The flight, kept as a function so the sequence can be started by the
+  // mark's arrival rather than only by the clock.
+  function fly() {
     if (over) return;
     // Measured, not assumed: where the hero's logo sits moves with the
     // viewport, the language and the font.
@@ -3122,7 +3130,39 @@ footer {
     }
     clearGround();
     timers.push(setTimeout(land, flew ? 760 : 300));   // in case it never fires
-  }, 1100));
+  }
+
+  // On a slow connection the mark had not arrived by the time the curtain
+  // lifted, so the opening was a blank dark screen and nothing else — 2.2
+  // seconds of it on a weak 4G and 3.4 on 3G, which reads exactly like a
+  // page that has frozen. The sequence now waits for the mark, and if it
+  // has not come in time there is no opening at all: the page is shown.
+  //
+  // Either a proper opening or none. Never a wait in front of nothing.
+  var logo = el.querySelector('.intro-logo');
+
+  function begin() {
+    timers.push(setTimeout(function () { el.classList.add('shine'); }, 420));
+    timers.push(setTimeout(fly, 1100));
+  }
+
+  if (logo && logo.complete && logo.naturalWidth > 0) { begin(); }
+  else if (!logo) { land(); }
+  else {
+    var started = false;
+    var start = function (withOpening) {
+      if (started || over) return;
+      started = true;
+      clearTimeout(giveUp);
+      withOpening ? begin() : land();
+    };
+    // Long enough for the mark on any connection worth waiting for, short
+    // enough that nobody is held in front of an empty screen.
+    var giveUp = setTimeout(function () { start(false); }, 700);
+    timers.push(giveUp);
+    logo.addEventListener('load',  function () { start(true);  }, { once: true });
+    logo.addEventListener('error', function () { start(false); }, { once: true });
+  }
 })();
 </script>
 
