@@ -85,6 +85,14 @@
       "mainEntity": [
         {
           "@type": "Question",
+          "name": "כמה זה עולה?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים — לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "למי אני עוזר?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -3524,6 +3532,14 @@ footer {
 
       <div class="faq-item reveal">
         <button class="faq-q" onclick="toggleFaq(this)">
+          <span>כמה זה עולה?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים — לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך.</div>
+      </div>
+
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="toggleFaq(this)">
           <span>מה ההבדל בינך לבין יועץ בבנק?</span>
           <span class="faq-icon">+</span>
         </button>
@@ -5043,6 +5059,8 @@ const translations = {
     quizText: 'חמש שאלות קצרות, דקה אחת, בלי להשאיר טלפון. בסוף תקבלו תמונה ברורה של המצב שלכם. ואם תרצו, אחזור אליכם עם הכיוון הראשון.',
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
+    qPrice: 'כמה זה עולה?',
+    aPrice: 'שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים — לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך.',
     q6: 'מה קורה ביום שאחרי?',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ויהיה לכם את האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
@@ -5124,6 +5142,8 @@ const translations = {
     quizText: 'Five short questions, one minute, no phone number needed. You will come away with a clear picture of where you stand, and if you want, I will get back to you with a first direction.',
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
+    qPrice: 'How much does it cost?',
+    aPrice: "The first call is free, with no commitment. I set the price with you in that conversation, once I understand where you stand and what you need — not before. There is no fixed price list, because no two situations are the same. What is certain: you will know the number up front and agree to it, with no surprises later.",
     q6: 'What happens the day after?',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
@@ -5222,8 +5242,9 @@ function setLang(lang) {
   const realFaq = document.querySelector('.faq-section:not(.process-section):not(.whatis-section)');
   const faqQs = realFaq.querySelectorAll('.faq-q span:first-child');
   const faqAs = realFaq.querySelectorAll('.faq-a');
-  const qs = ['q1','q2','q3','q4','q5','q6'];
-  const as = ['a1','a2','a3','a4','a5','a6'];
+  // In the order the questions appear, which is what these are matched by.
+  const qs = ['q1','q2','q3','qPrice','q4','q5','q6'];
+  const as = ['a1','a2','a3','aPrice','a4','a5','a6'];
   qs.forEach((k,i) => { if(faqQs[i]) faqQs[i].textContent = t[k]; });
   as.forEach((k,i) => { if(faqAs[i]) faqAs[i].textContent = t[k]; });
 
