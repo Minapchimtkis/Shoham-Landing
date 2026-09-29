@@ -3555,7 +3555,7 @@ footer {
   <div class="cta-glow"></div>
   <div class="section-label reveal">בואו נדבר</div>
   <h2 class="cta-title reveal">מוכנים לשנות מסלול?</h2>
-  <p class="cta-sub reveal">השאירו פרטים ואחזור אליכם בהקדם האפשרי. שיחת ההיכרות חינם, ללא התחייבות.</p>
+  <p class="cta-sub reveal">השאירו פרטים ואחזור אליכם תוך שעתיים בשעות היום. שיחת ההיכרות חינם, ללא התחייבות.</p>
 
   <div class="form-wrap reveal">
     <div id="contactForm">
@@ -3591,7 +3591,7 @@ footer {
       <p class="form-note">הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.</p>
     </div>
     <div class="success-msg" id="successMsg">
-      🎉 קיבלתי! אחזור אליכם בהקדם האפשרי.<br>
+      <span id="successMain">🎉 קיבלתי! אחזור אליכם תוך שעתיים בשעות היום.</span><br>
       <span style="font-size:14px; font-weight:300; color:rgba(255,255,255,0.75);">הצעד הראשון כבר מאחורינו.</span>
     </div>
   </div>
@@ -5023,7 +5023,7 @@ const translations = {
     q5: 'תוך כמה זמן רואים תוצאות?', a5: 'סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.',
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
     callOr: 'או פשוט תרימו טלפון',
-    ctaSub: 'השאירו פרטים ואחזור אליכם בהקדם האפשרי. שיחת ההיכרות חינם, ללא התחייבות.',
+    ctaSub: 'השאירו פרטים ואחזור אליכם תוך שעתיים בשעות היום. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
     iphoneGreet: 'שלום, נדבר?', iphoneSub: 'תיאום שיחת ייעוץ חינמית', iphoneWa: 'מעדיפים בווטסאפ? בואו נדבר', navBrand: 'שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי',
@@ -5031,6 +5031,7 @@ const translations = {
     mailLabel: 'אימייל', mailSubject: 'פנייה מהאתר', igPersonal: 'שוהם אבו', igBrand: 'מנפחים ת\'כיס',
     a11yLabel: 'הצהרת נגישות', a11yTitle: 'הצהרת נגישות', skipLink: 'דלג לתוכן הראשי',
     privacyLabel: 'מדיניות פרטיות', privacyTitle: 'מדיניות פרטיות', consentHTML: 'קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.', formNote: 'הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.',
+    successMain: '🎉 קיבלתי! אחזור אליכם תוך שעתיים בשעות היום.',
     successSub: 'הצעד הראשון כבר מאחורינו.',
     waTitle: 'רגע לפני שעוברים',
     waSub: 'שם וטלפון, כדי שאדע מי פנה ואוכל לחזור אליכם גם אם נתנתק באמצע.',
@@ -5103,7 +5104,7 @@ const translations = {
     q5: 'How long until I see results?', a5: "You'll gain clarity and structure from the first month. Significant financial results are built over time with consistency. I don't make empty promises. I build a real process with you, step by step.",
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
     callOr: 'Or simply pick up the phone',
-    ctaSub: "Leave your details and I'll get back to you as soon as possible. The first call is free, with no commitment.",
+    ctaSub: "Leave your details and I'll get back to you within two hours during the day. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
     iphoneGreet: 'Hello, shall we talk?', iphoneSub: 'Book a free advisory call', iphoneWa: 'Prefer WhatsApp? Let\'s talk', navBrand: 'Shoham Abo <span class="navbar-sep">|</span> Financial Coach',
@@ -5111,6 +5112,7 @@ const translations = {
     mailLabel: 'Email', mailSubject: 'Enquiry from your website', igPersonal: 'Shoham Abo', igBrand: "Minapchim T'kis",
     a11yLabel: 'Accessibility Statement', a11yTitle: 'Accessibility Statement', skipLink: 'Skip to main content',
     privacyLabel: 'Privacy Policy', privacyTitle: 'Privacy Policy', consentHTML: 'I have read and agree to the <a href="#" onclick="openPrivacy(event)">privacy policy</a>.', formNote: 'Your details are used only to contact you, and are never passed to third parties for marketing.',
+    successMain: "🎉 Got it! I'll get back to you within two hours during the day.",
     successSub: 'The first step is already behind us.',
     waTitle: 'One moment before we move',
     waSub: 'Your name and phone, so I know who got in touch and can come back to you even if we lose the thread.',
@@ -5272,7 +5274,8 @@ function setLang(lang) {
 
   // Everything below was left in Hebrew whichever language was chosen.
   const set = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
-  set('#successMsg span', t.successSub);
+  set('#successMain', t.successMain);
+  set('#successMsg span:not(#successMain)', t.successSub);
   set('.quiz-invite-label', t.quizLabel);
   set('.quiz-invite h3', t.quizTitle);
   set('.quiz-invite p', t.quizText);
