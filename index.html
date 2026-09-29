@@ -1895,6 +1895,35 @@ section {
   margin-top: 16px;
 }
 
+/* What is missing, said under the button that was just pressed — where the
+   eye already is — rather than in a system dialog that has to be dismissed
+   before the field can be reached. It takes no room until there is
+   something to say, so nothing moves on the way in. */
+.form-error {
+  margin: 12px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  /* 5.6:1 on this ground, and not the only signal: the field it names is
+     outlined and takes the focus. */
+  color: #ff9d9d;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+}
+.form-error.show {
+  max-height: 80px;
+  opacity: 1;
+}
+
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+  border-color: #ff7a7a;
+  box-shadow: 0 0 0 3px rgba(255,122,122,0.14);
+}
+
 
 /* ── CONSENT CHECKBOX ── */
 .consent-row {
@@ -3554,9 +3583,11 @@ footer {
           data-error-callback="onTurnstileError">
         </div>
       </div>
-      <button class="btn-primary" id="submitBtn" onclick="submitForm()" disabled style="width:100%; justify-content:center;">
+      <button class="btn-primary" id="submitBtn" onclick="submitForm()"
+              aria-describedby="formError" style="width:100%; justify-content:center;">
         מתחילים לצמוח ←
       </button>
+      <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
       <p class="form-note">הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.</p>
     </div>
     <div class="success-msg" id="successMsg">
@@ -3967,17 +3998,50 @@ const observer = new IntersectionObserver(entries => {
 reveals.forEach(el => observer.observe(el));
 
 // ── FORM ──
-// ── CONSENT GATE ──
-// The button is inert until the box is ticked, so there is no path to
-// submitting without consent rather than a warning after the fact.
+// ── SAYING WHAT IS MISSING ──
+// The button used to arrive disabled until the consent box was ticked. That
+// stops nothing — submitForm checks consent again and refuses without it —
+// but it does mean the one thing the page is asking for looks broken on
+// arrival, with nothing saying why. A grey button explains nothing; a person
+// who cannot press it assumes the page is at fault, not that they have
+// missed a step.
+//
+// So it is live from the start, and pressing it says what is needed.
 (function () {
-  const box = document.getElementById('fconsent');
-  const btn = document.getElementById('submitBtn');
-  if (!box || !btn) return;
-  const sync = () => { btn.disabled = !box.checked; };
-  box.addEventListener('change', sync);
-  sync();
+  const err = document.getElementById('formError');
+  if (!err) return;
+  // Clear it as soon as they put right whatever it was.
+  ['fname', 'fphone', 'fconsent'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener(id === 'fconsent' ? 'change' : 'input', function () {
+      if (err.classList.contains('show')) clearFormError();
+    });
+  });
 })();
+
+function clearFormError() {
+  const err = document.getElementById('formError');
+  if (err) { err.classList.remove('show'); err.textContent = ''; }
+  const row = document.querySelector('.consent-row');
+  if (row) row.classList.remove('consent-error');
+  ['fname', 'fphone'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.removeAttribute('aria-invalid');
+  });
+}
+
+// Short, and pointing at the thing to fix rather than at the person.
+function showFormError(msg, focusId) {
+  const err = document.getElementById('formError');
+  if (err) { err.textContent = msg; err.classList.add('show'); }
+  const el = focusId && document.getElementById(focusId);
+  if (el) {
+    if (el.type !== 'checkbox') el.setAttribute('aria-invalid', 'true');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
 
 // ── EMAIL: desktop clipboard fallback ──
 // A browser can't tell us whether the visitor has a mail client configured,
@@ -4121,8 +4185,18 @@ function submitForm() {
   const name = document.getElementById('fname').value.trim();
   const phone = document.getElementById('fphone').value.trim();
   const msg = document.getElementById('fmsg').value.trim();
-  if (!name || !phone) {
-    alert('אנא מלא שם וטלפון');
+  const en = document.documentElement.dir === 'ltr';
+  clearFormError();
+
+  // One thing at a time, and the first one that is missing, so nobody is
+  // handed a list of everything they have done wrong.
+  if (!name) {
+    showFormError(en ? 'Your name, please.' : 'חסר השם שלך.', 'fname');
+    return;
+  }
+  if (!phone) {
+    showFormError(en ? 'A phone number, so I can get back to you.'
+                     : 'חסר מספר טלפון, כדי שאוכל לחזור אליך.', 'fphone');
     return;
   }
 
@@ -4132,17 +4206,14 @@ function submitForm() {
   const consentRow = document.querySelector('.consent-row');
   if (consent && !consent.checked) {
     if (consentRow) consentRow.classList.add('consent-error');
-    alert(document.documentElement.dir === 'ltr'
-      ? 'Please confirm you agree to the privacy policy.'
-      : 'יש לאשר את מדיניות הפרטיות כדי להמשיך.');
+    showFormError(en ? 'Please tick the box to agree to the privacy policy.'
+                     : 'צריך לאשר את מדיניות הפרטיות כדי לשלוח.', 'fconsent');
     return;
   }
-  if (consentRow) consentRow.classList.remove('consent-error');
 
   if (!turnstileToken) {
-    alert(document.documentElement.dir === 'ltr'
-      ? 'Please complete the security check.'
-      : 'יש להשלים את בדיקת האבטחה לפני השליחה.');
+    showFormError(en ? 'Just a moment — the security check has not finished.'
+                     : 'רגע אחד, בדיקת האבטחה עוד לא הסתיימה.');
     return;
   }
 
