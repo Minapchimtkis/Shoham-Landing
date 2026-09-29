@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "hebrew-content-writer": {
+      "source": "skills-il/localization",
+      "sourceType": "github",
+      "computedHash": "da7677bda48ea25e2a930dd89601ff5cf083211ca724b4c0d8aea94ecd5a2880"
+    }
+  }
+}
