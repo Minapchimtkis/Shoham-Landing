@@ -391,6 +391,15 @@ h1 .hl {
 .gate h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; }
 .gate p.sub { font-size: 15px; color: rgba(255,255,255,0.72); font-weight: 300; margin-bottom: 20px; }
 
+.gate-legal {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.52);
+  margin: -8px 0 18px;
+}
+.gate h2 + .sub { margin-bottom: 10px; }
+.gate .sub strong { color: rgba(255,255,255,0.92); font-weight: 700; }
+
 .consent { display: flex; gap: 11px; align-items: flex-start; cursor: pointer; margin: 16px 0 4px; }
 .consent input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--p5); flex: 0 0 auto; }
 .consent span { font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.72); }
@@ -812,9 +821,12 @@ input[type=range]::-moz-range-thumb {
   <div class="gate" id="gate">
     <h2>התוצאה שלך מוכנה</h2>
     <p class="sub">
-      כדי לקבל את הניתוח המלא — שלושת התרחישים, מה בפועל מזיז את התאריך אצלך,
-      והאפשרות לשחק עם המספרים — השאירו את הפרטים שלכם.
+      לפני שחולמים על פרישה, חשוב קודם לדעת להתנהל נכון כלכלית בהווה.
+      ליווי פיננסי ליחידים ולמשפחות צעירות — ליצור סדר, להבין את התמונה הכלכלית
+      ולקבל החלטות מושכלות ואחראיות.
+      <br><strong>השאירו פרטים וקבלו את הניתוח המלא.</strong>
     </p>
+    <p class="gate-legal">השירות אינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ מס.</p>
 
     <div class="field">
       <label for="lName">שם מלא</label>
