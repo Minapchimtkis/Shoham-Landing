@@ -207,6 +207,7 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .row-src.wa{color:#8cf0bc;border-color:rgba(47,217,139,.28);background:rgba(47,217,139,.11)}
 .wa-line{display:flex;align-items:center;gap:8px;color:#8cf0bc;font-size:11.5px;font-weight:800;margin-top:11px;padding:10px 12px;border:1px solid rgba(47,217,139,.22);border-radius:12px;background:rgba(47,217,139,.06)}
 .row-src.call{color:#bcd7ff;border-color:rgba(96,150,255,.3);background:rgba(96,150,255,.12)}
+.row-src.calc{color:#ffc2dd;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.12)}
 .row-src.dupe{color:#ffd57e;border-color:rgba(245,166,35,.26);background:rgba(245,166,35,.11)}
 .dupe-note{margin:0 0 11px;border:1px solid rgba(245,166,35,.24);border-radius:12px;background:rgba(245,166,35,.08);color:#ffd57e;font-size:10px;font-weight:800;line-height:1.6;padding:9px 11px}
 .link-btn{width:100%;min-height:44px;margin-top:11px;border-radius:13px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:#dce0e8;font-size:12px;font-weight:900}
@@ -610,7 +611,7 @@ async function loadLeads(){
   leads=data||[];selectedIds=new Set([...selectedIds].filter(id=>leads.some(l=>l.id===id)));render();renderQuiz();if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderDetail(activeLeadId)
 }
 const QUIZ_KIND={single:'קצר · יחיד',couple:'קצר · זוג',assessment:'עומק'};
-const SRC_LABEL={quiz:'שאלון',whatsapp:'וואטסאפ',call:'טלפון',landing:'אתר',form:'טופס',direct:'ישיר'};
+const SRC_LABEL={quiz:'שאלון',whatsapp:'וואטסאפ',call:'טלפון',calculator:'מחשבון',landing:'אתר',form:'טופס',direct:'ישיר'};
 function scoreClass(n){return n>=75?'s-hi':n>=50?'s-mid':n>=25?'s-low':'s-min'}
 
 // Someone who chose WhatsApp instead of the form leaves a click here. It
@@ -927,7 +928,7 @@ function render(){
     const src=party.map(x=>x.source).find(Boolean);
     const srcKey=String(src||'').toLowerCase();
     if(src){const c=document.createElement('span');
-      c.className='row-src'+(srcKey==='quiz'?' quiz':srcKey==='whatsapp'?' wa':srcKey==='call'?' call':'');
+      c.className='row-src'+(srcKey==='quiz'?' quiz':srcKey==='whatsapp'?' wa':srcKey==='call'?' call':srcKey==='calculator'?' calc':'');
       c.textContent=SRC_LABEL[srcKey]||src;meta.append(c)}
     // Only worth a chip when it says something the source chip does not.
     if(srcKey!=='whatsapp'&&waStat(lead.id).clicks){const c=document.createElement('span');
