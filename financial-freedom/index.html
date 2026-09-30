@@ -389,17 +389,15 @@ h1 .hl {
   padding: 24px 22px;
 }
 .gate h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; }
-.gate p.sub { font-size: 15px; color: rgba(255,255,255,0.72); font-weight: 300; margin-bottom: 20px; }
+.gate p.sub { font-size: 15px; color: rgba(255,255,255,0.72); font-weight: 300; margin-bottom: 11px; }
+.gate p.sub.open { font-size: 16px; color: rgba(255,255,255,0.92); font-weight: 600; margin-bottom: 13px; }
 
 .gate-legal {
   font-size: 12.5px;
   line-height: 1.6;
   color: rgba(255,255,255,0.52);
-  margin: -8px 0 18px;
+  margin: 8px 0 20px;
 }
-.gate h2 + .sub { margin-bottom: 10px; }
-.gate .sub strong { color: rgba(255,255,255,0.92); font-weight: 700; }
-
 .consent { display: flex; gap: 11px; align-items: flex-start; cursor: pointer; margin: 16px 0 4px; }
 .consent input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--p5); flex: 0 0 auto; }
 .consent span { font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.72); }
@@ -727,7 +725,7 @@ input[type=range]::-moz-range-thumb {
     <!-- ─── שלב 4 ─── -->
     <div class="step" data-step="4" hidden>
       <h2 class="step-title">איך הכסף שלכם עובד</h2>
-      <p class="step-note">זה הנתון שמשנה את התוצאה יותר מכל דבר אחר בשאלון.</p>
+      <p class="step-note">כדי להניח תשואה בחישוב, צריך לדעת איפה הכסף יושב היום.</p>
 
       <div class="field">
         <span class="qlabel">כיצד הכסף שלכם מנוהל כיום?</span>
@@ -820,11 +818,14 @@ input[type=range]::-moz-range-thumb {
   <!-- ─── שער הליד ─── -->
   <div class="gate" id="gate">
     <h2>התוצאה שלך מוכנה</h2>
+    <p class="sub open">לפני שחולמים על פרישה, חשוב קודם לדעת להתנהל נכון כלכלית בהווה.</p>
     <p class="sub">
-      לפני שחולמים על פרישה, חשוב קודם לדעת להתנהל נכון כלכלית בהווה.
+      המספר שלמעלה נשען על דבר אחד — כמה נשאר לכם בסוף החודש.
+      אם הוא נראה רחוק, ברוב המקרים זו לא שאלה של איפה להשקיע אלא של איך מתנהלים.
+    </p>
+    <p class="sub">
       ליווי פיננסי ליחידים ולמשפחות צעירות — ליצור סדר, להבין את התמונה הכלכלית
       ולקבל החלטות מושכלות ואחראיות.
-      <br><strong>השאירו פרטים וקבלו את הניתוח המלא.</strong>
     </p>
     <p class="gate-legal">השירות אינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ מס.</p>
 
@@ -1447,7 +1448,9 @@ function renderLevers(st, c) {
   } else {
     t2 += 'ההפרש בין הנחות תשואה שונות הולך וגדל ככל שהתקופה ארוכה יותר — זו המכניקה של ריבית דריבית.';
   }
-  t2 += ' ההנחה הזו אינה תחזית, וההצגה כאן אינה המלצה לגבי אף אפיק.';
+  t2 += ' ההנחה הזו אינה תחזית ואינה המלצה לגבי אף אפיק. מה לעשות עם זה היא ' +
+        'שאלה לבעל רישיון בתחום ההשקעות. מה שכן בידיים שלכם כאן ועכשיו הוא לוודא ' +
+        'שיש מה להפקיד בכל חודש — וזה כבר עניין של התנהלות.';
   host.appendChild(lever(2, 'איך הכסף שלכם מנוהל', t2));
 
   /* 3 — ההוצאות */
