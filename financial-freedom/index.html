@@ -444,15 +444,28 @@ h1 .hl {
   font-size: 14px; margin-bottom: 9px;
 }
 .sld-top .val { font-weight: 800; font-size: 16px; color: var(--p6); direction: ltr; }
+/* גובה השדה עצמו הוא שטח המגע, לא עובי הפס. קודם הוא היה 4px —
+   הידית נראתה גדולה, אבל האצבע הייתה צריכה לפגוע ברצועה של ארבעה
+   פיקסלים. הפס מצויר עכשיו על ה-track, והשדה מחזיק 44px. */
 input[type=range] {
   -webkit-appearance: none; appearance: none;
-  width: 100%; height: 4px; border-radius: 100px;
-  background: rgba(255,255,255,0.14);
+  width: 100%; height: 44px;
+  background: transparent;
   outline: none; cursor: pointer;
+  margin: -12px 0;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 100px;
+  background: rgba(255,255,255,0.14);
+}
+input[type=range]::-moz-range-track {
+  height: 4px; border-radius: 100px;
+  background: rgba(255,255,255,0.14);
 }
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 24px; height: 24px; border-radius: 50%;
+  margin-top: -10px;              /* ממרכז את הידית על פס של 4px */
   background: var(--p5);
   border: 3px solid #fff;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
@@ -462,6 +475,7 @@ input[type=range]::-moz-range-thumb {
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--p5); border: 3px solid #fff; cursor: grab;
 }
+input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
 .delta {
   display: flex; align-items: center; justify-content: center;
@@ -533,6 +547,110 @@ input[type=range]::-moz-range-thumb {
   .grid { grid-template-columns: 1fr; }
   .opts.two { grid-template-columns: 1fr; }
 }
+
+/* ── הגרף ───────────────────────────────────────────────────────────
+   סדרה אחת (מסלול הבסיס), רצועה באותו גוון שמראה את אותו מסלול תחת
+   הנחת תשואה שמרנית מול אופטימית, וקו ייחוס אחד ליעד ההון.
+   הגוון #a855f7 נבדק מול משטח הכרטיס ועובר את כל שש הבדיקות. */
+.chart-card { padding: 18px 14px 12px; }
+.chart-wrap { position: relative; width: 100%; touch-action: pan-y; }
+.chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.ch-grid      { stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+.ch-band      { fill: var(--p5); opacity: 0.085; }
+.ch-line      { fill: none; stroke: var(--p5); stroke-width: 2;
+                stroke-linejoin: round; stroke-linecap: round; }
+.ch-area      { fill: var(--p5); opacity: 0.07; }
+.ch-target    { stroke: rgba(255,255,255,0.34); stroke-width: 1; }
+.ch-hit       { fill: var(--p5); stroke: var(--p2); stroke-width: 2; }
+.ch-tick      { fill: rgba(255,255,255,0.5); font-size: 10.5px; font-family: inherit; }
+.ch-note      { fill: rgba(255,255,255,0.62); font-size: 10.5px; font-family: inherit; }
+.ch-hitlabel  { fill: #fff; font-size: 12.5px; font-weight: 800; font-family: inherit; }
+.ch-cross     { stroke: rgba(255,255,255,0.28); stroke-width: 1; }
+.ch-cursor    { fill: var(--p5); stroke: var(--p2); stroke-width: 2; }
+
+.ch-tip {
+  position: absolute; pointer-events: none; opacity: 0;
+  transform: translate(-50%, -100%);
+  background: rgba(10,8,16,0.96);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 10px; padding: 7px 10px;
+  font-size: 12px; line-height: 1.5; white-space: nowrap;
+  transition: opacity .12s;
+  z-index: 3;
+}
+.ch-tip.on { opacity: 1; }
+.ch-tip b { color: var(--p6); font-weight: 800; }
+
+.chart-cap {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  line-height: 1.6; margin-top: 10px; text-align: start;
+}
+
+/* ── בועות מידע ─────────────────────────────────────────────────── */
+.tip-host { position: relative; display: inline-block; }
+.tip-btn {
+  appearance: none; border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8);
+  width: 17px; height: 17px; border-radius: 50%;
+  font-size: 11px; font-weight: 700; font-family: inherit;
+  line-height: 1; cursor: pointer; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  vertical-align: 1px; margin-inline-start: 5px;
+  transition: background .15s, border-color .15s;
+}
+.tip-btn:hover, .tip-btn[aria-expanded="true"] {
+  background: rgba(168,85,247,0.28); border-color: rgba(168,85,247,0.6); color: #fff;
+}
+/* שטח המגע הוא 44px גם כשהעיגול קטן — בלי להזיז את הפריסה */
+.tip-btn::before {
+  content: ''; position: absolute; inset: 50% auto auto 50%;
+  width: 44px; height: 44px; transform: translate(-50%, -50%);
+}
+.tip-pop {
+  display: none; position: absolute; z-index: 5;
+  top: calc(100% + 9px); inset-inline-start: -10px;
+  width: min(272px, 74vw);
+  background: rgba(14,11,22,0.98);
+  border: 1px solid rgba(168,85,247,0.4);
+  border-radius: 12px; padding: 11px 13px;
+  font-size: 12.5px; line-height: 1.62; font-weight: 400;
+  color: rgba(255,255,255,0.84);
+  box-shadow: 0 14px 34px -12px rgba(0,0,0,0.85);
+  text-align: start;
+}
+.tip-host.open .tip-pop { display: block; }
+
+/* ── אקורדיון ההנחות ────────────────────────────────────────────── */
+.acc {
+  border: 1px solid var(--line); border-radius: 14px;
+  background: rgba(255,255,255,0.025);
+  margin-top: 16px; overflow: hidden;
+}
+.acc > summary {
+  list-style: none; cursor: pointer;
+  padding: 15px 16px; min-height: 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-size: 14.5px; font-weight: 600;
+  transition: background .15s;
+}
+.acc > summary::-webkit-details-marker { display: none; }
+.acc > summary:hover { background: rgba(255,255,255,0.04); }
+.acc > summary .chev {
+  flex: 0 0 auto; color: var(--p6); font-size: 13px;
+  transition: transform .22s cubic-bezier(.22,.9,.3,1);
+}
+.acc[open] > summary .chev { transform: rotate(-180deg); }
+.acc-body { padding: 2px 16px 16px; }
+.acc-row {
+  display: flex; justify-content: space-between; gap: 14px;
+  padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.055);
+  font-size: 13px;
+}
+.acc-row:last-of-type { border-bottom: 0; }
+.acc-row .k { color: rgba(255,255,255,0.62); }
+.acc-row .v { font-weight: 700; direction: ltr; }
+.acc-note { font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.65; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -802,11 +920,11 @@ input[type=range]::-moz-range-thumb {
   </div>
 
   <div class="grid" id="resGrid">
-    <div class="cell"><div class="k">הון פיננסי נוכחי</div><div class="v" id="cCap">—</div></div>
+    <div class="cell"><div class="k" data-tip="capital">הון פיננסי נוכחי</div><div class="v" id="cCap">—</div></div>
     <div class="cell"><div class="k">שווי נקי</div><div class="v" id="cNet">—</div></div>
     <div class="cell"><div class="k">חיסכון חודשי</div><div class="v" id="cSave">—</div></div>
     <div class="cell"><div class="k">שיעור חיסכון</div><div class="v" id="cRate">—</div></div>
-    <div class="cell"><div class="k">יעד הון משוער</div><div class="v lilac" id="cTarget">—</div></div>
+    <div class="cell"><div class="k" data-tip="target">יעד הון משוער</div><div class="v lilac" id="cTarget">—</div></div>
     <div class="cell"><div class="k">פער משוער</div><div class="v gold" id="cGap">—</div></div>
   </div>
 
@@ -875,9 +993,35 @@ input[type=range]::-moz-range-thumb {
       <p style="margin:6px 0 0">הניתוח המלא פתוח מתחת.</p>
     </div>
 
+    <h2 class="sec-title">הדרך אל היעד</h2>
+    <p class="sec-note">
+      איך ההון מצטבר משנה לשנה, ומתי הוא חוצה את היעד. כל הסכומים בערך של היום.<span data-tip="infl"></span>
+    </p>
+
+    <div class="card chart-card">
+      <div class="chart-wrap" id="chartWrap">
+        <svg id="chart" viewBox="0 0 600 310" role="img" aria-labelledby="chTitle chDesc" preserveAspectRatio="xMidYMid meet">
+          <title id="chTitle">צבירת ההון עד ליעד החופש הכלכלי</title>
+          <desc id="chDesc"></desc>
+        </svg>
+        <div class="ch-tip" id="chTip" role="status" aria-live="off"></div>
+      </div>
+      <p class="chart-cap" id="chartCap"></p>
+    </div>
+
+    <details class="acc" id="accTable">
+      <summary>אותם נתונים כטבלה<span class="chev">▾</span></summary>
+      <div class="acc-body" id="chartTable"></div>
+    </details>
+
     <h2 class="sec-title">שלושה תרחישים</h2>
-    <p class="sec-note">אותם נתונים, שלוש הנחות שונות לגבי התשואה ולגבי כמה אפשר למשוך מההון בכל שנה. אף אחד מהם אינו הבטחה.</p>
+    <p class="sec-note" data-tip="swr">אותם נתונים, שלוש הנחות שונות לגבי התשואה ולגבי כמה אפשר למשוך מההון בכל שנה. אף אחד מהם אינו הבטחה.</p>
     <div class="scn" id="scnList"></div>
+
+    <details class="acc" id="accAssume">
+      <summary>ההנחות שמאחורי החישוב<span class="chev">▾</span></summary>
+      <div class="acc-body" id="assumeBody"></div>
+    </details>
 
     <h2 class="sec-title">שלושת הדברים שהכי משפיעים על הדרך שלך</h2>
     <p class="sec-note">לא עצות — הסבר על מה שמזיז את המספר, עם המספרים שלך.</p>
@@ -897,7 +1041,7 @@ input[type=range]::-moz-range-thumb {
         <p class="hint">זה הסכום שקובע את גודל ההון שצריך. הורדה שלו מקטינה את היעד באותו יחס.</p>
       </div>
       <div class="sld" style="margin-bottom:6px">
-        <div class="sld-top"><label for="sRet">תשואה שנתית מונחת</label><span class="val" id="sRetV">—</span></div>
+        <div class="sld-top"><span data-tip="yield"><label for="sRet">תשואה שנתית מונחת</label></span><span class="val" id="sRetV">—</span></div>
         <input type="range" id="sRet" min="0" max="10" step="0.25" value="0">
       </div>
 
@@ -1532,6 +1676,15 @@ function refreshSliders() {
     : 'מאחר אתכם בכ־' + Math.round(-d) + ' שנים.';
 }
 
+/* המחוונים מציירים מחדש את הגרף באותה נשימה. */
+var _refreshSliders = refreshSliders;
+refreshSliders = function () {
+  _refreshSliders();
+  if (!baseState || !result) return;
+  var r = sliderYears();
+  buildChart(baseState, result, { saving: r.saving, freedom: r.freedom, nominal: r.nominal });
+};
+
 function armSliders(st, c) {
   baseState   = st;
   baseYears   = c.base.years;
@@ -1707,8 +1860,365 @@ function revealFull() {
   full.hidden = false;
   renderScenarios(baseState, result);
   renderLevers(baseState, result);
+  buildChart(baseState, result, null);
+  buildAssumptions(baseState, result);
+  mountTips();
   armSliders(baseState, result);
   full.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   12. הגרף
+       סדרה אחת — מסלול הבסיס. הרצועה סביבה היא אותו מסלול בדיוק
+       תחת הנחת תשואה שמרנית מול אופטימית, כלומר אותו גוון בשקיפות
+       נמוכה ולא סדרה שנייה. קו היעד הוא ייחוס, לא נתון.
+       הזמן זורם משמאל לימין וציר הסכומים יושב מימין, כמו בכל
+       אפליקציה פיננסית. הטקסט לעולם לא לובש את צבע הנתון.
+   ══════════════════════════════════════════════════════════════════ */
+var NS = 'http://www.w3.org/2000/svg';
+var CH = { w: 600, h: 310, l: 10, r: 62, t: 18, b: 30 };
+
+function sizeChart(svg) {
+  var wrap = $('chartWrap');
+  var w = Math.round((wrap && wrap.clientWidth) || 340);
+  if (w < 220) w = 220;
+  var h = Math.round(Math.max(196, Math.min(300, w * 0.66)));
+  CH.w = w; CH.h = h;
+  svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+}
+
+function el(tag, attrs) {
+  var n = document.createElementNS(NS, tag);
+  for (var k in attrs) if (attrs.hasOwnProperty(k)) n.setAttribute(k, attrs[k]);
+  return n;
+}
+
+/* דגימה רבעונית — מספיק צפוף לעקומה חלקה, לא כבד */
+function capPath(c0, monthly, rr, growing, years) {
+  var rm = Math.pow(1 + rr, 1 / 12) - 1;
+  var cap = c0, sv = Math.max(0, monthly);
+  var out = [{ t: 0, v: cap }];
+  var total = Math.max(1, Math.ceil(years * 12));
+  for (var m = 1; m <= total; m++) {
+    cap = cap * (1 + rm) + sv;
+    if (growing && m % 12 === 0) sv *= (1 + ASSUME.savingGrowth);
+    if (m % 3 === 0 || m === total) out.push({ t: m / 12, v: cap });
+  }
+  return out;
+}
+
+function niceMax(v) {
+  if (!(v > 0)) return 1;
+  var p = Math.pow(10, Math.floor(Math.log10(v)));
+  var n = v / p;
+  var step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+  return step * p;
+}
+
+function shortIls(v) {
+  if (v >= 1e6) return '₪' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+  if (v >= 1e3) return '₪' + Math.round(v / 1e3) + 'K';
+  return '₪' + Math.round(v);
+}
+
+var chartPts = null;   /* למצב הריחוף */
+
+function buildChart(st, c, over) {
+  var svg = $('chart');
+  if (!svg) return;
+  while (svg.lastChild && svg.lastChild.nodeName !== 'desc' && svg.lastChild.nodeName !== 'title') {
+    svg.removeChild(svg.lastChild);
+  }
+  sizeChart(svg);
+
+  var saving  = over ? over.saving  : st.saving;
+  var freedom = over ? over.freedom : st.freedom;
+  var nominal = over ? over.nominal : c.base.nominal;
+
+  var target = freedom * 12 / ASSUME.withdraw.base;
+  var rrMid  = realReturn(nominal);
+  var rrLow  = realReturn(clamp(nominal - ASSUME.spread, 0, 0.12));
+  var rrHigh = realReturn(clamp(nominal + ASSUME.spread, 0, 0.12));
+
+  var hit  = yearsTo(c.freedomCapital, saving, rrMid, target, c.growing);
+  var span = hit === null ? 40 : Math.max(4, Math.min(ASSUME.maxYears, Math.ceil(hit * 1.18)));
+
+  var mid  = capPath(c.freedomCapital, saving, rrMid,  c.growing, span);
+  var low  = capPath(c.freedomCapital, saving, rrLow,  c.growing, span);
+  var high = capPath(c.freedomCapital, saving, rrHigh, c.growing, span);
+
+  var peak = Math.max(target, high[high.length - 1].v, mid[mid.length - 1].v);
+  var yMax = niceMax(peak * 1.06);
+
+  var x0 = CH.l, x1 = CH.w - CH.r, y0 = CH.h - CH.b, y1 = CH.t;
+  var X = function (t) { return x0 + (t / span) * (x1 - x0); };
+  var Y = function (v) { return y0 - (Math.min(v, yMax) / yMax) * (y0 - y1); };
+  var d = function (pts) {
+    return pts.map(function (p, i) { return (i ? 'L' : 'M') + X(p.t).toFixed(1) + ' ' + Y(p.v).toFixed(1); }).join(' ');
+  };
+
+  /* ── רשת: קו אחיד בעובי 1, נסוג לאחור ── */
+  for (var i = 0; i <= 4; i++) {
+    var v = yMax * i / 4, y = Y(v);
+    svg.appendChild(el('line', { class: 'ch-grid', x1: x0, x2: x1, y1: y, y2: y }));
+    var tk = el('text', { class: 'ch-tick', x: x1 + 8, y: y + 3.5, direction: 'ltr' });
+    tk.textContent = i === 0 ? '0' : shortIls(v);
+    svg.appendChild(tk);
+  }
+
+  /* ── הרצועה: שמרני מול אופטימי, אותו גוון ── */
+  var band = d(high) + ' ' + low.slice().reverse().map(function (p, i) {
+    return (i ? 'L' : 'L') + X(p.t).toFixed(1) + ' ' + Y(p.v).toFixed(1);
+  }).join(' ') + ' Z';
+  svg.appendChild(el('path', { class: 'ch-band', d: band }));
+
+  /* ── מילוי ב-10% מתחת לקו הבסיס, ואז הקו עצמו ── */
+  svg.appendChild(el('path', { class: 'ch-area', d: d(mid) + ' L' + X(span) + ' ' + y0 + ' L' + x0 + ' ' + y0 + ' Z' }));
+  svg.appendChild(el('path', { class: 'ch-line', d: d(mid) }));
+
+  /* ── קו היעד ── */
+  var ty = Y(target);
+  svg.appendChild(el('line', { class: 'ch-target', x1: x0, x2: x1, y1: ty, y2: ty }));
+  var tl = el('text', { class: 'ch-note', x: x0 + 4, y: ty - 7, direction: 'rtl', 'text-anchor': 'end' });
+  tl.textContent = 'יעד ההון · ' + shortIls(target);
+  svg.appendChild(tl);
+
+  /* ── נקודת החיתוך: סימן גדול מ-8px עם טבעת במשטח, ותווית ישירה ── */
+  if (hit !== null && hit > 0 && hit <= span) {
+    var hx = X(hit);
+    svg.appendChild(el('line', { class: 'ch-cross', x1: hx, x2: hx, y1: ty, y2: y0 }));
+    svg.appendChild(el('circle', { class: 'ch-hit', cx: hx, cy: ty, r: 5 }));
+    var lbl = el('text', {
+      class: 'ch-hitlabel', y: ty - 13, direction: 'ltr',
+      x: hx, 'text-anchor': hx > x1 - 60 ? 'end' : (hx < x0 + 40 ? 'start' : 'middle')
+    });
+    lbl.textContent = String(NOW_YEAR + Math.round(hit));
+    svg.appendChild(lbl);
+  }
+
+  /* ── ציר הזמן ── */
+  var room  = Math.max(2, Math.floor((x1 - x0) / 54));
+  var steps = Math.max(1, Math.ceil(span / room / 5) * 5);
+  if (span <= 10) steps = Math.max(1, Math.ceil(span / room));
+  for (var t = 0; t <= span; t += steps) {
+    var xt = el('text', { class: 'ch-tick', x: X(t), y: y0 + 17, 'text-anchor': 'middle', direction: 'ltr' });
+    xt.textContent = t === 0 ? 'היום' : String(NOW_YEAR + t);
+    svg.appendChild(xt);
+  }
+
+  /* ── שכבת הריחוף ── */
+  chartPts = { mid: mid, X: X, Y: Y, x0: x0, x1: x1, span: span, age: st.age, target: target };
+  var cross = el('line', { class: 'ch-cross', x1: 0, x2: 0, y1: y1, y2: y0, opacity: 0, id: 'chCross' });
+  var dot   = el('circle', { class: 'ch-cursor', cx: 0, cy: 0, r: 5, opacity: 0, id: 'chDot' });
+  svg.appendChild(cross); svg.appendChild(dot);
+  svg.appendChild(el('rect', { id: 'chHit', x: x0, y: y1, width: x1 - x0, height: y0 - y1, fill: 'transparent' }));
+
+  /* ── תיאור למי שלא רואה את הגרף ── */
+  var desc = svg.querySelector('desc');
+  if (desc) {
+    desc.textContent = hit === null
+      ? 'ההון מתחיל ב' + shekel(c.freedomCapital) + ' ואינו חוצה את יעד ההון של ' + shekel(target) + ' בתוך ' + span + ' שנה.'
+      : 'ההון מתחיל ב' + shekel(c.freedomCapital) + ' וחוצה את יעד ההון של ' + shekel(target) +
+        ' כעבור כ־' + Math.round(hit) + ' שנים, סביב ' + (NOW_YEAR + Math.round(hit)) + '.';
+  }
+
+  var cap = $('chartCap');
+  if (cap) {
+    cap.textContent = 'הקו הוא תרחיש הבסיס. הרצועה סביבו היא אותו מסלול בדיוק בהנחת תשואה ' +
+      'שמרנית יותר ואופטימית יותר — היא מראה כמה התאריך זז מהנחה אחת, ולא הבטחה לטווח.';
+  }
+
+  buildChartTable(st, c, mid, target, hit, span);
+}
+
+function buildChartTable(st, c, mid, target, hit, span) {
+  var host = $('chartTable');
+  if (!host) return;
+  host.textContent = '';
+  var every = span <= 12 ? 2 : span <= 30 ? 5 : 10;
+  for (var t = 0; t <= span; t += every) {
+    var pt = mid[Math.min(mid.length - 1, Math.round(t * 4))];
+    var row = document.createElement('div');
+    row.className = 'acc-row';
+    var k = document.createElement('span'); k.className = 'k';
+    k.textContent = t === 0 ? 'היום · גיל ' + Math.round(st.age)
+                            : (NOW_YEAR + t) + ' · גיל ' + Math.round(st.age + t);
+    var v = document.createElement('span'); v.className = 'v';
+    v.textContent = shekel(pt.v);
+    row.append(k, v);
+    host.appendChild(row);
+  }
+  var note = document.createElement('p');
+  note.className = 'acc-note';
+  note.textContent = hit === null
+    ? 'יעד ההון הוא ' + shekel(target) + ', והמסלול הזה אינו מגיע אליו בתוך ' + ASSUME.maxYears + ' שנה.'
+    : 'יעד ההון הוא ' + shekel(target) + ', והמסלול חוצה אותו סביב ' + (NOW_YEAR + Math.round(hit)) + '.';
+  host.appendChild(note);
+}
+
+/* ── ריחוף: צלב ונקודה, עם תיבה שנצמדת לעקומה ── */
+(function () {
+  var wrap = $('chartWrap'), svg = $('chart'), tip = $('chTip');
+  if (!wrap || !svg || !tip) return;
+
+  function at(e) {
+    if (!chartPts) return;
+    var box = svg.getBoundingClientRect();
+    var k = box.width ? CH.w / box.width : 1;
+    var px = (e.clientX - box.left) * k;
+    var t = clamp((px - chartPts.x0) / (chartPts.x1 - chartPts.x0), 0, 1) * chartPts.span;
+    var i = clamp(Math.round(t * 4), 0, chartPts.mid.length - 1);
+    var pt = chartPts.mid[i];
+    var cx = chartPts.X(pt.t), cy = chartPts.Y(pt.v);
+
+    var cross = $('chCross'), dot = $('chDot');
+    if (cross) { cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); cross.setAttribute('opacity', 1); }
+    if (dot) { dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('opacity', 1); }
+
+    tip.innerHTML = '';
+    var a = document.createElement('div');
+    a.textContent = pt.t === 0 ? 'היום, גיל ' + Math.round(chartPts.age)
+                               : (NOW_YEAR + Math.round(pt.t)) + ' · גיל ' + Math.round(chartPts.age + pt.t);
+    var bEl = document.createElement('div');
+    var strong = document.createElement('b');
+    strong.textContent = shekel(pt.v);
+    bEl.appendChild(strong);
+    tip.append(a, bEl);
+    tip.style.left = (cx / k) + 'px';
+    tip.style.top  = (cy / k - 10) + 'px';
+    tip.classList.add('on');
+  }
+  function off() {
+    tip.classList.remove('on');
+    var cross = $('chCross'), dot = $('chDot');
+    if (cross) cross.setAttribute('opacity', 0);
+    if (dot) dot.setAttribute('opacity', 0);
+  }
+  wrap.addEventListener('pointermove', at);
+  wrap.addEventListener('pointerdown', at);
+  wrap.addEventListener('pointerleave', off);
+  wrap.addEventListener('pointercancel', off);
+})();
+
+/* הגרף נמדד לפי הרוחב בפועל, אז שינוי רוחב מחייב ציור מחדש. */
+(function () {
+  var t = null, lastW = 0;
+  window.addEventListener('resize', function () {
+    var full = $('full');
+    if (!full || full.hidden || !baseState || !result) return;
+    var w = $('chartWrap') ? $('chartWrap').clientWidth : 0;
+    if (w === lastW) return;
+    lastW = w;
+    clearTimeout(t);
+    t = setTimeout(function () {
+      var r = sliderYears();
+      buildChart(baseState, result, { saving: r.saving, freedom: r.freedom, nominal: r.nominal });
+    }, 140);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   13. בועות מידע
+       מונחים פיננסיים מוסברים במקום, בלי להעמיס את המסך.
+   ══════════════════════════════════════════════════════════════════ */
+var TIPS = {
+  capital: 'הכסף שיכול לממן לכם הוצאות חודשיות בלי משכורת: עו״ש, חיסכון, תיק ' +
+           'השקעות, קרנות וקופות. דירה שגרים בה לא נספרת כאן — היא בשווי הנקי, ' +
+           'אבל אי אפשר לחיות ממנה בזמן שגרים בה.',
+  target:  'ההון שצריך כדי שהמשיכה השנתית ממנו תממן את הסכום החודשי שהגדרתם. ' +
+           'מחושב לפי שיעור משיכה של ' + '4%' + ' בתרחיש הבסיס.',
+  swr:     'כמה אחוזים מההון אפשר למשוך בכל שנה מבלי לכלות אותו לאורך זמן. ' +
+           'ככל שההנחה זהירה יותר, כך ההון שצריך גדול יותר. זו הנחת תכנון ' +
+           'מקובלת, לא הבטחה.',
+  yield:   'התשואה השנתית שהחישוב מניח על הכסף, לפני אינפלציה, לפי אופן הניהול ' +
+           'שסימנתם. זו הנחה במודל — לא תחזית ולא המלצה לגבי אף אפיק.',
+  infl:    'שחיקת ערך הכסף לאורך זמן. כל הסכומים כאן מוצגים בערך של היום, ולכן ' +
+           'האינפלציה מנוכה מהתשואה במקום להתווסף לסכומים. ההנחה: ' +
+           (ASSUME.inflation * 100).toFixed(1) + '% בשנה.'
+};
+
+function mountTips() {
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tip]'), function (host) {
+    if (host.dataset.tipped) return;
+    host.dataset.tipped = '1';
+    var key = host.getAttribute('data-tip');
+    if (!TIPS[key]) return;
+
+    var box = document.createElement('span');
+    box.className = 'tip-host';
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tip-btn';
+    btn.textContent = 'i';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', 'הסבר');
+
+    var pop = document.createElement('span');
+    pop.className = 'tip-pop';
+    pop.setAttribute('role', 'tooltip');
+    pop.id = 'tip-' + key;
+    pop.textContent = TIPS[key];
+    btn.setAttribute('aria-describedby', pop.id);
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = box.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      Array.prototype.forEach.call(document.querySelectorAll('.tip-host.open'), function (o) {
+        if (o !== box) { o.classList.remove('open'); o.querySelector('.tip-btn').setAttribute('aria-expanded', 'false'); }
+      });
+    });
+
+    box.append(btn, pop);
+    host.appendChild(box);
+  });
+}
+document.addEventListener('click', function () {
+  Array.prototype.forEach.call(document.querySelectorAll('.tip-host.open'), function (o) {
+    o.classList.remove('open');
+    o.querySelector('.tip-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  Array.prototype.forEach.call(document.querySelectorAll('.tip-host.open'), function (o) {
+    o.classList.remove('open');
+    o.querySelector('.tip-btn').setAttribute('aria-expanded', 'false');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   14. ההנחות, פתוחות למי שרוצה לראות
+   ══════════════════════════════════════════════════════════════════ */
+function buildAssumptions(st, c) {
+  var host = $('assumeBody');
+  if (!host) return;
+  host.textContent = '';
+  function row(k, v) {
+    var r = document.createElement('div'); r.className = 'acc-row';
+    var a = document.createElement('span'); a.className = 'k'; a.textContent = k;
+    var b2 = document.createElement('span'); b2.className = 'v'; b2.textContent = v;
+    r.append(a, b2); host.appendChild(r);
+  }
+  row('אינפלציה שנתית מונחת', pct(ASSUME.inflation, 1));
+  row('תשואה מונחת — שמרני',  pct(c.scenarios[0].nominal, 2));
+  row('תשואה מונחת — בסיס',   pct(c.scenarios[1].nominal, 2));
+  row('תשואה מונחת — אופטימי', pct(c.scenarios[2].nominal, 2));
+  row('שיעור משיכה — שמרני',  pct(ASSUME.withdraw.low, 2));
+  row('שיעור משיכה — בסיס',   pct(ASSUME.withdraw.base, 2));
+  row('שיעור משיכה — אופטימי', pct(ASSUME.withdraw.high, 2));
+  if (c.growing) row('גידול ריאלי בחיסכון', pct(ASSUME.savingGrowth, 1) + ' בשנה');
+  row('אופק החישוב', ASSUME.maxYears + ' שנה');
+
+  var n = document.createElement('p');
+  n.className = 'acc-note';
+  n.textContent = 'כל הסכומים מוצגים בערך של היום: האינפלציה מנוכה מהתשואה במקום ' +
+    'להתווסף לסכומים. ההפקדות מחושבות חודש אחר חודש, לא פעם בשנה. התשואה המונחת ' +
+    'נגזרת מאופן הניהול שסימנתם בשלב 4. אלה הנחות תכנון ולא תחזיות, והתשואה בפועל ' +
+    'משתנה משנה לשנה ועשויה להיות שלילית.';
+  host.appendChild(n);
 }
 
 /* ══════════════════════════════════════════════════════════════════
