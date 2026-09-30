@@ -678,7 +678,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   <div class="card">
     <p style="font-size:15px;color:rgba(255,255,255,0.78);font-weight:300">
       השאלות הן על ההכנסה, ההוצאות, מה שכבר נצבר ומה שעדיין חייבים.
-      בסוף תקבלו הערכה של כמה זמן לוקח מכאן ליעד שהגדרתם — ומה בפועל
+      בסוף תקבלו הערכה של כמה זמן לוקח מכאן ליעד שהגדרתם, ומה בפועל
       מזיז את המספר הזה.
     </p>
     <button class="btn btn-primary btn-wide" id="btnStart" style="margin-top:20px">מתחילים ←</button>
@@ -707,7 +707,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
     <!-- ─── שלב 1 ─── -->
     <div class="step" data-step="1">
       <h2 class="step-title">קצת עליכם</h2>
-      <p class="step-note">ארבעה מספרים. אם אתם לא בטוחים — הערכה טובה מספיקה.</p>
+      <p class="step-note">ארבעה מספרים. אם אתם לא בטוחים, הערכה טובה מספיקה.</p>
 
       <div class="field">
         <label for="age">גיל</label>
@@ -716,7 +716,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
       <div class="field">
         <label for="income">הכנסה נטו חודשית</label>
         <span class="inp-wrap cur"><span class="cur-sign">₪</span><input class="inp" id="income" type="number" inputmode="numeric" min="0" step="100" placeholder="12,000"></span>
-        <p class="hint">מה שנכנס לחשבון בפועל, אחרי מס. אם יש בן/בת זוג שאתם מתכננים יחד — סכמו את שניכם.</p>
+        <p class="hint">מה שנכנס לחשבון בפועל, אחרי מס. אם יש בן/בת זוג שאתם מתכננים יחד, סכמו את שניכם.</p>
       </div>
       <div class="field">
         <label for="expenses">הוצאות חודשיות ממוצעות</label>
@@ -730,7 +730,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
       <div class="live" id="liveRate" hidden>
         <span id="liveRateLabel">שיעור החיסכון שלכם</span>
-        <b id="liveRateVal">—</b>
+        <b id="liveRateVal"></b>
       </div>
     </div>
 
@@ -754,7 +754,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
       <div class="field">
         <label for="aFund">קרנות וקופות</label>
         <span class="inp-wrap cur"><span class="cur-sign">₪</span><input class="inp asset" id="aFund" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"></span>
-        <p class="hint">קרן השתלמות, קופת גמל להשקעה, פוליסת חיסכון. פנסיה — רק אם אתם מתכננים למשוך ממנה בגיל שבחרתם.</p>
+        <p class="hint">קרן השתלמות, קופת גמל להשקעה, פוליסת חיסכון. פנסיה נכנסת רק אם אתם מתכננים למשוך ממנה בגיל שבחרתם.</p>
       </div>
       <div class="field">
         <label for="aOther">נכסים נוספים</label>
@@ -784,20 +784,20 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
             <label class="opt sel"><input type="radio" name="propUse" value="home" checked><span class="dot"></span>מגורים</label>
             <label class="opt"><input type="radio" name="propUse" value="invest"><span class="dot"></span>השקעה</label>
           </div>
-          <p class="hint">הדירה שגרים בה נכנסת לשווי הנקי, אבל היא לא מממנת הוצאות חודשיות — אז היא לא נספרת בהון שמייצר את החופש. נכס להשקעה כן.</p>
+          <p class="hint">הדירה שגרים בה נכנסת לשווי הנקי, אבל היא לא מממנת הוצאות חודשיות, ולכן היא לא נספרת בהון שמייצר את החופש. נכס להשקעה כן.</p>
         </div>
       </div>
 
       <div class="live" id="liveNet" hidden>
         <span>שווי נקי משוער<br><span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:300">סך הנכסים שלכם פחות ההתחייבויות</span></span>
-        <b id="liveNetVal">—</b>
+        <b id="liveNetVal"></b>
       </div>
     </div>
 
     <!-- ─── שלב 3 ─── -->
     <div class="step" data-step="3" hidden>
       <h2 class="step-title">מה עדיין חייבים</h2>
-      <p class="step-note">בלי המשכנתא — אותה כבר ציינתם.</p>
+      <p class="step-note">בלי המשכנתא, אותה כבר ציינתם.</p>
 
       <div class="field">
         <span class="qlabel">יש לכם הלוואות?</span>
@@ -836,7 +836,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
       <div class="live" id="liveDebt" hidden>
         <span>סך ההתחייבויות</span>
-        <b id="liveDebtVal">—</b>
+        <b id="liveDebtVal"></b>
       </div>
     </div>
 
@@ -860,7 +860,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
       <div class="live" id="liveSaving" hidden>
         <span>החיסכון החודשי שמסרתם</span>
-        <b id="liveSavingVal">—</b>
+        <b id="liveSavingVal"></b>
       </div>
 
       <div class="field" style="margin-top:20px">
@@ -915,17 +915,17 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
   <div class="res-head">
     <p class="res-kicker">התוצאה שלך</p>
-    <div class="res-big" id="resBig">—</div>
+    <div class="res-big" id="resBig"></div>
     <p class="res-sub" id="resSub"></p>
   </div>
 
   <div class="grid" id="resGrid">
-    <div class="cell"><div class="k" data-tip="capital">הון פיננסי נוכחי</div><div class="v" id="cCap">—</div></div>
-    <div class="cell"><div class="k">שווי נקי</div><div class="v" id="cNet">—</div></div>
-    <div class="cell"><div class="k">חיסכון חודשי</div><div class="v" id="cSave">—</div></div>
-    <div class="cell"><div class="k">שיעור חיסכון</div><div class="v" id="cRate">—</div></div>
-    <div class="cell"><div class="k" data-tip="target">יעד הון משוער</div><div class="v lilac" id="cTarget">—</div></div>
-    <div class="cell"><div class="k">פער משוער</div><div class="v gold" id="cGap">—</div></div>
+    <div class="cell"><div class="k" data-tip="capital">הון פיננסי נוכחי</div><div class="v" id="cCap"></div></div>
+    <div class="cell"><div class="k">שווי נקי</div><div class="v" id="cNet"></div></div>
+    <div class="cell"><div class="k">חיסכון חודשי</div><div class="v" id="cSave"></div></div>
+    <div class="cell"><div class="k">שיעור חיסכון</div><div class="v" id="cRate"></div></div>
+    <div class="cell"><div class="k" data-tip="target">יעד הון משוער</div><div class="v lilac" id="cTarget"></div></div>
+    <div class="cell"><div class="k">פער משוער</div><div class="v gold" id="cGap"></div></div>
   </div>
 
   <p class="disclaimer top" id="preDisc">
@@ -938,7 +938,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
     <h2>התוצאה שלך מוכנה</h2>
     <p class="sub open">לפני שחולמים על פרישה, חשוב קודם לדעת להתנהל נכון כלכלית בהווה.</p>
     <p class="sub">
-      המספר שלמעלה נשען על דבר אחד — כמה נשאר לכם בסוף החודש.
+      המספר שלמעלה נשען על דבר אחד: כמה נשאר לכם בסוף החודש.
       אם הוא נראה רחוק, ברוב המקרים זו לא שאלה של איפה להשקיע אלא של איך מתנהלים.
     </p>
     <p class="sub">
@@ -1024,7 +1024,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
     </details>
 
     <h2 class="sec-title">שלושת הדברים שהכי משפיעים על הדרך שלך</h2>
-    <p class="sec-note">לא עצות — הסבר על מה שמזיז את המספר, עם המספרים שלך.</p>
+    <p class="sec-note">לא עצות. הסבר על מה שמזיז את המספר, עם המספרים שלך.</p>
     <div id="levers"></div>
 
     <h2 class="sec-title">תשחקו עם המספרים</h2>
@@ -1032,23 +1032,23 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
     <div class="card">
       <div class="sld">
-        <div class="sld-top"><label for="sSave">חיסכון חודשי</label><span class="val" id="sSaveV">—</span></div>
+        <div class="sld-top"><label for="sSave">חיסכון חודשי</label><span class="val" id="sSaveV"></span></div>
         <input type="range" id="sSave" min="0" max="20000" step="250" value="0">
       </div>
       <div class="sld">
-        <div class="sld-top"><label for="sExp">יעד חודשי בחופש כלכלי</label><span class="val" id="sExpV">—</span></div>
+        <div class="sld-top"><label for="sExp">יעד חודשי בחופש כלכלי</label><span class="val" id="sExpV"></span></div>
         <input type="range" id="sExp" min="2000" max="40000" step="250" value="0">
         <p class="hint">זה הסכום שקובע את גודל ההון שצריך. הורדה שלו מקטינה את היעד באותו יחס.</p>
       </div>
       <div class="sld" style="margin-bottom:6px">
-        <div class="sld-top"><span data-tip="yield"><label for="sRet">תשואה שנתית מונחת</label></span><span class="val" id="sRetV">—</span></div>
+        <div class="sld-top"><span data-tip="yield"><label for="sRet">תשואה שנתית מונחת</label></span><span class="val" id="sRetV"></span></div>
         <input type="range" id="sRet" min="0" max="10" step="0.25" value="0">
       </div>
 
       <div class="delta">
-        <div class="col"><div class="k">לפני</div><div class="v" id="dBefore">—</div></div>
+        <div class="col"><div class="k">לפני</div><div class="v" id="dBefore"></div></div>
         <div class="arrow" aria-hidden="true">←</div>
-        <div class="col after"><div class="k">אחרי</div><div class="v" id="dAfter">—</div></div>
+        <div class="col after"><div class="k">אחרי</div><div class="v" id="dAfter"></div></div>
       </div>
       <p class="delta-note" id="dNote"></p>
       <button class="btn btn-ghost btn-wide" id="btnReset" type="button" style="margin-top:14px">חזרה לנתונים שלי</button>
@@ -1176,7 +1176,7 @@ function filled(id) {
   return !!(el && String(el.value).trim() !== '');
 }
 function shekel(n) {
-  if (!isFinite(n)) return '—';
+  if (!isFinite(n)) return '';
   return '₪' + Math.round(n).toLocaleString('en-US');
 }
 function pct(n, digits) {
@@ -1185,6 +1185,14 @@ function pct(n, digits) {
   return t + '%';
 }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+/* בעברית 1 ו-2 לא נספרים כמו כל השאר. */
+function yearsWord(v) {
+  var n = Math.round(v);
+  if (n === 1) return 'שנה';
+  if (n === 2) return 'שנתיים';
+  return n + ' שנים';
+}
 
 function radio(name) {
   var el = document.querySelector('input[name="' + name + '"]:checked');
@@ -1361,7 +1369,7 @@ function softNote(st) {
     if (st.saving > 0 && st.income > 0 && st.saving > st.income)
       return 'החיסכון שציינתם גבוה מההכנסה. שווה לבדוק את שני השדות.';
     if (st.income > 0 && st.expenses > 0 && st.saving > (st.income - st.expenses) + 1)
-      return 'החיסכון שציינתם גבוה ממה שנשאר אחרי ההוצאות. אם הוא מגיע ממקור אחר — אפשר להמשיך.';
+      return 'החיסכון שציינתם גבוה ממה שנשאר אחרי ההוצאות. אם הוא מגיע ממקור אחר, אפשר להמשיך.';
     if (st.income > 0 && st.expenses > st.income)
       return 'ההוצאות גבוהות מההכנסה. אפשר להמשיך, אבל שווה לשים לב לזה.';
   }
@@ -1373,13 +1381,13 @@ function softNote(st) {
 function validate() {
   var st = readState();
   if (step === 1) {
-    if (!filled('age') || st.age < 16 || st.age > 90) { showErr('wizErr', 'צריך גיל בין 16 ל־90.', 'age'); return false; }
+    if (!filled('age') || st.age < 16 || st.age > 90) { showErr('wizErr', 'הגיל צריך להיות בין 16 לבין 90.', 'age'); return false; }
     if (!filled('income'))   { showErr('wizErr', 'חסרה ההכנסה החודשית.', 'income'); return false; }
     if (!filled('expenses')) { showErr('wizErr', 'חסרות ההוצאות החודשיות.', 'expenses'); return false; }
-    if (!filled('saving'))   { showErr('wizErr', 'חסר הסכום שאתם חוסכים בכל חודש. אם אתם לא חוסכים כרגע — כתבו 0.', 'saving'); return false; }
+    if (!filled('saving'))   { showErr('wizErr', 'חסר הסכום שאתם חוסכים בכל חודש. אם אתם לא חוסכים כרגע, כתבו 0.', 'saving'); return false; }
   }
   if (step === 4) {
-    if (!st.mgmt) { showErr('wizErr', 'בחרו איך הכסף מנוהל היום. אם אף אפשרות לא מדויקת — בחרו ״אחר״.'); return false; }
+    if (!st.mgmt) { showErr('wizErr', 'בחרו איך הכסף מנוהל היום. אם אף אפשרות לא מדויקת, בחרו ״אחר״.'); return false; }
   }
   if (step === 5) {
     if (!filled('freedom') || st.freedom <= 0) { showErr('wizErr', 'חסר הסכום החודשי שהייתם רוצים בחופש כלכלי.', 'freedom'); return false; }
@@ -1459,12 +1467,12 @@ var REACH_YEARS = 25;
 function phrase(years, age, c) {
   if (years === null) {
     var sub = 'במסלול הנוכחי ההון לא מגיע ליעד בתוך ' + ASSUME.maxYears +
-              ' שנה. זה לא אומר שאי אפשר — זה אומר שאחד הנתונים צריך לזוז.';
+              ' שנה. זה לא אומר שאי אפשר. זה אומר שאחד הנתונים צריך לזוז.';
     /* המספר שהופך את התשובה הזו לשימושית: מה כן היה נדרש. */
     if (c) {
       var need = neededMonthly(c.freedomCapital, c.base.realReturn, c.base.target, REACH_YEARS * 12);
       if (need !== null && isFinite(need) && need > 0) {
-        sub += ' כדי להגיע תוך ' + REACH_YEARS + ' שנה בהנחות האלה נדרש כ־' +
+        sub += ' כדי להגיע תוך ' + REACH_YEARS + ' שנה בהנחות האלה נדרש בערך ' +
                shekel(need) + ' בחודש.';
       }
     }
@@ -1482,7 +1490,7 @@ function phrase(years, age, c) {
   }
   return {
     big: String(NOW_YEAR + y), small: false,
-    sub: 'כ־' + y + ' שנים מהיום, סביב גיל ' + atAge + '. זו הערכה ולא תאריך.'
+    sub: 'בערך ' + yearsWord(y) + ' מהיום, סביב גיל ' + atAge + '. זו הערכה ולא תאריך.'
   };
 }
 
@@ -1496,7 +1504,7 @@ function renderResult(st, c) {
   $('cCap').textContent    = shekel(c.freedomCapital);
   $('cNet').textContent    = shekel(c.net);
   $('cSave').textContent   = shekel(st.saving);
-  $('cRate').textContent   = st.income > 0 ? pct(c.rate, c.rate < 0.1 ? 1 : 0) : '—';
+  $('cRate').textContent   = st.income > 0 ? pct(c.rate, c.rate < 0.1 ? 1 : 0) : '';
   $('cTarget').textContent = shekel(c.base.target);
   $('cGap').textContent    = c.base.gap > 0 ? shekel(c.base.gap) : 'אין פער';
 }
@@ -1561,10 +1569,10 @@ function renderLevers(st, c) {
   var t1 = 'כרגע אתם מפנים ' + shekel(st.saving) + ' בחודש' +
            (st.income > 0 ? ', שהם ' + pct(c.rate, c.rate < 0.1 ? 1 : 0) + ' מההכנסה' : '') + '. ';
   if (base.years !== null && plus !== null && base.years - plus >= 0.5) {
-    t1 += 'בהנחות של תרחיש הבסיס, עוד ₪500 בחודש מקצרים את הדרך בכ־' +
-          Math.round(base.years - plus) + ' שנים.';
+    t1 += 'בהנחות של תרחיש הבסיס, עוד ₪500 בחודש מקצרים את הדרך בערך ' +
+          yearsWord(base.years - plus) + '.';
   } else if (base.years !== null && plus !== null) {
-    t1 += 'בהנחות של תרחיש הבסיס, עוד ₪500 בחודש כמעט ולא מזיזים את התאריך — במצב שלכם ההון הקיים עושה את רוב העבודה.';
+    t1 += 'בהנחות של תרחיש הבסיס, עוד ₪500 בחודש כמעט ולא מזיזים את התאריך. במצב שלכם ההון הקיים עושה את רוב העבודה.';
   } else {
     t1 += 'כל תוספת קבועה לחיסכון החודשי היא מה שמניע את ההון קדימה בשלב הזה.';
   }
@@ -1578,31 +1586,31 @@ function renderLevers(st, c) {
            pct(base.nominal, 2) + ' בשנה לפני אינפלציה. ';
   if (base.years !== null && altYears === null) {
     t2 += 'אותם נתונים בדיוק, בהנחת תשואה של ' + pct(ASSUME.returnBy[altKey], 2) +
-          ', לא מגיעים ליעד בתוך ' + ASSUME.maxYears + ' שנה בכלל — לעומת כ־' +
-          Math.round(base.years) + ' שנים כאן. זה ההבדל שריבית דריבית עושה לאורך זמן, ' +
+          ', לא מגיעים ליעד בתוך ' + ASSUME.maxYears + ' שנה בכלל, לעומת בערך ' +
+          yearsWord(base.years) + ' כאן. זה ההבדל שריבית דריבית עושה לאורך זמן, ' +
           'וזה גם הדבר שהכי קשה לראות מבלי לחשב אותו.';
   } else if (base.years === null && altYears !== null) {
     t2 += 'אותם נתונים בדיוק, בהנחת תשואה של ' + pct(ASSUME.returnBy[altKey], 2) +
-          ', מגיעים ליעד בתוך כ־' + Math.round(altYears) + ' שנים. ההנחה הנוכחית היא ' +
+          ', מגיעים ליעד בתוך בערך ' + yearsWord(altYears) + '. ההנחה הנוכחית היא ' +
           'שעוצרת את התוצאה, ולא הסכומים.';
   } else if (base.years !== null && altYears !== null && Math.abs(base.years - altYears) >= 1) {
     t2 += 'אותם נתונים בדיוק, בהנחת תשואה של ' + pct(ASSUME.returnBy[altKey], 2) +
-          ', נותנים כ־' + Math.round(altYears) + ' שנים במקום כ־' + Math.round(base.years) +
+          ', נותנים בערך ' + yearsWord(altYears) + ' במקום ' + Math.round(base.years) +
           '. זה ההבדל שריבית דריבית עושה לאורך זמן, וזה גם הדבר שהכי קשה לראות מבלי לחשב אותו.';
   } else {
-    t2 += 'ההפרש בין הנחות תשואה שונות הולך וגדל ככל שהתקופה ארוכה יותר — זו המכניקה של ריבית דריבית.';
+    t2 += 'ההפרש בין הנחות תשואה שונות הולך וגדל ככל שהתקופה ארוכה יותר. זו המכניקה של ריבית דריבית.';
   }
   t2 += ' ההנחה הזו אינה תחזית ואינה המלצה לגבי אף אפיק. מה לעשות עם זה היא ' +
         'שאלה לבעל רישיון בתחום ההשקעות. מה שכן בידיים שלכם כאן ועכשיו הוא לוודא ' +
-        'שיש מה להפקיד בכל חודש — וזה כבר עניין של התנהלות.';
+        'שיש מה להפקיד בכל חודש, וזה כבר עניין של התנהלות.';
   host.appendChild(lever(2, 'איך הכסף שלכם מנוהל', t2));
 
   /* 3 — ההוצאות */
   var targetIfLess = Math.max(0, (st.freedom - 500)) * 12 / base.wd;
   var t3 = 'ההוצאות שלכם עומדות על ' + shekel(st.expenses) + ' בחודש. הן קובעות כמה נשאר ' +
            'לחסוך מתוך ' + shekel(st.income) + ' שנכנסים. ' +
-           'הסכום שהגדרתם לחופש — ' + shekel(st.freedom) + ' בחודש — הוא זה שקובע כמה הון צריך: ' +
-           shekel(base.target) + '. אילו הוא היה נמוך ב־₪500, היעד היה ' + shekel(targetIfLess) +
+           'הסכום שהגדרתם לחופש, ' + shekel(st.freedom) + ' בחודש, הוא זה שקובע כמה הון צריך: ' +
+           shekel(base.target) + '. אילו הוא היה נמוך בחמש מאות שקלים, היעד היה ' + shekel(targetIfLess) +
            ', כלומר ' + shekel(base.target - targetIfLess) + ' פחות. ' +
            'רוב האנשים מגדירים את יעד החופש לפי ההוצאות שיש להם היום, ולכן שני המספרים האלה ' +
            'נעים יחד.';
@@ -1615,9 +1623,9 @@ function renderLevers(st, c) {
       t4 = 'ביקשתם להגיע בגיל ' + Math.round(st.targetAge) + '. לפי הנתונים וההנחות של תרחיש הבסיס, ' +
            'ההון הקיים לבדו מגיע ליעד עד הגיל הזה גם בלי הפקדות נוספות.';
     } else {
-      t4 = 'ביקשתם להגיע בגיל ' + Math.round(st.targetAge) + ', כלומר בעוד כ־' +
-           Math.round(c.targetMonths / 12) + ' שנים. בהנחות של תרחיש הבסיס, זה דורש כ־' +
-           shekel(c.neededMonthly) + ' בחודש — לעומת ' + shekel(st.saving) + ' היום' +
+      t4 = 'ביקשתם להגיע בגיל ' + Math.round(st.targetAge) + ', כלומר בעוד ' +
+           yearsWord(c.targetMonths / 12) + '. בהנחות של תרחיש הבסיס, זה דורש בערך ' +
+           shekel(c.neededMonthly) + ' בחודש, לעומת ' + shekel(st.saving) + ' היום' +
            (c.neededMonthly > st.saving ? ', פער של ' + shekel(c.neededMonthly - st.saving) + ' בחודש.' : '.');
     }
     host.appendChild(lever('★', 'גיל היעד שביקשתם', t4));
@@ -1647,7 +1655,7 @@ function sliderYears() {
 }
 
 function yearsText(y) {
-  if (y === null) return '—';
+  if (y === null) return 'לא בטווח';
   if (y === 0) return 'כבר שם';
   if (y < 1) return '<1';
   return String(NOW_YEAR + Math.round(y));
@@ -1672,8 +1680,8 @@ function refreshSliders() {
   var d = baseYears - r.years;
   if (Math.abs(d) < 0.5) { note.textContent = 'זהה פחות או יותר לנתונים שלכם.'; return; }
   note.textContent = d > 0
-    ? 'מקדים אתכם בכ־' + Math.round(d) + ' שנים.'
-    : 'מאחר אתכם בכ־' + Math.round(-d) + ' שנים.';
+    ? 'מקדים אתכם בערך ' + yearsWord(d) + '.'
+    : 'מאחר אתכם בערך ' + yearsWord(-d) + '.';
 }
 
 /* המחוונים מציירים מחדש את הגרף באותה נשימה. */
@@ -1752,10 +1760,10 @@ function leadSummary(st, c, email) {
            shekel(s.target) + ' · ' +
            (s.years === null ? 'לא מגיע בתוך ' + ASSUME.maxYears + ' שנה'
             : s.years === 0 ? 'כבר שם'
-            : 'כ־' + Math.round(s.years) + ' שנים, סביב ' + (NOW_YEAR + Math.round(s.years))));
+            : 'בערך ' + yearsWord(s.years) + ', סביב ' + (NOW_YEAR + Math.round(s.years))));
   });
   if (c.neededMonthly !== undefined && c.neededMonthly !== null && c.neededMonthly > 0) {
-    L.push('כדי לעמוד בגיל היעד נדרש כ־' + shekel(c.neededMonthly) + ' בחודש.');
+    L.push('כדי לעמוד בגיל היעד נדרש בערך ' + shekel(c.neededMonthly) + ' בחודש.');
   }
   return L.join('\n');
 }
@@ -2020,13 +2028,13 @@ function buildChart(st, c, over) {
     desc.textContent = hit === null
       ? 'ההון מתחיל ב' + shekel(c.freedomCapital) + ' ואינו חוצה את יעד ההון של ' + shekel(target) + ' בתוך ' + span + ' שנה.'
       : 'ההון מתחיל ב' + shekel(c.freedomCapital) + ' וחוצה את יעד ההון של ' + shekel(target) +
-        ' כעבור כ־' + Math.round(hit) + ' שנים, סביב ' + (NOW_YEAR + Math.round(hit)) + '.';
+        ' כעבור בערך ' + yearsWord(hit) + ', סביב ' + (NOW_YEAR + Math.round(hit)) + '.';
   }
 
   var cap = $('chartCap');
   if (cap) {
-    cap.textContent = 'הקו הוא תרחיש הבסיס. הרצועה סביבו היא אותו מסלול בדיוק בהנחת תשואה ' +
-      'שמרנית יותר ואופטימית יותר — היא מראה כמה התאריך זז מהנחה אחת, ולא הבטחה לטווח.';
+    cap.textContent = 'הקו הוא תרחיש הבסיס. הרצועה סביבו מראה איך המסלול יכול להשתנות ' +
+      'אם התשואה תהיה נמוכה או גבוהה יותר, ולא מבטיחה תוצאה מסוימת.';
   }
 
   buildChartTable(st, c, mid, target, hit, span);
@@ -2124,7 +2132,7 @@ function buildChartTable(st, c, mid, target, hit, span) {
    ══════════════════════════════════════════════════════════════════ */
 var TIPS = {
   capital: 'הכסף שיכול לממן לכם הוצאות חודשיות בלי משכורת: עו״ש, חיסכון, תיק ' +
-           'השקעות, קרנות וקופות. דירה שגרים בה לא נספרת כאן — היא בשווי הנקי, ' +
+           'השקעות, קרנות וקופות. דירה שגרים בה לא נספרת כאן. היא בשווי הנקי, ' +
            'אבל אי אפשר לחיות ממנה בזמן שגרים בה.',
   target:  'ההון שצריך כדי שהמשיכה השנתית ממנו תממן את הסכום החודשי שהגדרתם. ' +
            'מחושב לפי שיעור משיכה של ' + '4%' + ' בתרחיש הבסיס.',
@@ -2132,7 +2140,7 @@ var TIPS = {
            'ככל שההנחה זהירה יותר, כך ההון שצריך גדול יותר. זו הנחת תכנון ' +
            'מקובלת, לא הבטחה.',
   yield:   'התשואה השנתית שהחישוב מניח על הכסף, לפני אינפלציה, לפי אופן הניהול ' +
-           'שסימנתם. זו הנחה במודל — לא תחזית ולא המלצה לגבי אף אפיק.',
+           'שסימנתם. זו הנחה במודל, לא תחזית ולא המלצה לגבי אף אפיק.',
   infl:    'שחיקת ערך הכסף לאורך זמן. כל הסכומים כאן מוצגים בערך של היום, ולכן ' +
            'האינפלציה מנוכה מהתשואה במקום להתווסף לסכומים. ההנחה: ' +
            (ASSUME.inflation * 100).toFixed(1) + '% בשנה.'
@@ -2203,12 +2211,12 @@ function buildAssumptions(st, c) {
     r.append(a, b2); host.appendChild(r);
   }
   row('אינפלציה שנתית מונחת', pct(ASSUME.inflation, 1));
-  row('תשואה מונחת — שמרני',  pct(c.scenarios[0].nominal, 2));
-  row('תשואה מונחת — בסיס',   pct(c.scenarios[1].nominal, 2));
-  row('תשואה מונחת — אופטימי', pct(c.scenarios[2].nominal, 2));
-  row('שיעור משיכה — שמרני',  pct(ASSUME.withdraw.low, 2));
-  row('שיעור משיכה — בסיס',   pct(ASSUME.withdraw.base, 2));
-  row('שיעור משיכה — אופטימי', pct(ASSUME.withdraw.high, 2));
+  row('תשואה מונחת שמרנית',  pct(c.scenarios[0].nominal, 2));
+  row('תשואה מונחת בסיס',    pct(c.scenarios[1].nominal, 2));
+  row('תשואה מונחת אופטימית',pct(c.scenarios[2].nominal, 2));
+  row('שיעור משיכה שמרני',   pct(ASSUME.withdraw.low, 2));
+  row('שיעור משיכה בסיס',    pct(ASSUME.withdraw.base, 2));
+  row('שיעור משיכה אופטימי', pct(ASSUME.withdraw.high, 2));
   if (c.growing) row('גידול ריאלי בחיסכון', pct(ASSUME.savingGrowth, 1) + ' בשנה');
   row('אופק החישוב', ASSUME.maxYears + ' שנה');
 
