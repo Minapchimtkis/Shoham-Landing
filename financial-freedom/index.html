@@ -993,48 +993,55 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
    שמודבק על הרקע. שכבה אחת קבועה, בלי אירועי עכבר, ומתחת לכל
    דבר שאפשר ללחוץ עליו.
    ══════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════
+   אור ברקע
+   שלושה משבי אור סגולים מאחורי התוכן. בלי filter: blur — הרכות
+   אפויה בתוך הגרדיאנט עצמו, וזה עולה לדפדפן אפס. טשטוש על אלמנט
+   קבוע מכריח ציור מחדש בכל פריים של גלילה.
+
+   הם נעים לאט יותר מהדף, אז הם נקראים כעומק ולא כרקע מודבק.
+   ══════════════════════════════════════════════════════════════════ */
 .bolts {
   position: fixed; inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
 }
-/* בלי filter: blur. הרכות אפויה בתוך הגרדיאנט עצמו, וזה עולה
-   לדפדפן אפס. טשטוש על אלמנט קבוע מכריח ציור מחדש בכל פריים של
-   גלילה, וזה מה שהקפיץ את הטקסט באייפון. */
 .bolt {
   position: absolute;
   will-change: transform;
   transform: translate3d(0, var(--sy, 0px), 0) rotate(var(--rot, 0deg));
 }
-/* ארוכים וצרים ומסובבים: רסיסי אור, לא כתמים. */
+
 .bolt-1 {
-  top: -22%; right: -34%;
-  width: 128vw; height: 58vw;
+  top: -30%; right: -40%;
+  width: 150vw; height: 86vw;
   background:
-    radial-gradient(closest-side ellipse at 50% 50%, rgba(216,180,254,0.20), transparent 72%)
-      50% 50% / 54% 34% no-repeat,
+    radial-gradient(closest-side ellipse at 50% 50%, rgba(233,213,255,0.26), transparent 66%)
+      50% 50% / 46% 30% no-repeat,
     radial-gradient(closest-side ellipse at 50% 50%,
-      rgba(168,85,247,0.40) 0%, rgba(124,58,237,0.17) 46%, transparent 78%);
-  --rot: -21deg;
+      rgba(168,85,247,0.56) 0%, rgba(124,58,237,0.24) 44%, transparent 76%);
+  --rot: -19deg;
 }
 .bolt-2 {
-  top: 30%; left: -42%;
-  width: 136vw; height: 52vw;
+  top: 24%; left: -48%;
+  width: 156vw; height: 78vw;
   background:
-    radial-gradient(closest-side ellipse at 50% 50%, rgba(168,85,247,0.17), transparent 70%)
-      50% 50% / 50% 30% no-repeat,
+    radial-gradient(closest-side ellipse at 50% 50%, rgba(216,180,254,0.20), transparent 64%)
+      50% 50% / 42% 28% no-repeat,
     radial-gradient(closest-side ellipse at 50% 50%,
-      rgba(124,58,237,0.32) 0%, rgba(124,58,237,0.13) 48%, transparent 80%);
-  --rot: 16deg;
+      rgba(124,58,237,0.46) 0%, rgba(124,58,237,0.19) 46%, transparent 78%);
+  --rot: 15deg;
 }
 .bolt-3 {
-  top: 72%; right: -30%;
-  width: 112vw; height: 46vw;
+  top: 66%; right: -34%;
+  width: 132vw; height: 68vw;
   background:
+    radial-gradient(closest-side ellipse at 50% 50%, rgba(216,180,254,0.17), transparent 66%)
+      50% 50% / 44% 28% no-repeat,
     radial-gradient(closest-side ellipse at 50% 50%,
-      rgba(216,180,254,0.24) 0%, rgba(168,85,247,0.11) 50%, transparent 80%);
-  --rot: -28deg;
+      rgba(168,85,247,0.38) 0%, rgba(124,58,237,0.15) 48%, transparent 80%);
+  --rot: -26deg;
 }
 
 /* התוכן יושב מעליהם */
