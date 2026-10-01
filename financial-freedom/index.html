@@ -985,9 +985,74 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   #scrResult.on .res-head,
   #scrResult.on .span-track::before { animation: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   ברקים
+   שלושה רסיסי אור סגולים מאחורי התוכן, בשקיפות נמוכה ומטושטשים
+   חזק. הם נעים לאט יותר מהגלילה, אז הם קוראים כעומק ולא כקישוט
+   שמודבק על הרקע. שכבה אחת קבועה, בלי אירועי עכבר, ומתחת לכל
+   דבר שאפשר ללחוץ עליו.
+   ══════════════════════════════════════════════════════════════════ */
+.bolts {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+.bolt {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  transform: translate3d(0, var(--sy, 0px), 0) rotate(var(--rot, 0deg));
+}
+/* ארוך וצר ומסובב: רסיס, לא כתם. */
+.bolt-1 {
+  top: -6%; right: -18%;
+  width: 76vw; height: 30vw;
+  background: linear-gradient(104deg, transparent 8%, rgba(168,85,247,0.30) 48%, transparent 88%);
+  filter: blur(54px);
+  --rot: -24deg;
+}
+.bolt-2 {
+  top: 36%; left: -26%;
+  width: 84vw; height: 24vw;
+  background: linear-gradient(96deg, transparent 12%, rgba(124,58,237,0.26) 50%, transparent 86%);
+  filter: blur(62px);
+  --rot: 18deg;
+}
+.bolt-3 {
+  top: 72%; right: -10%;
+  width: 62vw; height: 20vw;
+  background: linear-gradient(110deg, transparent 10%, rgba(216,180,254,0.17) 50%, transparent 90%);
+  filter: blur(48px);
+  --rot: -32deg;
+}
+
+/* התוכן יושב מעליהם */
+.top, main, .foot { position: relative; z-index: 1; }
+
+/* ══════════════════════════════════════════════════════════════════
+   מעבר גלילה
+   אותה תחושה שכבר אושרה בדף הנחיתה: בלוק שנכנס למסך מתרומם
+   ומתבהר, ובלוק שיוצא ממנו מתכווץ קלות. הקריאות נשמרת כי שום
+   בלוק לא יורד מתחת ל-65 אחוז שקיפות בזמן שהוא במרכז המסך.
+   ══════════════════════════════════════════════════════════════════ */
+.slide { will-change: transform, opacity; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bolt { transform: none !important; }
+  .slide { transform: none !important; opacity: 1 !important; }
+}
 </style>
 </head>
 <body>
+
+<div class="bolts" aria-hidden="true">
+  <span class="bolt bolt-1"></span>
+  <span class="bolt bolt-2"></span>
+  <span class="bolt bolt-3"></span>
+</div>
 
 <header class="top">
   <a href="/" aria-label="לאתר של שוהם אבו">
@@ -1782,6 +1847,7 @@ function showScreen(id) {
     el.classList.toggle('on', el.id === id);
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (window.rescan) setTimeout(window.rescan, 60);
 }
 
 function showErr(boxId, msg, focusId) {
@@ -2340,6 +2406,7 @@ function revealFull() {
   mountTips();
   armSliders(baseState, result);
   full.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  if (window.rescan) setTimeout(window.rescan, 80);
 }
 
 
@@ -2695,6 +2762,85 @@ function buildAssumptions(st, c) {
     'משתנה משנה לשנה ועשויה להיות שלילית.';
   host.appendChild(n);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   15. גלילה
+       שני דברים על אותו מאזין: הברקים נעים לאט יותר מהדף, והבלוקים
+       מתרוממים כשהם נכנסים ומתכווצים קלות כשהם יוצאים. זו אותה
+       תחושה שכבר אושרה בדף הנחיתה.
+
+       כל הקריאות מהפריסה נאספות לפני שכותבים אליה ולו פעם אחת.
+       קריאה אחרי כתיבה מכריחה את הדפדפן לחשב מחדש את הפריסה בכל
+       פריים, וזה מה שהופך גלילה חלקה לגלילה שנתקעת.
+   ══════════════════════════════════════════════════════════════════ */
+(function () {
+  var reduce = false;
+  try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (reduce) return;
+
+  var BOLTS = Array.prototype.slice.call(document.querySelectorAll('.bolt'));
+  var RATE  = [-0.075, 0.055, -0.105];
+
+  /* הבלוקים שמקבלים מעבר. טופס הליד בכוונה לא ברשימה: להזיז שדה
+     בזמן שמקלידים בו זה מעצבן, לא יפה. */
+  var SEL = ['#scrIntro .hero', '#scrIntro .card.intro', '#scrIntro .disclaimer',
+             '#scrIntro .learn-label', '#scrIntro .learn-title', '#scrIntro .learn-lede',
+             '#scrIntro .faq-list',
+             '#scrResult .res-head', '#scrResult .grid', '#scrResult #preDisc',
+             '#full .chart-card', '#full .scn', '#full #levers',
+             '#full .closing', '#full > .disclaimer'];
+  var slides = [];
+  function collect() {
+    slides = [];
+    SEL.forEach(function (q) {
+      var el = document.querySelector(q);
+      if (el) { el.classList.add('slide'); slides.push(el); }
+    });
+  }
+  collect();
+
+  var ticking = false;
+  function frame() {
+    ticking = false;
+    var y = window.scrollY || window.pageYOffset || 0;
+    var vh = window.innerHeight || 1;
+
+    /* ── קוראים הכל קודם ── */
+    var rects = [];
+    for (var i = 0; i < slides.length; i++) {
+      rects.push(slides[i].offsetParent === null ? null : slides[i].getBoundingClientRect());
+    }
+
+    /* ── ורק אז כותבים ── */
+    for (var b = 0; b < BOLTS.length; b++) {
+      BOLTS[b].style.setProperty('--sy', (y * RATE[b]).toFixed(1) + 'px');
+    }
+    for (var j = 0; j < slides.length; j++) {
+      var r = rects[j];
+      if (!r) continue;
+      var enter = Math.min(1, Math.max(0, (r.top - vh * 0.5) / (vh * 0.5)));
+      /* היציאה נמדדת לפי הקצה העליון ולא לפי התחתון. לפי התחתון,
+         בלוק קטן שיושב בדיוק במרכז המסך כבר נחשב חצי יוצא, ולכן
+         נצבע עמום בזמן שקוראים אותו. */
+      var out   = Math.min(1, Math.max(0, -r.top / (vh * 0.55)));
+      slides[j].style.transform =
+        'translateY(' + (enter * 24).toFixed(1) + 'px) scale(' + (1 - out * 0.06).toFixed(4) + ')';
+      slides[j].style.opacity = ((1 - enter * 0.34) * (1 - out * 0.22)).toFixed(3);
+    }
+  }
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  frame();
+
+  /* מעבר בין מסכים מחליף את מה שגלוי, אז אוספים מחדש ומיישרים. */
+  window.rescan = function () { collect(); frame(); };
+})();
 
 /* ══════════════════════════════════════════════════════════════════
    11. חיווט
