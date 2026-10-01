@@ -998,35 +998,43 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  contain: strict;
 }
+/* בלי filter: blur. הרכות אפויה בתוך הגרדיאנט עצמו, וזה עולה
+   לדפדפן אפס. טשטוש על אלמנט קבוע מכריח ציור מחדש בכל פריים של
+   גלילה, וזה מה שהקפיץ את הטקסט באייפון. */
 .bolt {
   position: absolute;
-  border-radius: 50%;
   will-change: transform;
   transform: translate3d(0, var(--sy, 0px), 0) rotate(var(--rot, 0deg));
 }
-/* ארוך וצר ומסובב: רסיס, לא כתם. */
+/* ארוכים וצרים ומסובבים: רסיסי אור, לא כתמים. */
 .bolt-1 {
-  top: -6%; right: -18%;
-  width: 76vw; height: 30vw;
-  background: linear-gradient(104deg, transparent 8%, rgba(168,85,247,0.30) 48%, transparent 88%);
-  filter: blur(54px);
-  --rot: -24deg;
+  top: -22%; right: -34%;
+  width: 128vw; height: 58vw;
+  background:
+    radial-gradient(closest-side ellipse at 50% 50%, rgba(216,180,254,0.20), transparent 72%)
+      50% 50% / 54% 34% no-repeat,
+    radial-gradient(closest-side ellipse at 50% 50%,
+      rgba(168,85,247,0.40) 0%, rgba(124,58,237,0.17) 46%, transparent 78%);
+  --rot: -21deg;
 }
 .bolt-2 {
-  top: 36%; left: -26%;
-  width: 84vw; height: 24vw;
-  background: linear-gradient(96deg, transparent 12%, rgba(124,58,237,0.26) 50%, transparent 86%);
-  filter: blur(62px);
-  --rot: 18deg;
+  top: 30%; left: -42%;
+  width: 136vw; height: 52vw;
+  background:
+    radial-gradient(closest-side ellipse at 50% 50%, rgba(168,85,247,0.17), transparent 70%)
+      50% 50% / 50% 30% no-repeat,
+    radial-gradient(closest-side ellipse at 50% 50%,
+      rgba(124,58,237,0.32) 0%, rgba(124,58,237,0.13) 48%, transparent 80%);
+  --rot: 16deg;
 }
 .bolt-3 {
-  top: 72%; right: -10%;
-  width: 62vw; height: 20vw;
-  background: linear-gradient(110deg, transparent 10%, rgba(216,180,254,0.17) 50%, transparent 90%);
-  filter: blur(48px);
-  --rot: -32deg;
+  top: 72%; right: -30%;
+  width: 112vw; height: 46vw;
+  background:
+    radial-gradient(closest-side ellipse at 50% 50%,
+      rgba(216,180,254,0.24) 0%, rgba(168,85,247,0.11) 50%, transparent 80%);
+  --rot: -28deg;
 }
 
 /* התוכן יושב מעליהם */
@@ -1038,7 +1046,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
    ומתבהר, ובלוק שיוצא ממנו מתכווץ קלות. הקריאות נשמרת כי שום
    בלוק לא יורד מתחת ל-65 אחוז שקיפות בזמן שהוא במרכז המסך.
    ══════════════════════════════════════════════════════════════════ */
-.slide { will-change: transform, opacity; }
+/* בלי will-change: חמישה-עשר אלמנטים עם רמז כזה יוצרים חמש-עשרה
+   שכבות קומפוזיציה, וזה מכביד יותר ממה שהוא חוסך. */
+.slide { }
 
 @media (prefers-reduced-motion: reduce) {
   .bolt { transform: none !important; }
