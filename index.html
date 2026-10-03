@@ -3140,12 +3140,20 @@ footer {
    הזוגי לאי זוגי במסכים צרים. */
 @media (hover: hover) and (pointer: fine) {
 
+  /* ‏המרחק בפרספקטיבה הוא המנוף האמיתי, לא הזווית. ב-1000
+     פיקסל אותה זווית בדיוק כמעט ולא נראית, מפני שככל
+     שהצופה רחוק יותר כך ההטיה שטוחה יותר. 560 מקרב אותו.
+
+     ‏הזווית סביב הציר האופקי גדולה מזו שסביב האנכי, מפני
+     שבכרטיס רחב ונמוך דווקא הסיבוב האנכי הוא שמעקם את
+     הטקסט, והאופקי נקרא יפה. שני מספרים שונים כאן שומרים
+     על אותה עוצמת הטיה בכרטיסים בשתי הצורות. */
   .demon-card.visible, .phil-card.visible {
     transform:
-      perspective(1000px)
-      rotateX(calc(var(--py) * -4.5deg))
-      rotateY(calc(var(--px) * 4.5deg))
-      translate3d(0, calc(var(--lift) * -4px), 0);
+      perspective(560px)
+      rotateX(calc(var(--py) * -12deg))
+      rotateY(calc(var(--px) * 8deg))
+      translate3d(0, calc(var(--lift) * -8px), 0);
   }
 
   /* ‏כל עוד הסמן בפנים ההטיה עוקבת אחריו בלי השהיה. ברגע
@@ -3163,7 +3171,7 @@ footer {
      נשאר במסגרת. אז האייקון נשאר מוצמד למשטח, והמילים הן
      שצפות מעליו. ההפרש זהה, המחיר אינו. */
   .demon-card .demon-text-wrap {
-    transform: translate3d(calc(var(--px) * 5px), calc(var(--py) * 5px), 0);
+    transform: translate3d(calc(var(--px) * 10px), calc(var(--py) * 10px), 0);
     transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
   }
 
@@ -3172,7 +3180,7 @@ footer {
      שנעה בניגוד לכל השאר אומרת את העומק בבירור רב יותר
      משלוש שכבות שנעות יחד. */
   .phil-card .phil-num {
-    transform: translate3d(calc(var(--px) * -3px), calc(var(--py) * -3px), 0);
+    transform: translate3d(calc(var(--px) * -6px), calc(var(--py) * -6px), 0);
     transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
   }
 
