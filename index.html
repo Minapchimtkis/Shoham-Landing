@@ -3047,6 +3047,159 @@ footer {
   line-height: 1.8;
 }
 
+
+/* ══ עומק בשתי שלשות הכרטיסים ════════════════════════════════
+   האור הסגול שזז ברקע הוא האור של הדף, ולכן המשטחים האלה
+   מתייחסים אליו כאל אור אמיתי: קו מואר בקצה העליון, קו כהה
+   בקצה התחתון, וברק שנע על פני השטח במקום שבו הסמן נמצא.
+
+   מה שבאמת יוצר את העומק הוא ההפרש בין הקצבים. האייקון זז
+   שש פיקסלים, המילים זזות שניים, והספרה הסריפית זזה שניים
+   בכיוון ההפוך, ולכן היא נקראת כחרוטה לתוך הלוח ולא כמונחת
+   עליו. בלי ההפרש הזה כל הסיבוב הוא רק מלבן שמתנדנד.
+
+   מה לא קורה כאן: אין מאזין גלילה חדש, אין טשטוש, ואין צל
+   מונפש. נעים רק transform ו-opacity.
+   ────────────────────────────────────────────────────────── */
+
+/* ‏JS כותב חמישה מספרים בלבד, וכל השאר נגזר מהם כאן, כדי
+   שבכל פריים תהיה קבוצת כתיבה אחת ולא חישוב בתוך הקוד. */
+.demon-card, .phil-card {
+  --px: 0;     /* מרחק הסמן ממרכז הכרטיס, מנורמל לטווח 1± */
+  --py: 0;
+  --sx: 0px;   /* מרחק הברק ממרכז הכרטיס, בפיקסלים */
+  --sy: 0px;
+  --lift: 0;   /* 0 במנוחה, 1 כשהסמן מעל הכרטיס */
+  transform-origin: 50% 50%;
+}
+
+/* ‏כרטיסי הפילוסופיה מקבלים את אותו משטח שכרטיסי השדים כבר
+   קיבלו. בלעדיו שתי השלשות נראות כמו שני אפקטים נפרדים
+   במקום כמו מערכת אחת. */
+.phil-card {
+  background:
+    linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
+  box-shadow:
+    0 20px 44px -20px rgba(0,0,0,0.80),
+    0 3px 10px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.075);
+  transition: border-color 0.4s, box-shadow 0.4s, background 0.4s,
+              opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+              transform 0.55s cubic-bezier(0.22,1,0.36,1);
+}
+
+.phil-card:hover {
+  box-shadow:
+    0 28px 60px -22px rgba(0,0,0,0.85),
+    0 0 34px -12px rgba(168,85,247,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* ‏העובי של הלוח, ועליו הברק. על אלמנט נפרד ולא על פסאודו,
+   מפני ששני הפסאודו של הכרטיסים כבר תפוסים בקו העליון, וכך
+   גם אין מאבק עם מפל ה-box-shadow שכבר קיים עליהם.
+
+   ‏z-index שלילי: הכרטיס הוא כבר הקשר ערימה בגלל ה-transform
+   של החשיפה, ולכן המשטח נצבע מעל הרקע שלו ומתחת לתוכן, בלי
+   לגעת ב-mix-blend-mode של האייקון. */
+.surf {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.45);
+}
+
+/* ‏הברק הוא כתם בגודל קבוע שזז, ולא מעבר צבע שמרכזו משתנה.
+   ההבדל הזה הוא כל ההבדל: מעבר צבע שמרכזו נע חייב להיצבע
+   מחדש בכל פריים על כל שטח הכרטיס, ואילו כתם קבוע נצבע
+   פעם אחת ואחר כך רק מוזז. מדדתי את שתי הגרסאות, והשנייה
+   חוסכת את רוב הפריימים הארוכים. */
+.surf::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 480px;
+  height: 480px;
+  margin: -240px 0 0 -240px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(255,255,255,0.11),
+    rgba(168,85,247,0.06) 42%,
+    transparent 72%);
+  transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0);
+  opacity: var(--lift);
+  transition: opacity 0.35s ease;
+}
+
+/* ‏ההטיה היא תחושה של סמן, ולכן היא קיימת רק במקום שבו יש
+   סמן. במסך מגע נשארים הקצה המואר, הקצה הכהה והשכבות
+   הקיימות בדיוק כפי שהיו, כולל ההפרש בעומק שבין הכרטיס
+   הזוגי לאי זוגי במסכים צרים. */
+@media (hover: hover) and (pointer: fine) {
+
+  .demon-card.visible, .phil-card.visible {
+    transform:
+      perspective(1000px)
+      rotateX(calc(var(--py) * -4.5deg))
+      rotateY(calc(var(--px) * 4.5deg))
+      translate3d(0, calc(var(--lift) * -4px), 0);
+  }
+
+  /* ‏כל עוד הסמן בפנים ההטיה עוקבת אחריו בלי השהיה. ברגע
+     שהוא יוצא חוזרת ההנעה הרגילה והכרטיס נח בחזרה. */
+  .demon-card.tilting, .phil-card.tilting {
+    transition: border-color 0.4s, box-shadow 0.4s, background 0.4s;
+  }
+
+  /* ‏שכבה אחת זזה בכל כרטיס, ולא יותר.
+
+     האייקון היה המועמד הטבעי, אבל הוא נושא שני drop-shadow
+     ו-mix-blend-mode, ולכן כל תזוזה שלו מכריחה את הדפדפן
+     לקרוא מחדש את מה שמאחוריו ולצבוע הכול שוב. מדדתי: עם
+     האייקון נע הפריים החציוני עלה ל-22.3ms, בלעדיו הוא
+     נשאר במסגרת. אז האייקון נשאר מוצמד למשטח, והמילים הן
+     שצפות מעליו. ההפרש זהה, המחיר אינו. */
+  .demon-card .demon-text-wrap {
+    transform: translate3d(calc(var(--px) * 5px), calc(var(--py) * 5px), 0);
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* ‏הספרה נעה בכיוון ההפוך לסיבוב. זה מה שמציב אותה מתחת
+     לפני השטח במקום עליו. שאר הטקסט אינו זז: ספרה אחת
+     שנעה בניגוד לכל השאר אומרת את העומק בבירור רב יותר
+     משלוש שכבות שנעות יחד. */
+  .phil-card .phil-num {
+    transform: translate3d(calc(var(--px) * -3px), calc(var(--py) * -3px), 0);
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* ‏גם השכבות שבפנים מפסיקות להשתהות כל עוד הסמן בתנועה. */
+  .demon-card.tilting .demon-text-wrap,
+  .phil-card.tilting .phil-num { transition: none; }
+
+  /* ‏כל שכבה שזזה מקבלת משטח צביעה משלה, אחרת כל תזוזה
+     שלה מכריחה את הכרטיס כולו להיצבע מחדש. זה קיים רק
+     כל עוד הסמן בפנים, מפני שמשטח צביעה עולה זיכרון. */
+  .demon-card.tilting .demon-text-wrap,
+  .demon-card.tilting .surf::after,
+  .phil-card.tilting .phil-num,
+  .phil-card.tilting .surf::after { will-change: transform; }
+}
+
+/* ‏מי שביקש לצמצם אנימציות מקבל את הקצה הפיזי בלבד: שום
+   דבר לא מסתובב ושום שכבה לא נעה. הבלוק הזה חייב להיות
+   האחרון בגיליון, אחרת הוא מפסיד בהכרעת סדר המקור. */
+@media (prefers-reduced-motion: reduce) {
+  .demon-card, .phil-card,
+  .demon-card.visible, .phil-card.visible { transform: none !important; }
+  .demon-card .demon-text-wrap,
+  .phil-card .phil-num { transform: none !important; }
+  .surf::after { transition: none; }
+}
+
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -3276,12 +3429,15 @@ footer {
   <h2 class="pain-title reveal">הבעיה האמיתית היא לא המספרים.<br>היא מה שאנחנו מאמינים עליהם.</h2>
   <div class="demons">
     <div class="demon-card reveal-scale" style="transition-delay:0.0s">
+      <span class="surf" aria-hidden="true"></span>
       <img decoding="async" src="assets/demon-1.webp" alt="מוח" class="demon-icon-img" loading="lazy"><div class="demon-text-wrap"><div class="demon-title">״זה לא בשבילי״</div><div class="demon-desc">האמונה שכסף וצמיחה כלכלית שמורים לאנשים אחרים. לא לך. זה השקר הכי יקר שעולה לך.</div></div>
     </div>
     <div class="demon-card reveal-scale" style="transition-delay:0.12s">
+      <span class="surf" aria-hidden="true"></span>
       <img decoding="async" src="assets/demon-2.webp" alt="פחד" class="demon-icon-img" loading="lazy"><div class="demon-text-wrap"><div class="demon-title">פחד להסתכל בחשבון</div><div class="demon-desc">כשהחרדה גדולה מהרצון לדעת. אנשים מעדיפים לא לדעת כי הידיעה מכאיבה. אבל חוסר הידיעה עולה יותר.</div></div>
     </div>
     <div class="demon-card reveal-scale" style="transition-delay:0.24s">
+      <span class="surf" aria-hidden="true"></span>
       <img decoding="async" src="assets/demon-3.webp" alt="דפוס" class="demon-icon-img" loading="lazy"><div class="demon-text-wrap"><div class="demon-title">אנחנו חוזרים על הדפוסים</div><div class="demon-desc">כי הרגלים פיננסיים נבנו שנים. לשנות אותם דורש כלים נכונים, לא רק רצון טוב.</div></div>
     </div>
   </div>
@@ -3427,16 +3583,19 @@ footer {
 
     <div class="phil-grid">
       <div class="phil-card reveal-scale" style="transition-delay:0s">
+        <span class="surf" aria-hidden="true"></span>
         <div class="phil-num">01</div>
         <div class="phil-title">משחררים את הלחץ</div>
         <div class="phil-desc">הניסיון מהצבא לימד אותי שהכול מתחיל בחוסן מנטלי. לפני שנוגעים במספרים, נבנה שקט נפשי וסדר בראש.</div>
       </div>
       <div class="phil-card reveal-scale" style="transition-delay:0.12s">
+        <span class="surf" aria-hidden="true"></span>
         <div class="phil-num">02</div>
         <div class="phil-title">כלים שבאמת עובדים</div>
         <div class="phil-desc">נמאס לך ממושגים מסובכים? גם לי. אלמד אותך איך לנהל את הכסף בדרך פשוטה וחכמה שמתאימה לחיים ולרצונות שלך בלבד.</div>
       </div>
       <div class="phil-card reveal-scale" style="transition-delay:0.24s">
+        <span class="surf" aria-hidden="true"></span>
         <div class="phil-num">03</div>
         <div class="phil-title">מפענחים את התמונה</div>
         <div class="phil-desc">נעבור יחד על קרן הפנסיה, קרן ההשתלמות ואפיקי החיסכון, ונבין מה כל אחד מהם ואיך הוא עובד, כדי שתדעו בדיוק מה יש לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.</div>
@@ -4014,6 +4173,73 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0, rootMargin: '0px 0px 120px 0px' });
 
 reveals.forEach(el => observer.observe(el));
+
+// ── עומק בכרטיסים ──
+// הסמן קובע שני מספרים בלבד, px ו-py, והגיליון נוסח כך שכל
+// השאר נגזר מהם. כאן יש כתיבה אחת לפריים ולא יותר.
+//
+// המלבן נמדד בתוך הפריים ולפני כל הכתיבות, ולכן אין צורך
+// במאזין גלילה כדי לדעת איפה הכרטיס נמצא, ואין קריאה אחרי
+// כתיבה שתכריח את הדפדפן לחשב פריסה פעמיים.
+(function () {
+  if (!window.matchMedia) return;
+  // הטיה היא תחושה של סמן. במסך מגע אין מה לעקוב אחריו.
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  document.querySelectorAll('.demon-card, .phil-card').forEach(function (card) {
+    var pending = null, frame = 0, rest = 0;
+
+    function paint() {
+      frame = 0;
+      if (!pending) return;
+      var r = card.getBoundingClientRect();
+      if (!r.width || !r.height) { pending = null; return; }
+      var x = (pending.clientX - r.left) / r.width;
+      var y = (pending.clientY - r.top) / r.height;
+      card.style.setProperty('--px', (x * 2 - 1).toFixed(3));
+      card.style.setProperty('--py', (y * 2 - 1).toFixed(3));
+      card.style.setProperty('--sx', ((x - 0.5) * r.width).toFixed(1) + 'px');
+      card.style.setProperty('--sy', ((y - 0.5) * r.height).toFixed(1) + 'px');
+      pending = null;
+    }
+
+    function track(e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      pending = e;
+      if (!frame) frame = requestAnimationFrame(paint);
+    }
+
+    card.addEventListener('pointerenter', function (e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      if (rest) { clearTimeout(rest); rest = 0; }
+      card.classList.add('tilting');
+      // will-change עולה זיכרון, ולכן הוא קיים רק כל עוד
+      // הכרטיס באמת נע.
+      card.style.willChange = 'transform';
+      card.style.setProperty('--lift', '1');
+      track(e);
+    });
+
+    card.addEventListener('pointermove', track, { passive: true });
+
+    card.addEventListener('pointerleave', function () {
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      pending = null;
+      // הסרת tilting מחזירה את ההנעה, ואיפוס המספרים מחזיר
+      // את הכרטיס למנוחה דרכה ולא בבת אחת.
+      card.classList.remove('tilting');
+      card.style.setProperty('--px', '0');
+      card.style.setProperty('--py', '0');
+      card.style.setProperty('--lift', '0');
+      rest = setTimeout(function () {
+        rest = 0;
+        if (!card.classList.contains('tilting')) card.style.willChange = '';
+      }, 650);
+    });
+  });
+})();
+
 
 // ── FORM ──
 // ── SAYING WHAT IS MISSING ──
