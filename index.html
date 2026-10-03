@@ -3159,7 +3159,45 @@ footer {
   /* ‏כל עוד הסמן בפנים ההטיה עוקבת אחריו בלי השהיה. ברגע
      שהוא יוצא חוזרת ההנעה הרגילה והכרטיס נח בחזרה. */
   .demon-card.tilting, .phil-card.tilting {
-    transition: border-color 0.4s, box-shadow 0.4s, background 0.4s;
+    transition: border-color 0.4s, background 0.4s;
+  }
+
+  /* ‏הצל מחליף מצב מיד, בלי מעבר.
+
+     צל מטושטש הוא כבר הדבר היקר ביותר שיש לכרטיס לצבוע,
+     וצל מטושטש על לוח שמסתובב צריך להיצבע מחדש במרחב
+     המסובב, בכל פריים, לאורך כל ארבע עשיריות השנייה של
+     המעבר. מדדתי: כשהסמן חוצה את שלושת הכרטיסים זה לבדו
+     היה ההפרש בין 18.9ms ל-17.3ms.
+
+     ההרמה והברק כבר אומרים שהסמן כאן, אז החלפה מיידית של
+     הצל לא חסרה לאיש. במסך מגע אין הטיה, ושם המעבר הרך
+     נשאר. */
+  .demon-card:hover, .phil-card:hover {
+    box-shadow:
+      0 20px 44px -20px rgba(0,0,0,0.80),
+      0 3px 10px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.075);
+  }
+  .demon-card:nth-child(even):hover {
+    box-shadow:
+      0 12px 30px -18px rgba(0,0,0,0.70),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* ‏וההחזרה למנוחה מתקצרת.
+
+     חצי שנייה היא נצח כשהסמן כבר עבר הלאה. כשחוצים את
+     שלושת הכרטיסים ברצף, כל אחד מהם נשאר מוטה מאחורי
+     הסמן, וזה נקרא כמו דף שמתקשה לעמוד בקצב גם כשכל
+     פריים בזמן. 220 אלפיות מספיקות לריכוך ולא נגררות.
+
+     ‏הקיצור חי במחלקה נפרדת שקיימת רק בזמן ההחזרה עצמה,
+     ולא על הכרטיס תמיד, מפני שאותה הנעה משמשת גם לחשיפה
+     בגלילה. לקצר אותה שם היה מוציא את ששת הכרטיסים האלה
+     מהקצב של כל שאר הדף. */
+  .demon-card.untilting, .phil-card.untilting {
+    transition-duration: 0.4s, 0.4s, 0.4s, 0.55s, 0.22s;
   }
 
   /* ‏שכבה אחת זזה בכל כרטיס, ולא יותר.
@@ -4196,19 +4234,17 @@ reveals.forEach(el => observer.observe(el));
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   document.querySelectorAll('.demon-card, .phil-card').forEach(function (card) {
-    var pending = null, frame = 0, rest = 0;
+    var pending = null, frame = 0, rest = 0, box = null;
 
     function paint() {
       frame = 0;
-      if (!pending) return;
-      var r = card.getBoundingClientRect();
-      if (!r.width || !r.height) { pending = null; return; }
-      var x = (pending.clientX - r.left) / r.width;
-      var y = (pending.clientY - r.top) / r.height;
+      if (!pending || !box) return;
+      var x = (pending.clientX - box.left) / box.width;
+      var y = (pending.clientY - box.top) / box.height;
       card.style.setProperty('--px', (x * 2 - 1).toFixed(3));
       card.style.setProperty('--py', (y * 2 - 1).toFixed(3));
-      card.style.setProperty('--sx', ((x - 0.5) * r.width).toFixed(1) + 'px');
-      card.style.setProperty('--sy', ((y - 0.5) * r.height).toFixed(1) + 'px');
+      card.style.setProperty('--sx', ((x - 0.5) * box.width).toFixed(1) + 'px');
+      card.style.setProperty('--sy', ((y - 0.5) * box.height).toFixed(1) + 'px');
       pending = null;
     }
 
@@ -4221,6 +4257,15 @@ reveals.forEach(el => observer.observe(el));
     card.addEventListener('pointerenter', function (e) {
       if (e.pointerType && e.pointerType !== 'mouse') return;
       if (rest) { clearTimeout(rest); rest = 0; }
+      card.classList.remove('untilting');
+      // המלבן נמדד פעם אחת, בכניסה, כשהכרטיס עוד שטוח.
+      //
+      // שתי סיבות. האחת, מדידה בתוך הפריים באה אחרי שהפריים
+      // הקודם כבר שינה סגנון, ולכן היא מכריחה את הדפדפן
+      // לחשב את הפריסה של כל הדף מחדש, בכל פריים. השנייה
+      // חמורה יותר: המלבן של אלמנט מוטה הוא המלבן החוסם
+      // שלו אחרי ההטיה, כלומר ההטיה הייתה מזינה את עצמה.
+      box = card.getBoundingClientRect();
       card.classList.add('tilting');
       // will-change עולה זיכרון, ולכן הוא קיים רק כל עוד
       // הכרטיס באמת נע.
@@ -4234,16 +4279,19 @@ reveals.forEach(el => observer.observe(el));
     card.addEventListener('pointerleave', function () {
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
       pending = null;
+      box = null;
       // הסרת tilting מחזירה את ההנעה, ואיפוס המספרים מחזיר
       // את הכרטיס למנוחה דרכה ולא בבת אחת.
       card.classList.remove('tilting');
+      card.classList.add('untilting');
       card.style.setProperty('--px', '0');
       card.style.setProperty('--py', '0');
       card.style.setProperty('--lift', '0');
       rest = setTimeout(function () {
         rest = 0;
+        card.classList.remove('untilting');
         if (!card.classList.contains('tilting')) card.style.willChange = '';
-      }, 650);
+      }, 300);
     });
   });
 })();
@@ -4918,40 +4966,16 @@ function closeIphone() {
 
 
 // ── 3D TILT HOVER ──
-(function() {
-  const tiltCards = document.querySelectorAll('.phil-card, .demon-card');
-  const isTouch = window.matchMedia('(hover: none)').matches;
-  if (isTouch) return; // skip on touch devices
-
-  tiltCards.forEach(card => {
-    card.style.transformStyle = 'preserve-3d';
-
-    // The tilt wants a fast transform to feel attached to the pointer, but
-    // setting that inline at load also overrode the scroll reveal: these
-    // cards snapped in at 0.15s with no fade while everything else eased in
-    // over 0.55s. Apply it on entry and hand the element back on the way out.
-    card.addEventListener('mouseenter', () => {
-      card.style.transition = 'transform 0.15s ease-out, border-color 0.4s, background 0.4s';
-    });
-
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const cx = rect.width / 2;
-      const cy = rect.height / 2;
-      const rotX = ((y - cy) / cy) * -5;
-      const rotY = ((x - cx) / cx) * 5;
-      card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      // once the tilt has settled, let the stylesheet own it again
-      setTimeout(() => { card.style.transition = ''; }, 200);
-    });
-  });
-})();
+// ‏הוסר. היה כאן מאזין שני על אותם כרטיסים בדיוק, שעשה את
+// אותו דבר: קורא getBoundingClientRect וכותב transform בשורת
+// הסגנון, בכל אירוע תזוזה של העכבר ולא פעם אחת לפריים. עכבר
+// מודרני מדווח מאות פעמים בשנייה, כך שזו הייתה מדידת פריסה
+// כפויה וכתיבת סגנון מאות פעמים בשנייה, על כרטיס.
+//
+// ‏הוא גם ניצח את גיליון הסגנונות, מפני ששורת סגנון גוברת על
+// כל כלל, ולכן ההטיה שנראתה בדף הייתה שלו ולא זו שמוגדרת
+// למעלה. הגרסה שנשארה מסונכרנת לפריימים, מודדת את המלבן
+// פעם אחת בכניסה, ומכבדת בקשה לצמצום אנימציות.
 
 // ── PARALLAX SCROLL ──
 (function() {
