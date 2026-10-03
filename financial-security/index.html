@@ -1848,7 +1848,10 @@ function showStep(n) {
   $('progNum').textContent = n;
   $('progName').textContent = STEP_NAMES[n - 1];
   $('progFill').style.width = (n / 5 * 100) + '%';
-  $('btnBack').style.visibility = n === 1 ? 'hidden' : 'visible';
+  // ‏בשלב הראשון אין לאן לחזור, ולכן הכפתור יורד מהפריסה ולא רק
+  // נעלם. visibility:hidden משאיר את התא שלו תופס מקום, וזו הייתה
+  // הסיבה ש״המשך״ נראה דחוק לצד אחד במקום לתפוס את כל השורה.
+  $('btnBack').style.display = n === 1 ? 'none' : '';
   $('btnNext').textContent = n === 5 ? 'חשבו את התוצאה שלי' : 'המשך';
   hideErr('wizErr');
   refreshLive();
