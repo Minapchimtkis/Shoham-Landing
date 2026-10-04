@@ -543,11 +543,13 @@ body::before {
   transform: scale(0.985);
 }
 
-.demon-card:hover {
-  box-shadow:
-    0 28px 60px -22px rgba(0,0,0,0.85),
-    0 0 34px -12px rgba(168,85,247,0.30),
-    inset 0 1px 0 rgba(255,255,255,0.10);
+@media (hover: hover) and (pointer: fine) {
+  .demon-card:hover {
+    box-shadow:
+      0 28px 60px -22px rgba(0,0,0,0.85),
+      0 0 34px -12px rgba(168,85,247,0.30),
+      inset 0 1px 0 rgba(255,255,255,0.10);
+  }
 }
 
 /* ── SECTION 3 · WHAT IS AN ADVISOR ──────────────────────
@@ -786,9 +788,11 @@ section {
   box-shadow: 0 0 0 1px rgba(168,85,247,0.4);
 }
 
-.lang-btn:not(.active):hover {
-  color: var(--p6);
-  background: rgba(168,85,247,0.1);
+@media (hover: hover) and (pointer: fine) {
+  .lang-btn:not(.active):hover {
+    color: var(--p6);
+    background: rgba(168,85,247,0.1);
+  }
 }
 
 /* ── HERO ── */
@@ -824,11 +828,13 @@ section {
   transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
-.hero-badge:hover {
-  background: rgba(168,85,247,0.16);
-  border-color: rgba(168,85,247,0.7);
-  box-shadow: 0 0 0 1px rgba(168,85,247,0.35);
-  transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .hero-badge:hover {
+    background: rgba(168,85,247,0.16);
+    border-color: rgba(168,85,247,0.7);
+    box-shadow: 0 0 0 1px rgba(168,85,247,0.35);
+    transform: scale(1.04);
+  }
 }
 
 .hero-badge:active {
@@ -1022,11 +1028,15 @@ section {
   transition: opacity 0.3s;
 }
 
-.btn-primary:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 14px 38px rgba(0,0,0,0.55);
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 14px 38px rgba(0,0,0,0.55);
+  }
 }
-.btn-primary:hover::before { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover::before { opacity: 1; }
+}
 
 /* 44px of padding on each side is more than a 360px phone can spare, so the
    main call to action wrapped onto two lines on the two narrowest handsets
@@ -1093,16 +1103,22 @@ section {
   transition: opacity 0.4s;
 }
 
-.demon-card:hover {
-  border-color: rgba(168,85,247,0.4);
-  background: rgba(255,255,255,0.06);
+@media (hover: hover) and (pointer: fine) {
+  .demon-card:hover {
+    border-color: rgba(168,85,247,0.4);
+    background: rgba(255,255,255,0.06);
+  }
 }
 
-.demon-card:hover::before { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .demon-card:hover::before { opacity: 1; }
+}
 
-.demon-card:hover .demon-icon-img {
-  transform: scale(1.15) rotate(-4deg);
-  filter: drop-shadow(0 0 22px rgba(168,85,247,0.9)) drop-shadow(0 0 40px rgba(240,192,64,0.3));
+@media (hover: hover) and (pointer: fine) {
+  .demon-card:hover .demon-icon-img {
+    transform: scale(1.15) rotate(-4deg);
+    filter: drop-shadow(0 0 22px rgba(168,85,247,0.9)) drop-shadow(0 0 40px rgba(240,192,64,0.3));
+  }
 }
 
 .demon-text-wrap {
@@ -1140,8 +1156,10 @@ section {
     gap: 16px;
     padding: 28px 24px;
   }
-  .demon-card:hover {
-    transform: translateY(-4px);
+  @media (hover: hover) and (pointer: fine) {
+    .demon-card:hover {
+        transform: translateY(-4px);
+      }
   }
 }
 
@@ -1499,12 +1517,16 @@ section {
   transition: opacity 0.4s;
 }
 
-.phil-card:hover {
-  border-color: rgba(168,85,247,0.35);
-  background: rgba(168,85,247,0.06);
+@media (hover: hover) and (pointer: fine) {
+  .phil-card:hover {
+    border-color: rgba(168,85,247,0.35);
+    background: rgba(168,85,247,0.06);
+  }
 }
 
-.phil-card:hover::after { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .phil-card:hover::after { opacity: 1; }
+}
 
 .phil-num {
   font-family: 'Frank Ruhl Libre', serif;
@@ -1700,11 +1722,13 @@ section {
   letter-spacing: 0.3px;
 }
 
-.site-link:hover {
-  background: rgba(168,85,247,0.22);
-  border-color: var(--p5);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+@media (hover: hover) and (pointer: fine) {
+  .site-link:hover {
+    background: rgba(168,85,247,0.22);
+    border-color: var(--p5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+  }
 }
 
 .site-link svg { opacity: 0.7; }
@@ -1743,9 +1767,11 @@ section {
   transition: transform 0.3s, border-color 0.3s;
 }
 
-.testimonial:hover {
-  transform: translateY(-4px);
-  border-color: rgba(168,85,247,0.3);
+@media (hover: hover) and (pointer: fine) {
+  .testimonial:hover {
+    transform: translateY(-4px);
+    border-color: rgba(168,85,247,0.3);
+  }
 }
 
 .testimonial-text {
@@ -1825,10 +1851,17 @@ section {
   text-decoration: none;
   transition: border-color 0.3s, background 0.3s, transform 0.3s;
 }
-.call-link:hover, .call-link:focus-visible {
+.call-link:focus-visible {
   border-color: rgba(216,180,254,0.6);
   background: rgba(168,85,247,0.14);
   transform: translateY(-2px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .call-link:hover {
+    border-color: rgba(216,180,254,0.6);
+    background: rgba(168,85,247,0.14);
+    transform: translateY(-2px);
+  }
 }
 .call-link svg { opacity: 0.75; flex: none; }
 
@@ -1885,10 +1918,11 @@ section {
   color: rgba(255,255,255,0.55);
 }
 
-.form-field input:hover,
-.form-field textarea:hover {
-  border-color: rgba(168,85,247,0.5);
-  box-shadow: 0 0 18px rgba(168,85,247,0.18);
+@media (hover: hover) and (pointer: fine) {
+  .form-field input:hover, .form-field textarea:hover {
+    border-color: rgba(168,85,247,0.5);
+    box-shadow: 0 0 18px rgba(168,85,247,0.18);
+  }
 }
 
 .form-field input:focus,
@@ -2045,9 +2079,11 @@ section {
   transform: none !important;
 }
 
-.btn-primary:disabled:hover {
-  transform: none;
-  box-shadow: none;
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
 
 /* ── PRIVACY MODAL ── */
@@ -2108,7 +2144,9 @@ section {
   transition: background 0.2s, color 0.2s;
 }
 
-.privacy-close:hover { background: rgba(168,85,247,0.3); color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .privacy-close:hover { background: rgba(168,85,247,0.3); color: #fff; }
+}
 
 .privacy-title {
   font-size: 24px;
@@ -2240,7 +2278,9 @@ section {
   text-underline-offset: 3px;
 }
 
-.wa-skip:hover { color: rgba(255,255,255,0.8); }
+@media (hover: hover) and (pointer: fine) {
+  .wa-skip:hover { color: rgba(255,255,255,0.8); }
+}
 
 /* ── FOOTER ── */
 footer {
@@ -2291,9 +2331,11 @@ footer {
   transition: color 0.25s, border-color 0.25s;
 }
 
-.footer-privacy-link:hover {
-  color: rgba(255,255,255,0.85);
-  border-color: rgba(168,85,247,0.7);
+@media (hover: hover) and (pointer: fine) {
+  .footer-privacy-link:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(168,85,247,0.7);
+  }
 }
 
 /* On a narrow screen a split row just wraps into a lopsided mess,
@@ -2323,11 +2365,13 @@ footer {
   transition: border-color 0.3s, background 0.3s, color 0.3s, transform 0.3s;
 }
 
-.footer-link:hover {
-  border-color: rgba(168,85,247,0.6);
-  background: rgba(168,85,247,0.14);
-  color: #fff;
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .footer-link:hover {
+    border-color: rgba(168,85,247,0.6);
+    background: rgba(168,85,247,0.14);
+    color: #fff;
+    transform: translateY(-2px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -2341,9 +2385,11 @@ footer {
   transition: filter 0.3s, transform 0.3s;
 }
 
-.footer-link:hover .ig-icon {
-  filter: drop-shadow(0 0 9px rgba(225,48,108,0.6));
-  transform: scale(1.08);
+@media (hover: hover) and (pointer: fine) {
+  .footer-link:hover .ig-icon {
+    filter: drop-shadow(0 0 9px rgba(225,48,108,0.6));
+    transform: scale(1.08);
+  }
 }
 
 /* Brand purple rather than a colourful gradient: the Instagram marks earn
@@ -2357,9 +2403,11 @@ footer {
   transition: filter 0.3s, transform 0.3s;
 }
 
-.footer-link-mail:hover .mail-icon {
-  filter: drop-shadow(0 0 9px rgba(168,85,247,0.65));
-  transform: scale(1.08);
+@media (hover: hover) and (pointer: fine) {
+  .footer-link-mail:hover .mail-icon {
+    filter: drop-shadow(0 0 9px rgba(168,85,247,0.65));
+    transform: scale(1.08);
+  }
 }
 
 .footer-disclaimer {
@@ -2642,10 +2690,12 @@ footer {
   line-height: 1.3;
 }
 
-.iphone-wa-btn:hover {
-  background: #20bc5a;
-  transform: scale(1.03);
-  box-shadow: 0 0 26px rgba(37,211,102,0.6), 0 0 52px rgba(37,211,102,0.25);
+@media (hover: hover) and (pointer: fine) {
+  .iphone-wa-btn:hover {
+    background: #20bc5a;
+    transform: scale(1.03);
+    box-shadow: 0 0 26px rgba(37,211,102,0.6), 0 0 52px rgba(37,211,102,0.25);
+  }
 }
 
 .iphone-wa-btn:active {
@@ -2696,9 +2746,11 @@ footer {
   z-index: 2;
   box-shadow: 0 4px 14px rgba(0,0,0,0.45);
 }
-.iphone-close:hover {
-  background: rgba(168,85,247,0.2);
-  color: white;
+@media (hover: hover) and (pointer: fine) {
+  .iphone-close:hover {
+    background: rgba(168,85,247,0.2);
+    color: white;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2776,7 +2828,9 @@ footer {
   transition: color 0.3s;
 }
 
-.faq-q:hover { color: var(--p6); }
+@media (hover: hover) and (pointer: fine) {
+  .faq-q:hover { color: var(--p6); }
+}
 
 .faq-q.open {
   color: var(--p6);
@@ -2848,9 +2902,11 @@ footer {
   box-shadow: 0 0 12px rgba(168,85,247,0.5);
 }
 
-.lang-btn:not(.active):hover {
-  color: var(--p6);
-  background: rgba(168,85,247,0.1);
+@media (hover: hover) and (pointer: fine) {
+  .lang-btn:not(.active):hover {
+    color: var(--p6);
+    background: rgba(168,85,247,0.1);
+  }
 }
 
 /* ── PHILOSOPHY PHOTOS ── */
@@ -2925,14 +2981,16 @@ footer {
   animation: floatC 5.5s ease-in-out infinite;
 }
 
-.phil-photo:hover {
-  transform: perspective(600px) rotateY(-6deg) rotate(0deg) scale(1.1) !important;
-  z-index: 10 !important;
-  box-shadow:
-    0 35px 90px rgba(0,0,0,0.85),
-    0 15px 35px rgba(0,0,0,0.65),
-    0 0 45px rgba(240,192,64,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.25);
+@media (hover: hover) and (pointer: fine) {
+  .phil-photo:hover {
+    transform: perspective(600px) rotateY(-6deg) rotate(0deg) scale(1.1) !important;
+    z-index: 10 !important;
+    box-shadow:
+      0 35px 90px rgba(0,0,0,0.85),
+      0 15px 35px rgba(0,0,0,0.65),
+      0 0 45px rgba(240,192,64,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+  }
 }
 
 @keyframes floatA {
@@ -3100,11 +3158,13 @@ footer {
               transform 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 
-.phil-card:hover {
-  box-shadow:
-    0 28px 60px -22px rgba(0,0,0,0.85),
-    0 0 34px -12px rgba(168,85,247,0.30),
-    inset 0 1px 0 rgba(255,255,255,0.10);
+@media (hover: hover) and (pointer: fine) {
+  .phil-card:hover {
+    box-shadow:
+      0 28px 60px -22px rgba(0,0,0,0.85),
+      0 0 34px -12px rgba(168,85,247,0.30),
+      inset 0 1px 0 rgba(255,255,255,0.10);
+  }
 }
 
 /* ‏העובי של הלוח, ועליו הברק. על אלמנט נפרד ולא על פסאודו,

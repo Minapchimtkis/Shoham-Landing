@@ -424,7 +424,9 @@ h1 .hl {
   transition: background .16s, color .16s;
   user-select: none;
 }
-.opt:hover { background: rgba(255,255,255,0.06); }
+@media (hover: hover) and (pointer: fine) {
+  .opt:hover { background: rgba(255,255,255,0.06); }
+}
 /* הסרגל בקצה הוא מה שאומר ״נבחר״. לא מסגרת סביב הכל. */
 .opt::after {
   content: ''; position: absolute;
@@ -481,7 +483,9 @@ h1 .hl {
   background: var(--p4);
   color: #fff;
 }
-.btn-primary:hover { background: #8b4df0; }
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: #8b4df0; }
+}
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
 .btn-ghost {
   background: transparent;
@@ -489,7 +493,9 @@ h1 .hl {
   color: var(--text-2);
   padding-inline: 20px;
 }
-.btn-ghost:hover { border-color: rgba(255,255,255,0.28); color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.28); color: #fff; }
+}
 .btn-wide { width: 100%; }
 
 .err {
@@ -776,7 +782,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   color: rgba(255,255,255,0.42);
 }
 .foot a { color: rgba(255,255,255,0.62); text-decoration: none; }
-.foot a:hover { color: var(--p6); }
+@media (hover: hover) and (pointer: fine) {
+  .foot a:hover { color: var(--p6); }
+}
 
 .sr {
   position: absolute; width: 1px; height: 1px;
@@ -839,8 +847,13 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   vertical-align: 1px; margin-inline-start: 5px;
   transition: background .15s, border-color .15s;
 }
-.tip-btn:hover, .tip-btn[aria-expanded="true"] {
+.tip-btn[aria-expanded="true"] {
   background: rgba(168,85,247,0.28); border-color: rgba(168,85,247,0.6); color: #fff;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tip-btn:hover {
+    background: rgba(168,85,247,0.28); border-color: rgba(168,85,247,0.6); color: #fff;
+  }
 }
 /* שטח המגע הוא 44px גם כשהעיגול קטן — בלי להזיז את הפריסה */
 .tip-btn::before {
@@ -876,7 +889,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   transition: color .15s;
 }
 .acc > summary::-webkit-details-marker { display: none; }
-.acc > summary:hover { color: var(--p6); }
+@media (hover: hover) and (pointer: fine) {
+  .acc > summary:hover { color: var(--p6); }
+}
 .acc > summary .chev {
   flex: 0 0 auto; color: var(--p6); font-size: 13px;
   transition: transform .22s cubic-bezier(.22,.9,.3,1);
@@ -939,7 +954,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   cursor: pointer;
   transition: color .3s;
 }
-.faq-q:hover { color: var(--p6); }
+@media (hover: hover) and (pointer: fine) {
+  .faq-q:hover { color: var(--p6); }
+}
 .faq-q.open { color: var(--p6); }
 
 .faq-icon {
