@@ -1869,7 +1869,11 @@ section {
   border-radius: 12px;
   padding: 16px 20px;
   font-family: 'Heebo', sans-serif;
-  font-size: 15px;
+  /* ‏שישה עשר ולא חמישה עשר. מתחת לסף הזה ספארי באייפון מזגזג את
+     העמוד פנימה ברגע שנוגעים בשדה, ולא חוזר אחורה כשעוזבים אותו.
+     הדרך הנפוצה לעקוף את זה היא לחסום זום בכלל, וזה כשל נגישות.
+     מתקנים את הסיבה. */
+  font-size: 16px;
   color: var(--white);
   outline: none;
   transition: border-color 0.35s, background 0.35s, box-shadow 0.35s;
