@@ -1091,6 +1091,15 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 .btn:active { transform: scale(.985); }
 .faq-q:active, .tip-btn:active { opacity: 0.72; transition-duration: 0.1s; }
 
+
+/* ‏יעדי נגיעה בתחתית. ריפוד מגדיל את אזור הנגיעה ושוליים שליליים
+   מחזירים את השורה בדיוק למקום שבו הייתה, כך שאף פיקסל לא זז. */
+.foot a {
+  display: inline-block;
+  padding: 11px 6px;
+  margin: -11px 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glow, .glow i { transform: none !important; animation: none !important; }
   .slide { transform: none !important; opacity: 1 !important; }

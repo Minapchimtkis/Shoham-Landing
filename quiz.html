@@ -522,6 +522,15 @@ h1 .accent {
 /* ‏בסוף הגיליון, כדי שסדר המקור ייתן ללחיצה לנצח את הריחוף. */
 .btn-primary:active, .btn-wa:active { transform: scale(0.97); transition-duration: 0.1s; }
 
+
+/* ‏יעדי נגיעה בתחתית. ריפוד מגדיל את אזור הנגיעה ושוליים שליליים
+   מחזירים את השורה בדיוק למקום שבו הייתה, כך שאף פיקסל לא זז. */
+.foot a {
+  display: inline-block;
+  padding: 11px 6px;
+  margin: -11px 0;
+}
+
 </style>
 </head>
 <body>
