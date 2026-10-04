@@ -46,7 +46,20 @@
 
 /* A gradient is an image, not a colour — without a solid floor under it iOS
    can leave the end of a long page white. */
-html { background: var(--p1); }
+html {
+  background: var(--p1);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+button, [role="button"], .btn, .btn-primary, .btn-wa, .opt {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+a, input, textarea, label, summary { touch-action: manipulation; }
+
 
 body {
   font-family: 'Heebo', sans-serif;
@@ -505,6 +518,10 @@ h1 .accent {
   .opt { font-size: 15px; padding: 16px 17px; }
   .result-card { padding: 26px 20px; }
 }
+
+/* ‏בסוף הגיליון, כדי שסדר המקור ייתן ללחיצה לנצח את הריחוף. */
+.btn-primary:active, .btn-wa:active { transform: scale(0.97); transition-duration: 0.1s; }
+
 </style>
 </head>
 <body>

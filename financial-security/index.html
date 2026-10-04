@@ -183,7 +183,20 @@
 
 /* גרדיאנט הוא תמונה, לא צבע. בלי רצפה מוצקה מתחתיו iOS משאיר
    לפעמים את סוף הדף לבן. */
-html { background: var(--p1); -webkit-text-size-adjust: 100%; }
+html {
+  background: var(--p1);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, [role="button"], .btn, .faq-q, .tip-btn, .opt {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+a, input, textarea, label, summary { touch-action: manipulation; }
+
 
 body {
   font-family: 'Heebo', system-ui, sans-serif;
@@ -477,7 +490,6 @@ h1 .hl {
   min-height: 52px;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn:active { transform: scale(.985); }
 .btn-primary {
   flex: 1;
   background: var(--p4);
@@ -1074,6 +1086,10 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 /* בלי will-change: חמישה-עשר אלמנטים עם רמז כזה יוצרים חמש-עשרה
    שכבות קומפוזיציה, וזה מכביד יותר ממה שהוא חוסך. */
 .slide { }
+
+/* ‏משוב לחיצה, בסוף הגיליון כדי שינצח את הריחוף בסדר המקור. */
+.btn:active { transform: scale(.985); }
+.faq-q:active, .tip-btn:active { opacity: 0.72; transition-duration: 0.1s; }
 
 @media (prefers-reduced-motion: reduce) {
   .glow, .glow i { transform: none !important; animation: none !important; }

@@ -342,7 +342,39 @@ html {
   overflow-x: hidden;
   max-width: 100vw;
   background: var(--p1);
+  /* ‏הדפדפן צובע ריבוע כחול שקוף על כל דבר שנוגעים בו. זה הסימן
+     הכי רועש לכך שמדובר באתר ולא באפליקציה, והוא גם נלחם במשוב
+     הלחיצה שמוגדר למטה. */
+  -webkit-tap-highlight-color: transparent;
+  /* ‏בלי זה אייפון מנפח פונטים מעצמו כשמסובבים לרוחב. */
+  -webkit-text-size-adjust: 100%;
 }
+
+/* ‏פקדים, ורק פקדים.
+
+   touch-action: הדפדפן ממתין אחרי נגיעה כדי לראות אם מגיעה שנייה,
+   כי נגיעה כפולה מקרבת. ההצהרה הזאת אומרת לו שכאן זה לא קורה,
+   והנגיעה נרשמת מיד.
+
+   user-select: לחיצה ארוכה על כפתור בוחרת את הטקסט שלו ומקפיצה
+   תפריט העתקה. על פקד זה פגם, על טקסט רץ זה הכרח, ולכן הרשימה
+   כאן מונה פקדים בשמם ולא נוגעת ב-body ולא בקישורים שבתוך פסקה. */
+button,
+[role="button"],
+.btn-primary,
+.lang-btn,
+.faq-q,
+.iphone-close,
+.privacy-close,
+.iphone-wa-btn {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+a, input, textarea, label, summary { touch-action: manipulation; }
+
+
 
 body {
   font-family: 'Heebo', sans-serif;
@@ -779,7 +811,7 @@ section {
   padding: 5px 12px;
   border-radius: 100px;
   cursor: pointer;
-  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 
 .lang-btn.active {
@@ -3317,6 +3349,25 @@ footer {
   .phil-card .phil-num { transform: none !important; }
   .surf::after { transition: none; }
 }
+
+
+/* ‏משוב הלחיצה יושב בסוף הגיליון בכוונה.
+
+   ‏ל-:hover ול-:active אותה דרגת ייחוד, ולכן סדר המקור הוא שמכריע.
+   כשהגוש הזה היה למעלה, לחיצה בעכבר הראתה את מצב הריחוף במקום את
+   מצב הלחיצה. בטלפון זה לא היה משנה, כי שם אין ריחוף בכלל, אבל
+   בדסקטופ זה היה מבטל את המשוב. */
+.btn-primary:active,
+.lang-btn:active,
+.privacy-close:active,
+.iphone-close:active {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+
+/* ‏האקורדיונים לא מקבלים שינוי גודל: הם ברוחב מלא, וההיפתחות של
+   התשובה היא המשוב, והיא מיידית. */
+.faq-q:active { opacity: 0.72; transition-duration: 0.1s; }
 
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
