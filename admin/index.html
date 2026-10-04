@@ -300,12 +300,13 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 </head>
 <body>
 
+<main>
 <section id="loginView" class="login-wrap">
   <div class="login-card">
     <div class="brand-mark">ש</div><h1>ניהול לידים</h1><p class="sub">כניסה מאובטחת למערכת הניהול.</p>
     <form id="loginForm">
-      <div class="field"><label>אימייל</label><input id="loginEmail" class="input" type="email" autocomplete="username" required></div>
-      <div class="field"><label>סיסמה</label><input id="loginPassword" class="input" type="password" autocomplete="current-password" required></div>
+      <div class="field"><label for="loginEmail">אימייל</label><input id="loginEmail" class="input" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="loginPassword">סיסמה</label><input id="loginPassword" class="input" type="password" autocomplete="current-password" required></div>
       <div id="loginError" class="error hidden"></div>
       <button id="loginBtn" class="btn btn-primary btn-block">כניסה למערכת</button>
     </form>
@@ -507,6 +508,7 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 
 </div>
 </section>
+</main>
 
 <div id="deleteConfirmBackdrop" class="confirm-backdrop hidden">
   <div class="confirm-dialog"><div class="confirm-icon">!</div><h2>למחוק?</h2><p id="deleteConfirmText">הפעולה בלתי הפיכה.</p><div class="confirm-actions"><button id="cancelDeleteBtn" class="btn">ביטול</button><button id="confirmDeleteBtn" class="btn btn-danger">כן, למחוק</button></div></div>
