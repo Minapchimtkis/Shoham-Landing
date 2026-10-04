@@ -2508,7 +2508,15 @@ footer {
 .iphone-wrap.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
-  pointer-events: all;
+  /* ‏רשת ביטחון שנייה. גם אם הווידג׳ט ייפרש פעם מעל תוכן, רק שני
+     הפקדים שבתוכו לוכדים נגיעה, והשאר, כלומר שלד הטלפון, התמונה
+     והברכה, שקוף למגע ומעביר אותה למה שמתחת. */
+  pointer-events: none;
+}
+
+.iphone-wrap.visible .iphone-wa-btn,
+.iphone-wrap.visible .iphone-close {
+  pointer-events: auto;
 }
 
 /* phone shell */
@@ -4943,8 +4951,23 @@ function setQuizPhone(phone) {
     const reached = from.getBoundingClientRect().top < window.innerHeight * 0.6;
     const arrived = upTo.getBoundingClientRect().top < window.innerHeight * 0.55;
     if (reached && !arrived) {
-      if (!shown) { shown = true; setTimeout(() => {
-        if (widget.isConnected) widget.classList.add('visible'); }, 600); }
+      if (!shown) {
+        shown = true;
+        // ‏ההשהיה הזאת הייתה מוסיפה את המחלקה בלי לשאול שוב, ושש
+        // עשיריות השנייה האלה הספיקו כדי שהתנאי כבר לא יתקיים.
+        //
+        // ‏מי שלוחץ על כפתור ההירו קופץ ישר אל הטופס: בדרך הוא חולף
+        // על פני הקטע שמדליק את הווידג׳ט, מה שמתניע את הטיימר, ומגיע
+        // ליעד בתוך פחות משש עשיריות. הבדיקה שרצה בסוף הגלילה כן
+        // הסתירה אותו כמו שצריך, ואז הטיימר הישן התעורר והחזיר אותו,
+        // פרוש על שדות הטופס, עם תיבת האישור מתחתיו.
+        setTimeout(function () {
+          if (!widget.isConnected) return;
+          var stillBefore = from.getBoundingClientRect().top < window.innerHeight * 0.6;
+          var notYetThere = upTo.getBoundingClientRect().top >= window.innerHeight * 0.55;
+          if (stillBefore && notYetThere) widget.classList.add('visible');
+        }, 600);
+      }
       else widget.classList.add('visible');
     } else {
       widget.classList.remove('visible');
@@ -4953,6 +4976,7 @@ function setQuizPhone(phone) {
 
   window.addEventListener('scroll', checkScroll, { passive: true });
   window.addEventListener('resize', checkScroll, { passive: true });
+
   checkScroll();
 })();
 
