@@ -672,6 +672,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .set-row,.set-row:hover{color:var(--ink);text-decoration:none}
 /* ‏חוץ מאחת, במכוון. */
 .set-row.lead .k{color:var(--violet);font-weight:600}
+/* ‏הסמל של וואטסאפ בירוק שלו, וזאת החריגה היחידה מהסגול באפליקציה.
+   הוא מזוהה בצורה הזאת, וצביעה שלו בסגול רק תאט את הזיהוי. */
+.set-row svg.wa{width:21px;height:21px;color:#25D366}
 .set-row .k{flex:1;min-width:0}
 .set-row .k small{display:block;font-size:13px;color:var(--ink-3);font-weight:400}
 .set-row .v{flex:none;color:var(--ink-3);font-size:15px;

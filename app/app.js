@@ -2449,6 +2449,26 @@ const IMP = mountImport({
   reload: async () => { try { await loadAll(); } catch (err) { toast(human(err)); } }
 });
 
+/* ‏קליק וואטסאפ נספר, כדי שהמקור החדש הזה לא ייעלם לו מהמדידה
+   שכבר יש לו. הרשומה היא חותמת זמן והמילה app, בלי שום פרט מזהה.
+
+   ‏fetch גולמי ולא דרך הלקוח, כי keepalive הוא מה שמאפשר לבקשה
+   להסתיים אחרי שהדפדפן כבר עזב לוואטסאפ. והיא לעולם לא מעכבת
+   את המעבר: הקישור ממשיך כרגיל גם אם היא נכשלת. */
+$('setWa').addEventListener('click', () => {
+  try {
+    fetch(SUPABASE_URL + '/rest/v1/rpc/wa_click', {
+      method: 'POST', keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+      },
+      body: JSON.stringify({ p_page: 'app' })
+    }).catch(() => {});
+  } catch {}
+});
+
 $('setImport').addEventListener('click', () => tab('import'));
 $('setDocs').addEventListener('click', () => tab('docs'));
 $('setSum').addEventListener('click', () => tab('sum'));
