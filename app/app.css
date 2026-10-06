@@ -124,7 +124,6 @@ input:not([type=checkbox]):not([type=radio]),textarea{
 }
 
 a{color:var(--violet);text-decoration:none}
-a:hover{text-decoration:underline}
 /* ‏קישור בתוך שורת טקסט חייב להיות מזוהה גם למי שאינו רואה
    את ההבדל בצבע. */
 p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
@@ -685,6 +684,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 /* ‏ריחוף קיים רק למי שיש לו עכבר. בטלפון, חוק הריחוף נדבק
      אחרי נגיעה והכפתור נשאר דלוק עד שנוגעים במקום אחר. */
 @media (hover:hover) and (pointer:fine){
+  a:hover{text-decoration:underline}
   .btn:hover{background:#6d28d9}
   .btn-ghost:hover,.btn-quiet:hover{background:var(--wash)}
   .btn-danger:hover{background:var(--amber-soft)}
@@ -916,7 +916,6 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 @media (hover:hover) and (pointer:fine){
   .cta:hover,.goal:hover{background:var(--wash-2)}
-  .cta:hover{background:var(--wash-2)}
 }
 .cta:active,.goal:active{background:var(--wash-2)}
 
