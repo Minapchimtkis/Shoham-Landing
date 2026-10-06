@@ -197,7 +197,13 @@
 
   <!-- ─────────────────────────────────────── תנועות ── -->
   <main class="screen hidden" id="scTx">
-    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">מה קרה החודש</h1>
+    <h1 class="pg-title">מה קרה החודש</h1>
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.8 15.8L20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="txSearch" type="search" autocomplete="off" enterkeyhint="search"
+             placeholder="חיפוש לפי תיאור או סכום" aria-label="חיפוש בתנועות">
+    </div>
+    <div class="chips" id="txFilters" style="margin:12px 0 4px"></div>
     <div id="txList"></div>
   </main>
 
@@ -237,6 +243,24 @@
       <button class="set-row" id="setNameBtn" type="button">
         <span class="k">השם שלי</span>
         <span class="v" id="setName"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
+      <h2>התמונה</h2>
+      <button class="set-row" id="setSum" type="button">
+        <span class="k">
+          סיכום החודש
+          <small>לאן הכסף הלך, ומה השתנה מהחודש שעבר</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setGoals" type="button">
+        <span class="k">
+          מטרות חיסכון
+          <small>כמה צריך, עד מתי, וכמה כבר יש</small>
+        </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -307,6 +331,16 @@
     </p>
   </main>
 
+  <!-- ─────────────────────────────────────── סיכום ── -->
+  <main class="screen hidden" id="scSum">
+    <button class="back" id="sumBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title" id="sumTitle">הסיכום</h1>
+    <div id="sumBody"></div>
+  </main>
+
   <!-- ─────────────────────────────────────── ייבוא ── -->
   <main class="screen hidden" id="scImport">
     <button class="back" id="importBack" type="button">
@@ -371,6 +405,21 @@
         <button class="btn" id="impGo" type="button">ייבוא</button>
       </div>
     </div>
+  </main>
+
+  <!-- ──────────────────────────────────────── מטרות ── -->
+  <main class="screen hidden" id="scGoals">
+    <button class="back" id="goalsBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">מטרות חיסכון</h1>
+    <p class="note" style="margin-bottom:18px">
+      סכום, תאריך, וכמה כבר יש. בלי תחזיות ובלי ריביות, כי את אלה
+      אי אפשר להבטיח.
+    </p>
+    <button class="btn" id="goalAdd" type="button">מטרה חדשה</button>
+    <div id="goalsList" style="margin-top:22px"></div>
   </main>
 
   <!-- ────────────────────────────────────── מסמכים ── -->
@@ -597,6 +646,37 @@
      לאפס אינו אזור חי טוב, והוא גם נמדד באמצע הדהייה ככיתוב
      לבן על רקע בהיר. החזותי מוסתר מעץ הנגישות, והטקסט נאמר
      מכאן. -->
+<!-- מטרה -->
+<div class="sheet hidden" id="goalSheet" role="dialog" aria-modal="true" aria-labelledby="goalTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="goalTitle">מטרה חדשה</h2>
+  <p class="sub">דבר אחד שאתם חוסכים בשבילו. אחד, לא שבעה.</p>
+  <div class="field">
+    <label for="goalName">בשביל מה</label>
+    <input class="inp" id="goalName" type="text" maxlength="60" autocomplete="off" placeholder="קרן חירום">
+  </div>
+  <div class="field">
+    <label for="goalTarget">כמה צריך</label>
+    <input class="inp" id="goalTarget" type="text" inputmode="decimal" autocomplete="off" placeholder="30000">
+  </div>
+  <div class="field">
+    <label for="goalSaved">כמה כבר יש</label>
+    <input class="inp" id="goalSaved" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+  </div>
+  <div class="field">
+    <label for="goalDate">עד מתי, אם יש תאריך</label>
+    <input class="inp" id="goalDate" type="date">
+  </div>
+  <p class="err hidden" id="goalErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="goalCancel" type="button">ביטול</button>
+    <button class="btn" id="goalSave" type="button">שמירה</button>
+  </div>
+  <div class="sheet-row hidden" id="goalDelRow">
+    <button class="btn btn-danger" id="goalDelete" type="button">מחיקת המטרה</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" aria-hidden="true"></div>
 <p class="sr-only" id="say" role="status" aria-live="polite"></p>
 

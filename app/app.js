@@ -158,6 +158,8 @@ const S = {
   reflections: [],
   tab: 'home',
   filterCat: null,
+  txFilter: 'all',
+  hist: null,
   mode: 'signup',
   asked: false,             // לא שואלים יותר מפעם אחת בביקור
   lastLeft: null
@@ -253,12 +255,12 @@ function stage(name) {
 /* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
-const SUB = { import: 'set', docs: 'set' };
+const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
-                import: 'scImport', docs: 'scDocs' };
+                import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -273,6 +275,8 @@ function tab(name) {
   if (name === 'set') renderSet();
   if (name === 'import') IMP.openImport();
   if (name === 'docs') IMP.openDocs();
+  if (name === 'sum') renderSum();
+  if (name === 'goals') renderGoals();
   window.scrollTo({ top: 0 });
 }
 
@@ -617,6 +621,7 @@ function renderRows(current, dim, now) {
     return;
   }
 
+  const frag = document.createDocumentFragment();
   for (const { c, p, s } of rows) {
     const over = p > 0 && s > p;
     const row = el('button', 'row');
@@ -652,8 +657,9 @@ function renderRows(current, dim, now) {
 
     row.append(top, bar);
     row.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
-    box.append(row);
+    frag.append(row);
   }
+  box.append(frag);
 }
 
 /* ═══════════════════════════════════ ארבעת המנגנונים ══ */
@@ -825,6 +831,30 @@ async function renderInsight() {
     }
   }
 
+  /* ‏אזהרה לפני החריגה ולא אחריה, ופעם אחת לכל קטגוריה בחודש.
+     התנאי אינו "עברת שמונים אחוז" אלא "הקצב שלך מקדים את
+     החודש": שמונים אחוז בעשרים ושמונה בחודש הוא בסדר גמור,
+     ושמונים אחוז בעשירי הוא מה ששווה לדעת עליו עכשיו. */
+  if (current) {
+    const pace = now.getDate() / daysInMonth(S.month);
+    for (const c of outCats()) {
+      const p = planned(c.id), used = spentIn(c.id);
+      if (p <= 0 || used <= 0 || used > p) continue;
+      const share = used / p;
+      const seen = LS.get('warn.' + monthKey(S.month), {});
+      if (seen[c.id]) continue;
+      if (share >= 0.75 && share - pace >= 0.25) {
+        seen[c.id] = 1;
+        LS.set('warn.' + monthKey(S.month), seen);
+        const leftCat = p - used;
+        card(`${c.label}: נשארו ${fmt(leftCat)} ל־${daysInMonth(S.month) - now.getDate()} ימים`,
+          `השתמשתם ב־${Math.round(share * 100)}% מהתכנון, והחודש רק ב־${Math.round(pace * 100)}%. זאת לא נזיפה, זה הזמן שבו עוד אפשר להחליט.`,
+          [['לתנועות', () => { S.filterCat = c.id; tab('tx'); }]]);
+        return;
+      }
+    }
+  }
+
   /* ‏השד השלישי: אנחנו חוזרים על הדפוסים. הכלל הזה מחפש דפוס
      אמיתי בין שני חודשים ואומר אותו בשמו. */
   if (S.txs.length >= 4) {
@@ -847,6 +877,30 @@ async function renderInsight() {
         card(`${worst.c.label} עלה ב־${worst.pct}% מול ${monthName(addMonths(S.month, -1))}`,
           `זה ${fmt(worst.delta)} יותר. פעם אחת זה מקריות, פעמיים זה דפוס. שווה להסתכל על התנועות ולראות מה השתנה.`,
           [['לתנועות', () => { S.filterCat = worst.c.id; tab('tx'); }]]);
+        return;
+      }
+    }
+  }
+
+  /* ‏הוצאה חריגה ביחס להרגל, ולא ביחס לסכום קבוע. 400 שקל הם
+     חריגה אצל אחד ושגרה אצל אחר, ולכן ההשוואה היא לחציון של
+     ההוצאות שלו עצמו. חציון ולא ממוצע, כי ממוצע נגרר דווקא
+     אחרי החריגה שמחפשים. */
+  if (S.txs.length >= 5) {
+    const prevRows = await loadPrev();
+    const pool = [...S.txs, ...prevRows]
+      .filter(t => t.direction === 'out' && !t.is_transfer)
+      .map(t => t.amount_agorot).sort((a, b) => a - b);
+    if (pool.length >= 6) {
+      const med = pool[Math.floor(pool.length / 2)];
+      const big = S.txs
+        .filter(t => t.direction === 'out' && !t.is_transfer)
+        .sort((a, b) => b.amount_agorot - a.amount_agorot)[0];
+      if (big && med > 0 && big.amount_agorot >= med * 4 && big.amount_agorot >= 25000) {
+        const c = byId(big.category_id);
+        card(`${fmt(big.amount_agorot)} ב${c ? c.label : 'תנועה אחת'}, פי ${Math.round(big.amount_agorot / med)} מהרגיל אצלכם`,
+          `${big.description || 'התנועה הזאת'} גדולה בהרבה מכל השאר החודש. אם היא מתוכננת, הכול בסדר. אם לא, זה הדבר שכדאי להסתכל עליו לפני כל השאר.`,
+          [['לתנועות', () => { S.filterCat = big.category_id; tab('tx'); }]]);
         return;
       }
     }
@@ -902,27 +956,65 @@ function dayBeforeEnd() { return daysInMonth(S.month) - 2; }
 
 /* ═══════════════════════════════════════════ תנועות ══ */
 
+/* ‏חיפוש על מה שכבר בזיכרון. חודש של תנועות הוא מאות שורות,
+   ולכן אין שום סיבה לנסוע לשרת בשביל כל אות. */
+function matches(t, q) {
+  if (!q) return true;
+  const c = byId(t.category_id);
+  const hay = [t.description || '', c ? c.label : '', t.is_transfer ? 'העברה' : '']
+    .join(' ').toLowerCase();
+  if (hay.includes(q)) return true;
+  // ‏מספר בשאילתה מחפש בסכום, כי "כמה זה היה" הוא איך שזוכרים
+  if (/^[\d.,]+$/.test(q)) return fmtNum(t.amount_agorot).replace(/,/g, '').includes(q.replace(/,/g, ''));
+  return false;
+}
+
+const TX_FILTERS = [
+  { key: 'all',  label: 'הכל',    test: () => true },
+  { key: 'out',  label: 'הוצאות', test: t => t.direction === 'out' && !t.is_transfer },
+  { key: 'in',   label: 'הכנסות', test: t => t.direction === 'in' && !t.is_transfer },
+  { key: 'move', label: 'העברות', test: t => !!t.is_transfer }
+];
+
 function renderTx() {
   const box = $('txList');
   box.textContent = '';
 
-  let rows = S.txs;
+  const q = ($('txSearch').value || '').trim().toLowerCase();
+  const f = TX_FILTERS.find(x => x.key === S.txFilter) || TX_FILTERS[0];
+
+  const chips = $('txFilters');
+  chips.textContent = '';
+  for (const o of TX_FILTERS) {
+    const n = S.txs.filter(o.test).length;
+    if (o.key !== 'all' && !n) continue;
+    const b = el('button', 'chip chip-quiet', o.label);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(o.key === f.key));
+    b.addEventListener('click', () => { S.txFilter = o.key; renderTx(); });
+    chips.append(b);
+  }
+
+  let rows = S.txs.filter(t => f.test(t) && matches(t, q));
   if (S.filterCat) {
     const c = byId(S.filterCat);
     rows = rows.filter(t => t.category_id === S.filterCat);
-    const chips = el('div', 'chips');
-    chips.style.marginBottom = '6px';
     const b = el('button', 'chip', `${c ? c.label : 'קטגוריה'} ✕`);
     b.type = 'button';
     b.setAttribute('aria-pressed', 'true');
     b.setAttribute('aria-label', `מסונן לפי ${c ? c.label : 'קטגוריה'}. לחיצה מבטלת את הסינון`);
     b.addEventListener('click', () => { S.filterCat = null; renderTx(); });
     chips.append(b);
-    box.append(chips);
   }
 
   if (!rows.length) {
     const e = el('div', 'empty');
+    if (q) {
+      e.append(el('h2', null, 'לא נמצא כלום'));
+      e.append(el('p', null, `אין תנועה שמתאימה ל"${q}" בחודש הזה. אפשר לנסות חודש אחר מלמעלה.`));
+      box.append(e);
+      return;
+    }
     e.append(el('h2', null, S.filterCat ? 'אין תנועות בקטגוריה הזאת' : 'החודש הזה עוד ריק'));
     e.append(el('p', null, S.filterCat
       ? 'אף תנועה לא נרשמה כאן בחודש הזה.'
@@ -941,11 +1033,17 @@ function renderTx() {
       e.append(wrap);
     }
     box.append(e);
+    /* ‏דוגמה, לא הסבר. ברגע הזה אדם לא יודע איך נראית תנועה
+       אצלו, ומסך שאומר "אין כאן כלום" לא מלמד אותו. */
+    if (!S.filterCat) box.append(exampleTx());
     return;
   }
 
   /* ‏מקובצות לפי יום. אדם זוכר "ביום חמישי" ולא "ב-14 בחודש",
      ולכן הכותרת היא שם היום. */
+  /* ‏נבנה בשבר מסמך ומוכנס פעם אחת. שלוש מאות הכנסות נפרדות
+     לתוך המסמך החי מבטלות את הפריסה שלוש מאות פעמים. */
+  const frag = document.createDocumentFragment();
   let day = null;
   for (const t of rows) {
     if (t.occurred_on !== day) {
@@ -953,7 +1051,7 @@ function renderTx() {
       const sum = rows.filter(r => r.occurred_on === day && r.direction === 'out' && !r.is_transfer)
                       .reduce((s, r) => s + r.amount_agorot, 0);
       const h = el('h2', 'sec-h', dayName(day) + (sum ? ' · ' + fmt(sum) : ''));
-      box.append(h);
+      frag.append(h);
     }
     const c = byId(t.category_id);
     const row = el('button', 'tx');
@@ -979,8 +1077,9 @@ function renderTx() {
       `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}`);
     row.append(ic, mid, amt);
     row.addEventListener('click', () => openTx(t));
-    box.append(row);
+    frag.append(row);
   }
+  box.append(frag);
 }
 
 let txCtx = null;
@@ -1322,6 +1421,320 @@ $('monthBtn').addEventListener('click', () => {
 });
 $('monthClose').addEventListener('click', closeSheet);
 
+/* ═══════════════════════════════════ דוגמה למצב ריק ══ */
+
+/* ‏שלוש שורות שנראות כמו תנועות אמיתיות, מעומעמות ובלי מגע.
+   הן עונות על השאלה שהמסך הריק משאיר פתוחה: איך זה ייראה. */
+function exampleTx() {
+  const box = el('div', 'eg');
+  box.append(el('h3', null, 'ככה זה ייראה'));
+  const demo = [
+    ['🛒', 'שופרסל', 'מזון', 24900],
+    ['☕', 'קפה עם מיכל', 'בילויים', 1800],
+    ['🚗', 'דלק', 'תחבורה', 25000]
+  ];
+  for (const [icon, desc, cat, ag] of demo) {
+    const row = el('div', 'tx');
+    const ic = el('span', 'tx-ico', icon); ic.setAttribute('aria-hidden', 'true');
+    const mid = el('div', 'tx-mid');
+    mid.append(el('div', 't', desc), el('div', 's', cat));
+    const amt = el('span', 'tx-amt money');
+    setMoney(amt, ag);
+    row.append(ic, mid, amt);
+    box.append(row);
+  }
+  box.setAttribute('aria-hidden', 'true');
+  return box;
+}
+
+/* ═══════════════════════════════════════ היסטוריה ══ */
+
+/* ‏ארבעה חודשים אחורה, פעם אחת, לשימוש הסיכום וזיהוי המנויים.
+   נטען רק כשנכנסים למסך שצריך אותו. */
+async function loadHistory(months) {
+  const n = months || 4;
+  if (S.hist && S.hist.n >= n && S.hist.anchor === monthKey(S.month)) return S.hist.rows;
+  const from = monthKey(addMonths(S.month, -(n - 1)));
+  const to = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  const { data, error } = await sb.from('transactions')
+    .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
+    .gte('occurred_on', from).lte('occurred_on', to);
+  const rows = error ? [] : (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
+  S.hist = { n, anchor: monthKey(S.month), rows };
+  return rows;
+}
+
+/* ═════════════════════════════════ מה חוזר כל חודש ══ */
+
+/* ‏"לאן הכסף נעלם" הוא כמעט תמיד הדברים שחוזרים. הם קטנים, הם
+   לא מורגשים, ואף אחד לא סוכם אותם.
+
+   ‏הזיהוי הוא לפי התיאור בלי המספרים שבו, כי פירוט אשראי מוסיף
+   לכל שורה אסמכתא משתנה, ולפי סכום דומה בחודשים שונים. פעמיים
+   באותו חודש אינן מנוי, הן שתי קניות. */
+function normDesc(d) {
+  return String(d || '')
+    .replace(/[‎‏]/g, '')
+    .replace(/\d+/g, ' ')
+    .replace(/[^֐-׿a-zA-Z ]/g, ' ')
+    .replace(/\s+/g, ' ').trim().toLowerCase()
+    .split(' ').slice(0, 3).join(' ');
+}
+
+function recurring(rows) {
+  const g = new Map();
+  for (const t of rows) {
+    if (t.direction !== 'out' || t.is_transfer) continue;
+    const k = normDesc(t.description);
+    if (k.length < 3) continue;
+    if (!g.has(k)) g.set(k, []);
+    g.get(k).push(t);
+  }
+  const out = [];
+  for (const [k, list] of g) {
+    const months = new Set(list.map(t => t.occurred_on.slice(0, 7)));
+    if (months.size < 2) continue;
+    const amounts = list.map(t => t.amount_agorot).sort((a, b) => a - b);
+    const mid = amounts[Math.floor(amounts.length / 2)];
+    // ‏סכום שמשתנה בחצי אינו מנוי, הוא מקום שקונים בו הרבה
+    const steady = amounts.every(a => Math.abs(a - mid) <= mid * 0.2);
+    if (!steady) continue;
+    out.push({ key: k, label: list[list.length - 1].description || k,
+               amount: mid, months: months.size, total: list.reduce((s, t) => s + t.amount_agorot, 0) });
+  }
+  return out.sort((a, b) => b.amount - a.amount);
+}
+
+/* ═══════════════════════════════════ סיכום החודש ══ */
+
+async function renderSum() {
+  const box = $('sumBody');
+  box.textContent = '';
+  $('sumTitle').textContent = 'הסיכום של ' + monthName(S.month);
+
+  const spent = spentAll(), got = gotAll(), plan = plannedOut(), moved = movedAll();
+
+  if (!S.txs.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'אין מה לסכם עדיין'));
+    e.append(el('p', null, 'בחודש הזה לא נרשמה אף תנועה. אחרי כמה רישומים יהיה כאן מה לראות.'));
+    box.append(e);
+    return;
+  }
+
+  /* ── המספר, ומה הוא אומר ── */
+  const head = el('div', 'sum-block');
+  const big = el('div', 'sum-big');
+  const v = el('span', 'v money'); setMoney(v, spent);
+  big.append(v, el('span', 'k', plan ? 'יצאו מתוך ' + fmt(plan) : 'יצאו החודש'));
+  head.append(big);
+  if (got) head.append(el('p', 'note', `נכנסו ${fmt(got)}, ונשארו ${fmt(got - spent)}.`));
+  if (moved) head.append(el('p', 'note', `ועוד ${fmt(moved)} בהעברות, שאינן הוצאה.`));
+  box.append(head);
+
+  /* ── לאן הכסף הלך ── */
+  const rows = outCats()
+    .map(c => ({ c, s: spentIn(c.id) }))
+    .filter(r => r.s > 0)
+    .sort((a, b) => b.s - a.s);
+
+  if (rows.length) {
+    const blk = el('div', 'sum-block');
+    blk.append(el('h2', null, 'לאן הכסף הלך'));
+    const max = rows[0].s;
+    for (const { c, s: amt } of rows) {
+      const row = el('div', 'sum-row');
+      row.append(el('span', 'nm', (c.icon || '•') + ' ' + c.label));
+      const track = el('div', 'track'); track.setAttribute('aria-hidden', 'true');
+      const fill = el('i');
+      fill.style.width = Math.max(3, Math.round(amt / max * 100)) + '%';
+      track.append(fill);
+      const vv = el('span', 'vv money'); setMoney(vv, amt);
+      const wrap = el('span');
+      wrap.append(vv, el('span', 'pct', Math.round(amt / spent * 100) + '%'));
+      row.append(track, wrap);
+      row.setAttribute('aria-label', `${c.label}, ${fmt(amt)}, ${Math.round(amt / spent * 100)} אחוז מההוצאות`);
+      blk.append(row);
+    }
+    box.append(blk);
+  }
+
+  /* ── מה השתנה מול החודש שעבר ── */
+  const prev = await loadPrev();
+  if (prev.length) {
+    const deltas = outCats().map(c => {
+      const now = spentIn(c.id);
+      const was = prev.reduce((s, t) =>
+        s + (!t.is_transfer && t.direction === 'out' && t.category_id === c.id ? t.amount_agorot : 0), 0);
+      return { c, now, was, d: now - was };
+    }).filter(x => Math.abs(x.d) >= 5000 && (x.now || x.was))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 5);
+
+    if (deltas.length) {
+      const blk = el('div', 'sum-block');
+      blk.append(el('h2', null, 'מה השתנה מול ' + monthName(addMonths(S.month, -1))));
+      for (const x of deltas) {
+        const row = el('div', 'sum-row');
+        row.append(el('span', 'nm', (x.c.icon || '•') + ' ' + x.c.label));
+        row.append(el('span'));
+        const d = el('span', 'delta ' + (x.d > 0 ? 'up' : 'down'),
+                     (x.d > 0 ? '+' : '−') + fmt(Math.abs(x.d)).replace('₪', '₪'));
+        row.append(d);
+        row.setAttribute('aria-label',
+          `${x.c.label}, ${x.d > 0 ? 'עלה ב' : 'ירד ב'}${fmt(Math.abs(x.d))} מול החודש הקודם`);
+        blk.append(row);
+      }
+      box.append(blk);
+    }
+  }
+
+  /* ── מה חוזר כל חודש ── */
+  const hist = await loadHistory(4);
+  const rec = recurring(hist).slice(0, 8);
+  if (rec.length) {
+    const blk = el('div', 'sum-block');
+    blk.append(el('h2', null, 'חוזר כל חודש'));
+    const sum = rec.reduce((s, r) => s + r.amount, 0);
+    blk.append(el('p', 'note',
+      `${rec.length} ${rec.length === 1 ? 'דבר חוזר' : 'דברים חוזרים'}, יחד ${fmt(sum)} בחודש. זה ${fmt(sum * 12)} בשנה.`));
+    for (const r of rec) {
+      const row = el('div', 'sum-row');
+      row.append(el('span', 'nm', r.label.slice(0, 26)));
+      row.append(el('span'));
+      const vv = el('span', 'vv money'); setMoney(vv, r.amount);
+      const wrap = el('span');
+      wrap.append(vv, el('span', 'pct', `${r.months} חודשים`));
+      row.append(wrap);
+      blk.append(row);
+    }
+    box.append(blk);
+  }
+
+  /* ── ההזמנה. בסוף, ואחרי שהמסך כבר נתן משהו ── */
+  const cta = el('a', 'cta');
+  cta.href = '../#contact';
+  cta.target = '_blank';
+  cta.rel = 'noopener';
+  cta.append(el('strong', null, 'רוצים להבין את התמונה לעומק?'));
+  const sp = el('span');
+  sp.append(document.createTextNode('המספרים כאן אומרים מה קרה. למה זה קורה, ומה לעשות עם זה, זאת כבר שיחה. '));
+  sp.append(el('span', 'go', 'לדבר עם שוהם'));
+  cta.append(sp);
+  box.append(cta);
+}
+
+/* ═══════════════════════════════════════════ מטרות ══ */
+
+let goalEdit = null;
+
+async function renderGoals() {
+  const box = $('goalsList');
+  box.textContent = '';
+  const { data, error } = await sb.from('goals')
+    .select('*').eq('archived', false).order('created_at', { ascending: true });
+  if (error) { box.append(el('p', 'note', human(error))); return; }
+
+  if (!data || !data.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'עוד אין מטרה'));
+    e.append(el('p', null, 'קרן חירום של שלוש משכורות, טיול, דירה. מטרה אחת שיש לה סכום ותאריך שווה יותר משבע כוונות.'));
+    box.append(e);
+    return;
+  }
+
+  for (const g of data) {
+    const target = Number(g.target_agorot), saved = Number(g.saved_agorot);
+    const pct = Math.min(100, Math.round(saved / target * 100));
+    const done = saved >= target;
+    const row = el('button', 'goal' + (done ? ' goal-done' : ''));
+    row.type = 'button';
+
+    const top = el('div', 'goal-top');
+    top.append(el('span', 'goal-nm', g.title));
+    const v = el('span', 'goal-v money'); setMoney(v, saved);
+    const of = el('span', 'row-of');
+    of.append(document.createTextNode('מתוך '));
+    const ofv = el('span', 'money'); setMoney(ofv, target); of.append(ofv);
+    top.append(v, of);
+
+    const track = el('div', 'bar'); track.setAttribute('aria-hidden', 'true');
+    const fill = el('i'); fill.style.width = pct + '%'; track.append(fill);
+
+    const sub = el('div', 'goal-sub');
+    sub.append(el('span', null, pct + '%'));
+    /* ‏כמה להפריש כל חודש כדי להגיע בזמן. זה המספר היחיד שהופך
+       מטרה ממשאלה לתוכנית. */
+    if (g.target_date && !done) {
+      const left = target - saved;
+      const months = Math.max(1, Math.round(
+        (new Date(g.target_date) - new Date()) / (30.4 * DAY)));
+      sub.append(el('span', null,
+        months > 0 ? `${fmt(Math.ceil(left / months / 100) * 100)} בחודש עד ${new Date(g.target_date + 'T12:00:00').toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}`
+                   : 'היעד עבר'));
+    } else if (done) {
+      sub.append(el('span', null, 'הגעתם'));
+    }
+
+    row.append(top, track, sub);
+    row.setAttribute('aria-label', `${g.title}, נחסכו ${fmt(saved)} מתוך ${fmt(target)}, ${pct} אחוז`);
+    row.addEventListener('click', () => openGoal(g));
+    box.append(row);
+  }
+}
+
+function openGoal(g) {
+  goalEdit = g || null;
+  $('goalTitle').textContent = g ? 'המטרה' : 'מטרה חדשה';
+  $('goalName').value = g ? g.title : '';
+  $('goalTarget').value = g ? (Number(g.target_agorot) / 100).toString() : '';
+  $('goalSaved').value = g ? (Number(g.saved_agorot) / 100).toString() : '';
+  $('goalDate').value = g && g.target_date ? g.target_date : '';
+  $('goalDelRow').classList.toggle('hidden', !g);
+  setErr($('goalErr'), '');
+  openSheet($('goalSheet'));
+}
+
+$('goalAdd').addEventListener('click', () => openGoal(null));
+$('goalCancel').addEventListener('click', closeSheet);
+
+$('goalSave').addEventListener('click', async () => {
+  setErr($('goalErr'), '');
+  const title = $('goalName').value.trim();
+  const target = toAgorot($('goalTarget').value);
+  const saved = toAgorot($('goalSaved').value) || 0;
+  if (!title) { setErr($('goalErr'), 'צריך שם למטרה.'); $('goalName').focus(); return; }
+  if (!target) { setErr($('goalErr'), 'צריך סכום יעד גדול מאפס.'); $('goalTarget').focus(); return; }
+  if (saved > target) { setErr($('goalErr'), 'כבר יש יותר מהיעד. אולי כדאי להעלות את היעד.'); return; }
+
+  const btn = $('goalSave');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const row = { title: title.slice(0, 60), target_agorot: target, saved_agorot: saved,
+                  target_date: $('goalDate').value || null, updated_at: new Date().toISOString() };
+    const { error } = goalEdit
+      ? await sb.from('goals').update(row).eq('id', goalEdit.id)
+      : await sb.from('goals').insert({ ...row, household_id: S.hh, created_by: S.user.id });
+    if (error) throw error;
+    closeSheet();
+    toast(goalEdit ? 'עודכן.' : 'נשמר.');
+    renderGoals();
+  } catch (err) {
+    setErr($('goalErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'שמירה';
+  }
+});
+
+$('goalDelete').addEventListener('click', async () => {
+  const g = goalEdit;
+  closeSheet();
+  if (!g) return;
+  const { error } = await sb.from('goals').delete().eq('id', g.id);
+  if (error) { toast(human(error)); return; }
+  toast('נמחק.');
+  renderGoals();
+});
+
 /* ═══════════════════════════════════════════ הגדרות ══ */
 
 function renderSet() {
@@ -1426,8 +1839,16 @@ const IMP = mountImport({
 
 $('setImport').addEventListener('click', () => tab('import'));
 $('setDocs').addEventListener('click', () => tab('docs'));
+$('setSum').addEventListener('click', () => tab('sum'));
+$('setGoals').addEventListener('click', () => tab('goals'));
 $('importBack').addEventListener('click', () => tab('set'));
 $('docsBack').addEventListener('click', () => tab('set'));
+$('sumBack').addEventListener('click', () => tab('set'));
+$('goalsBack').addEventListener('click', () => tab('set'));
+
+/* ‏חיפוש בהקלדה, בלי השהיה: הכל כבר בזיכרון. */
+$('txSearch').addEventListener('input', () => renderTx());
+$('txSearch').addEventListener('search', () => renderTx());
 
 for (const b of document.querySelectorAll('.nav button[data-tab]')) {
   b.addEventListener('click', () => {
