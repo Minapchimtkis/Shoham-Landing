@@ -648,10 +648,16 @@ function renderHome() {
     }
   }
 
+  /* ‏"נכנסו 18,500 מתוך 18,500 שתוכננו" הוא אותו מספר פעמיים,
+     ושורה מודגשת שאינה אומרת כלום מתחרה במספר הגדול. ההכנסה
+     נאמרת רק כשהיא שונה ממה שתוכנן, כי אז זה מידע. */
   const got = gotAll(), pin = plannedIn(), moved = movedAll();
-  if (got > 0 && pin > 0) line(document.createTextNode('נכנסו '), strong(got),
-                               document.createTextNode(' מתוך '), strong(pin), document.createTextNode(' שתוכננו'));
-  else if (got > 0) line(document.createTextNode('נכנסו החודש '), strong(got));
+  const offPlan = pin > 0 && Math.abs(got - pin) / pin >= 0.02;
+  if (got > 0 && pin > 0 && offPlan)
+    line(document.createTextNode(got > pin ? 'נכנסו ' : 'נכנסו רק '), strong(got),
+         document.createTextNode(' מתוך '), strong(pin), document.createTextNode(' שתוכננו'));
+  else if (got > 0 && !pin)
+    line(document.createTextNode('נכנסו החודש '), strong(got));
   if (moved > 0) line(document.createTextNode('ועוד '), strong(moved),
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
@@ -696,10 +702,15 @@ function renderRows(current, dim, now) {
     if (p > 0) { of.append(document.createTextNode('מתוך ')); of.append(moneyEl(p)); }
     top.append(ic, nm, val, of);
 
-    const bar = el('div', 'bar');
+    const bar = el('div', 'bar' + (over ? ' over' : ''));
     bar.setAttribute('aria-hidden', 'true');
     const fill = el('i');
-    const pct = p > 0 ? Math.min(100, Math.round(s / p * 100)) : (s > 0 ? 100 : 0);
+    /* ‏בחריגה הפס כולו הוא מה שיצא, והקטע המלא הוא החלק שמעבר
+       לתכנון. כך חריגה של שישה אחוזים נראית אחרת מחריגה של
+       שבעים, ולא שתיהן כפס מלא זהה. */
+    const pct = over ? Math.max(4, Math.round((s - p) / s * 100))
+              : p > 0 ? Math.min(100, Math.round(s / p * 100))
+              : (s > 0 ? 100 : 0);
     fill.style.width = pct + '%';
     if (over) fill.classList.add('over');
     else if (!p) fill.classList.add('none');
@@ -708,7 +719,7 @@ function renderRows(current, dim, now) {
     /* ‏הסימן של היום בתוך התקופה. בלעדיו "ארבעים אחוז מהתקציב"
        הוא לא מידע: ארבעים אחוז ביום העשירי הוא בעיה, וביום
        העשרים ושמונה הוא מצוין. */
-    if (current && p > 0) {
+    if (current && p > 0 && !over) {
       const t = el('span', 'today');
       t.style.right = Math.round(dayOfPeriod(S.month, now) / dim * 100) + '%';
       bar.append(t);
@@ -947,13 +958,17 @@ async function renderInsight() {
      אחרי החריגה שמחפשים. */
   if (S.txs.length >= 5) {
     const prevRows = await loadPrev();
-    const pool = [...S.txs, ...prevRows]
-      .filter(t => t.direction === 'out' && !t.is_transfer)
-      .map(t => t.amount_agorot).sort((a, b) => a - b);
+    const both = [...S.txs, ...prevRows].filter(t => t.direction === 'out' && !t.is_transfer);
+    /* ‏הוצאה שחוזרת כל חודש באותו סכום אינה חריגה, היא הדבר הכי
+       קבוע שיש. בלי ההחרגה הזאת שכר הדירה נתפס כ"פי 31 מהרגיל"
+       בכל חודש מחדש, כי החציון נגרר אחרי המון הוצאות קטנות. */
+    const steady = new Set(recurring(both).map(r => r.key));
+    const oneOff = both.filter(t => !steady.has(normDesc(t.description)));
+    const pool = oneOff.map(t => t.amount_agorot).sort((a, b) => a - b);
     if (pool.length >= 6) {
       const med = pool[Math.floor(pool.length / 2)];
       const big = S.txs
-        .filter(t => t.direction === 'out' && !t.is_transfer)
+        .filter(t => t.direction === 'out' && !t.is_transfer && !steady.has(normDesc(t.description)))
         .sort((a, b) => b.amount_agorot - a.amount_agorot)[0];
       if (big && med > 0 && big.amount_agorot >= med * 4 && big.amount_agorot >= 25000) {
         const c = byId(big.category_id);

@@ -236,20 +236,7 @@
 
   <!-- ─────────────────────────────────────── הגדרות ── -->
   <main class="screen hidden" id="scSet">
-    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">הגדרות</h1>
-
-    <div class="set-group">
-      <h2>החשבון</h2>
-      <div class="set-row">
-        <span class="k">אימייל</span>
-        <span class="v" id="setEmail" dir="ltr"></span>
-      </div>
-      <button class="set-row" id="setNameBtn" type="button">
-        <span class="k">השם שלי</span>
-        <span class="v" id="setName"></span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
+    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">עוד</h1>
 
     <div class="set-group">
       <h2>הכסף שלי</h2>
@@ -288,17 +275,6 @@
     </div>
 
     <div class="set-group">
-      <h2>החודש התקציבי</h2>
-      <button class="set-row" id="setCycle" type="button">
-        <span class="k">
-          מתי מתחיל החודש
-          <small id="cycleNow">בראשון בחודש</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <div class="set-group">
       <h2>קבצים</h2>
       <button class="set-row" id="setImport" type="button">
         <span class="k">
@@ -311,6 +287,17 @@
         <span class="k">
           המסמכים שלי
           <small>דוח סילוקין, חשבונות, כל נייר ששווה לשמור</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
+      <h2>החודש התקציבי</h2>
+      <button class="set-row" id="setCycle" type="button">
+        <span class="k">
+          מתי מתחיל החודש
+          <small id="cycleNow">בראשון בחודש</small>
         </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -335,8 +322,21 @@
     </div>
 
     <div class="set-group">
+      <h2>החשבון</h2>
+      <div class="set-row">
+        <span class="k">אימייל</span>
+        <span class="v" id="setEmail" dir="ltr"></span>
+      </div>
+      <button class="set-row" id="setNameBtn" type="button">
+        <span class="k">השם שלי</span>
+        <span class="v" id="setName"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
       <h2>שוהם</h2>
-      <a class="set-row" href="../#contact" target="_blank" rel="noopener">
+      <a class="set-row lead" href="../#contact" target="_blank" rel="noopener">
         <span class="k">
           לדבר עם שוהם
           <small>שיחת היכרות, בלי התחייבות</small>
@@ -570,7 +570,7 @@
   </div>
 
   <p class="err hidden" id="addErr" role="alert"></p>
-  <div class="sheet-row">
+  <div class="sheet-row pin">
     <button class="btn btn-ghost" id="addCancel" type="button">ביטול</button>
     <button class="btn" id="addSave" type="button">הוספה</button>
   </div>
@@ -737,7 +737,7 @@
     <input class="inp" id="goalDate" type="date">
   </div>
   <p class="err hidden" id="goalErr" role="alert"></p>
-  <div class="sheet-row">
+  <div class="sheet-row pin">
     <button class="btn btn-ghost" id="goalCancel" type="button">ביטול</button>
     <button class="btn" id="goalSave" type="button">שמירה</button>
   </div>
@@ -816,7 +816,7 @@
   </div>
 
   <p class="err hidden" id="assetErr" role="alert"></p>
-  <div class="sheet-row">
+  <div class="sheet-row pin">
     <button class="btn btn-ghost" id="assetCancel" type="button">ביטול</button>
     <button class="btn" id="assetSave" type="button">שמירה</button>
   </div>

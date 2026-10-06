@@ -443,7 +443,12 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   background:var(--violet-fill);border-radius:3px;
   transition:width .4s var(--ease);
 }
-.bar i.over{background:var(--amber)}
+/* ‏קודם כל חריגה נראתה אותו דבר: פס ענבר מלא. חריגה של שישה
+   אחוזים וחריגה של שבעים אחוזים הן אותה תמונה, וזה איבוד מידע
+   בדיוק במקום שבו הוא הכי נחוץ. עכשיו המסילה היא התכנון, והקטע
+   המלא הוא החריגה עצמה. */
+.bar.over{background:var(--amber-soft)}
+.bar i.over{background:var(--amber);right:auto;left:0}
 .bar i.none{background:var(--rule-2)}
 
 /* ‏ציון התאריך בחודש. בלעדיו אין משמעות ל"40 אחוז מהתקציב":
@@ -636,6 +641,16 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 
 .sheet-row{display:flex;gap:10px;margin-top:18px}
+/* ‏בטלפון בן 640 פיקסל כפתור ההוספה נפל מתחת לקיפול, והרישום
+   של שתי שניות הפך לגלילה בתוך גלון. הפעולה הראשית נדבקת
+   לתחתית, בכל גובה ובכל אורך תוכן. */
+.sheet-row.pin{
+  position:sticky;bottom:0;z-index:2;
+  margin-inline:calc(var(--pad) * -1);
+  padding:12px var(--pad) 2px;
+  background:var(--paper);
+  box-shadow:0 -1px 0 var(--rule);
+}
 .sheet-row .btn{flex:1}
 
 /* ═══════════════════════════════════════════ הגדרות ══ */
@@ -651,6 +666,12 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   padding:14px 0;border-bottom:1px solid var(--rule);
   font-size:16px;
 }
+/* ‏שורה שהיא קישור יורשת את הסגול של <a>, ואז שבע שורות ניווט
+   צועקות ביחד. הסגול שמור לערך החי, למצב הפעיל ולפעולה הראשית,
+   והחץ ממילא כבר אומר שהשורה מובילה למקום. */
+.set-row,.set-row:hover{color:var(--ink);text-decoration:none}
+/* ‏חוץ מאחת, במכוון. */
+.set-row.lead .k{color:var(--violet);font-weight:600}
 .set-row .k{flex:1;min-width:0}
 .set-row .k small{display:block;font-size:13px;color:var(--ink-3);font-weight:400}
 .set-row .v{flex:none;color:var(--ink-3);font-size:15px;
