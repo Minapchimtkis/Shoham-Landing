@@ -3509,8 +3509,12 @@ footer {
 /* ‏העיגול לא במרכז הגאומטרי.
 
    ‏במרכז נמצאות הפנים שלו, וכפתור סגול על העיניים הוא בדיוק
-   מה שלא רוצים בתמונה שנבחרה בגלל מה שהיא משדרת. 64 אחוז
+   מה שלא רוצים בתמונה שנבחרה בגלל מה שהיא משדרת. 69 אחוז
    מציב אותו מתחת לסנטר ומעל הכתובית.
+
+   ‏היה 64 אחוז, וזה התאים לתמונה הקודמת. בחדשה הוא ממוסגר
+   קרוב יותר והסנטר יורד נמוך יותר במסגרת, ולכן הערך הישן
+   היה נוגע בזקן. המספר הזה תלוי בתמונה, ולכן הוא משתנה איתה.
 
    ‏הניסיון הקודם היה ריפוד באחוזים, וזה לא עובד: ריפוד באחוזים
    נמדד תמיד לפי הרוחב, גם כשהוא עליון, ולכן 56 אחוז נחתו על
@@ -3521,7 +3525,7 @@ footer {
 .iv-play-ring {
   position: absolute;
   left: 50%;
-  top: 64%;
+  top: 69%;
   transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
@@ -3796,11 +3800,11 @@ footer {
   <div class="iv-frame" id="ivFrame">
     <div class="iv-inner">
       <video id="introVideo" class="iv-media"
-             poster="assets/intro-poster.webp?v=d1c78e69"
+             poster="assets/intro-poster.webp?v=0e858dca"
              width="1080" height="1920"
              playsinline preload="none"
              aria-label="סרטון היכרות עם שוהם אבו, חצי דקה, בעברית">
-        <source src="assets/intro.mp4?v=1f30c8a1" type="video/mp4">
+        <source src="assets/intro.mp4?v=a568751f" type="video/mp4">
       </video>
     </div>
 
