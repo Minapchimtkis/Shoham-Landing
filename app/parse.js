@@ -237,6 +237,24 @@ const RULES = [
   ['other',     []]
 ];
 
+/* ‏העברה אינה הוצאה, ודף עו"ש מלא בהן. בלי הזיהוי הזה כל העברה
+   לחיסכון נכנסת כהוצאה ומקלקלת את המספר הגדול.
+
+   ‏שמרני בכוונה: רק ניסוחים שאין בהם ספק. ביט ופייבוקס אינם
+   כאן, כי בהם משלמים לאנשים לא פחות משמעבירים לעצמך, וניחוש
+   שגוי לכיוון הזה מסתיר הוצאה אמיתית. */
+const MOVE_WORDS = [
+  'העברה עצמית','העברה לחשבון','העברה בנקאית','העברת כספים','העברה מחשבון',
+  'הפקדה לחיסכון','הפקדה לפקדון','הפקדה לפיקדון','הפקדה לתוכנית',
+  'משיכה מחיסכון','לחיסכון','לפקדון','לפיקדון','ני"ע','נייר ערך'
+];
+
+export function isTransfer(desc) {
+  const t = norm(desc);
+  if (!t) return false;
+  return MOVE_WORDS.some(w => t.includes(norm(w)));
+}
+
 export function guessCategory(desc) {
   const t = norm(desc);
   if (!t) return 'other';
@@ -293,6 +311,7 @@ export function rowsFromTable(rows, kind, today) {
       direction: outward ? 'out' : 'in',
       description: desc.slice(0, 80) || null,
       cat: outward ? guessCategory(desc) : 'salary',
+      move: isTransfer(desc),
       installment_no: inst ? inst.no : null,
       installment_total: inst ? inst.total : null,
       take: true
@@ -343,6 +362,7 @@ export function rowsFromLines(lines, kind, today) {
       direction: outward ? 'out' : 'in',
       description: desc.slice(0, 80) || null,
       cat: outward ? guessCategory(desc) : 'salary',
+      move: isTransfer(desc),
       installment_no: inst ? inst.no : null,
       installment_total: inst ? inst.total : null,
       take: true

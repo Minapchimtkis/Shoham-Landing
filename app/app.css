@@ -518,6 +518,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .tx-mid .s{font-size:13px;color:var(--ink-3)}
 .tx-amt{flex:none;font-size:16px}
 .tx-amt.in{color:var(--violet)}
+/* ‏העברה אינה הוצאה ואינה הכנסה, ולכן גם לא נצבעת כמו אחת מהן. */
+.tx-amt.moved{color:var(--ink-3)}
 
 .tag{
   display:inline-block;font-size:11px;font-weight:700;
@@ -601,6 +603,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   gap:4px;padding:4px;margin-bottom:18px;
   background:var(--wash-2);border-radius:var(--r);
 }
+.seg-3{grid-template-columns:1fr 1fr 1fr}
 .seg button{
   min-height:44px;border-radius:9px;
   font-size:15px;font-weight:600;color:var(--ink-2);
@@ -764,6 +767,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .ir.off{opacity:.42}
 .ir.off .ir-amt{text-decoration:line-through}
+/* ‏שורה שסומנה כהעברה נראית אחרת, כדי שיהיה ברור במבט אחד
+   שהיא נרשמת אבל אינה נספרת. */
+.ir.moved .ir-amt{color:var(--ink-3)}
 .ir input[type=checkbox]{
   flex:none;width:22px;height:22px;margin-top:3px;
   -webkit-appearance:auto;appearance:auto;

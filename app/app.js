@@ -172,16 +172,26 @@ const inCats  = () => S.cats.filter(c => c.kind === 'income'  && !c.archived)
 const planned   = id => S.budgets.get(id) || 0;
 const plannedOut = () => outCats().reduce((s, c) => s + planned(c.id), 0);
 const plannedIn  = () => inCats().reduce((s, c) => s + planned(c.id), 0);
+/* ‏העברה אינה הוצאה. מי שמעביר אלפיים לחיסכון לא הוציא אלפיים,
+   הוא העביר אותם לכיס אחר, ואפליקציה שסופרת את זה כהוצאה משקרת
+   במספר הגדול שהוא כל האפליקציה. כל ספירה כאן מדלגת עליהן. */
+const real = t => !t.is_transfer;
 const spentIn = id => S.txs.reduce((s, t) =>
-  s + (t.direction === 'out' && t.category_id === id ? t.amount_agorot : 0), 0);
-const spentAll = () => S.txs.reduce((s, t) => s + (t.direction === 'out' ? t.amount_agorot : 0), 0);
-const gotAll   = () => S.txs.reduce((s, t) => s + (t.direction === 'in'  ? t.amount_agorot : 0), 0);
+  s + (real(t) && t.direction === 'out' && t.category_id === id ? t.amount_agorot : 0), 0);
+const spentAll = () => S.txs.reduce((s, t) => s + (real(t) && t.direction === 'out' ? t.amount_agorot : 0), 0);
+const gotAll   = () => S.txs.reduce((s, t) => s + (real(t) && t.direction === 'in'  ? t.amount_agorot : 0), 0);
+const movedAll = () => S.txs.reduce((s, t) => s + (t.is_transfer ? t.amount_agorot : 0), 0);
 
-/* ‏המספר של האפליקציה. אם אין בכלל תכנון להוצאות, "נשאר" חסר
-   משמעות, ואז התשובה היא ההכנסה פחות מה שיצא. */
+/* ‏המספר של האפליקציה.
+   ‏כשיש תכנון, התשובה היא מה שנשאר ממנו.
+   ‏כשאין, "נשאר מהתכנון" חסר משמעות, ואז התשובה נמדדת בכסף
+   אמיתי: מה שנכנס בפועל פחות מה שיצא. חודש שיובא מדף בנק הוא
+   בדיוק המקרה הזה, ובלי זה הוא היה מוצג כחריגה של כל ההוצאות
+   שבו דווקא בחודש שנכנסה בו משכורת מלאה. */
 function leftToSpend() {
   const p = plannedOut();
-  return p > 0 ? p - spentAll() : plannedIn() - spentAll();
+  if (p > 0) return p - spentAll();
+  return (gotAll() || plannedIn()) - spentAll();
 }
 
 /* ─────────────────────────────────────────── גלונים ── */
@@ -540,24 +550,48 @@ function renderHome() {
   }
   S.lastLeft = left;
 
-  const parts = [];
+  /* ‏שתי שורות ולא שלוש אריחים: מה הוצאתי מתוך מה תכננתי, וכמה
+     מותר לי היום. "מותר היום" הוא מה שנשאר חלקי הימים שנותרו,
+     והוא מתקן את עצמו: כל הוצאה היום מקטינה את מה שנשאר ולכן
+     גם אותו. */
+  const sub = $('heroSub');
+  sub.textContent = '';
+  const line = (...nodes) => { const d = el('div'); d.append(...nodes); sub.append(d); };
+  const strong = v => { const b = el('b', 'money'); setMoney(b, v); return b; };
+
   if (!plannedOut() && !plannedIn()) {
-    parts.push('עוד אין תקציב לחודש הזה. אפשר לבנות אותו בלשונית התקציב.');
-  } else if (over) {
-    parts.push('מעל התכנון. זה לא סוף העולם, זה מידע.');
-  } else if (current) {
-    parts.push(`עוד ${daysLeft} ${daysLeft === 1 ? 'יום' : 'ימים'}`);
-    if (daysLeft > 0) parts.push(`<b>${fmt(Math.floor(left / daysLeft / 100) * 100)}</b> ליום`);
+    if (spentAll() || gotAll()) {
+      line(document.createTextNode('הוצאתי '), strong(spentAll()));
+      line(document.createTextNode('אין תקציב לחודש הזה, אז זה מה שנכנס פחות מה שיצא.'));
+    } else {
+      line(document.createTextNode('עוד אין תקציב לחודש הזה. אפשר לבנות אותו בלשונית התקציב.'));
+    }
   } else {
-    parts.push('החודש נגמר, ועמדתם בתכנון.');
+    const spent = spentAll(), plan = plannedOut();
+    line(document.createTextNode('הוצאתי '), strong(spent),
+         ...(plan ? [document.createTextNode(' מתוך '), strong(plan)] : []));
+
+    if (current && daysLeft > 0) {
+      if (over) {
+        line(document.createTextNode('מעל התכנון. נשארו '),
+             el('b', null, String(daysLeft)),
+             document.createTextNode(daysLeft === 1 ? ' יום' : ' ימים'));
+      } else {
+        line(document.createTextNode('מותר לי היום '),
+             strong(Math.floor(left / daysLeft / 100) * 100),
+             document.createTextNode(` · עוד ${daysLeft} ${daysLeft === 1 ? 'יום' : 'ימים'}`));
+      }
+    } else if (!current) {
+      line(document.createTextNode(over ? 'החודש נגמר מעל התכנון.' : 'החודש נגמר, ועמדתם בתכנון.'));
+    }
   }
-  const got = gotAll(), pin = plannedIn();
-  $('heroSub').innerHTML = parts.join(' · ');
-  if (got > 0 && pin > 0) {
-    $('heroSub').innerHTML += `<br>נכנסו ${fmt(got)} מתוך ${fmt(pin)} שתוכננו.`;
-  } else if (got > 0) {
-    $('heroSub').innerHTML += `<br>נכנסו החודש ${fmt(got)}.`;
-  }
+
+  const got = gotAll(), pin = plannedIn(), moved = movedAll();
+  if (got > 0 && pin > 0) line(document.createTextNode('נכנסו '), strong(got),
+                               document.createTextNode(' מתוך '), strong(pin), document.createTextNode(' שתוכננו'));
+  else if (got > 0) line(document.createTextNode('נכנסו החודש '), strong(got));
+  if (moved > 0) line(document.createTextNode('ועוד '), strong(moved),
+                      document.createTextNode(' בהעברות, שאינן הוצאה'));
 
   renderRows(current, dim, now);
   renderInsight();
@@ -577,7 +611,7 @@ function renderRows(current, dim, now) {
     e.append(el('p', null, 'כל הוצאה שתוסיפו תופיע כאן, והמספר למעלה יזוז. אפשר להתחיל מההוצאה האחרונה שאתם זוכרים.'));
     const b = el('button', 'btn', 'הוספת ההוצאה הראשונה');
     b.type = 'button';
-    b.addEventListener('click', openAdd);
+    b.addEventListener('click', () => openAdd());
     e.append(b);
     box.append(e);
     return;
@@ -836,7 +870,7 @@ async function renderInsight() {
     if (gap >= 4) {
       card(`${gap} ימים בלי רישום`,
         'לא נורא, וזה לא מחייב לשחזר הכול. מספיק להוסיף את מה שאתם זוכרים, והמספר למעלה יחזור להיות נכון.',
-        [['להוסיף עכשיו', openAdd]]);
+        [['להוסיף עכשיו', () => openAdd()]]);
       return;
     }
   }
@@ -895,7 +929,7 @@ function renderTx() {
       : 'כל מה שתוסיפו יופיע כאן, לפי ימים, מהחדש לישן.'));
     const b = el('button', 'btn', 'הוספת תנועה');
     b.type = 'button';
-    b.addEventListener('click', openAdd);
+    b.addEventListener('click', () => openAdd());
     e.append(b);
     if (!S.filterCat) {
       const imp = el('button', 'btn-quiet', 'או ייבוא קובץ מהבנק');
@@ -916,7 +950,7 @@ function renderTx() {
   for (const t of rows) {
     if (t.occurred_on !== day) {
       day = t.occurred_on;
-      const sum = rows.filter(r => r.occurred_on === day && r.direction === 'out')
+      const sum = rows.filter(r => r.occurred_on === day && r.direction === 'out' && !r.is_transfer)
                       .reduce((s, r) => s + r.amount_agorot, 0);
       const h = el('h2', 'sec-h', dayName(day) + (sum ? ' · ' + fmt(sum) : ''));
       box.append(h);
@@ -925,20 +959,21 @@ function renderTx() {
     const row = el('button', 'tx');
     row.type = 'button';
 
-    const ic = el('span', 'tx-ico', (c && c.icon) || '•');
+    const ic = el('span', 'tx-ico', t.is_transfer ? '⇄' : ((c && c.icon) || '•'));
     ic.setAttribute('aria-hidden', 'true');
     const mid = el('div', 'tx-mid');
     mid.append(el('div', 't', t.description || (c ? c.label : 'תנועה')));
     const sub = el('div', 's');
-    sub.textContent = t.description && c ? c.label : (t.source === 'import' ? 'מיובא' : '');
+    sub.textContent = t.is_transfer ? 'העברה, לא נספרת כהוצאה'
+                    : (t.description && c ? c.label : (t.source === 'import' ? 'מיובא' : ''));
     if (t.installment_no && t.installment_total) {
       const tag = el('span', 'tag', `תשלום ${t.installment_no} מתוך ${t.installment_total}`);
       sub.append(tag);
     }
     mid.append(sub);
-    const amt = el('span', 'tx-amt money' + (t.direction === 'in' ? ' in' : ''));
+    const amt = el('span', 'tx-amt money' + (t.direction === 'in' ? ' in' : '') + (t.is_transfer ? ' moved' : ''));
     setMoney(amt, t.amount_agorot);
-    if (t.direction === 'in') amt.prepend(document.createTextNode('+'));
+    if (t.direction === 'in' && !t.is_transfer) amt.prepend(document.createTextNode('+'));
 
     row.setAttribute('aria-label',
       `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}`);
@@ -954,11 +989,17 @@ function openTx(t) {
   const c = byId(t.category_id);
   $('txSheetTitle').textContent = t.description || (c ? c.label : 'תנועה');
   $('txSheetSub').textContent =
-    `${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} של ${fmt(t.amount_agorot)}` +
-    `${c ? ', ' + c.label : ''}, ${dayName(t.occurred_on)}.`;
+    `${t.is_transfer ? 'העברה' : t.direction === 'in' ? 'הכנסה' : 'הוצאה'} של ${fmt(t.amount_agorot)}` +
+    `${c && !t.is_transfer ? ', ' + c.label : ''}, ${dayName(t.occurred_on)}.` +
+    (t.is_transfer ? ' היא לא נספרת כהוצאה.' : '');
   openSheet($('txSheet'));
 }
 $('txClose').addEventListener('click', closeSheet);
+$('txEdit').addEventListener('click', () => {
+  const t = txCtx;
+  closeSheet();
+  if (t) setTimeout(() => openAdd(t), 260);
+});
 
 $('txDelete').addEventListener('click', async () => {
   const t = txCtx;
@@ -973,20 +1014,29 @@ $('txDelete').addEventListener('click', async () => {
 
 /* ═════════════════════════════════════ הוספת תנועה ══ */
 
-let addDir = 'out';
+let addDir = 'out';      // out | in | move
+let editId = null;       // תנועה שנערכת, או null
 
 function setDir(d) {
   addDir = d;
-  $('dirOut').setAttribute('aria-pressed', String(d === 'out'));
-  $('dirIn').setAttribute('aria-pressed', String(d === 'in'));
-  $('addTitle').textContent = d === 'out' ? 'מה הוצאתם?' : 'מה נכנס?';
-  $('addSub').textContent = d === 'out'
-    ? 'סכום, קטגוריה, וזה הכל. התיאור הוא לכם, לא לנו.'
-    : 'משכורת, החזר, מתנה. כל שקל שנכנס ולא תוכנן.';
-  fillAddCats();
+  for (const [id, k] of [['dirOut','out'], ['dirIn','in'], ['dirMove','move']])
+    $(id).setAttribute('aria-pressed', String(d === k));
+
+  const T = {
+    out:  ['מה הוצאתם?', 'סכום, קטגוריה, וזה הכל. התיאור הוא לכם, לא לנו.'],
+    in:   ['מה נכנס?',   'משכורת, החזר, מתנה. כל שקל שנכנס ולא תוכנן.'],
+    move: ['לאן העברתם?', 'העברה לחיסכון או בין חשבונות. היא נרשמת, והיא לא נספרת כהוצאה.']
+  };
+  $('addTitle').textContent = editId ? 'עריכת תנועה' : T[d][0];
+  $('addSub').textContent = T[d][1];
+  /* ‏להעברה אין קטגוריה: היא לא שייכת לשום סעיף בתקציב, כי היא
+     לא יצאה מהתקציב. */
+  $('catField').classList.toggle('hidden', d === 'move');
+  if (d !== 'move') fillAddCats();
 }
 $('dirOut').addEventListener('click', () => setDir('out'));
 $('dirIn').addEventListener('click', () => setDir('in'));
+$('dirMove').addEventListener('click', () => setDir('move'));
 
 let addCat = null;
 function fillAddCats() {
@@ -1007,23 +1057,43 @@ function fillAddCats() {
   }
 }
 
-function openAdd() {
-  setDir('out');
-  $('txAmount').value = '';
-  $('txDesc').value = '';
+/* ‏מקבל תנועה לעריכה, או כלום לתנועה חדשה. כל מי שקורא לה
+   כמאזין חייב לעטוף: מאזין מקבל את אירוע הלחיצה כארגומנט
+   ראשון, והוא היה נכנס לכאן בתור "התנועה שנערכת". */
+function openAdd(t) {
+  editId = t ? t.id : null;
+  /* ‏הקטגוריה האחרונה שנבחרה חוזרת מעצמה. רוב ההוצאות של אדם
+     נופלות על אותן שתיים או שלוש, ובחירה מחדש בכל פעם היא
+     הנגיעה שהופכת רישום של שתי שניות לרישום של חמש. */
+  if (!t) addCat = LS.get('lastCat', null) || addCat;
+  setDir(t ? (t.is_transfer ? 'move' : t.direction) : 'out');
+
+  $('txAmount').value = t ? (t.amount_agorot / 100).toString() : '';
+  $('txDesc').value = t ? (t.description || '') : '';
+  if (t && t.category_id) { addCat = t.category_id; fillAddCats(); }
+
   /* ‏ברירת המחדל היא היום, אלא אם מסתכלים על חודש שעבר. תנועה
      שנרשמת לחודש שלא מסתכלים עליו פשוט נעלמת מהעיניים. */
   const now = new Date();
   const d = sameMonth(S.month, now)
     ? now
     : new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0);
-  $('txDate').value = isoDate(d);
+  $('txDate').value = t ? t.occurred_on : isoDate(d);
   $('txDate').min = monthKey(S.month);
   $('txDate').max = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  $('addSave').textContent = t ? 'שמירה' : 'הוספה';
   setErr($('addErr'), '');
   openSheet($('addSheet'));
+  /* ‏המיקוד נכנס לסכום ולא לכפתור הראשון: זה השדה היחיד שתמיד
+     ממלאים, ובלעדיו כל רישום מתחיל בנגיעה מיותרת. */
+  setTimeout(() => $('txAmount').focus({ preventScroll: true }), 120);
 }
-$('addBtn').addEventListener('click', openAdd);
+
+/* ‏אנטר בשדה הסכום שומר. שתי שניות, כפי שהוא ביקש. */
+$('txAmount').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); $('addSave').click(); }
+});
+$('addBtn').addEventListener('click', () => openAdd());
 $('addCancel').addEventListener('click', closeSheet);
 
 $('addSave').addEventListener('click', async () => {
@@ -1033,42 +1103,52 @@ $('addSave').addEventListener('click', async () => {
     setErr($('addErr'), 'צריך סכום גדול מאפס.');
     $('txAmount').focus(); return;
   }
-  if (!addCat) { setErr($('addErr'), 'צריך לבחור קטגוריה.'); return; }
+  const move = addDir === 'move';
+  if (!move && !addCat) { setErr($('addErr'), 'צריך לבחור קטגוריה.'); return; }
   const on = $('txDate').value;
   if (!on) { setErr($('addErr'), 'צריך תאריך.'); return; }
 
   const btn = $('addSave');
-  btn.disabled = true; btn.textContent = 'מוסיף...';
+  const was = editId;
+  btn.disabled = true; btn.textContent = was ? 'שומר...' : 'מוסיף...';
   try {
     const row = {
-      household_id: S.hh,
       occurred_on: on,
       amount_agorot: ag,
-      direction: addDir,
-      category_id: addCat,
-      description: $('txDesc').value.trim() || null,
-      source: 'manual',
-      created_by: S.user.id
+      direction: move ? 'out' : addDir,
+      is_transfer: move,
+      category_id: move ? null : addCat,
+      description: $('txDesc').value.trim() || null
     };
-    const { data, error } = await sb.from('transactions').insert(row).select().single();
-    if (error) throw error;
 
-    const t = { ...data, amount_agorot: Number(data.amount_agorot) };
-    /* ‏נכנס לרשימה במקום הנכון לפי תאריך, במקום טעינה מחדש של
-       כל החודש בשביל שורה אחת. */
-    S.txs.push(t);
+    if (was) {
+      const { error } = await sb.from('transactions').update(row).eq('id', was);
+      if (error) throw error;
+      const i = S.txs.findIndex(x => x.id === was);
+      if (i >= 0) S.txs[i] = { ...S.txs[i], ...row };
+    } else {
+      const { data, error } = await sb.from('transactions')
+        .insert({ ...row, household_id: S.hh, source: 'manual', created_by: S.user.id })
+        .select().single();
+      if (error) throw error;
+      /* ‏נכנס לרשימה במקום הנכון לפי תאריך, במקום טעינה מחדש של
+         כל החודש בשביל שורה אחת. */
+      S.txs.push({ ...data, amount_agorot: Number(data.amount_agorot) });
+    }
+
     S.txs.sort((a, b) => b.occurred_on.localeCompare(a.occurred_on) ||
                          String(b.created_at).localeCompare(String(a.created_at)));
+    if (!move && addCat) LS.set('lastCat', addCat);
+    editId = null;
     closeSheet();
     renderHome();
     if (S.tab === 'tx') renderTx();
-    toast(addDir === 'out' ? 'נרשם.' : 'נכנס.');
-    S.asked = false;
-    maybeAsk();
+    toast(was ? 'עודכן.' : move ? 'הועבר.' : addDir === 'out' ? 'נרשם.' : 'נכנס.');
+    if (!was) { S.asked = false; maybeAsk(); }
   } catch (err) {
     setErr($('addErr'), human(err));
   } finally {
-    btn.disabled = false; btn.textContent = 'הוספה';
+    btn.disabled = false; btn.textContent = editId ? 'שמירה' : 'הוספה';
   }
 });
 
@@ -1339,6 +1419,8 @@ const IMP = mountImport({
   sb, S, $, el, show, hide, toast, openSheet, closeSheet,
   fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,
   goTab: tab,
+  monthName, monthKeyOf: monthKey,
+  setMonth: m => { S.month = m; S.lastLeft = null; $('monthLabel').textContent = monthName(m); },
   reload: async () => { try { await loadAll(); } catch (err) { toast(human(err)); } }
 });
 

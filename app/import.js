@@ -32,6 +32,7 @@ export function mountImport(A) {
   const { sb, S, $, el, show, hide, toast, openSheet, closeSheet,
           fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats } = A;
 
+  const MOVE = '__move';
   let impKind = 'bank';
   let impRows = [];
   let impFile = null;
@@ -240,21 +241,35 @@ export function mountImport(A) {
       sub.append(el('span', null, new Date(r.occurred_on + 'T12:00:00')
         .toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' })));
 
+      /* ‏ההעברה היא אפשרות בתוך בורר הקטגוריה ולא פקד נוסף: היא
+         ממילא התשובה לשאלה "לאיזה סעיף זה שייך", והתשובה היא
+         לאף אחד. פקד נפרד לכל שורה היה מכפיל את המסך. */
       const sel = el('select');
       sel.setAttribute('aria-label', 'קטגוריה עבור ' + (r.description || 'התנועה'));
+      const moveOpt = el('option', null, '⇄ העברה, לא הוצאה');
+      moveOpt.value = MOVE;
+      sel.append(moveOpt);
       for (const c of cats) {
         const o = el('option', null, (c.icon || '•') + ' ' + c.label);
         o.value = c.id;
-        if (c.key === r.cat || c.id === r.catId) o.selected = true;
         sel.append(o);
       }
-      if (!cats.some(c => c.key === r.cat)) {
-        const fallback = cats.find(c => c.key === (r.direction === 'in' ? 'other_in' : 'other'));
-        if (fallback) sel.value = fallback.id;
+      if (r.move) sel.value = MOVE;
+      else {
+        const hit = cats.find(c => c.key === r.cat) ||
+                    cats.find(c => c.key === (r.direction === 'in' ? 'other_in' : 'other'));
+        if (hit) sel.value = hit.id;
       }
       r.catId = sel.value;
-      sel.addEventListener('change', () => { r.catId = sel.value; });
+      const syncMove = () => {
+        r.catId = sel.value;
+        r.move = sel.value === MOVE;
+        row.classList.toggle('moved', r.move);
+        updateSum();
+      };
+      sel.addEventListener('change', syncMove);
       sub.append(sel);
+      if (r.move) row.classList.add('moved');
 
       if (r.installment_total)
         sub.append(el('span', 'ir-inst', `תשלום ${r.installment_no} מתוך ${r.installment_total}`));
@@ -269,8 +284,9 @@ export function mountImport(A) {
 
   function updateSum() {
     const taken = impRows.filter(r => r.take);
-    const out = taken.filter(r => r.direction === 'out').reduce((s, r) => s + r.amount_agorot, 0);
-    const inn = taken.filter(r => r.direction === 'in').reduce((s, r) => s + r.amount_agorot, 0);
+    const out = taken.filter(r => r.direction === 'out' && !r.move).reduce((s, r) => s + r.amount_agorot, 0);
+    const inn = taken.filter(r => r.direction === 'in' && !r.move).reduce((s, r) => s + r.amount_agorot, 0);
+    const mov = taken.filter(r => r.move).reduce((s, r) => s + r.amount_agorot, 0);
     const dups = impRows.filter(r => r.dup).length;
 
     const box = $('impSum');
@@ -286,6 +302,7 @@ export function mountImport(A) {
     const l2 = el('p');
     l2.append(document.createTextNode('יוצא ' + fmt(out)));
     if (inn) l2.append(document.createTextNode(' · נכנס ' + fmt(inn)));
+    if (mov) l2.append(document.createTextNode(' · ' + fmt(mov) + ' בהעברות'));
     box.append(l2);
 
     if (dups) {
@@ -320,7 +337,8 @@ export function mountImport(A) {
         occurred_on: r.occurred_on,
         amount_agorot: r.amount_agorot,
         direction: r.direction,
-        category_id: r.catId || catIdOf(r.cat) || null,
+        category_id: r.move ? null : (r.catId && r.catId !== MOVE ? r.catId : catIdOf(r.cat)) || null,
+        is_transfer: !!r.move,
         description: r.description,
         source: 'import',
         import_id: imp.id,
@@ -337,7 +355,26 @@ export function mountImport(A) {
         if (error) throw error;
       }
 
-      toast(`נכנסו ${taken.length} תנועות.`);
+      /* ‏דף של שלושה חודשים נוחת בשלושה חודשים, ומי שמסתכל על
+         אוקטובר ומייבא את אפריל רואה מסך שלא השתנה בכלום וחושב
+         שהייבוא נכשל. עוברים לחודש שקיבל הכי הרבה שורות. */
+      const byMonth = new Map();
+      for (const r of taken) {
+        const k = r.occurred_on.slice(0, 7);
+        byMonth.set(k, (byMonth.get(k) || 0) + 1);
+      }
+      const here = A.monthKeyOf(S.month).slice(0, 7);
+      if (!byMonth.has(here) && byMonth.size) {
+        const top = [...byMonth.entries()].sort((a, b) => b[1] - a[1])[0][0];
+        A.setMonth(new Date(+top.slice(0, 4), +top.slice(5, 7) - 1, 1));
+      }
+
+      const names = [...byMonth.keys()].sort().reverse()
+        .map(k => A.monthName(new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, 1)));
+      toast(`נכנסו ${taken.length} תנועות${names.length === 1 ? ' ל' + names[0]
+            : names.length === 2 ? ' ל' + names[0] + ' ול' + names[1]
+            : ' ב' + names.length + ' חודשים'}.`);
+
       resetImport();
       await A.reload();
       A.goTab('home');

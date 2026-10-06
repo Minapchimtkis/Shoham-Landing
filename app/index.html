@@ -424,17 +424,19 @@
   <h2 id="addTitle">מה הוצאתם?</h2>
   <p class="sub" id="addSub">סכום, קטגוריה, וזה הכל. התיאור הוא לכם, לא לנו.</p>
 
-  <div class="seg" role="group" aria-label="סוג התנועה">
+  <div class="seg seg-3" role="group" aria-label="סוג התנועה">
     <button type="button" id="dirOut" aria-pressed="true">הוצאה</button>
     <button type="button" id="dirIn" aria-pressed="false">הכנסה</button>
+    <button type="button" id="dirMove" aria-pressed="false">העברה</button>
   </div>
 
   <div class="field amount-field">
     <label for="txAmount">סכום בשקלים</label>
-    <input class="inp" id="txAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+    <input class="inp" id="txAmount" type="text" inputmode="decimal"
+           autocomplete="off" placeholder="0" enterkeyhint="done">
   </div>
 
-  <div class="field">
+  <div class="field" id="catField">
     <span class="lbl" id="catLbl">קטגוריה</span>
     <div class="chips" id="txCats" role="group" aria-labelledby="catLbl"></div>
   </div>
@@ -462,8 +464,11 @@
   <h2 id="txSheetTitle">התנועה הזאת</h2>
   <p class="sub" id="txSheetSub"></p>
   <div class="sheet-row">
-    <button class="btn btn-ghost" id="txClose" type="button">סגירה</button>
+    <button class="btn" id="txEdit" type="button">עריכה</button>
     <button class="btn btn-danger" id="txDelete" type="button">מחיקה</button>
+  </div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="txClose" type="button">סגירה</button>
   </div>
 </div>
 
