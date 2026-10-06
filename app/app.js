@@ -55,12 +55,29 @@ function toAgorot(raw) {
 
 /* ‏כסף החוצה. אגורות מוצגות רק כשהן אינן אפס, כי ".00" בסוף כל
    מספר על המסך הוא רעש בארבעה תווים. */
-function fmt(ag, withSign) {
+function fmtNum(ag) {
   const n = Math.abs(Math.round(ag || 0));
   const sh = Math.floor(n / 100), ar = n % 100;
   let s = sh.toLocaleString('en-US');
   if (ar) s += '.' + String(ar).padStart(2, '0');
-  return (withSign && (ag || 0) < 0 ? '−' : '') + '₪' + s;
+  return s;
+}
+function fmt(ag, withSign) {
+  return (withSign && (ag || 0) < 0 ? '−' : '') + '₪' + fmtNum(ag);
+}
+
+/* ‏הש"ח אינו חלק מהמספר, הוא סימן לידו.
+   ‏הסריף טעון עם הספרות בלבד, ולכן הש"ח נופל ל-Heebo. במשקל של
+   המספר הוא יוצא בלוק כבד שמתחרה בו. כאן הוא נכתב בנפרד, קטן
+   ושקט, והספרה נשארת הדבר שרואים. */
+function setMoney(node, ag, withSign) {
+  node.textContent = '';
+  if (withSign && (ag || 0) < 0) node.append(document.createTextNode('−'));
+  node.append(el('span', 'cur', '₪'), document.createTextNode(fmtNum(ag)));
+  return node;
+}
+function moneyEl(ag, cls) {
+  return setMoney(el('span', 'money' + (cls ? ' ' + cls : '')), ag);
 }
 
 const DAY = 86400000;
@@ -302,7 +319,10 @@ $('authForm').addEventListener('submit', async e => {
     setErr($('authErr'), human(err));
   } finally {
     btn.disabled = false;
-    authMode(S.mode);
+    /* ‏כאן היה authMode, והוא מנקה את הודעת השגיאה בסופו. כלומר
+       כל שגיאה שהגיעה מהשרת נכתבה ונמחקה באותו רגע, ומי שהקליד
+       סיסמה שגויה ראה טופס שלא קרה בו כלום. רק התווית חוזרת. */
+    btn.textContent = S.mode === 'signup' ? 'פתיחת חשבון' : 'כניסה';
   }
 });
 
@@ -349,6 +369,15 @@ function buildSetup() {
     box.append(row);
   }
   $('setup').addEventListener('input', setupLive);
+
+  /* ‏הסרגל התחתון קבוע במקומו ולכן הוא מכסה את השורה האחרונה.
+     הרמז שבתוכו מתחלף לפי מה שהוקלד, ולכן גם הגובה שלו מתחלף,
+     ומספר קבוע בגיליון הסגנון היה נכון רק לאחד הנוסחים. נמדד. */
+  const bar = document.querySelector('.setup-bar');
+  const fit = () => { $('setup').style.paddingBottom = (bar.offsetHeight + 26) + 'px'; };
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(bar);
+  fit();
+
   setupLive();
 }
 
@@ -370,7 +399,7 @@ function setupLive() {
   const { income, out } = setupNumbers();
   const left = income - out;
   const v = $('setupLeft');
-  v.textContent = fmt(left, true);
+  setMoney(v, left, true);
   v.classList.toggle('over', left < 0);
 
   if (!income) {
@@ -485,7 +514,8 @@ function renderHome() {
      שהיא עצמה שאלה. */
   $('heroQ').textContent = over ? 'כמה חרגתי?' : 'כמה יש לי?';
   const a = $('heroA');
-  a.textContent = fmt(left);
+  setMoney(a, left);
+  a.setAttribute('aria-label', (over ? 'חרגתם ב' : 'נשאר לכם ') + fmt(left));
   a.classList.toggle('over', over);
 
   if (S.lastLeft !== null && S.lastLeft !== left) {
@@ -502,7 +532,7 @@ function renderHome() {
     parts.push('מעל התכנון. זה לא סוף העולם, זה מידע.');
   } else if (current) {
     parts.push(`עוד ${daysLeft} ${daysLeft === 1 ? 'יום' : 'ימים'}`);
-    if (daysLeft > 0) parts.push(`<b>${fmt(Math.floor(left / daysLeft))}</b> ליום`);
+    if (daysLeft > 0) parts.push(`<b>${fmt(Math.floor(left / daysLeft / 100) * 100)}</b> ליום`);
   } else {
     parts.push('החודש נגמר, ועמדתם בתכנון.');
   }
@@ -549,8 +579,9 @@ function renderRows(current, dim, now) {
     const top = el('div', 'row-top');
     const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
     const nm = el('span', 'row-nm', c.label);
-    const val = el('span', 'row-val money' + (over ? ' over' : ''), fmt(s));
-    const of = el('span', 'row-of', p > 0 ? '/ ' + fmt(p) : '');
+    const val = moneyEl(s, 'row-val' + (over ? ' over' : '') + (s === 0 ? ' zero' : ''));
+    const of = el('span', 'row-of');
+    if (p > 0) { of.append(document.createTextNode('מתוך ')); of.append(moneyEl(p)); }
     top.append(ic, nm, val, of);
 
     const bar = el('div', 'bar');
@@ -881,8 +912,9 @@ function renderTx() {
       sub.append(tag);
     }
     mid.append(sub);
-    const amt = el('span', 'tx-amt money' + (t.direction === 'in' ? ' in' : ''),
-      (t.direction === 'in' ? '+' : '') + fmt(t.amount_agorot));
+    const amt = el('span', 'tx-amt money' + (t.direction === 'in' ? ' in' : ''));
+    setMoney(amt, t.amount_agorot);
+    if (t.direction === 'in') amt.prepend(document.createTextNode('+'));
 
     row.setAttribute('aria-label',
       `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}`);
@@ -1068,7 +1100,7 @@ function budgetNumbers() {
 
 function budgetLive() {
   const { sumOut, sumIn } = budgetNumbers();
-  $('budgetTotal').textContent = fmt(sumOut);
+  setMoney($('budgetTotal'), sumOut);
   const left = sumIn - sumOut;
   if (!sumIn) {
     $('budgetHint').textContent = 'בלי הכנסה אין למה להשוות את התכנון.';

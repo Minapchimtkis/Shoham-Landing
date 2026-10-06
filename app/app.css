@@ -21,8 +21,11 @@
      שחור בנטייה סגולה ולא אפור כהה. נגזר מהסגול של המותג, ולכן
      הוא מתיישב איתו במקום להתנגש בו. */
   --ink:#16111f;
-  --ink-2:rgba(22,17,31,0.62);
-  --ink-3:rgba(22,17,31,0.42);
+  /* ‏ארבע דרגות דיו, וכולן עוברות 4.5 מול לבן. הדרגה השקטה
+     הייתה 0.42, שהם 2.74 בלבד, ולכן כל טקסט משני באפליקציה
+     היה מתחת לסף הקריאות. 0.60 נותן 4.85. */
+  --ink-2:rgba(22,17,31,0.76);
+  --ink-3:rgba(22,17,31,0.60);
 
   /* ── הסגול, ורק עליו ──
      הערך החי, המצב הפעיל, הפעולה הראשית. שלושה תפקידים. אם הוא
@@ -92,6 +95,17 @@ body{
   unicode-bidi:isolate;
 }
 
+/* ‏סימן השקל יושב ליד המספר, לא בתוכו. בלי הכלל הזה הוא נופל
+   ל-Heebo במשקל 900, יוצא בלוק כבד לצד ספרות סריף, ומתחרה
+   במספר במקום להגיד מה היחידה שלו. */
+.money .cur{
+  font-family:'Heebo',sans-serif;
+  font-weight:500;
+  font-size:0.66em;
+  margin-inline-end:0.1em;
+  vertical-align:0.06em;
+}
+
 /* ─────────────────────────────────────────────── יסודות ── */
 
 button,input,select,textarea{
@@ -103,6 +117,9 @@ input,textarea{-webkit-appearance:none;appearance:none}
 
 a{color:var(--violet);text-decoration:none}
 a:hover{text-decoration:underline}
+/* ‏קישור בתוך שורת טקסט חייב להיות מזוהה גם למי שאינו רואה
+   את ההבדל בצבע. */
+p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 :focus-visible{
   outline:2px solid var(--violet);
@@ -223,8 +240,8 @@ a:hover{text-decoration:underline}
 }
 .gate-switch{font-size:15px;color:var(--ink-2)}
 .gate-switch button{
-  color:var(--violet);font-weight:700;padding:4px;
-  min-height:32px;
+  color:var(--violet);font-weight:700;padding:4px 8px;
+  min-height:44px;
 }
 
 .sent{
@@ -272,7 +289,9 @@ a:hover{text-decoration:underline}
   flex:none;width:118px;position:relative;
 }
 .num-row .amt input{
-  width:100%;text-align:left;direction:ltr;
+  /* ‏הספרות נצמדות לצד שבו נמצאת התווית, ולא לקצה הרחוק ממנה.
+     כך גם נוצר טור מיושר של מספרים לאורך הטופס. */
+  width:100%;text-align:right;direction:ltr;
   font-family:'Frank Ruhl Libre','Heebo',serif;
   font-weight:900;font-size:18px;
   padding:9px 10px;
@@ -327,7 +346,7 @@ a:hover{text-decoration:underline}
   font-size:16px;font-weight:700;
   padding:6px 10px;margin-inline-start:-10px;
   border-radius:var(--r-pill);
-  min-height:40px;
+  min-height:44px;
 }
 .month-pick svg{width:15px;height:15px;color:var(--ink-3)}
 .month-pick:disabled{opacity:1}
@@ -336,7 +355,7 @@ a:hover{text-decoration:underline}
 .streak{
   display:inline-flex;align-items:center;gap:6px;
   font-size:13px;font-weight:700;color:var(--ink-2);
-  padding:7px 11px;min-height:38px;
+  padding:7px 11px;min-height:44px;
   background:var(--wash);border-radius:var(--r-pill);
 }
 .streak .dot{
@@ -396,9 +415,14 @@ a:hover{text-decoration:underline}
 .row-val.over{color:var(--amber)}
 .row-of{
   flex:none;font-size:13px;color:var(--ink-3);
-  font-family:'Frank Ruhl Libre','Heebo',serif;font-weight:900;
-  direction:ltr;unicode-bidi:isolate;
+  display:flex;align-items:baseline;gap:3px;
 }
+/* ‏המספר המתוכנן שקט יותר מזה שיצא: שם היא השאלה, כאן רק הרקע. */
+.row-of .money{font-size:13px;font-weight:700}
+
+/* ‏אפס אינו מידע, ולכן הוא לא נכתב בשחור מלא. שורה שלא קרה בה
+   כלום לא צריכה למשוך את העין יותר משורה שכן. */
+.row-val.zero{color:var(--ink-3);font-weight:700}
 
 /* ‏הפס מתמלא מימין, כמו שהעין קוראת. שני פסים ולא אחד: הרקע
    הוא המתוכנן, המילוי הוא מה שיצא. */
@@ -444,7 +468,7 @@ a:hover{text-decoration:underline}
 .insight .acts button{
   font-size:14px;font-weight:600;color:var(--violet);
   background:var(--paper);
-  padding:8px 13px;min-height:38px;
+  padding:8px 13px;min-height:44px;
   border-radius:var(--r-pill);
   box-shadow:0 0 0 1px var(--rule);
 }
@@ -573,7 +597,7 @@ a:hover{text-decoration:underline}
   background:var(--wash-2);border-radius:var(--r);
 }
 .seg button{
-  min-height:40px;border-radius:9px;
+  min-height:44px;border-radius:9px;
   font-size:15px;font-weight:600;color:var(--ink-2);
   transition:background-color .14s var(--ease),color .14s var(--ease);
 }
@@ -597,7 +621,7 @@ a:hover{text-decoration:underline}
   box-shadow:none;font-weight:600;
 }
 .chip-quiet{
-  font-size:14px;padding:8px 12px;min-height:38px;
+  font-size:14px;padding:8px 12px;min-height:44px;
   color:var(--ink-2);
 }
 
