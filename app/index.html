@@ -242,6 +242,24 @@
     </div>
 
     <div class="set-group">
+      <h2>קבצים</h2>
+      <button class="set-row" id="setImport" type="button">
+        <span class="k">
+          ייבוא מהבנק או מהאשראי
+          <small>קובץ אקסל, CSV או PDF הופך לתנועות</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setDocs" type="button">
+        <span class="k">
+          המסמכים שלי
+          <small>דוח סילוקין, חשבונות, כל נייר ששווה לשמור</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
       <h2>הנתונים</h2>
       <button class="set-row" id="setExport" type="button">
         <span class="k">
@@ -287,6 +305,87 @@
       פיננסים בפיקוח אוניברסיטת אריאל. הכלי הזה אינו ייעוץ השקעות
       ואינו המלצה. הוא מראה לכם את הכסף שלכם.
     </p>
+  </main>
+
+  <!-- ─────────────────────────────────────── ייבוא ── -->
+  <main class="screen hidden" id="scImport">
+    <button class="back" id="importBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">ייבוא מהבנק</h1>
+    <p class="note" style="margin-bottom:20px">
+      מייצאים מהאתר של הבנק או של חברת האשראי קובץ אקסל או CSV,
+      ומעלים אותו כאן. שום שורה לא נכנסת לפני שראיתם אותה.
+    </p>
+
+    <div id="impPick">
+      <span class="lbl" id="impKindLbl">איזה קובץ זה</span>
+      <div class="seg" role="group" aria-labelledby="impKindLbl" style="margin-bottom:20px">
+        <button type="button" id="impBank" aria-pressed="true">עובר ושב</button>
+        <button type="button" id="impCredit" aria-pressed="false">כרטיס אשראי</button>
+      </div>
+
+      <label class="drop" id="impDrop" for="impFile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5m0 0L8 9m4-4l4 4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <strong id="impDropTitle">בחירת קובץ</strong>
+        <span id="impDropSub">אקסל, CSV או PDF</span>
+        <input type="file" id="impFile" accept=".csv,.xls,.xlsx,.pdf,text/csv,application/pdf" hidden>
+      </label>
+
+      <p class="err hidden" id="impErr" role="alert"></p>
+
+      <div class="insight" style="margin-top:24px">
+        <h3>למה אקסל ולא PDF</h3>
+        <p>
+          ל־PDF של בנקים אין מבנה אחיד, ולכל בנק פריסה אחרת. קובץ
+          אקסל או CSV נקרא במדויק בכל פעם. בכל אתר של בנק ושל חברת
+          אשראי יש כפתור ייצוא לאקסל ליד הכפתור של ההורדה ל־PDF.
+        </p>
+      </div>
+    </div>
+
+    <div id="impReview" class="hidden">
+      <div class="imp-sum" id="impSum"></div>
+
+      <div class="field hidden" id="impChargeWrap">
+        <label for="impCharge">מועד החיוב בחשבון</label>
+        <input class="inp" id="impCharge" type="date">
+        <p class="note" style="margin-top:6px">
+          כרטיס אשראי מחייב בסכום אחד בתאריך אחד. התנועות מוצגות
+          לפי יום הקנייה, ומועד החיוב נשמר בנפרד.
+        </p>
+      </div>
+
+      <div class="imp-acts">
+        <button class="chip chip-quiet" id="impAll" type="button">לסמן הכל</button>
+        <button class="chip chip-quiet" id="impNone" type="button">לנקות הכל</button>
+        <button class="chip chip-quiet" id="impNoDup" type="button">בלי הכפולות</button>
+      </div>
+
+      <div id="impRows" class="imp-rows"></div>
+
+      <p class="err hidden" id="impErr2" role="alert"></p>
+      <div class="sheet-row" style="margin-bottom:12px">
+        <button class="btn btn-ghost" id="impCancel" type="button">ביטול</button>
+        <button class="btn" id="impGo" type="button">ייבוא</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ────────────────────────────────────── מסמכים ── -->
+  <main class="screen hidden" id="scDocs">
+    <button class="back" id="docsBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">המסמכים שלי</h1>
+    <p class="note" style="margin-bottom:18px">
+      דוח יתרות וסילוקין, חשבון חשמל, ארנונה, כל נייר שחשוב שיהיה
+      שמור. הקבצים פרטיים ורק אתם רואים אותם.
+    </p>
+    <button class="btn" id="docAdd" type="button">העלאת מסמך</button>
+    <div id="docsList" style="margin-top:22px"></div>
   </main>
 
   <!-- ──────────────────────────────────── ניווט ── -->
@@ -433,7 +532,68 @@
   </div>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- העלאת מסמך -->
+<div class="sheet hidden" id="docSheet" role="dialog" aria-modal="true" aria-labelledby="docTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="docTitle">מסמך חדש</h2>
+  <p class="sub">הקובץ נשמר אצלכם. מה שתמלאו כאן הוא מה שיופיע ברשימה.</p>
+
+  <div class="field">
+    <span class="lbl" id="docKindLbl">איזה מסמך</span>
+    <div class="chips" id="docKinds" role="group" aria-labelledby="docKindLbl"></div>
+  </div>
+
+  <label class="drop drop-sm" id="docDrop" for="docFile">
+    <strong id="docDropTitle">בחירת קובץ</strong>
+    <span id="docDropSub">PDF או תמונה, עד 15 מגה</span>
+    <input type="file" id="docFile" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*" hidden>
+  </label>
+
+  <div class="field" style="margin-top:16px">
+    <label for="docName">שם המסמך</label>
+    <input class="inp" id="docName" type="text" maxlength="160" autocomplete="off" placeholder="חשבון חשמל">
+  </div>
+  <div class="field">
+    <label for="docProvider">הספק, אם רלוונטי</label>
+    <input class="inp" id="docProvider" type="text" maxlength="80" autocomplete="off" placeholder="חברת החשמל">
+  </div>
+  <div class="field">
+    <label for="docAmount">סכום, אם יש</label>
+    <input class="inp" id="docAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+  </div>
+  <div class="field">
+    <label for="docDue">תאריך, אם יש</label>
+    <input class="inp" id="docDue" type="date">
+  </div>
+
+  <p class="err hidden" id="docErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="docCancel" type="button">ביטול</button>
+    <button class="btn" id="docSave" type="button">שמירה</button>
+  </div>
+</div>
+
+<!-- מסמך קיים -->
+<div class="sheet hidden" id="docView" role="dialog" aria-modal="true" aria-labelledby="docViewTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="docViewTitle">מסמך</h2>
+  <p class="sub" id="docViewSub"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="docOpen" type="button">פתיחת הקובץ</button>
+    <button class="btn" id="docToTx" type="button">להוסיף כהוצאה</button>
+  </div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="docClose" type="button">סגירה</button>
+    <button class="btn btn-danger" id="docDelete" type="button">מחיקה</button>
+  </div>
+</div>
+
+<!-- ‏ההודעה החזותית וההודעה לקורא מסך הן שני דברים. דבר שדוהה
+     לאפס אינו אזור חי טוב, והוא גם נמדד באמצע הדהייה ככיתוב
+     לבן על רקע בהיר. החזותי מוסתר מעץ הנגישות, והטקסט נאמר
+     מכאן. -->
+<div class="toast" id="toast" aria-hidden="true"></div>
+<p class="sr-only" id="say" role="status" aria-live="polite"></p>
 
 <script type="module" src="app.js"></script>
 </body>

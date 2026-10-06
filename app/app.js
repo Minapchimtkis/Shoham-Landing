@@ -18,6 +18,7 @@
 */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { mountImport } from './import.js';
 
 /* ‏אותו פרויקט ואותו מפתח פרסום כמו בשאר הדפים. אין כאן סוד:
    המפתח הזה נועד לרוץ בדפדפן, והוא לבדו אינו מאפשר דבר. מה שמגן
@@ -112,6 +113,8 @@ function toast(msg) {
   t.classList.add('on');
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('on'), 2400);
+  // ‏נאמר בנפרד, כדי שמי שמקשיב ישמע גם אחרי שההודעה דהתה
+  $('say').textContent = msg;
 }
 
 function setErr(node, msg) {
@@ -237,17 +240,29 @@ function stage(name) {
   $('boot').removeAttribute('aria-busy');
 }
 
+/* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
+   ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
+   את בורר החודש, שאין לו שם משמעות. */
+const SUB = { import: 'set', docs: 'set' };
+
 function tab(name) {
   S.tab = name;
-  const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet' };
+  const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
+                import: 'scImport', docs: 'scDocs' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
+
+  const current = SUB[name] || name;
   for (const b of document.querySelectorAll('.nav button[data-tab]')) {
-    b.dataset.tab === name ? b.setAttribute('aria-current', 'page')
-                           : b.removeAttribute('aria-current');
+    b.dataset.tab === current ? b.setAttribute('aria-current', 'page')
+                              : b.removeAttribute('aria-current');
   }
+  document.querySelector('.topbar').classList.toggle('hidden', !!SUB[name]);
+
   if (name === 'tx') renderTx();
   if (name === 'budget') renderBudget();
   if (name === 'set') renderSet();
+  if (name === 'import') IMP.openImport();
+  if (name === 'docs') IMP.openDocs();
   window.scrollTo({ top: 0 });
 }
 
@@ -882,6 +897,15 @@ function renderTx() {
     b.type = 'button';
     b.addEventListener('click', openAdd);
     e.append(b);
+    if (!S.filterCat) {
+      const imp = el('button', 'btn-quiet', 'או ייבוא קובץ מהבנק');
+      imp.type = 'button';
+      imp.style.marginTop = '12px';
+      imp.addEventListener('click', () => tab('import'));
+      const wrap = el('div');
+      wrap.append(imp);
+      e.append(wrap);
+    }
     box.append(e);
     return;
   }
@@ -1307,6 +1331,21 @@ $('setWipe').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════ הפעלה ══ */
+
+/* ‏מודול הייבוא מקבל את מה שהוא צריך במקום לייבא מכאן: ייבוא
+   הדדי בין שני קבצים הוא מעגל, והוא נשבר בדיוק בסדר שבו קשה
+   לשחזר אותו. */
+const IMP = mountImport({
+  sb, S, $, el, show, hide, toast, openSheet, closeSheet,
+  fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,
+  goTab: tab,
+  reload: async () => { try { await loadAll(); } catch (err) { toast(human(err)); } }
+});
+
+$('setImport').addEventListener('click', () => tab('import'));
+$('setDocs').addEventListener('click', () => tab('docs'));
+$('importBack').addEventListener('click', () => tab('set'));
+$('docsBack').addEventListener('click', () => tab('set'));
 
 for (const b of document.querySelectorAll('.nav button[data-tab]')) {
   b.addEventListener('click', () => {
