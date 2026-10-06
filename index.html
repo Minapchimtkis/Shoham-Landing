@@ -3426,6 +3426,98 @@ footer {
   inset: -11px;
 }
 
+
+/* ══ סרטון התדמית ══════════════════════════════════════════
+   הקצה הוא מעבר צבע סגול אל זהב, לא גבול בצבע אחד. הוא נוצר
+   משכבה אחת מאחור וריפוד של פיקסל, וזה הדבר היחיד שנותן קצה
+   שמשנה גוון לאורכו. בפנים מסך כהה, כדי שהרגע שלפני הניגון
+   לא יהיה לבן. ══════════════════════════════════════════ */
+
+.intro-video {
+  padding: 0 24px 100px;
+  text-align: center;
+}
+
+.iv-title {
+  font-size: clamp(21px, 5.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--white);
+  margin: 0 0 22px;
+}
+
+.iv-frame {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 1px;
+  border-radius: 25px;
+  background: linear-gradient(158deg,
+    rgba(168,85,247,0.60),
+    rgba(240,192,64,0.30) 44%,
+    rgba(168,85,247,0.16));
+  box-shadow:
+    0 36px 80px -30px rgba(0,0,0,0.95),
+    0 0 64px -22px rgba(168,85,247,0.34);
+}
+
+.iv-inner {
+  border-radius: 24px;
+  overflow: hidden;
+  background: #0c0b11;
+  line-height: 0;
+}
+
+.iv-media {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  background: #0c0b11;
+}
+
+/* ‏במסך רחב הסרטון מוגבל בגובה ולא ברוחב. 9:16 ברוחב 380
+   הוא 675 פיקסל גובה, וזה גבוה מכדי לראות אותו ואת הכותרת
+   שלו באותה מסגרת מסך. */
+@media (min-width: 861px) {
+  .iv-frame { max-width: min(360px, calc((100svh - 230px) * 9 / 16)); }
+}
+
+/* ‏כפתור הקול. למעלה ולא למטה, כי למטה יושבים פקדי הנגן. */
+.iv-sound {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  background: rgba(12,11,17,0.60);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font-family: 'Heebo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+/* ‏ברגע שיש קול הכפתור סיים את תפקידו. */
+.iv-frame.sound-on .iv-sound { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .iv-sound:hover {
+    background: rgba(12,11,17,0.82);
+    border-color: rgba(168,85,247,0.55);
+  }
+}
+
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -3647,6 +3739,37 @@ footer {
 
   <div class="hero-view" aria-hidden="true"><span class="hero-view-img"></span></div>
 
+</section>
+
+<!-- ══════════════ סרטון תדמית ══════════════
+     ‏מאונך 9:16, כי הוא נערך לאינסטגרם ומשם מגיע רוב הקהל.
+     הכתוביות צרובות בתוכו, ולכן הוא עובד מצוין בלי קול, וזו
+     הסיבה שההפעלה האוטומטית מושתקת ויש כפתור נפרד לקול.
+
+     ‏אין כאן data-stage בכוונה: המדידה בדף סופרת סקשנים לפי
+     אינדקס רץ, והוספת אחד באמצע הייתה מזיזה את כל המספרים
+     שאחריו ומשנה את המשמעות של נתוני העבר. -->
+<section class="intro-video reveal">
+  <h2 class="iv-title">חצי דקה איתי</h2>
+
+  <div class="iv-frame" id="ivFrame">
+    <div class="iv-inner">
+      <video id="introVideo" class="iv-media"
+             poster="assets/intro-poster.webp?v=a57132d0"
+             width="1080" height="1920"
+             controls playsinline muted preload="metadata"
+             aria-label="סרטון היכרות עם שוהם אבו, חצי דקה, עם כתוביות בעברית">
+        <source src="assets/intro.mp4?v=1f30c8a1" type="video/mp4">
+      </video>
+    </div>
+
+    <button class="iv-sound" id="ivSound" type="button">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+        <path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3c0-1.8-1-3.3-2.5-4v8c1.5-.7 2.5-2.2 2.5-4zM14 3.2v2.1c2.9.9 5 3.5 5 6.7s-2.1 5.8-5 6.7v2.1c4-1 7-4.5 7-8.8s-3-7.8-7-8.8z"/>
+      </svg>
+      <span>הפעל קול</span>
+    </button>
+  </div>
 </section>
 
 <!-- PAIN -->
@@ -5102,6 +5225,65 @@ function setQuizPhone(phone) {
 // further down was already moving the same things, so the two fought and the
 // boundary between the sections slid about. Removed: the parallax below owns
 // the hero, and overflow-x is set in the stylesheet, where it belongs.
+// ── סרטון התדמית ──
+// ‏הכתוביות צרובות בסרטון, ולכן הוא מובן לגמרי בלי קול. זה מה
+// שמאפשר הפעלה אוטומטית מושתקת, שהיא היחידה שדפדפנים מרשים
+// בלי מגע מהמשתמש, ומה שהופך את כפתור הקול לבחירה ולא לתנאי.
+//
+// ‏הניגון מתחיל רק כשהסרטון באמת על המסך, ועוצר כשהוא יוצא
+// ממנו. preload="metadata" אומר שעד אז לא יורד וידאו בכלל,
+// אז מי שלא גלל עד לכאן לא שילם על זה כלום.
+(function () {
+  const video = document.getElementById('introVideo');
+  const frame = document.getElementById('ivFrame');
+  const button = document.getElementById('ivSound');
+  if (!video || !frame || !button) return;
+
+  button.addEventListener('click', function () {
+    video.muted = false;
+    frame.classList.add('sound-on');
+    const p = video.play();
+    if (p && p.catch) p.catch(function () {});
+  });
+
+  // ‏אפשר לבטל השתקה גם מהפקדים של הדפדפן עצמו, ואז הכפתור
+  // שלנו כבר לא אומר כלום.
+  video.addEventListener('volumechange', function () {
+    frame.classList.toggle('sound-on', !video.muted);
+  });
+
+  // ‏מי שביקש לצמצם אנימציות לא מקבל ניגון שמתחיל מעצמו.
+  let still = false;
+  try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (still || !('IntersectionObserver' in window)) return;
+
+  // ‏וגם מי שמשלם על כל מגה.
+  //
+  // ‏הסרטון שוקל שישה וחצי מגה, והוא יושב מיד אחרי הפתיח, כלומר
+  // כמעט כל מי שגולל מגיע אליו. בסלולר איטי או כשחיסכון בנתונים
+  // דולק, הורדה כזאת בלי שביקשו אותה היא פשוט גסות. שם נשארת
+  // תמונת הפתיחה, שמשקלה 24 קילו, והסרטון יורד רק אם לוחצים.
+  try {
+    const net = navigator.connection;
+    if (net && (net.saveData === true || /^(slow-)?2g$/.test(net.effectiveType || ''))) return;
+  } catch (e) {}
+
+  let startedOnce = false;
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        startedOnce = true;
+        const p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      } else if (startedOnce && !video.paused) {
+        // ‏עוצר גם כשיש קול. סרטון שממשיך לדבר מחוץ למסך
+        // הוא הדבר הכי מרגיז שדף יכול לעשות.
+        video.pause();
+      }
+    });
+  }, { threshold: 0.6 }).observe(video);
+})();
+
 // ── IPHONE WIDGET ──
 (function() {
   const widget = document.getElementById('iphoneWidget');
@@ -5446,6 +5628,8 @@ const translations = {
     heroLine3: 'הוא בחירה.',
     heroAudience: 'ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך',
     heroCta: 'מתחילים לצמוח · לתיאום פגישה',
+    videoTitle: 'חצי דקה איתי',
+    videoSound: 'הפעל קול',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
     licenseSub: 'בפיקוח אוניברסיטת אריאל',
     painLabel: 'השדים שבראש',
@@ -5529,6 +5713,8 @@ const translations = {
     heroLine3: "It's a choice.",
     heroAudience: 'Financial guidance for young families and individuals starting out',
     heroCta: "Let's Grow · Book a Meeting",
+    videoTitle: 'Half a minute with me, in Hebrew',
+    videoSound: 'Sound on',
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
     licenseSub: 'Under Ariel University supervision',
     painLabel: 'The mental blocks',
@@ -5634,6 +5820,13 @@ function setLang(lang) {
   const line3 = document.querySelectorAll('.hero-title .line2');
   if (line3[1]) line3[1].innerHTML = isEN ? "It's a <span class='accent'>choice.</span>" : 'הוא <span class="accent">בחירה.</span>';
   document.querySelector('.hero-cta a').textContent = t.heroCta;
+
+  // ‏סרטון התדמית. שתי מחרוזות, ושתיהן עוברות דרך כאן כדי
+  // שהמעבר לאנגלית לא ישאיר אותן בעברית.
+  const ivTitle = document.querySelector('.iv-title');
+  if (ivTitle) ivTitle.textContent = t.videoTitle;
+  const ivSoundLabel = document.querySelector('#ivSound span');
+  if (ivSoundLabel) ivSoundLabel.textContent = t.videoSound;
   document.querySelector('.license-title').textContent = t.licenseTitle;
   document.querySelector('.license-sub').textContent = t.licenseSub;
 
