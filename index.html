@@ -4953,6 +4953,7 @@ function notrackToast(on) {
 }
 
 window.trackStage = function () {};
+window.trackVideo = function () {};
 (function () {
   const VISIT = (function () {
     try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
@@ -4996,9 +4997,9 @@ window.trackStage = function () {};
   let deepest = -1;
   let pending = null, timer = null;
 
-  const post = body => {
+  const post = (body, rpc) => {
     try {
-      fetch(SUPABASE_URL + '/rest/v1/rpc/page_stage', {
+      fetch(SUPABASE_URL + '/rest/v1/rpc/' + (rpc || 'page_stage'), {
         method: 'POST', keepalive: true,
         headers: {
           'Content-Type': 'application/json',
@@ -5032,6 +5033,31 @@ window.trackStage = function () {};
     if (!timer) timer = setTimeout(flush, 1200);
   };
   window.trackStage = send;
+
+  // ── הסרטון ──
+  // ‏יושב כאן ולא בנפרד מסיבה אחת: VISIT, הוויתור על מדידה למי
+  // שביקש, notrack, המכשיר והמקור כבר נבדקו למעלה. בלוק נפרד היה
+  // צריך לשכפל את כולם, ושכפול של ויתור על מדידה הוא בדיוק הסוג
+  // של כפילות שנשברת בשקט.
+  //
+  // ‏חמש שליחות לכל ביקור לכל היותר, כל אחת פעם אחת: הגעה, לחיצה,
+  // שלוש אבני דרך, ושורה אחרונה כשעוזבים. לא שליחה לכל שנייה.
+  const videoSent = {};
+  window.trackVideo = (key, fields) => {
+    if (videoSent[key]) return;
+    videoSent[key] = true;
+    post({
+      p_visit:   VISIT,
+      p_video:   'intro',
+      p_reached: !!fields.reached,
+      p_played:  !!fields.played,
+      p_percent: Math.round(fields.percent || 0),
+      p_seconds: Math.round(fields.seconds || 0),
+      p_lang:    document.documentElement.dir === 'ltr' ? 'en' : 'he',
+      p_device:  device,
+      p_ref:     refHost
+    }, 'video_watch');
+  };
 
   const start = () => {
     const sections = [...document.querySelectorAll('[data-stage]')];
@@ -5300,6 +5326,71 @@ function setQuizPhone(phone) {
   });
   video.addEventListener('pause', function () { frame.classList.remove('playing'); });
   video.addEventListener('ended', function () { frame.classList.remove('playing'); });
+
+  // ── המדידה ──
+  // ‏הסרטון הוא הדבר היקר בעמוד, שישה וחצי מגה ופנים וקול, ועד
+  // עכשיו לא הייתה דרך לדעת אם מישהו בכלל לוחץ עליו.
+  //
+  // ‏מה שנשלח הוא חמישה מספרים לכל היותר, לאותו מזהה ביקור אקראי
+  // שהדף כבר ממציא ושוכח בסגירת הלשונית. אין שם, אין טלפון, אין
+  // עוגייה, ומי שביקש לא להימדד לא נמדד גם כאן, כי trackVideo
+  // פשוט לא קיים אצלו.
+  let watched = 0;   // ‏שניות שנצפו בפועל, לא מיקום הסמן
+  let lastAt = 0;
+
+  // ‏הגיע לסרטון. זה המכנה של כל השאר: בלי לדעת כמה הגיעו, אחוז
+  // הנגינה חסר משמעות.
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) {
+        window.trackVideo('reached', { reached: true });
+        io.disconnect();
+      }
+    }, { threshold: 0.5 });
+    io.observe(video);
+  }
+
+  video.addEventListener('play', function () {
+    lastAt = video.currentTime;
+    window.trackVideo('played', { reached: true, played: true });
+  });
+
+  // ‏זמן נצבר ולא נקרא מהסמן, אחרת מי שגורר קדימה נספר כאילו צפה
+  // בכל מה שדילג עליו.
+  video.addEventListener('timeupdate', function () {
+    const now = video.currentTime;
+    const step = now - lastAt;
+    if (step > 0 && step < 1.5) watched += step;
+    lastAt = now;
+
+    const d = video.duration;
+    if (!d || !isFinite(d)) return;
+    const pct = (now / d) * 100;
+    if (pct >= 75)      window.trackVideo('p75', { reached: true, played: true, percent: 75, seconds: watched });
+    else if (pct >= 50) window.trackVideo('p50', { reached: true, played: true, percent: 50, seconds: watched });
+    else if (pct >= 25) window.trackVideo('p25', { reached: true, played: true, percent: 25, seconds: watched });
+  });
+
+  video.addEventListener('seeking', function () { lastAt = video.currentTime; });
+
+  video.addEventListener('ended', function () {
+    window.trackVideo('p100', { reached: true, played: true, percent: 100, seconds: watched });
+  });
+
+  // ‏מי שעזב באמצע הוא המעניין ביותר, ובלי זה הוא פשוט לא נספר.
+  // keepalive בשולח הוא מה שמאפשר לבקשה לצאת אחרי שהדף נסגר.
+  const last = function () {
+    if (watched < 1) return;
+    const d = video.duration;
+    window.trackVideo('final', {
+      reached: true, played: true, seconds: watched,
+      percent: (d && isFinite(d)) ? Math.min(100, (video.currentTime / d) * 100) : 0
+    });
+  };
+  addEventListener('pagehide', last);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') last();
+  });
 })();
 
 // ── IPHONE WIDGET ──
@@ -6128,7 +6219,7 @@ function setLang(lang) {
       <p><strong>במחשבון הביטחון הכלכלי:</strong> שם מלא, מספר טלפון וכתובת אימייל, יחד עם הנתונים שהזנתם לצורך החישוב: גיל, הכנסה והוצאות חודשיות, הסכום שאתם מפנים לחיסכון, היתרות שדיווחתם עליהן, שווי נכס ויתרת משכנתא אם יש, הלוואות והתחייבויות, ואופן ניהול הכסף. נשמרת גם התוצאה שחושבה מהם.</p>
       <p>הנתונים נשמרים רק אם בחרתם להשאיר פרטים בסוף התהליך. עד לרגע הזה הם קיימים בדפדפן שלכם בלבד ואינם נשלחים לשום מקום. הם אינם נשמרים בכתובת האתר ואינם נשמרים בזיכרון הדפדפן לטווח ארוך.</p>
       <p><strong>בלחיצה על כפתור הוואטסאפ:</strong> נשמר תיעוד של המעבר, ואם בחרת למלא, גם השם והטלפון. אם בחרת לדלג, נשמר רק שהמעבר קרה, בלי פרטים מזהים.</p>
-      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, ועד לאיזה חלק של דף הנחיתה הגיעה הגלילה, לצורך שיפור השאלון והדף. לצד זה נשמרים שפת הדף, האם הגלישה מהנייד או מהמחשב, והאתר שממנו הגעתם ברמת שם האתר בלבד (לדוגמה instagram.com, ולא הכתובת המלאה). המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, נמחק כשסוגרים את הלשונית, ואינה כוללת שם, טלפון או כתובת. אם הדפדפן שלכם שולח בקשה שלא לעקוב (Do Not Track או Global Privacy Control), לא נשמרת מדידה כלל. ניתן גם לבטל את הספירה ידנית בכניסה לכתובת <code>?notrack=1</code>; במקרה כזה נשמרת בדפדפן שלכם רק העובדה שביקשתם לא להיספר, ושום דבר נוסף.</p>
+      <p><strong>מדידה אנונימית:</strong> נשמר עד לאיזה שלב בשאלון הגיעה כל כניסה, ועד לאיזה חלק של דף הנחיתה הגיעה הגלילה, לצורך שיפור השאלון והדף. לגבי הסרטון שבדף נשמר גם האם הוא עלה על המסך, האם נלחץ נגן, כמה שניות נצפו וכמה אחוזים ממנו נראו. לצד זה נשמרים שפת הדף, האם הגלישה מהנייד או מהמחשב, והאתר שממנו הגעתם ברמת שם האתר בלבד (לדוגמה instagram.com, ולא הכתובת המלאה). המדידה מזוהה במזהה אקראי שנוצר לאותה כניסה בלבד, נמחק כשסוגרים את הלשונית, ואינה כוללת שם, טלפון או כתובת. אם הדפדפן שלכם שולח בקשה שלא לעקוב (Do Not Track או Global Privacy Control), לא נשמרת מדידה כלל. ניתן גם לבטל את הספירה ידנית בכניסה לכתובת <code>?notrack=1</code>; במקרה כזה נשמרת בדפדפן שלכם רק העובדה שביקשתם לא להיספר, ושום דבר נוסף.</p>
       <p><strong>בדפדפן שלך:</strong> אם השארתם פרטים, מספר הטלפון נשמר מקומית בדפדפן שלכם כדי שלא תתבקשו למלא אותו שוב. הוא נשאר במכשיר שלכם וניתן למחיקה בכל עת דרך הגדרות הדפדפן.</p>
       <p>בנוסף, כמו בכל אתר, עשויים להישמר נתוני גלישה טכניים כגון כתובת IP וסוג הדפדפן.</p>
 
@@ -6169,7 +6260,7 @@ function setLang(lang) {
       <p><strong>Through the financial security calculator:</strong> your full name, phone number and email address, together with the figures you entered for the calculation: age, monthly income and expenses, how much you set aside, the balances you reported, property value and mortgage balance where applicable, loans and other liabilities, and how your money is currently held. The result calculated from them is kept as well.</p>
       <p>None of it is stored unless you choose to leave your details at the end. Until that point it exists only in your own browser and is sent nowhere. It is never placed in the page address and is not kept in browser storage.</p>
       <p><strong>When you use the WhatsApp button:</strong> the handoff is recorded, along with your name and phone if you chose to give them. If you skipped that step, only the fact that it happened is recorded, with nothing identifying you.</p>
-      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got, and how far down the landing page it scrolled, are recorded so that both can be improved. Alongside this: the language of the page, whether the visit was from a phone or a computer, and the site you arrived from as a host name only (instagram.com, for example, never the full address). It is identified by a random id created for that visit alone, discarded when the tab is closed, and contains no name, phone or address. If your browser sends a do-not-track request (Do Not Track or Global Privacy Control), nothing is measured at all. You can also switch counting off by hand by visiting the page with <code>?notrack=1</code>; in that case the only thing stored in your browser is the fact that you asked not to be counted, and nothing else.</p>
+      <p><strong>Anonymous measurement:</strong> how far into a questionnaire each visit got, and how far down the landing page it scrolled, are recorded so that both can be improved. For the video on the page this also covers whether it came on screen, whether play was pressed, how many seconds were watched and what share of it was seen. Alongside this: the language of the page, whether the visit was from a phone or a computer, and the site you arrived from as a host name only (instagram.com, for example, never the full address). It is identified by a random id created for that visit alone, discarded when the tab is closed, and contains no name, phone or address. If your browser sends a do-not-track request (Do Not Track or Global Privacy Control), nothing is measured at all. You can also switch counting off by hand by visiting the page with <code>?notrack=1</code>; in that case the only thing stored in your browser is the fact that you asked not to be counted, and nothing else.</p>
       <p><strong>In your own browser:</strong> if you have left your details, your phone number is stored locally in your browser so you are not asked for it again. It stays on your device and can be cleared at any time through your browser settings.</p>
       <p>As with any website, technical browsing data such as IP address and browser type may also be recorded.</p>
 

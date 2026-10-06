@@ -296,6 +296,17 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 .notify-row b{display:block;font-size:12px}
 .notify-row span{display:block;margin-top:4px;color:var(--muted2);font-size:10px}
 .notify-row .btn{min-height:38px;padding:0 14px;font-size:12px}
+
+/* ‏ההשוואה שבגללה נבנתה המדידה: האם מי שצפה משאיר פרטים יותר
+   ממי שלא. שתי עמודות, ושורת פער מתחתן. */
+.vid-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.vid-cmp{padding:13px 15px;border-radius:12px;background:var(--card-2);border:1px solid var(--line)}
+.vid-cmp b{display:block;font-size:22px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.vid-cmp span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.vid-cmp small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;opacity:.8}
+.vid-cmp.win b{color:var(--green)}
+.vid-gap{grid-column:1/-1;font-size:12.5px;color:var(--muted);text-align:center;padding-top:2px}
+.vid-gap b{color:var(--text);font-weight:800}
 </style>
 </head>
 <body>
@@ -425,6 +436,12 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
     <div class="fn-head"><strong>עד לאן מגיעים בדף</strong><span id="pgRange">—</span></div>
     <div id="pgRows"></div>
   </div>
+  <div class="fn-wrap" id="vidWrap">
+    <div class="fn-head"><strong>הסרטון</strong><span id="vidRange">—</span></div>
+    <div id="vidRows"></div>
+    <div id="vidCompare" class="vid-compare"></div>
+  </div>
+
   <p class="pane-note">כניסה נספרת בשלב מסוים אם אותו חלק של הדף עלה מעל אמצע המסך ונשאר שם רגע, כך שגלילה מהירה עד למטה לא נספרת כקריאה. מי שהדפדפן שלו מבקש לא להיעקב לא נספר כאן כלל.</p>
   <div class="list-shell">
     <div class="src-head"><span>מאיפה הגיעו</span><span>כניסות</span><span>לטופס</span><span>פרטים</span></div>
@@ -756,14 +773,111 @@ const PAGE_STAGES=[
 ];
 let pageCounts=[], pageSources=[], pageRpcOk=true;
 
+// ‏הסרטון.
+//
+// ‏שונה בצורתו משני המשפכים האחרים: שם יש ספירה לכל שלב, כאן יש
+// שורה אחת עם הכול. לכן הוא לא עובר דרך drawFunnel, אבל כן משתמש
+// באותן מחלקות, כדי שהעין תקרא את זה כאותו דבר.
+let vidSum=null, vidRpcOk=true;
+
+function renderVideo(){
+  const rows=$('vidRows'), cmp=$('vidCompare'), range=$('vidRange');
+  rows.replaceChildren(); cmp.replaceChildren();
+
+  if(!vidRpcOk){
+    range.textContent='—';
+    const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='כדי לראות את נתוני הסרטון צריך להריץ את המיגרציה video_funnel.';
+    rows.append(p);return;
+  }
+  const v=vidSum;
+  const reached=v?Number(v.reached):0;
+  if(!reached){
+    range.textContent='—';
+    const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='עדיין לא הגיע אף אחד לסרטון בטווח שנבחר.';
+    rows.append(p);return;
+  }
+  range.textContent=reached+' הגיעו';
+
+  // ‏המכנה הוא תמיד מי שהגיע לסרטון. אחוז נגינה מתוך כלל הכניסות
+  // לדף היה מספר אחר לגמרי, ובלתי ניתן להשוואה.
+  const steps=[
+    ['הגיעו לסרטון', reached],
+    ['לחצו נגן',     Number(v.played)],
+    ['רבע',          Number(v.pct25)],
+    ['חצי',          Number(v.pct50)],
+    ['שלושה רבעים',  Number(v.pct75)],
+    ['סיימו',        Number(v.completed)]
+  ];
+  let prev=null;
+  steps.forEach(([label,n])=>{
+    const row=document.createElement('div');row.className='fn-row';
+    const top=document.createElement('div');top.className='fn-top';
+    const nm=document.createElement('span');nm.className='fn-name';nm.textContent=label;
+    const num=document.createElement('span');num.className='fn-num';
+    const b=document.createElement('b');b.textContent=n;
+    num.append(b,document.createTextNode(' · '+Math.round(n/reached*100)+'%'));
+    if(prev!==null&&prev-n>0){const d=document.createElement('span');
+      d.className='fn-drop';d.textContent='  −'+(prev-n);num.append(d)}
+    top.append(nm,num);
+    const bar=document.createElement('div');bar.className='fn-bar';
+    const fill=document.createElement('div');fill.className='fn-fill';
+    fill.style.width=Math.round(n/reached*100)+'%';
+    bar.append(fill);row.append(top,bar);rows.append(row);
+    prev=n;
+  });
+
+  const med=Number(v.median_seconds)||0;
+  if(med){const p=document.createElement('p');p.className='pane-note';
+    p.style.margin='10px 0 0';
+    p.textContent='מי שלחץ נגן צפה בחציון '+med+' שניות מתוך 35.';
+    rows.append(p)}
+
+  // ‏ההשוואה. בלי מספרים קטנים אין לה משמעות, אז מתחת לעשרים
+  // צופים היא לא מוצגת בכלל ובמקומה נכתב כמה חסר.
+  const w=Number(v.watchers), wc=Number(v.watchers_converted);
+  const o=Number(v.others),   oc=Number(v.others_converted);
+  if(w<20||o<20){
+    const p=document.createElement('p');p.className='vid-gap';
+    p.textContent='ההשוואה בין צופים ללא צופים תוצג כשיהיו לפחות 20 מכל צד. כרגע '+w+' ו-'+o+'.';
+    cmp.append(p);return;
+  }
+  const wr=wc/w*100, or_=oc/o*100;
+  const card=(cls,val,title,sub)=>{
+    const d=document.createElement('div');d.className='vid-cmp'+(cls?' win':'');
+    const b=document.createElement('b');b.textContent=val.toFixed(1)+'%';
+    const t=document.createElement('span');t.textContent=title;
+    const sm=document.createElement('small');sm.textContent=sub;
+    d.append(b,t,sm);return d;
+  };
+  cmp.append(card(wr>=or_, wr, 'השאירו פרטים אחרי שצפו', wc+' מתוך '+w));
+  cmp.append(card(or_>wr, or_, 'השאירו פרטים בלי לצפות', oc+' מתוך '+o));
+  const gap=document.createElement('p');gap.className='vid-gap';
+  if(or_>0){
+    const x=wr/or_;
+    gap.innerHTML=wr>=or_
+      ? 'מי שצפה בסרטון משאיר פרטים <b>פי '+x.toFixed(1)+'</b> יותר.'
+      : 'מי שצפה בסרטון משאיר פרטים <b>פחות</b> ממי שלא. שווה בדיקה.';
+  } else gap.textContent='אין עדיין המרות אצל מי שלא צפה.';
+  cmp.append(gap);
+}
+
 async function loadPage(){
   if(!currentUser||!pageRpcOk)return;
   const{from,to}=dateRange();
   const f=from?from.toISOString():null, t=to?to.toISOString():null;
-  const[c,s]=await Promise.all([
+  const[c,s,vd]=await Promise.all([
     supabase.rpc('page_funnel_counts',{p_from:f,p_to:t,p_page:'landing'}),
-    supabase.rpc('page_sources',{p_from:f,p_to:t,p_page:'landing'})
+    supabase.rpc('page_sources',{p_from:f,p_to:t,p_page:'landing'}),
+    vidRpcOk?supabase.rpc('video_funnel_summary',{p_from:f,p_to:t,p_video:'intro'})
+            :Promise.resolve({data:null,error:null})
   ]);
+  // ‏הסרטון לא מפיל את הלוח. אם המיגרציה עוד לא רצה, הפאנל אומר
+  // את זה ושאר הדף ממשיך כרגיל.
+  if(vd.error){ if(schemaMissing(vd.error)) vidRpcOk=false; else console.error(vd.error); }
+  else vidSum=Array.isArray(vd.data)?vd.data[0]:vd.data;
+  renderVideo();
   // The table is not there until the migration is run, and the panel should
   // say so plainly rather than sit blank or fill the console with errors.
   if(c.error||s.error){
