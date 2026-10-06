@@ -305,13 +305,13 @@ function stage(name) {
 /* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
-const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set' };
+const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set', assets: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
                 import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
-                year: 'scYear' };
+                year: 'scYear', assets: 'scAssets' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -329,6 +329,7 @@ function tab(name) {
   if (name === 'sum') renderSum();
   if (name === 'goals') renderGoals();
   if (name === 'year') renderYear();
+  if (name === 'assets') renderAssets();
   window.scrollTo({ top: 0 });
 }
 
@@ -1680,6 +1681,285 @@ async function renderSum() {
   box.append(cta);
 }
 
+/* ═════════════════════════════════ חסכונות ונכסים ══ */
+
+/* ‏ספר חשבונות שני, ובכוונה אינו נוגע בתנועות. תנועות עונות על
+   "כמה הוצאתי החודש", נכסים עונים על "כמה יש לי בכלל", ואלה שתי
+   שאלות שונות.
+
+   ‏הכלל שחל על כל המסך הזה: הוא ממפה ואינו ממליץ. אין כאן דירוג
+   בין סוגי נכסים, אין "כדאי" ואין "עדיף", ואין שום משפט שאפשר
+   לקרוא כהמלצת השקעה. גם מנוע התובנות של האפליקציה אינו מגיע
+   לכאן. */
+
+const ASSET_KINDS = [
+  { key: 'bank_savings', icon: '🏦', label: 'חיסכון בבנק',   group: 'savings' },
+  { key: 'deposit',      icon: '💰', label: 'פיקדון',         group: 'savings' },
+  { key: 'cash',         icon: '💵', label: 'מזומן',          group: 'savings' },
+  { key: 'portfolio',    icon: '📊', label: 'תיק השקעות',     group: 'invest'  },
+  { key: 'crypto',       icon: '₿',  label: 'קריפטו',         group: 'invest'  },
+  { key: 'mutual_fund',  icon: '📋', label: 'קרן נאמנות',     group: 'invest'  },
+  { key: 'study_fund',   icon: '📈', label: 'קרן השתלמות',    group: 'retire'  },
+  { key: 'provident',    icon: '🏦', label: 'קופת גמל',       group: 'retire'  },
+  { key: 'pension',      icon: '👴', label: 'פנסיה',          group: 'retire'  },
+  { key: 'realestate',   icon: '🏠', label: 'נדל"ן',          group: 'estate'  },
+  { key: 'other',        icon: '➕', label: 'אחר',            group: 'other'   }
+];
+
+const ASSET_GROUPS = [
+  { key: 'savings', label: 'חסכונות' },
+  { key: 'invest',  label: 'השקעות' },
+  { key: 'retire',  label: 'פנסיה והשתלמות' },
+  { key: 'estate',  label: 'נדל"ן' },
+  { key: 'other',   label: 'אחר' }
+];
+
+/* ‏התחייבות נשאלת רק איפה שיש לה משמעות. */
+const ASKS_LIABILITY = new Set(['realestate', 'other']);
+const kindOf = k => ASSET_KINDS.find(x => x.key === k) || ASSET_KINDS[ASSET_KINDS.length - 1];
+
+let assetRows = [];
+let assetEdit = null;
+let assetKind = 'bank_savings';
+
+/* ‏מתי עודכן. בלי זה המסך מתחיל להיראות כאילו המספרים חיים,
+   והם לא: הם מה שאדם הקליד ביום מסוים. */
+function updatedAgo(iso) {
+  if (!iso) return '';
+  const d = Math.floor((Date.now() - new Date(iso)) / DAY);
+  if (d <= 0) return 'עודכן היום';
+  if (d === 1) return 'עודכן אתמול';
+  if (d < 31) return `עודכן לפני ${d} ימים`;
+  const m = Math.round(d / 30.4);
+  if (m < 12) return `עודכן לפני ${m} ${m === 1 ? 'חודש' : 'חודשים'}`;
+  return 'עודכן לפני יותר משנה';
+}
+
+const assetWorth = a => Number(a.amount_agorot) - Number(a.liability_agorot || 0);
+
+async function renderAssets() {
+  const box = $('assetsBody');
+  const { data, error } = await sb.from('assets')
+    .select('*').eq('archived', false).order('created_at', { ascending: true });
+  box.textContent = '';
+  if (error) { box.append(el('p', 'note', human(error))); return; }
+
+  assetRows = (data || []).map(a => ({ ...a,
+    amount_agorot: Number(a.amount_agorot),
+    liability_agorot: Number(a.liability_agorot || 0) }));
+
+  if (!assetRows.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'עוד לא מיפינו כלום'));
+    e.append(el('p', null, 'חיסכון בבנק, קרן השתלמות, פנסיה, דירה. כל מקום שיש בו כסף שלכם ואינו העובר ושב. אחרי שניים שלושה פריטים כבר רואים תמונה.'));
+    box.append(e);
+    return;
+  }
+
+  const total = assetRows.reduce((s, a) => s + Number(a.amount_agorot), 0);
+  const debts = assetRows.reduce((s, a) => s + Number(a.liability_agorot || 0), 0);
+  const worth = total - debts;
+
+  /* ── המספר, והבטחה להסביר אותו ── */
+  const head = el('button', 'worth');
+  head.type = 'button';
+  head.append(el('span', 'k', 'השווי הפיננסי שלי'));
+  const v = el('span', 'v money' + (worth < 0 ? ' neg' : ''));
+  setMoney(v, worth, true);
+  head.append(v);
+  const how = el('span', 'how');
+  how.append(document.createTextNode('ממה זה מורכב'));
+  const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  sv.setAttribute('viewBox', '0 0 24 24'); sv.setAttribute('aria-hidden', 'true');
+  const pa = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  pa.setAttribute('d', 'M14.5 6l-6 6 6 6'); pa.setAttribute('fill', 'none');
+  pa.setAttribute('stroke', 'currentColor'); pa.setAttribute('stroke-width', '2.4');
+  pa.setAttribute('stroke-linecap', 'round'); pa.setAttribute('stroke-linejoin', 'round');
+  sv.append(pa); how.append(sv);
+  head.append(how);
+  head.setAttribute('aria-label',
+    `השווי הפיננסי שלכם ${fmt(worth)}. לחיצה מראה ממה הוא מורכב.`);
+  head.addEventListener('click', openWorth);
+  box.append(head);
+
+  if (debts) {
+    box.append(el('p', 'note',
+      `סך הנכסים ${fmt(total)}, ומתוכם ${fmt(debts)} עוד לא שלכם.`));
+  }
+
+  /* ── לפי סוגים ── */
+  for (const g of ASSET_GROUPS) {
+    const keys = ASSET_KINDS.filter(k => k.group === g.key).map(k => k.key);
+    const list = assetRows.filter(a => keys.includes(a.kind));
+    if (!list.length) continue;
+
+    const wrap = el('div', 'ag');
+    const h = el('h2');
+    h.append(el('span', null, g.label));
+    const tv = el('span', 't money'); setMoney(tv, list.reduce((s, a) => s + assetWorth(a), 0), true);
+    h.append(tv);
+    wrap.append(h);
+
+    for (const a of list) {
+      const k = kindOf(a.kind);
+      const row = el('button', 'asset');
+      row.type = 'button';
+      const ic = el('span', 'asset-ico', k.icon); ic.setAttribute('aria-hidden', 'true');
+      const mid = el('div', 'asset-mid');
+      mid.append(el('div', 't', a.name));
+      const bits = [k.label];
+      if (a.note) bits.push(a.note);
+      bits.push(updatedAgo(a.updated_at || a.created_at));
+      mid.append(el('div', 's', bits.filter(Boolean).join(' · ')));
+
+      const end = el('div', 'asset-end');
+      const money = el('span', 'v money' + (assetWorth(a) < 0 ? ' over' : ''));
+      setMoney(money, assetWorth(a), true);
+      end.append(money);
+      /* ‏בנדל"ן המספר הגדול הוא ההון העצמי, והשווי נאמר מתחתיו
+         בנפרד. שני המספרים האלה אינם אותו דבר, ואסור שייראו כך. */
+      if (a.liability_agorot > 0) {
+        end.append(el('span', 'sub', `שווי ${fmt(a.amount_agorot)}, משכנתא ${fmt(a.liability_agorot)}`));
+      }
+      row.append(ic, mid, end);
+      row.setAttribute('aria-label', a.liability_agorot > 0
+        ? `${a.name}, ${k.label}. שווי ${fmt(a.amount_agorot)}, יתרת הלוואה ${fmt(a.liability_agorot)}, הון עצמי ${fmt(assetWorth(a))}`
+        : `${a.name}, ${k.label}, ${fmt(a.amount_agorot)}`);
+      row.addEventListener('click', () => openAsset(a));
+      wrap.append(row);
+    }
+    box.append(wrap);
+  }
+}
+
+/* ‏ממה מורכב השווי. הוא מבטיח הסבר, ולכן הוא מראה את החשבון
+   עצמו ולא גרסה מעוגלת שלו. */
+function openWorth() {
+  const body = $('worthBody');
+  body.textContent = '';
+  const line = (k, val, cls) => {
+    const r = el('div', 'worth-row' + (cls ? ' ' + cls : ''));
+    r.append(el('span', 'k', k));
+    const v = el('span', 'v money' + (cls === 'minus' ? ' minus' : ''));
+    setMoney(v, val, true);
+    r.append(v);
+    body.append(r);
+  };
+
+  for (const g of ASSET_GROUPS) {
+    const keys = ASSET_KINDS.filter(k => k.group === g.key).map(k => k.key);
+    const list = assetRows.filter(a => keys.includes(a.kind));
+    if (!list.length) continue;
+    line(g.label, list.reduce((s, a) => s + Number(a.amount_agorot), 0));
+  }
+
+  const debts = assetRows.reduce((s, a) => s + Number(a.liability_agorot || 0), 0);
+  if (debts) {
+    const r = el('div', 'worth-row');
+    r.append(el('span', 'k', 'פחות הלוואות על הנכסים'));
+    const v = el('span', 'v money minus');
+    setMoney(v, debts);
+    v.prepend(document.createTextNode('−'));
+    r.append(v);
+    body.append(r);
+  }
+
+  const total = assetRows.reduce((s, a) => s + assetWorth(a), 0);
+  line('השווי הפיננסי שלי', total, 'total');
+  openSheet($('worthSheet'));
+}
+$('worthClose').addEventListener('click', closeSheet);
+
+/* ─────────────────────────── הטופס ── */
+
+function assetEquityLine() {
+  if (!ASKS_LIABILITY.has(assetKind)) { $('assetEquity').textContent = ''; return; }
+  const v = toAgorot($('assetAmount').value) || 0;
+  const l = toAgorot($('assetLiab').value) || 0;
+  $('assetEquity').textContent = (v || l)
+    ? `ההון העצמי שלכם בנכס הוא ${fmt(v - l, true)}, כלומר השווי פחות יתרת ההלוואה.`
+    : '';
+}
+
+function setAssetKind(k) {
+  assetKind = k;
+  for (const b of $('assetKinds').children)
+    b.setAttribute('aria-pressed', String(b.dataset.kind === k));
+  const estate = k === 'realestate';
+  $('assetAmountLbl').textContent = estate ? 'שווי הנכס היום' : 'כמה יש שם';
+  $('assetLiabWrap').classList.toggle('hidden', !ASKS_LIABILITY.has(k));
+  assetEquityLine();
+}
+
+function openAsset(a) {
+  assetEdit = a || null;
+  $('assetTitle').textContent = a ? 'עדכון' : 'חיסכון או נכס חדש';
+  $('assetName').value = a ? a.name : '';
+  $('assetAmount').value = a ? (Number(a.amount_agorot) / 100).toString() : '';
+  $('assetLiab').value = a && a.liability_agorot ? (Number(a.liability_agorot) / 100).toString() : '';
+  $('assetNote').value = a && a.note ? a.note : '';
+  $('assetDelRow').classList.toggle('hidden', !a);
+
+  const box = $('assetKinds');
+  box.textContent = '';
+  for (const k of ASSET_KINDS) {
+    const b = el('button', 'chip', `${k.icon} ${k.label}`);
+    b.type = 'button';
+    b.dataset.kind = k.key;
+    b.addEventListener('click', () => setAssetKind(k.key));
+    box.append(b);
+  }
+  setAssetKind(a ? a.kind : 'bank_savings');
+  setErr($('assetErr'), '');
+  openSheet($('assetSheet'));
+}
+
+$('assetAdd').addEventListener('click', () => openAsset(null));
+$('assetCancel').addEventListener('click', closeSheet);
+$('assetAmount').addEventListener('input', assetEquityLine);
+$('assetLiab').addEventListener('input', assetEquityLine);
+
+$('assetSave').addEventListener('click', async () => {
+  setErr($('assetErr'), '');
+  const name = $('assetName').value.trim();
+  const amount = toAgorot($('assetAmount').value);
+  if (!name) { setErr($('assetErr'), 'צריך שם, כדי שתדעו מה זה כשתחזרו.'); $('assetName').focus(); return; }
+  if (amount == null) { setErr($('assetErr'), 'צריך סכום. אם אתם לא יודעים בדיוק, מספר בערך מספיק.'); $('assetAmount').focus(); return; }
+  const liab = ASKS_LIABILITY.has(assetKind) ? (toAgorot($('assetLiab').value) || 0) : 0;
+
+  const btn = $('assetSave');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const row = {
+      kind: assetKind, name: name.slice(0, 60),
+      amount_agorot: amount, liability_agorot: liab,
+      note: $('assetNote').value.trim().slice(0, 300) || null,
+      updated_at: new Date().toISOString()
+    };
+    const { error } = assetEdit
+      ? await sb.from('assets').update(row).eq('id', assetEdit.id)
+      : await sb.from('assets').insert({ ...row, household_id: S.hh, created_by: S.user.id });
+    if (error) throw error;
+    closeSheet();
+    toast(assetEdit ? 'עודכן.' : 'נוסף.');
+    renderAssets();
+  } catch (err) {
+    setErr($('assetErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'שמירה';
+  }
+});
+
+$('assetDelete').addEventListener('click', async () => {
+  const a = assetEdit;
+  closeSheet();
+  if (!a) return;
+  const { error } = await sb.from('assets').delete().eq('id', a.id);
+  if (error) { toast(human(error)); return; }
+  toast('נמחק.');
+  renderAssets();
+});
+
 /* ═══════════════════════════════════════ סיכום שנה ══ */
 
 /* ‏תמיד קלנדרי, מינואר עד דצמבר, בלי קשר ליום שבו המשתמש בחר
@@ -2158,6 +2438,8 @@ $('setImport').addEventListener('click', () => tab('import'));
 $('setDocs').addEventListener('click', () => tab('docs'));
 $('setSum').addEventListener('click', () => tab('sum'));
 $('setYear').addEventListener('click', () => tab('year'));
+$('setAssets').addEventListener('click', () => tab('assets'));
+$('assetsBack').addEventListener('click', () => tab('set'));
 $('yearBack').addEventListener('click', () => tab('set'));
 $('setGoals').addEventListener('click', () => tab('goals'));
 $('importBack').addEventListener('click', () => tab('set'));

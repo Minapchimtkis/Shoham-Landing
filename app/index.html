@@ -252,6 +252,17 @@
     </div>
 
     <div class="set-group">
+      <h2>הכסף שלי</h2>
+      <button class="set-row" id="setAssets" type="button">
+        <span class="k">
+          החסכונות והנכסים שלי
+          <small id="assetsNow">כמה יש לי מעבר לעובר ושב</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
       <h2>התמונה</h2>
       <button class="set-row" id="setYear" type="button">
         <span class="k">
@@ -350,6 +361,24 @@
       כמה יש לי · נבנה על ידי שוהם אבו, יועץ כלכלי מוסמך מטעם UNI
       פיננסים בפיקוח אוניברסיטת אריאל. הכלי הזה אינו ייעוץ השקעות
       ואינו המלצה. הוא מראה לכם את הכסף שלכם.
+    </p>
+  </main>
+
+  <!-- ──────────────────────────── חסכונות ונכסים ── -->
+  <main class="screen hidden" id="scAssets">
+    <button class="back" id="assetsBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">החסכונות והנכסים שלי</h1>
+    <div id="assetsBody"></div>
+    <button class="btn" id="assetAdd" type="button" style="margin-top:20px">הוספת חיסכון או נכס</button>
+
+    <p class="credit" id="assetsNote">
+      המסך הזה הוא מפה ולא ייעוץ. הוא מראה מה שהקלדתם ואיפה זה
+      נמצא. הוא אינו ממליץ על מסלול, על מוצר או על נכס, ואינו
+      אומר מה כדאי לקנות, למכור או להעביר. הסכומים הם מה שרשמתם,
+      והם אינם מתעדכנים מעצמם.
     </p>
   </main>
 
@@ -744,6 +773,59 @@
   <div class="sheet-row">
     <button class="btn btn-ghost" id="cycleCancel" type="button">ביטול</button>
     <button class="btn" id="cycleSave" type="button">שמירה</button>
+  </div>
+</div>
+
+<!-- חיסכון או נכס -->
+<div class="sheet hidden" id="assetSheet" role="dialog" aria-modal="true" aria-labelledby="assetTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="assetTitle">חיסכון או נכס חדש</h2>
+  <p class="sub">רק מה שצריך. אפשר לעדכן את הסכום בכל רגע.</p>
+
+  <div class="field">
+    <span class="lbl" id="assetKindLbl">מה זה</span>
+    <div class="chips" id="assetKinds" role="group" aria-labelledby="assetKindLbl"></div>
+  </div>
+
+  <div class="field">
+    <label for="assetName">איך לקרוא לזה</label>
+    <input class="inp" id="assetName" type="text" maxlength="60" autocomplete="off" placeholder="חיסכון בלאומי">
+  </div>
+
+  <div class="field">
+    <label for="assetAmount" id="assetAmountLbl">כמה יש שם</label>
+    <input class="inp" id="assetAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+  </div>
+
+  <div class="field hidden" id="assetLiabWrap">
+    <label for="assetLiab">יתרת המשכנתא</label>
+    <input class="inp" id="assetLiab" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+    <p class="note" id="assetEquity" style="margin-top:8px"></p>
+  </div>
+
+  <div class="field">
+    <label for="assetNote">הערה, אם בא לכם</label>
+    <input class="inp" id="assetNote" type="text" maxlength="300" autocomplete="off" placeholder="אופציונלי">
+  </div>
+
+  <p class="err hidden" id="assetErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="assetCancel" type="button">ביטול</button>
+    <button class="btn" id="assetSave" type="button">שמירה</button>
+  </div>
+  <div class="sheet-row hidden" id="assetDelRow">
+    <button class="btn btn-danger" id="assetDelete" type="button">מחיקה</button>
+  </div>
+</div>
+
+<!-- ממה מורכב השווי -->
+<div class="sheet hidden" id="worthSheet" role="dialog" aria-modal="true" aria-labelledby="worthTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="worthTitle">ממה מורכב השווי</h2>
+  <p class="sub">כל מה שהזנתם, פחות מה שרובץ עליו.</p>
+  <div id="worthBody"></div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="worthClose" type="button">סגירה</button>
   </div>
 </div>
 

@@ -927,3 +927,75 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   color:var(--ink-3);margin-top:1px;
 }
 .chip[aria-pressed="true"] small{color:rgba(255,255,255,.78)}
+
+/* ═══════════════════════════════════ חסכונות ונכסים ══ */
+
+/* ‏המספר הגדול כאן הוא כפתור, כי הוא מבטיח הסבר. */
+.worth{
+  display:block;width:100%;text-align:right;
+  padding:18px 0 20px;
+}
+.worth .k{font-size:16px;font-weight:700;color:var(--violet)}
+.worth .v{
+  display:block;margin-top:2px;
+  font-size:clamp(38px,12vw,50px);line-height:1.05;letter-spacing:-0.03em;
+}
+.worth .v.neg{color:var(--amber)}
+.worth .how{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:8px;font-size:14px;font-weight:600;color:var(--violet);
+}
+.worth .how svg{width:14px;height:14px}
+
+.ag{margin-top:6px}
+.ag > h2{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:13px;font-weight:700;color:var(--ink-3);
+  padding:18px 0 4px;
+}
+.ag > h2 .t{font-size:14px;color:var(--ink-2)}
+
+/* ‏כרטיס, לא שורה: כאן אין פס התקדמות ואין "מתוך", יש פריט
+   עומד בפני עצמו עם סכום. */
+.asset{
+  display:flex;align-items:center;gap:12px;
+  width:100%;text-align:right;
+  padding:13px 0;border-bottom:1px solid var(--rule);
+}
+.asset-ico{
+  flex:none;width:40px;height:40px;border-radius:11px;
+  background:var(--wash);display:grid;place-items:center;
+  font-size:18px;line-height:1;
+}
+.asset-mid{flex:1;min-width:0}
+.asset-mid .t{font-size:16px;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asset-mid .s{font-size:13px;color:var(--ink-3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asset-end{flex:none;text-align:left}
+.asset-end .v{font-size:17px;display:block}
+/* ‏בנדל"ן השווי וההון העצמי הם שני מספרים שונים, ואסור שייראו
+   כמו אחד. השווי הוא הקטן והשקט, ההון העצמי הוא מה שסופרים. */
+.asset-end .sub{
+  font-size:12px;color:var(--ink-3);display:block;margin-top:2px;
+}
+
+.worth-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:12px;padding:11px 0;border-bottom:1px solid var(--rule);
+  font-size:15px;
+}
+.worth-row:last-child{border-bottom:none}
+.worth-row.total{
+  border-top:1px solid var(--rule-2);border-bottom:none;
+  margin-top:6px;padding-top:14px;font-weight:700;
+}
+.worth-row .k{color:var(--ink-2)}
+.worth-row.total .k{color:var(--ink)}
+.worth-row .v{font-size:16px}
+.worth-row .v.minus{color:var(--amber)}
+
+@media (hover:hover) and (pointer:fine){
+  .asset:hover,.worth:hover{background:var(--wash)}
+}
+.asset:active,.worth:active{background:var(--wash-2)}
