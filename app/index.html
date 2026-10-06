@@ -253,6 +253,13 @@
 
     <div class="set-group">
       <h2>התמונה</h2>
+      <button class="set-row" id="setYear" type="button">
+        <span class="k">
+          סיכום השנה
+          <small>איפה אתם עומדים, שנים עשר חודשים במבט אחד</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <button class="set-row" id="setSum" type="button">
         <span class="k">
           סיכום החודש
@@ -264,6 +271,17 @@
         <span class="k">
           מטרות חיסכון
           <small>כמה צריך, עד מתי, וכמה כבר יש</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
+      <h2>החודש התקציבי</h2>
+      <button class="set-row" id="setCycle" type="button">
+        <span class="k">
+          מתי מתחיל החודש
+          <small id="cycleNow">בראשון בחודש</small>
         </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -333,6 +351,17 @@
       פיננסים בפיקוח אוניברסיטת אריאל. הכלי הזה אינו ייעוץ השקעות
       ואינו המלצה. הוא מראה לכם את הכסף שלכם.
     </p>
+  </main>
+
+  <!-- ──────────────────────────────────── סיכום שנה ── -->
+  <main class="screen hidden" id="scYear">
+    <button class="back" id="yearBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title" id="yearTitle">סיכום השנה</h1>
+    <div class="chips" id="yearPick" style="margin-bottom:18px"></div>
+    <div id="yearBody"></div>
   </main>
 
   <!-- ─────────────────────────────────────── סיכום ── -->
@@ -678,6 +707,43 @@
   </div>
   <div class="sheet-row hidden" id="goalDelRow">
     <button class="btn btn-danger" id="goalDelete" type="button">מחיקת המטרה</button>
+  </div>
+</div>
+
+<!-- מתי מתחיל החודש התקציבי -->
+<div class="sheet hidden" id="cycleSheet" role="dialog" aria-modal="true" aria-labelledby="cycleTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="cycleTitle">מתי מתחיל החודש</h2>
+  <p class="sub">
+    כרטיס אשראי בארץ מחייב ב־2 או ב־10, ולכן יש מי שמנהל תקציב
+    מהעשירי עד העשירי. אפשר, והנה הבחירה.
+  </p>
+
+  <div class="field">
+    <span class="lbl" id="cycleLbl">יום ההתחלה</span>
+    <div class="chips" id="cycleChips" role="group" aria-labelledby="cycleLbl"></div>
+  </div>
+
+  <div class="insight" id="cycleWarn">
+    <h3>מה שחשוב שתדעו לפני שאתם בוחרים</h3>
+    <p>
+      מהעשירי עד העשירי זה לא נכון כמסגרת ראשית. חודש כזה זוחל,
+      הוא לא מתיישר עם שום דוח, ואי אפשר להשוות בו ינואר לינואר.
+      הוא שימושי כדי לראות מה הכרטיס עומד לחייב, ולא כדי לנהל
+      שנה.
+    </p>
+    <p style="margin-top:8px">
+      לכן <b>סיכום השנה כאן תמיד קלנדרי</b>, מהראשון בינואר עד
+      השלושים ואחד בדצמבר, גם אם בחרתם להסתכל אחרת ביום יום.
+      וגם התקציב עצמו נשמר תמיד לפי החודש הקלנדרי, כך שאפשר
+      לשנות את הבחירה הזאת הלוך ושוב בלי לאבד כלום.
+    </p>
+  </div>
+
+  <p class="err hidden" id="cycleErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="cycleCancel" type="button">ביטול</button>
+    <button class="btn" id="cycleSave" type="button">שמירה</button>
   </div>
 </div>
 

@@ -92,12 +92,61 @@ const addMonths = (d, k) => new Date(d.getFullYear(), d.getMonth() + k, 1);
 const daysInMonth = d => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
 const sameMonth = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 
+/* ───────────────────────────────────────── תקופה ──
+   ‏יש מי שמנהל תקציב מהעשירי עד העשירי, כי כך הכרטיס שלו מחייב.
+   מבחינת יועץ זאת לא המסגרת הנכונה, ובוודאי לא לשנה: תקופה כזאת
+   זוחלת, ושנה כזאת אינה שנים עשר חודשים שלמים.
+
+   ‏לכן הבחירה חלה על מקום אחד בלבד · החלון שדרכו רואים תנועות.
+   התקציב נשאר מקובע לחודש הקלנדרי שבו התקופה נפתחת, ומכאן שסיכום
+   השנה הוא קלנדרי מעצם המבנה ולא בזכות תנאי שמישהו זכר לכתוב. */
+
+const atNoon = iso => new Date(iso + 'T12:00:00');
+
+function periodRange(anchor) {
+  const c = S.cycle || 1;
+  if (c === 1) {
+    return { from: monthKey(anchor),
+             to: isoDate(new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0)) };
+  }
+  return { from: isoDate(new Date(anchor.getFullYear(), anchor.getMonth(), c)),
+           to:   isoDate(new Date(anchor.getFullYear(), anchor.getMonth() + 1, c - 1)) };
+}
+
+/* ‏חודש העוגן של התקופה שהיום נמצא בה. ב-5 באוקטובר עם מחזור
+   שמתחיל בעשירי, התקופה הפעילה היא זו שנפתחה ב-10 בספטמבר. */
+function currentAnchor(d) {
+  const now = d || new Date();
+  const c = S.cycle || 1;
+  return now.getDate() >= c ? monthOf(now) : addMonths(monthOf(now), -1);
+}
+
+const inCurrentPeriod = () => monthKey(S.month) === monthKey(currentAnchor());
+
+function daysInPeriod(anchor) {
+  const { from, to } = periodRange(anchor);
+  return Math.round((atNoon(to) - atNoon(from)) / DAY) + 1;
+}
+
+/* ‏באיזה יום בתוך התקופה אנחנו. אחד הוא היום הראשון שלה. */
+function dayOfPeriod(anchor, d) {
+  const { from } = periodRange(anchor);
+  return Math.round((atNoon(isoDate(d || new Date())) - atNoon(from)) / DAY) + 1;
+}
+
 const MFMT = new Intl.DateTimeFormat('he-IL', { month: 'long' });
 function monthName(d) {
   const now = new Date();
   const m = MFMT.format(d);
   return d.getFullYear() === now.getFullYear() ? m : `${m} ${d.getFullYear()}`;
 }
+const SHORT = new Intl.DateTimeFormat('he-IL', { day: 'numeric', month: 'numeric' });
+function periodLabel(anchor) {
+  if ((S.cycle || 1) === 1) return monthName(anchor);
+  const { from, to } = periodRange(anchor);
+  return `${SHORT.format(atNoon(from))} עד ${SHORT.format(atNoon(to))}`;
+}
+
 const DFMT = new Intl.DateTimeFormat('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
 function dayName(iso) {
   const d = new Date(iso + 'T12:00:00');
@@ -157,6 +206,7 @@ const S = {
   prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
   reflections: [],
   tab: 'home',
+  cycle: 1,
   filterCat: null,
   txFilter: 'all',
   hist: null,
@@ -255,12 +305,13 @@ function stage(name) {
 /* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
-const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set' };
+const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
-                import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals' };
+                import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
+                year: 'scYear' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -277,6 +328,7 @@ function tab(name) {
   if (name === 'docs') IMP.openDocs();
   if (name === 'sum') renderSum();
   if (name === 'goals') renderGoals();
+  if (name === 'year') renderYear();
   window.scrollTo({ top: 0 });
 }
 
@@ -485,16 +537,19 @@ async function findHousehold() {
 }
 
 async function loadAll() {
+  /* ‏התקציב נשמר תחת החודש הקלנדרי. התנועות נקראות לפי החלון
+     שהמשתמש בחר. זאת כל ההפרדה. */
   const m0 = monthKey(S.month);
-  const m1 = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  const { from: p0, to: p1 } = periodRange(S.month);
 
-  const [cats, buds, txs, refl, prof] = await Promise.all([
+  const [cats, buds, txs, refl, prof, hh] = await Promise.all([
     sb.from('categories').select('*').eq('archived', false),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
-    sb.from('transactions').select('*').gte('occurred_on', m0).lte('occurred_on', m1)
+    sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
       .order('occurred_on', { ascending: false }).order('created_at', { ascending: false }),
     sb.from('reflections').select('*').eq('month', m0),
-    sb.from('profiles').select('display_name').limit(1)
+    sb.from('profiles').select('display_name').limit(1),
+    sb.from('households').select('cycle_start').limit(1)
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
@@ -506,6 +561,9 @@ async function loadAll() {
      שלה עוד לא רצה, האפליקציה עובדת בלעדיה במקום ליפול. */
   S.reflections = refl.error ? [] : (refl.data || []);
   S.profile = (prof.data && prof.data[0]) || null;
+  /* ‏העמודה הזאת נוספה אחרי שהיו כבר משקי בית. אם המיגרציה עוד
+     לא רצה, הראשון בחודש הוא מה שהיה תמיד. */
+  S.cycle = (!hh.error && hh.data && hh.data[0] && hh.data[0].cycle_start) || 1;
   S.prevTxs = null;
 
   renderHome();
@@ -516,8 +574,7 @@ async function loadAll() {
 async function loadPrev() {
   if (S.prevTxs) return S.prevTxs;
   const p = addMonths(S.month, -1);
-  const a = monthKey(p);
-  const b = isoDate(new Date(p.getFullYear(), p.getMonth() + 1, 0));
+  const { from: a, to: b } = periodRange(p);
   const { data, error } = await sb.from('transactions')
     .select('amount_agorot,direction,category_id,occurred_on')
     .gte('occurred_on', a).lte('occurred_on', b);
@@ -528,12 +585,12 @@ async function loadPrev() {
 /* ═══════════════════════════════════════════ הבית ══ */
 
 function renderHome() {
-  $('monthLabel').textContent = monthName(S.month);
+  $('monthLabel').textContent = periodLabel(S.month);
 
   const now = new Date();
-  const current = sameMonth(S.month, now);
-  const dim = daysInMonth(S.month);
-  const daysLeft = current ? (dim - now.getDate() + 1) : 0;
+  const current = inCurrentPeriod();
+  const dim = daysInPeriod(S.month);
+  const daysLeft = current ? (dim - dayOfPeriod(S.month, now) + 1) : 0;
 
   const left = leftToSpend();
   const over = left < 0;
@@ -647,11 +704,12 @@ function renderRows(current, dim, now) {
     else if (!p) fill.classList.add('none');
     bar.append(fill);
 
-    /* ‏הסימן של היום בחודש. בלעדיו "ארבעים אחוז מהתקציב" הוא לא
-       מידע: ארבעים אחוז בעשירי הוא בעיה, ובעשרים ושמונה הוא מצוין. */
+    /* ‏הסימן של היום בתוך התקופה. בלעדיו "ארבעים אחוז מהתקציב"
+       הוא לא מידע: ארבעים אחוז ביום העשירי הוא בעיה, וביום
+       העשרים ושמונה הוא מצוין. */
     if (current && p > 0) {
       const t = el('span', 'today');
-      t.style.right = Math.round(now.getDate() / dim * 100) + '%';
+      t.style.right = Math.round(dayOfPeriod(S.month, now) / dim * 100) + '%';
       bar.append(t);
     }
 
@@ -817,11 +875,11 @@ async function renderInsight() {
   };
 
   const now = new Date();
-  const current = sameMonth(S.month, now);
+  const current = inCurrentPeriod();
 
-  /* ‏שאלת סוף החודש. עד החמישי, ורק אם היה בחודש שעבר משהו
-     להסתכל עליו. */
-  if (current && now.getDate() <= 5 && !haveReflection('month_end', null)) {
+  /* ‏שאלת סוף החודש. בחמשת הימים הראשונים של התקופה, ורק אם
+     היה בקודמת משהו להסתכל עליו. */
+  if (current && dayOfPeriod(S.month, now) <= 5 && !haveReflection('month_end', null)) {
     const prev = await loadPrev();
     if (prev.length >= 3) {
       card(`${monthName(addMonths(S.month, -1))} נגמר`,
@@ -836,7 +894,7 @@ async function renderInsight() {
      החודש": שמונים אחוז בעשרים ושמונה בחודש הוא בסדר גמור,
      ושמונים אחוז בעשירי הוא מה ששווה לדעת עליו עכשיו. */
   if (current) {
-    const pace = now.getDate() / daysInMonth(S.month);
+    const pace = dayOfPeriod(S.month, now) / daysInPeriod(S.month);
     for (const c of outCats()) {
       const p = planned(c.id), used = spentIn(c.id);
       if (p <= 0 || used <= 0 || used > p) continue;
@@ -847,7 +905,7 @@ async function renderInsight() {
         seen[c.id] = 1;
         LS.set('warn.' + monthKey(S.month), seen);
         const leftCat = p - used;
-        card(`${c.label}: נשארו ${fmt(leftCat)} ל־${daysInMonth(S.month) - now.getDate()} ימים`,
+        card(`${c.label}: נשארו ${fmt(leftCat)} ל־${daysInPeriod(S.month) - dayOfPeriod(S.month, now)} ימים`,
           `השתמשתם ב־${Math.round(share * 100)}% מהתכנון, והחודש רק ב־${Math.round(pace * 100)}%. זאת לא נזיפה, זה הזמן שבו עוד אפשר להחליט.`,
           [['לתנועות', () => { S.filterCat = c.id; tab('tx'); }]]);
         return;
@@ -930,7 +988,7 @@ async function renderInsight() {
   }
 
   /* ‏השד הראשון: "זה לא בשבילי". הרגע שבו אפשר להראות שזה כן. */
-  if (!current || now.getDate() >= dayBeforeEnd()) {
+  if (!current || dayOfPeriod(S.month, now) >= dayBeforeEnd()) {
     const planned_ = outCats().filter(c => planned(c.id) > 0);
     if (planned_.length >= 3 && planned_.every(c => spentIn(c.id) <= planned(c.id))) {
       card('עמדתם בכל הקטגוריות', 'זה לא מקריות ולא מזל. זה מה שקורה כשמסתכלים. "זה לא בשבילי" הוא השד הראשון, וזה בדיוק הדבר שסותר אותו.');
@@ -952,7 +1010,7 @@ async function renderInsight() {
   card(t, p);
 }
 
-function dayBeforeEnd() { return daysInMonth(S.month) - 2; }
+function dayBeforeEnd() { return daysInPeriod(S.month) - 2; }
 
 /* ═══════════════════════════════════════════ תנועות ══ */
 
@@ -1174,12 +1232,10 @@ function openAdd(t) {
   /* ‏ברירת המחדל היא היום, אלא אם מסתכלים על חודש שעבר. תנועה
      שנרשמת לחודש שלא מסתכלים עליו פשוט נעלמת מהעיניים. */
   const now = new Date();
-  const d = sameMonth(S.month, now)
-    ? now
-    : new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0);
-  $('txDate').value = t ? t.occurred_on : isoDate(d);
-  $('txDate').min = monthKey(S.month);
-  $('txDate').max = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  const { from, to } = periodRange(S.month);
+  $('txDate').value = t ? t.occurred_on : (inCurrentPeriod() ? isoDate(now) : to);
+  $('txDate').min = from;
+  $('txDate').max = to;
   $('addSave').textContent = t ? 'שמירה' : 'הוספה';
   setErr($('addErr'), '');
   openSheet($('addSheet'));
@@ -1398,11 +1454,12 @@ $('catSave').addEventListener('click', async () => {
 $('monthBtn').addEventListener('click', () => {
   const box = $('monthChips');
   box.textContent = '';
-  const now = monthOf(new Date());
+  const now = currentAnchor();
   for (let i = 0; i < 7; i++) {
     const m = addMonths(now, -i);
     const b = el('button', 'chip', monthName(m));
     b.type = 'button';
+    if ((S.cycle || 1) !== 1) b.append(el('small', null, ' · ' + periodLabel(m)));
     b.setAttribute('aria-pressed', String(sameMonth(m, S.month)));
     b.addEventListener('click', async () => {
       closeSheet();
@@ -1410,7 +1467,7 @@ $('monthBtn').addEventListener('click', () => {
       S.month = m;
       S.filterCat = null;
       S.lastLeft = null;
-      $('monthLabel').textContent = monthName(m);
+      $('monthLabel').textContent = periodLabel(m);
       try { await loadAll(); } catch (err) { toast(human(err)); }
       if (S.tab === 'tx') renderTx();
       if (S.tab === 'budget') renderBudget();
@@ -1454,8 +1511,8 @@ function exampleTx() {
 async function loadHistory(months) {
   const n = months || 4;
   if (S.hist && S.hist.n >= n && S.hist.anchor === monthKey(S.month)) return S.hist.rows;
-  const from = monthKey(addMonths(S.month, -(n - 1)));
-  const to = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  const from = periodRange(addMonths(S.month, -(n - 1))).from;
+  const to = periodRange(S.month).to;
   const { data, error } = await sb.from('transactions')
     .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
     .gte('occurred_on', from).lte('occurred_on', to);
@@ -1623,6 +1680,265 @@ async function renderSum() {
   box.append(cta);
 }
 
+/* ═══════════════════════════════════════ סיכום שנה ══ */
+
+/* ‏תמיד קלנדרי, מינואר עד דצמבר, בלי קשר ליום שבו המשתמש בחר
+   לפתוח את החודש התקציבי שלו. חודש של עשירי עד עשירי זוחל, שנה
+   כזאת אינה שנים עשר חודשים שלמים, ואי אפשר להשוות בה ינואר
+   לינואר. זאת הסיבה שהחלון שהמשתמש בוחר חל על התצוגה היומיומית
+   בלבד ולא מגיע לכאן. */
+
+let yearPicked = null;
+
+async function renderYear() {
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  if (!yearPicked) yearPicked = thisYear;
+
+  const chips = $('yearPick');
+  chips.textContent = '';
+  for (const y of [thisYear, thisYear - 1, thisYear - 2]) {
+    const b = el('button', 'chip', String(y));
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(y === yearPicked));
+    b.addEventListener('click', () => { yearPicked = y; renderYear(); });
+    chips.append(b);
+  }
+
+  const box = $('yearBody');
+  box.textContent = '';
+  box.append(el('p', 'note', 'טוען...'));
+
+  const from = `${yearPicked}-01-01`, to = `${yearPicked}-12-31`;
+  const { data, error } = await sb.from('transactions')
+    .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
+    .gte('occurred_on', from).lte('occurred_on', to);
+  if (error) { box.textContent = ''; box.append(el('p', 'note', human(error))); return; }
+
+  const rows = (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
+  const spend = rows.filter(t => t.direction === 'out' && !t.is_transfer);
+  const income = rows.filter(t => t.direction === 'in' && !t.is_transfer);
+  const moved = rows.filter(t => t.is_transfer);
+
+  box.textContent = '';
+  $('yearTitle').textContent = 'סיכום ' + yearPicked;
+
+  if (!rows.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'אין נתונים ל' + yearPicked));
+    e.append(el('p', null, 'בשנה הזאת לא נרשמה אף תנועה. אפשר לייבא דפי בנק אחורה, והשנה תתמלא מעצמה.'));
+    const b = el('button', 'btn', 'לייבוא קובץ');
+    b.type = 'button';
+    b.addEventListener('click', () => tab('import'));
+    e.append(b);
+    box.append(e);
+    return;
+  }
+
+  const sum = a => a.reduce((s, t) => s + t.amount_agorot, 0);
+  const totalOut = sum(spend), totalIn = sum(income), totalMoved = sum(moved);
+  const kept = totalIn - totalOut;
+
+  /* ── המספר של השנה ── */
+  const head = el('div', 'sum-block');
+  const big = el('div', 'sum-big');
+  const v = el('span', 'v money' + (kept < 0 ? ' over' : ''));
+  setMoney(v, kept, true);
+  big.append(v, el('span', 'k', kept >= 0 ? 'נשארו אצלכם השנה' : 'חסרו השנה'));
+  head.append(big);
+
+  const l = el('p', 'note');
+  l.append(document.createTextNode('נכנסו ' + fmt(totalIn) + ' · יצאו ' + fmt(totalOut)));
+  head.append(l);
+  if (totalMoved) head.append(el('p', 'note', 'ועוד ' + fmt(totalMoved) + ' בהעברות, שאינן הוצאה.'));
+
+  const months = new Set(rows.map(t => t.occurred_on.slice(0, 7))).size;
+  if (months) head.append(el('p', 'note',
+    `ממוצע של ${fmt(Math.round(totalOut / months))} לחודש, על פני ${months} ${months === 1 ? 'חודש' : 'חודשים'} עם רישום.`));
+  box.append(head);
+
+  /* ── שנים עשר חודשים, הגרף היחיד שבאמת עוזר ── */
+  const perMonth = Array.from({ length: 12 }, (_, i) => ({
+    i, out: sum(spend.filter(t => +t.occurred_on.slice(5, 7) === i + 1)),
+    in: sum(income.filter(t => +t.occurred_on.slice(5, 7) === i + 1))
+  }));
+  const maxM = Math.max(...perMonth.map(m => m.out), 1);
+
+  const blk = el('div', 'sum-block');
+  blk.append(el('h2', null, 'חודש אחרי חודש'));
+  for (const m of perMonth) {
+    if (!m.out && !m.in) continue;
+    const row = el('div', 'sum-row');
+    row.append(el('span', 'nm', MFMT.format(new Date(yearPicked, m.i, 1))));
+    const track = el('div', 'track'); track.setAttribute('aria-hidden', 'true');
+    const fill = el('i');
+    fill.style.width = Math.max(3, Math.round(m.out / maxM * 100)) + '%';
+    track.append(fill);
+    const vv = el('span', 'vv money'); setMoney(vv, m.out);
+    row.append(track, vv);
+    row.setAttribute('aria-label',
+      `${MFMT.format(new Date(yearPicked, m.i, 1))}, יצאו ${fmt(m.out)}`);
+    blk.append(row);
+  }
+  box.append(blk);
+
+  const active = perMonth.filter(m => m.out > 0);
+  if (active.length >= 2) {
+    const hi = active.reduce((a, b) => a.out > b.out ? a : b);
+    const lo = active.reduce((a, b) => a.out < b.out ? a : b);
+    const note = el('p', 'note');
+    note.textContent =
+      `הכי יקר היה ${MFMT.format(new Date(yearPicked, hi.i, 1))} עם ${fmt(hi.out)}, ` +
+      `והכי זול ${MFMT.format(new Date(yearPicked, lo.i, 1))} עם ${fmt(lo.out)}. ` +
+      `ההפרש ביניהם הוא ${fmt(hi.out - lo.out)}.`;
+    box.append(note);
+  }
+
+  /* ── לאן הלך הכסף בשנה ── */
+  const byCat = outCats()
+    .map(c => ({ c, s: sum(spend.filter(t => t.category_id === c.id)) }))
+    .filter(x => x.s > 0).sort((a, b) => b.s - a.s);
+  if (byCat.length) {
+    const b2 = el('div', 'sum-block');
+    b2.append(el('h2', null, 'לאן הכסף הלך בשנה'));
+    const max = byCat[0].s;
+    for (const { c, s: amt } of byCat) {
+      const row = el('div', 'sum-row');
+      row.append(el('span', 'nm', (c.icon || '•') + ' ' + c.label));
+      const track = el('div', 'track'); track.setAttribute('aria-hidden', 'true');
+      const fill = el('i');
+      fill.style.width = Math.max(3, Math.round(amt / max * 100)) + '%';
+      track.append(fill);
+      const vv = el('span', 'vv money'); setMoney(vv, amt);
+      const wrap = el('span');
+      wrap.append(vv, el('span', 'pct', Math.round(amt / totalOut * 100) + '%'));
+      row.append(track, wrap);
+      row.setAttribute('aria-label', `${c.label}, ${fmt(amt)}, ${Math.round(amt / totalOut * 100)} אחוז מהוצאות השנה`);
+      b2.append(row);
+    }
+    box.append(b2);
+  }
+
+  /* ── מה חזר כל חודש, ומה הוא עלה בשנה ── */
+  const rec = recurring(spend).slice(0, 8);
+  if (rec.length) {
+    const b3 = el('div', 'sum-block');
+    b3.append(el('h2', null, 'מה חזר לאורך השנה'));
+    const tot = rec.reduce((s, r) => s + r.total, 0);
+    b3.append(el('p', 'note',
+      `${rec.length} ${rec.length === 1 ? 'דבר חוזר' : 'דברים חוזרים'}, ויחד ${fmt(tot)} לאורך השנה.`));
+    for (const r of rec) {
+      const row = el('div', 'sum-row');
+      row.append(el('span', 'nm', r.label.slice(0, 26)));
+      row.append(el('span'));
+      const vv = el('span', 'vv money'); setMoney(vv, r.total);
+      const wrap = el('span');
+      wrap.append(vv, el('span', 'pct', `${r.months} חודשים`));
+      row.append(wrap);
+      b3.append(row);
+    }
+    box.append(b3);
+  }
+
+  /* ── המטרות, אם יש ── */
+  const { data: goals } = await sb.from('goals').select('*').eq('archived', false);
+  if (goals && goals.length) {
+    const b4 = el('div', 'sum-block');
+    b4.append(el('h2', null, 'המטרות'));
+    for (const g of goals) {
+      const target = Number(g.target_agorot), saved = Number(g.saved_agorot);
+      const row = el('div', 'sum-row');
+      row.append(el('span', 'nm', g.title));
+      const track = el('div', 'track'); track.setAttribute('aria-hidden', 'true');
+      const fill = el('i');
+      fill.style.width = Math.min(100, Math.round(saved / target * 100)) + '%';
+      track.append(fill);
+      const wrap = el('span');
+      const vv = el('span', 'vv money'); setMoney(vv, saved);
+      wrap.append(vv, el('span', 'pct', Math.round(saved / target * 100) + '%'));
+      row.append(track, wrap);
+      b4.append(row);
+    }
+    box.append(b4);
+  }
+
+  /* ‏מי שבחר חלון שאינו קלנדרי צריך לדעת שכאן הוא לא חל. */
+  if ((S.cycle || 1) !== 1) {
+    const n = el('div', 'insight');
+    n.append(el('h3', null, 'הסיכום הזה קלנדרי'));
+    n.append(el('p', null,
+      `ביום יום אתם מסתכלים מה־${S.cycle} עד ה־${S.cycle}, וזה בסדר לראות מה הכרטיס עומד לחייב. ` +
+      'שנה נמדדת מהראשון בינואר עד השלושים ואחד בדצמבר, אחרת היא לא שנים עשר חודשים שלמים ואי אפשר להשוות בה ינואר לינואר.'));
+    box.append(n);
+  }
+
+  const cta = el('a', 'cta');
+  cta.href = '../#contact';
+  cta.target = '_blank'; cta.rel = 'noopener';
+  cta.append(el('strong', null, 'שנה שלמה במספרים. מה עושים איתה?'));
+  const sp = el('span');
+  sp.append(document.createTextNode('זה מה שקרה. לאן זה הולך, וכמה מזה אפשר לשנות, זאת כבר שיחה. '));
+  sp.append(el('span', 'go', 'לדבר עם שוהם'));
+  cta.append(sp);
+  box.append(cta);
+}
+
+/* ══════════════════════════ מתי מתחיל החודש התקציבי ══ */
+
+const CYCLE_DAYS = [1, 2, 5, 10, 15, 20, 25];
+let cyclePick = 1;
+
+function cycleLabel(c) {
+  return c === 1 ? 'בראשון בחודש' : `ב־${c} בחודש, כמו מועד החיוב בכרטיס`;
+}
+
+$('setCycle').addEventListener('click', () => {
+  cyclePick = S.cycle || 1;
+  const box = $('cycleChips');
+  box.textContent = '';
+  for (const c of CYCLE_DAYS) {
+    const b = el('button', 'chip', c === 1 ? 'הראשון' : 'ה־' + c);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(c === cyclePick));
+    b.addEventListener('click', () => {
+      cyclePick = c;
+      for (const o of box.children) o.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', 'true');
+      $('cycleWarn').classList.toggle('hidden', false);
+    });
+    box.append(b);
+  }
+  setErr($('cycleErr'), '');
+  openSheet($('cycleSheet'));
+});
+$('cycleCancel').addEventListener('click', closeSheet);
+
+$('cycleSave').addEventListener('click', async () => {
+  setErr($('cycleErr'), '');
+  const btn = $('cycleSave');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const { error } = await sb.from('households')
+      .update({ cycle_start: cyclePick }).eq('id', S.hh);
+    if (error) throw error;
+    S.cycle = cyclePick;
+    /* ‏נשארים על אותו חודש עוגן ולא קופצים ל"עכשיו". התקציב
+       שמור תחת החודש הקלנדרי, ולכן הוא לא זז; מה שזז הוא רק
+       טווח הימים שנספרים. קפיצה לחודש אחר כאן הייתה נראית
+       למשתמש כאילו התקציב שלו נעלם ברגע ששינה הגדרה. */
+    S.lastLeft = null;
+    S.hist = null;
+    closeSheet();
+    await loadAll();
+    renderSet();
+    toast(cyclePick === 1 ? 'החודש מתחיל בראשון.' : `החודש מתחיל ב־${cyclePick}.`);
+  } catch (err) {
+    setErr($('cycleErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'שמירה';
+  }
+});
+
 /* ═══════════════════════════════════════════ מטרות ══ */
 
 let goalEdit = null;
@@ -1740,6 +2056,7 @@ $('goalDelete').addEventListener('click', async () => {
 function renderSet() {
   $('setEmail').textContent = S.user?.email || '';
   $('setName').textContent  = S.profile?.display_name || 'לא הוגדר';
+  $('cycleNow').textContent = cycleLabel(S.cycle || 1);
 }
 
 $('setNameBtn').addEventListener('click', () => {
@@ -1833,13 +2150,15 @@ const IMP = mountImport({
   fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,
   goTab: tab,
   monthName, monthKeyOf: monthKey,
-  setMonth: m => { S.month = m; S.lastLeft = null; $('monthLabel').textContent = monthName(m); },
+  setMonth: m => { S.month = m; S.lastLeft = null; $('monthLabel').textContent = periodLabel(m); },
   reload: async () => { try { await loadAll(); } catch (err) { toast(human(err)); } }
 });
 
 $('setImport').addEventListener('click', () => tab('import'));
 $('setDocs').addEventListener('click', () => tab('docs'));
 $('setSum').addEventListener('click', () => tab('sum'));
+$('setYear').addEventListener('click', () => tab('year'));
+$('yearBack').addEventListener('click', () => tab('set'));
 $('setGoals').addEventListener('click', () => tab('goals'));
 $('importBack').addEventListener('click', () => tab('set'));
 $('docsBack').addEventListener('click', () => tab('set'));
@@ -1878,6 +2197,12 @@ async function enter(user) {
   }
 
   try {
+    /* ‏יום תחילת המחזור נקרא לפני הכל: הוא קובע איזו תקופה היא
+       "עכשיו", ובלעדיו הטעינה הראשונה הייתה מביאה את החלון
+       הלא נכון ומתקנת את עצמה אחר כך על המסך. */
+    const { data: h } = await sb.from('households').select('cycle_start').limit(1);
+    S.cycle = (h && h[0] && h[0].cycle_start) || 1;
+    S.month = currentAnchor();
     await loadAll();
   } catch (err) {
     stage('gate');
