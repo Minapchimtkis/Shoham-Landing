@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>כמה יש לי | אפליקציה לניהול תקציב אישי</title>
+<meta name="description" content="אפליקציה חינמית לניהול תקציב אישי בעברית. רושמים הוצאות, רואים מספר אחד שאומר כמה נשאר לחודש. מבית שוהם אבו, יועץ כלכלי.">
+<link rel="canonical" href="https://shohamfinance.co.il/app/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="שוהם אבו">
+<meta property="og:locale" content="he_IL">
+<meta property="og:title" content="כמה יש לי">
+<meta property="og:description" content="תקציב אישי בלי טבלאות. מספר אחד שאומר כמה נשאר לך לחודש.">
+<meta property="og:url" content="https://shohamfinance.co.il/app/">
+<meta property="og:image" content="https://shohamfinance.co.il/assets/share-home.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="../assets/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../assets/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="manifest" href="app.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-title" content="כמה יש לי">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- ‏Heebo לכל מילה. Frank Ruhl Libre רק לספרות ולפסיק, ולכן כל
+     תו אחר במספר, הש"ח והנקודה, נופל מעצמו חזרה ל-Heebo בלי
+     שאצטרך לעטוף אותו. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@900&amp;text=0123456789%2C&amp;display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ טעינה ══ -->
+<div id="boot" class="gate" aria-busy="true">
+  <div class="gate-brand">
+    <img src="../assets/logo.webp" alt="" width="26" height="26">
+    <span>שוהם אבו</span>
+  </div>
+  <div style="margin:auto 0">
+    <div class="skel" style="width:58%;height:22px"></div>
+    <div class="skel" style="width:40%;height:52px;margin-top:14px"></div>
+  </div>
+  <p class="sr-only" role="status">טוען</p>
+</div>
+
+<!-- ═══════════════════════════════════════ כניסה והרשמה ══ -->
+<main id="gate" class="gate hidden">
+  <div class="gate-brand">
+    <img src="../assets/logo.webp" alt="" width="26" height="26">
+    <span>שוהם אבו · יועץ כלכלי</span>
+  </div>
+
+  <div id="gateMain">
+    <h1 class="gate-name">כמה יש לי<span class="q">?</span></h1>
+    <p class="gate-lede">השאלה שאתם שואלים את עצמכם באמצע החודש. האפליקציה הזאת עונה עליה במספר אחד.</p>
+
+    <ul class="gate-points">
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.8l4.4 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>חינם, בעברית, בלי טבלאות ובלי אקסל</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.8l4.4 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>הקמה של דקה אחת, שבעה מספרים וזהו</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.8l4.4 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>הנתונים נשמרים ומחכים לכם בכל מכשיר</span>
+      </li>
+    </ul>
+
+    <form id="authForm" class="gate-form" novalidate>
+      <div class="field">
+        <label for="authEmail">אימייל</label>
+        <input class="inp" type="email" id="authEmail" name="email"
+               autocomplete="email" inputmode="email" required
+               placeholder="you@example.com" dir="ltr">
+      </div>
+      <div class="field">
+        <label for="authPass">סיסמה</label>
+        <input class="inp" type="password" id="authPass" name="password"
+               autocomplete="current-password" required minlength="8"
+               placeholder="לפחות שמונה תווים">
+      </div>
+      <button class="btn" id="authBtn" type="submit">פתיחת חשבון</button>
+      <p class="err hidden" id="authErr" role="alert"></p>
+    </form>
+
+    <div class="gate-foot">
+      <p class="gate-switch" id="authSwitch">
+        <span id="authSwitchText">יש לכם כבר חשבון?</span>
+        <button type="button" id="authToggle">כניסה</button>
+      </p>
+      <p class="note" id="authLegal">
+        פתיחת חשבון מהווה הסכמה
+        <a href="../#privacy" target="_blank" rel="noopener">למדיניות הפרטיות</a>.
+        הנתונים שלכם שלכם, ולא נעביר אותם לאף אחד.
+      </p>
+    </div>
+  </div>
+
+  <!-- ‏אם אישור אימייל פעיל בפרויקט, ההרשמה לא מחזירה מפתח גישה
+       והמשתמש צריך ללחוץ על קישור במייל. המסך הזה הוא מה שהוא
+       רואה אז, במקום טופס שנראה כאילו לא קרה בו כלום. -->
+  <div id="gateSent" class="sent hidden">
+    <h2>שלחנו לכם מייל</h2>
+    <p>
+      פתחו את <span class="mail" id="sentMail"></span>
+      ולחצו על הקישור כדי לאשר את החשבון. אחר כך חוזרים לכאן ונכנסים.
+    </p>
+    <p class="note" style="margin-top:18px">אם המייל לא הגיע תוך דקה, כדאי לבדוק בספאם.</p>
+    <button class="btn-quiet" id="sentBack" type="button" style="margin-top:20px">חזרה</button>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════ ההקמה ══ -->
+<main id="setup" class="setup hidden">
+  <h1>שבעה מספרים, ואנחנו בפנים</h1>
+  <p class="note">
+    לא צריך לדייק. מה שאתם זוכרים בערך מספיק טוב כדי להתחיל, ואפשר
+    לשנות הכול אחר כך. המספר למטה זז בזמן שאתם מקלידים.
+  </p>
+
+  <form id="setupForm" novalidate>
+    <div class="setup-group">
+      <h2>מה נכנס</h2>
+      <div class="num-row">
+        <span class="ico" aria-hidden="true">💼</span>
+        <label class="nm" for="s_income">
+          הכנסה חודשית
+          <small>נטו, מה שנכנס לחשבון</small>
+        </label>
+        <span class="amt"><input id="s_income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></span>
+      </div>
+    </div>
+
+    <div class="setup-group">
+      <h2>מה יוצא</h2>
+      <div id="setupCats"></div>
+    </div>
+
+    <div class="setup-group">
+      <h2>איך לקרוא לכם</h2>
+      <div class="field">
+        <label for="s_name">השם שלכם</label>
+        <input class="inp" id="s_name" type="text" autocomplete="name" placeholder="שוהם" maxlength="60">
+      </div>
+    </div>
+  </form>
+
+  <div class="setup-bar">
+    <div class="setup-left">
+      <span class="k" id="setupLeftLabel">נשאר לתכנן</span>
+      <span class="v money" id="setupLeft">0</span>
+    </div>
+    <p class="setup-hint" id="setupHint">מתחילים מההכנסה.</p>
+    <button class="btn" id="setupBtn" type="button">סיימתי, קחו אותי לפנים</button>
+    <p class="err hidden" id="setupErr" role="alert"></p>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════ האפליקציה ══ -->
+<div id="app" class="hidden">
+
+  <header class="topbar">
+    <button class="month-pick" id="monthBtn" type="button" aria-haspopup="dialog">
+      <span id="monthLabel">—</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="sr-only">בחירת חודש</span>
+    </button>
+    <button class="streak hidden" id="streakBtn" type="button">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="streakText"></span>
+    </button>
+  </header>
+
+  <!-- ───────────────────────────────────────── בית ── -->
+  <main class="screen" id="scHome">
+    <section class="hero">
+      <h1 class="q" id="heroQ">כמה יש לי?</h1>
+      <span class="a money" id="heroA" role="status" aria-live="polite">0</span>
+      <p class="sub" id="heroSub"></p>
+    </section>
+
+    <h2 class="sr-only">הקטגוריות של החודש</h2>
+    <div class="rows" id="homeRows"></div>
+
+    <div id="homeInsight"></div>
+  </main>
+
+  <!-- ─────────────────────────────────────── תנועות ── -->
+  <main class="screen hidden" id="scTx">
+    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">מה קרה החודש</h1>
+    <div id="txList"></div>
+  </main>
+
+  <!-- ──────────────────────────────────────── תקציב ── -->
+  <main class="screen hidden" id="scBudget">
+    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">התקציב</h1>
+    <p class="note" style="margin-bottom:18px">
+      כמה תכננתם לכל קטגוריה בחודש הזה. שינוי כאן לא נוגע בחודשים
+      אחרים, ולכן אפשר לתכנן חודש עמוס אחרת.
+    </p>
+    <form id="budgetForm" novalidate>
+      <div id="budgetRows"></div>
+      <button class="cat-add" id="catAddBtn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        הוספת קטגוריה
+      </button>
+    </form>
+    <div class="setup-left" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--rule)">
+      <span class="k">סך התכנון להוצאות</span>
+      <span class="v money" id="budgetTotal">0</span>
+    </div>
+    <p class="setup-hint" id="budgetHint"></p>
+    <button class="btn" id="budgetSave" type="button" style="margin-top:8px">שמירת התקציב</button>
+    <p class="err hidden" id="budgetErr" role="alert"></p>
+  </main>
+
+  <!-- ─────────────────────────────────────── הגדרות ── -->
+  <main class="screen hidden" id="scSet">
+    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">הגדרות</h1>
+
+    <div class="set-group">
+      <h2>החשבון</h2>
+      <div class="set-row">
+        <span class="k">אימייל</span>
+        <span class="v" id="setEmail" dir="ltr"></span>
+      </div>
+      <button class="set-row" id="setNameBtn" type="button">
+        <span class="k">השם שלי</span>
+        <span class="v" id="setName"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
+      <h2>הנתונים</h2>
+      <button class="set-row" id="setExport" type="button">
+        <span class="k">
+          הורדת כל הנתונים
+          <small>קובץ CSV של כל התנועות</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setWipe" type="button">
+        <span class="k">
+          מחיקת כל הנתונים
+          <small>משק הבית, התקציב וכל התנועות</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2m-8 0l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
+      <h2>שוהם</h2>
+      <a class="set-row" href="../" target="_blank" rel="noopener">
+        <span class="k">הדף של שוהם</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="set-row" href="../financial-security/" target="_blank" rel="noopener">
+        <span class="k">
+          מחשבון ביטחון כלכלי
+          <small>כמה צריך כדי לא להיות תלויים במשכורת</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="set-row" href="../#privacy" target="_blank" rel="noopener">
+        <span class="k">מדיניות פרטיות</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="set-group">
+      <button class="btn btn-ghost" id="setOut" type="button">יציאה מהחשבון</button>
+    </div>
+
+    <p class="credit">
+      כמה יש לי · נבנה על ידי שוהם אבו, יועץ כלכלי מוסמך מטעם UNI
+      פיננסים בפיקוח אוניברסיטת אריאל. הכלי הזה אינו ייעוץ השקעות
+      ואינו המלצה. הוא מראה לכם את הכסף שלכם.
+    </p>
+  </main>
+
+  <!-- ──────────────────────────────────── ניווט ── -->
+  <nav class="nav" aria-label="ניווט ראשי">
+    <button type="button" data-tab="home" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.6L12 4l8 6.6V20h-5v-5.4H9V20H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      בית
+    </button>
+    <button type="button" data-tab="tx">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5h15M4.5 12h15M4.5 16.5h9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      תנועות
+    </button>
+    <button type="button" class="add" id="addBtn" aria-haspopup="dialog">
+      <span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </span>
+      <span class="sr-only">הוספת תנועה</span>
+    </button>
+    <button type="button" data-tab="budget">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5V11m5 8.5V5.5m5 14V9m5 10.5v-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      תקציב
+    </button>
+    <button type="button" data-tab="set">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 3.5v2.2m0 12.6v2.2M3.5 12h2.2m12.6 0h2.2M6.1 6.1l1.6 1.6m8.6 8.6l1.6 1.6m0-11.8l-1.6 1.6M7.7 16.3l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      עוד
+    </button>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════════════ גלונים ══ -->
+<div class="scrim hidden" id="scrim"></div>
+
+<!-- הוספת תנועה -->
+<div class="sheet hidden" id="addSheet" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="addTitle">מה הוצאתם?</h2>
+  <p class="sub" id="addSub">סכום, קטגוריה, וזה הכל. התיאור הוא לכם, לא לנו.</p>
+
+  <div class="seg" role="group" aria-label="סוג התנועה">
+    <button type="button" id="dirOut" aria-pressed="true">הוצאה</button>
+    <button type="button" id="dirIn" aria-pressed="false">הכנסה</button>
+  </div>
+
+  <div class="field amount-field">
+    <label for="txAmount">סכום בשקלים</label>
+    <input class="inp" id="txAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+  </div>
+
+  <div class="field">
+    <span class="lbl" id="catLbl">קטגוריה</span>
+    <div class="chips" id="txCats" role="group" aria-labelledby="catLbl"></div>
+  </div>
+
+  <div class="field">
+    <label for="txDate">תאריך</label>
+    <input class="inp" id="txDate" type="date">
+  </div>
+
+  <div class="field">
+    <label for="txDesc">תיאור, אם בא לכם</label>
+    <input class="inp" id="txDesc" type="text" maxlength="80" autocomplete="off" placeholder="קפה עם מיכל">
+  </div>
+
+  <p class="err hidden" id="addErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="addCancel" type="button">ביטול</button>
+    <button class="btn" id="addSave" type="button">הוספה</button>
+  </div>
+</div>
+
+<!-- תנועה קיימת -->
+<div class="sheet hidden" id="txSheet" role="dialog" aria-modal="true" aria-labelledby="txSheetTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="txSheetTitle">התנועה הזאת</h2>
+  <p class="sub" id="txSheetSub"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="txClose" type="button">סגירה</button>
+    <button class="btn btn-danger" id="txDelete" type="button">מחיקה</button>
+  </div>
+</div>
+
+<!-- בחירת חודש -->
+<div class="sheet hidden" id="monthSheet" role="dialog" aria-modal="true" aria-labelledby="monthTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="monthTitle">איזה חודש</h2>
+  <p class="sub">שישה חודשים אחורה. קדימה אין מה לראות עוד.</p>
+  <div class="chips" id="monthChips" role="group" aria-labelledby="monthTitle"></div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="monthClose" type="button">סגירה</button>
+  </div>
+</div>
+
+<!-- קטגוריה חדשה -->
+<div class="sheet hidden" id="catSheet" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="catTitle">קטגוריה חדשה</h2>
+  <p class="sub">רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.</p>
+  <div class="field">
+    <label for="catName">השם</label>
+    <input class="inp" id="catName" type="text" maxlength="30" autocomplete="off" placeholder="חיות מחמד">
+  </div>
+  <div class="field">
+    <span class="lbl" id="catIcoLbl">סמל</span>
+    <div class="chips" id="catIcons" role="group" aria-labelledby="catIcoLbl"></div>
+  </div>
+  <p class="err hidden" id="catErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="catCancel" type="button">ביטול</button>
+    <button class="btn" id="catSave" type="button">הוספה</button>
+  </div>
+</div>
+
+<!-- ‏השאלה. לא נזיפה: הקטגוריה חרגה, וזה הזמן לשאול למה ולא
+     להדליק נורה אדומה. -->
+<div class="sheet hidden" id="askSheet" role="dialog" aria-modal="true" aria-labelledby="askTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="askTitle">שאלה אחת</h2>
+  <p class="sub" id="askSub"></p>
+  <div class="field">
+    <span class="lbl" id="askLbl">מה היה הסיפור?</span>
+    <div class="chips" id="askChips" role="group" aria-labelledby="askLbl"></div>
+  </div>
+  <div class="field">
+    <label for="askText">או במילים שלכם</label>
+    <input class="inp" id="askText" type="text" maxlength="200" autocomplete="off" placeholder="אופציונלי">
+  </div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="askSkip" type="button">לא עכשיו</button>
+    <button class="btn" id="askSave" type="button">שמירה</button>
+  </div>
+</div>
+
+<!-- שינוי שם -->
+<div class="sheet hidden" id="nameSheet" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="nameTitle">איך לקרוא לכם</h2>
+  <div class="field" style="margin-top:14px">
+    <label for="nameInput">השם</label>
+    <input class="inp" id="nameInput" type="text" maxlength="60" autocomplete="name">
+  </div>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="nameCancel" type="button">ביטול</button>
+    <button class="btn" id="nameSave" type="button">שמירה</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1336 @@
+/* ═══════════════════════════════════════════════════════════════
+   כמה יש לי · הלוגיקה
+   ═══════════════════════════════════════════════════════════════
+
+   ‏שלוש החלטות שמסבירות כמעט כל שורה בקובץ:
+
+   1. ‏כסף הוא מספר שלם באגורות, מהקלדה ועד למסך. שום חישוב אינו
+      נוגע בנקודה עשרונית, כי 0.1 + 0.2 אינו 0.3 וזה הבאג שאי אפשר
+      לתקן אחרי שיש נתונים.
+
+   2. ‏חודש הוא אובייקט Date של ה-1 בחודש בשעון המקומי. אין מחרוזות
+      חודש, ואין toISOString, שמזיז את התאריך לאחור בכל שעון שמוקדם
+      מ-UTC ולכן גם בשלנו.
+
+   3. ‏המסך נגזר מהמצב, והמצב נגזר מהבסיס. אין שום מקום שבו המסך
+      מתעדכן בלי שהנתון עבר קודם. זה מה שמונע את המצב שבו המספר על
+      המסך נכון והנתון בבסיס לא.
+*/
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+/* ‏אותו פרויקט ואותו מפתח פרסום כמו בשאר הדפים. אין כאן סוד:
+   המפתח הזה נועד לרוץ בדפדפן, והוא לבדו אינו מאפשר דבר. מה שמגן
+   על הנתונים הוא אבטחת השורות בבסיס, שבה כל גישה נגזרת מחברות
+   במשק הבית ומשום מקום אחר. */
+const SUPABASE_URL = 'https://vplqocqmlquajwwnyeby.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
+
+const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+/* ───────────────────────────────────────────────── עזרים ── */
+
+const $  = id => document.getElementById(id);
+const el = (tag, cls, txt) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (txt != null) n.textContent = txt;
+  return n;
+};
+const show = n => n && n.classList.remove('hidden');
+const hide = n => n && n.classList.add('hidden');
+
+/* ‏כסף פנימה. מקבל מה שאדם מקליד ומחזיר אגורות שלמות.
+   הפסיק הוא מפריד אלפים ולא נקודה עשרונית, כי כך כותבים כאן. */
+function toAgorot(raw) {
+  const s = String(raw == null ? '' : raw).replace(/[\s‏‎₪,]/g, '');
+  if (!s || !/^\d*\.?\d*$/.test(s)) return null;
+  const n = parseFloat(s);
+  if (!isFinite(n) || n < 0) return null;
+  // ‏עיגול ולא חיתוך: 45.995 הוא 46 שקל ולא 45.99.
+  return Math.round(n * 100);
+}
+
+/* ‏כסף החוצה. אגורות מוצגות רק כשהן אינן אפס, כי ".00" בסוף כל
+   מספר על המסך הוא רעש בארבעה תווים. */
+function fmt(ag, withSign) {
+  const n = Math.abs(Math.round(ag || 0));
+  const sh = Math.floor(n / 100), ar = n % 100;
+  let s = sh.toLocaleString('en-US');
+  if (ar) s += '.' + String(ar).padStart(2, '0');
+  return (withSign && (ag || 0) < 0 ? '−' : '') + '₪' + s;
+}
+
+const DAY = 86400000;
+const pad2 = n => String(n).padStart(2, '0');
+/* ‏תאריך מקומי. toISOString היה מחזיר כאן את היום הקודם בכל
+   תאריך שנוצר לפני 02:00 או 03:00 בבוקר. */
+const isoDate  = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const monthOf  = d => new Date(d.getFullYear(), d.getMonth(), 1);
+const monthKey = d => isoDate(monthOf(d));
+const addMonths = (d, k) => new Date(d.getFullYear(), d.getMonth() + k, 1);
+const daysInMonth = d => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+const sameMonth = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+
+const MFMT = new Intl.DateTimeFormat('he-IL', { month: 'long' });
+function monthName(d) {
+  const now = new Date();
+  const m = MFMT.format(d);
+  return d.getFullYear() === now.getFullYear() ? m : `${m} ${d.getFullYear()}`;
+}
+const DFMT = new Intl.DateTimeFormat('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+function dayName(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  const today = new Date(), yest = new Date(Date.now() - DAY);
+  if (isoDate(today) === iso) return 'היום';
+  if (isoDate(yest)  === iso) return 'אתמול';
+  return DFMT.format(d);
+}
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('on'), 2400);
+}
+
+function setErr(node, msg) {
+  if (!msg) { hide(node); node.textContent = ''; return; }
+  node.textContent = msg;
+  show(node);
+}
+
+/* ‏מה שבסיס הנתונים מחזיר אינו מה שאדם צריך לקרוא. כל שגיאה
+   שאין לה תרגום מקבלת נוסח אחד שאומר מה לעשות ולא מה נשבר. */
+function human(error) {
+  const m = String(error?.message || error || '').toLowerCase();
+  if (m.includes('invalid login')) return 'האימייל או הסיסמה אינם נכונים.';
+  if (m.includes('already registered') || m.includes('already been registered'))
+    return 'כבר יש חשבון עם האימייל הזה. אפשר להיכנס איתו.';
+  if (m.includes('password') && m.includes('6'))  return 'הסיסמה צריכה להיות באורך שמונה תווים לפחות.';
+  if (m.includes('weak') || m.includes('password should'))
+    return 'הסיסמה קצרה או פשוטה מדי. שמונה תווים לפחות.';
+  if (m.includes('email') && m.includes('invalid')) return 'כתובת האימייל אינה תקינה.';
+  if (m.includes('email not confirmed')) return 'החשבון עוד לא אושר. יש לפתוח את הקישור שנשלח במייל.';
+  if (m.includes('rate limit') || m.includes('too many'))
+    return 'יותר מדי ניסיונות. כדאי לנסות שוב בעוד דקה.';
+  if (m.includes('relation') && m.includes('does not exist'))
+    return 'מסד הנתונים של האפליקציה עוד לא הוקם. יש להריץ את המיגרציה.';
+  if (m.includes('failed to fetch') || m.includes('network'))
+    return 'אין חיבור לרשת כרגע. הנתונים לא אבדו, רק לא נשמרו עוד.';
+  return 'משהו לא עבד. כדאי לנסות שוב.';
+}
+
+/* ───────────────────────────────────────────────── המצב ── */
+
+const S = {
+  user: null,
+  hh: null,
+  profile: null,
+  month: monthOf(new Date()),
+  cats: [],                 // כל הקטגוריות הגלויות
+  budgets: new Map(),       // category_id → agorot
+  txs: [],                  // תנועות החודש הנבחר
+  prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
+  reflections: [],
+  tab: 'home',
+  filterCat: null,
+  mode: 'signup',
+  asked: false,             // לא שואלים יותר מפעם אחת בביקור
+  lastLeft: null
+};
+
+const byId  = id => S.cats.find(c => c.id === id);
+const outCats = () => S.cats.filter(c => c.kind === 'expense' && !c.archived)
+                            .sort((a, b) => a.sort - b.sort || a.label.localeCompare(b.label, 'he'));
+const inCats  = () => S.cats.filter(c => c.kind === 'income'  && !c.archived)
+                            .sort((a, b) => a.sort - b.sort);
+
+const planned   = id => S.budgets.get(id) || 0;
+const plannedOut = () => outCats().reduce((s, c) => s + planned(c.id), 0);
+const plannedIn  = () => inCats().reduce((s, c) => s + planned(c.id), 0);
+const spentIn = id => S.txs.reduce((s, t) =>
+  s + (t.direction === 'out' && t.category_id === id ? t.amount_agorot : 0), 0);
+const spentAll = () => S.txs.reduce((s, t) => s + (t.direction === 'out' ? t.amount_agorot : 0), 0);
+const gotAll   = () => S.txs.reduce((s, t) => s + (t.direction === 'in'  ? t.amount_agorot : 0), 0);
+
+/* ‏המספר של האפליקציה. אם אין בכלל תכנון להוצאות, "נשאר" חסר
+   משמעות, ואז התשובה היא ההכנסה פחות מה שיצא. */
+function leftToSpend() {
+  const p = plannedOut();
+  return p > 0 ? p - spentAll() : plannedIn() - spentAll();
+}
+
+/* ─────────────────────────────────────────── גלונים ── */
+
+let openEl = null, lastFocus = null;
+
+function openSheet(node) {
+  if (openEl) closeSheet();
+  lastFocus = document.activeElement;
+  openEl = node;
+  show($('scrim')); show(node);
+  // ‏פריים אחד לפני שמדליקים את המחלקה, אחרת הדפדפן מצייר את
+  // המצב הסופי ישר ואין מעבר.
+  requestAnimationFrame(() => {
+    $('scrim').classList.add('on');
+    node.classList.add('on');
+  });
+  document.body.style.overflow = 'hidden';
+  const first = node.querySelector('input:not([type=hidden]),button,select,textarea,[href]');
+  if (first) setTimeout(() => first.focus({ preventScroll: true }), 60);
+}
+
+function closeSheet() {
+  if (!openEl) return;
+  const node = openEl;
+  openEl = null;
+  node.classList.remove('on');
+  $('scrim').classList.remove('on');
+  document.body.style.overflow = '';
+  setTimeout(() => { hide(node); hide($('scrim')); }, 240);
+  if (lastFocus && lastFocus.isConnected) lastFocus.focus({ preventScroll: true });
+}
+
+/* ‏מלכודת טאב. בלעדיה הטאב יוצא מתוך הגלון אל הדף שמאחוריו,
+   שמוסתר מהעין אבל לא מהמקלדת. */
+document.addEventListener('keydown', e => {
+  if (!openEl) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeSheet(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...openEl.querySelectorAll('input:not([type=hidden]),button,select,textarea,[href]')]
+    .filter(n => !n.disabled && n.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+$('scrim').addEventListener('click', closeSheet);
+
+/* ─────────────────────────────────────── מסכים ראשיים ── */
+
+function stage(name) {
+  for (const id of ['boot', 'gate', 'setup', 'app']) {
+    id === name ? show($(id)) : hide($(id));
+  }
+  $('boot').removeAttribute('aria-busy');
+}
+
+function tab(name) {
+  S.tab = name;
+  const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet' };
+  for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
+  for (const b of document.querySelectorAll('.nav button[data-tab]')) {
+    b.dataset.tab === name ? b.setAttribute('aria-current', 'page')
+                           : b.removeAttribute('aria-current');
+  }
+  if (name === 'tx') renderTx();
+  if (name === 'budget') renderBudget();
+  if (name === 'set') renderSet();
+  window.scrollTo({ top: 0 });
+}
+
+/* ═════════════════════════════════════ כניסה והרשמה ══ */
+
+function authMode(mode) {
+  S.mode = mode;
+  const signup = mode === 'signup';
+  $('authBtn').textContent        = signup ? 'פתיחת חשבון' : 'כניסה';
+  $('authSwitchText').textContent = signup ? 'יש לכם כבר חשבון?' : 'עוד אין לכם חשבון?';
+  $('authToggle').textContent     = signup ? 'כניסה' : 'פתיחת חשבון';
+  $('authPass').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  $('authLegal').classList.toggle('hidden', !signup);
+  setErr($('authErr'), '');
+}
+
+$('authToggle').addEventListener('click', () => authMode(S.mode === 'signup' ? 'login' : 'signup'));
+
+$('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setErr($('authErr'), '');
+  const email = $('authEmail').value.trim();
+  const pass  = $('authPass').value;
+
+  if (!email || !email.includes('@')) {
+    setErr($('authErr'), 'צריך כתובת אימייל תקינה.');
+    $('authEmail').focus(); return;
+  }
+  if (pass.length < 8) {
+    setErr($('authErr'), 'הסיסמה צריכה להיות באורך שמונה תווים לפחות.');
+    $('authPass').focus(); return;
+  }
+
+  const btn = $('authBtn');
+  btn.disabled = true;
+  btn.textContent = S.mode === 'signup' ? 'פותח חשבון...' : 'נכנס...';
+
+  try {
+    if (S.mode === 'signup') {
+      const { data, error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { emailRedirectTo: window.location.origin + '/app/' }
+      });
+      if (error) throw error;
+
+      /* ‏שני עולמות, ואי אפשר לדעת מראש באיזה מהם אנחנו: אם אישור
+         אימייל כבוי בפרויקט, ההרשמה מחזירה מפתח גישה ואפשר להיכנס
+         מיד. אם הוא דלוק, היא מחזירה משתמש בלי מפתח, ואז הדבר
+         היחיד שאפשר לעשות הוא להגיד לו לפתוח את המייל. */
+      if (data.session) { await enter(data.session.user); return; }
+
+      /* ‏משתמש שכבר קיים מוחזר כאן בלי שגיאה ועם רשימת זהויות
+         ריקה. בלי הבדיקה הזאת הוא היה מקבל "שלחנו מייל" לנצח. */
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        authMode('login');
+        setErr($('authErr'), 'כבר יש חשבון עם האימייל הזה. אפשר להיכנס איתו.');
+        return;
+      }
+      $('sentMail').textContent = email;
+      hide($('gateMain')); show($('gateSent'));
+      return;
+    }
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) throw error;
+    await enter(data.user);
+
+  } catch (err) {
+    setErr($('authErr'), human(err));
+  } finally {
+    btn.disabled = false;
+    authMode(S.mode);
+  }
+});
+
+$('sentBack').addEventListener('click', () => {
+  show($('gateMain')); hide($('gateSent'));
+  authMode('login');
+});
+
+$('setOut').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  location.reload();
+});
+
+/* ═══════════════════════════════════════════ ההקמה ══ */
+
+/* ‏שש קטגוריות, לא שלוש עשרה. רשימה ארוכה בהקמה הראשונה היא
+   הדרך הבטוחה לכך שאיש לא ימלא אותה. */
+const SETUP_ROWS = [
+  { key: 'housing',   icon: '🏠', label: 'דיור',    hint: 'שכירות או משכנתא, ארנונה, חשמל, ועד' },
+  { key: 'food',      icon: '🛒', label: 'מזון',    hint: 'סופר, שוק, אוכל בחוץ' },
+  { key: 'transport', icon: '🚗', label: 'תחבורה',  hint: 'דלק, ביטוח, רב קו' },
+  { key: 'debt',      icon: '🏦', label: 'החזרים',  hint: 'הלוואות, מינוס, כרטיס' },
+  { key: 'fun',       icon: '🎬', label: 'בילויים', hint: 'מסעדות, חופשות, מנויים' },
+  { key: 'other',     icon: '•',  label: 'כל השאר', hint: 'מה שלא נכנס למעלה' }
+];
+
+function buildSetup() {
+  const box = $('setupCats');
+  box.textContent = '';
+  for (const r of SETUP_ROWS) {
+    const row = el('div', 'num-row');
+    const ic = el('span', 'ico', r.icon); ic.setAttribute('aria-hidden', 'true');
+    const lab = el('label', 'nm', r.label);
+    lab.htmlFor = 's_' + r.key;
+    lab.append(el('small', null, r.hint));
+    const wrap = el('span', 'amt');
+    const inp = el('input');
+    inp.id = 's_' + r.key;
+    inp.type = 'text'; inp.inputMode = 'decimal';
+    inp.autocomplete = 'off'; inp.placeholder = '0';
+    inp.dataset.key = r.key;
+    wrap.append(inp);
+    row.append(ic, lab, wrap);
+    box.append(row);
+  }
+  $('setup').addEventListener('input', setupLive);
+  setupLive();
+}
+
+function setupNumbers() {
+  const income = toAgorot($('s_income').value) || 0;
+  let out = 0;
+  const budget = {};
+  for (const r of SETUP_ROWS) {
+    const v = toAgorot($('s_' + r.key).value) || 0;
+    if (v > 0) budget[r.key] = v;
+    out += v;
+  }
+  return { income, out, budget };
+}
+
+/* ‏הקורא החי. הוא הסיבה שההקמה היא מסך אחד ולא שישה שלבים: כל
+   מספר שנכנס מזיז מספר אחד למטה, ואז מילוי טופס הופך למשחק. */
+function setupLive() {
+  const { income, out } = setupNumbers();
+  const left = income - out;
+  const v = $('setupLeft');
+  v.textContent = fmt(left, true);
+  v.classList.toggle('over', left < 0);
+
+  if (!income) {
+    $('setupLeftLabel').textContent = 'נשאר לתכנן';
+    $('setupHint').textContent = 'מתחילים מההכנסה.';
+  } else if (left > 0) {
+    $('setupLeftLabel').textContent = 'נשאר לתכנן';
+    $('setupHint').textContent = 'זה מה שעוד לא שובץ לשום מקום. אם הוא נשאר ככה, הוא ההפרש שלכם בסוף החודש.';
+  } else if (left === 0) {
+    $('setupLeftLabel').textContent = 'הכול משובץ';
+    $('setupHint').textContent = 'כל שקל שנכנס יש לו מקום. זה תכנון מדויק, ואין בו מרווח.';
+  } else {
+    $('setupLeftLabel').textContent = 'חסר';
+    $('setupHint').textContent = 'התכנון גדול מההכנסה. זה לא תקלה בטופס, זה מה שקורה בפועל אצל רבים, ובדיוק בשביל זה אנחנו כאן.';
+  }
+}
+
+$('setupBtn').addEventListener('click', async () => {
+  setErr($('setupErr'), '');
+  const { income, out, budget } = setupNumbers();
+
+  if (!income && !out) {
+    setErr($('setupErr'), 'צריך לפחות מספר אחד כדי להתחיל. ההכנסה היא המקום הטבעי.');
+    $('s_income').focus(); return;
+  }
+
+  const btn = $('setupBtn');
+  btn.disabled = true; btn.textContent = 'מקים...';
+  try {
+    const name = $('s_name').value.trim();
+    const { data, error } = await sb.rpc('setup_household', {
+      p_name: name || null, p_income: income, p_budget: budget
+    });
+    if (error) throw error;
+    S.hh = data;
+    await loadAll();
+    stage('app');
+    tab('home');
+    toast('הכול מוכן. ברוכים הבאים.');
+  } catch (err) {
+    setErr($('setupErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'סיימתי, קחו אותי לפנים';
+  }
+});
+
+/* ═══════════════════════════════════════ טעינת נתונים ══ */
+
+async function findHousehold() {
+  const { data, error } = await sb.from('household_members')
+    .select('household_id').limit(1);
+  if (error) throw error;
+  return data && data.length ? data[0].household_id : null;
+}
+
+async function loadAll() {
+  const m0 = monthKey(S.month);
+  const m1 = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+
+  const [cats, buds, txs, refl, prof] = await Promise.all([
+    sb.from('categories').select('*').eq('archived', false),
+    sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
+    sb.from('transactions').select('*').gte('occurred_on', m0).lte('occurred_on', m1)
+      .order('occurred_on', { ascending: false }).order('created_at', { ascending: false }),
+    sb.from('reflections').select('*').eq('month', m0),
+    sb.from('profiles').select('display_name').limit(1)
+  ]);
+
+  for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
+
+  S.cats = cats.data || [];
+  S.budgets = new Map((buds.data || []).map(b => [b.category_id, Number(b.planned_agorot)]));
+  S.txs = (txs.data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
+  /* ‏טבלת ההשתקפויות היא שכבת הנשמה, ולא שכבת הכסף. אם המיגרציה
+     שלה עוד לא רצה, האפליקציה עובדת בלעדיה במקום ליפול. */
+  S.reflections = refl.error ? [] : (refl.data || []);
+  S.profile = (prof.data && prof.data[0]) || null;
+  S.prevTxs = null;
+
+  renderHome();
+}
+
+/* ‏החודש שלפני, ורק בשביל ההשוואה. נטען אחרי הציור הראשון כדי
+   שהמסך לא יחכה לשאילתה שהוא לא צריך בשביל המספר הגדול. */
+async function loadPrev() {
+  if (S.prevTxs) return S.prevTxs;
+  const p = addMonths(S.month, -1);
+  const a = monthKey(p);
+  const b = isoDate(new Date(p.getFullYear(), p.getMonth() + 1, 0));
+  const { data, error } = await sb.from('transactions')
+    .select('amount_agorot,direction,category_id,occurred_on')
+    .gte('occurred_on', a).lte('occurred_on', b);
+  S.prevTxs = error ? [] : (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
+  return S.prevTxs;
+}
+
+/* ═══════════════════════════════════════════ הבית ══ */
+
+function renderHome() {
+  $('monthLabel').textContent = monthName(S.month);
+
+  const now = new Date();
+  const current = sameMonth(S.month, now);
+  const dim = daysInMonth(S.month);
+  const daysLeft = current ? (dim - now.getDate() + 1) : 0;
+
+  const left = leftToSpend();
+  const over = left < 0;
+
+  /* ‏כשחרגנו, השאלה משתנה יחד עם התשובה. אפליקציה שמראה מספר
+     שלילי מתחת לכיתוב "כמה יש לי" נותנת תשובה לא נכונה לשאלה
+     שהיא עצמה שאלה. */
+  $('heroQ').textContent = over ? 'כמה חרגתי?' : 'כמה יש לי?';
+  const a = $('heroA');
+  a.textContent = fmt(left);
+  a.classList.toggle('over', over);
+
+  if (S.lastLeft !== null && S.lastLeft !== left) {
+    a.classList.remove('bump');
+    void a.offsetWidth;          // הפעלה מחדש של האנימציה
+    a.classList.add('bump');
+  }
+  S.lastLeft = left;
+
+  const parts = [];
+  if (!plannedOut() && !plannedIn()) {
+    parts.push('עוד אין תקציב לחודש הזה. אפשר לבנות אותו בלשונית התקציב.');
+  } else if (over) {
+    parts.push('מעל התכנון. זה לא סוף העולם, זה מידע.');
+  } else if (current) {
+    parts.push(`עוד ${daysLeft} ${daysLeft === 1 ? 'יום' : 'ימים'}`);
+    if (daysLeft > 0) parts.push(`<b>${fmt(Math.floor(left / daysLeft))}</b> ליום`);
+  } else {
+    parts.push('החודש נגמר, ועמדתם בתכנון.');
+  }
+  const got = gotAll(), pin = plannedIn();
+  $('heroSub').innerHTML = parts.join(' · ');
+  if (got > 0 && pin > 0) {
+    $('heroSub').innerHTML += `<br>נכנסו ${fmt(got)} מתוך ${fmt(pin)} שתוכננו.`;
+  } else if (got > 0) {
+    $('heroSub').innerHTML += `<br>נכנסו החודש ${fmt(got)}.`;
+  }
+
+  renderRows(current, dim, now);
+  renderInsight();
+}
+
+function renderRows(current, dim, now) {
+  const box = $('homeRows');
+  box.textContent = '';
+
+  const rows = outCats()
+    .map(c => ({ c, p: planned(c.id), s: spentIn(c.id) }))
+    .filter(r => r.p > 0 || r.s > 0);
+
+  if (!rows.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'עוד לא רשמתם כלום'));
+    e.append(el('p', null, 'כל הוצאה שתוסיפו תופיע כאן, והמספר למעלה יזוז. אפשר להתחיל מההוצאה האחרונה שאתם זוכרים.'));
+    const b = el('button', 'btn', 'הוספת ההוצאה הראשונה');
+    b.type = 'button';
+    b.addEventListener('click', openAdd);
+    e.append(b);
+    box.append(e);
+    return;
+  }
+
+  for (const { c, p, s } of rows) {
+    const over = p > 0 && s > p;
+    const row = el('button', 'row');
+    row.type = 'button';
+    row.setAttribute('aria-label',
+      p > 0 ? `${c.label}. יצא ${fmt(s)} מתוך ${fmt(p)} שתוכננו${over ? '. חריגה' : ''}`
+            : `${c.label}. יצא ${fmt(s)}, לא תוכנן`);
+
+    const top = el('div', 'row-top');
+    const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
+    const nm = el('span', 'row-nm', c.label);
+    const val = el('span', 'row-val money' + (over ? ' over' : ''), fmt(s));
+    const of = el('span', 'row-of', p > 0 ? '/ ' + fmt(p) : '');
+    top.append(ic, nm, val, of);
+
+    const bar = el('div', 'bar');
+    bar.setAttribute('aria-hidden', 'true');
+    const fill = el('i');
+    const pct = p > 0 ? Math.min(100, Math.round(s / p * 100)) : (s > 0 ? 100 : 0);
+    fill.style.width = pct + '%';
+    if (over) fill.classList.add('over');
+    else if (!p) fill.classList.add('none');
+    bar.append(fill);
+
+    /* ‏הסימן של היום בחודש. בלעדיו "ארבעים אחוז מהתקציב" הוא לא
+       מידע: ארבעים אחוז בעשירי הוא בעיה, ובעשרים ושמונה הוא מצוין. */
+    if (current && p > 0) {
+      const t = el('span', 'today');
+      t.style.right = Math.round(now.getDate() / dim * 100) + '%';
+      bar.append(t);
+    }
+
+    row.append(top, bar);
+    row.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
+    box.append(row);
+  }
+}
+
+/* ═══════════════════════════════════ ארבעת המנגנונים ══ */
+
+/* ── 1. הרצף ──
+   ‏הוא נספר על ימים שבהם הסתכלתם, ולא על חודשים שבהם לא חרגתם.
+   השד השני בדף של שוהם הוא פחד להסתכל בחשבון, ולכן הדבר היחיד
+   שהאפליקציה מתגמלת הוא ההסתכלות. רצף של התנהגות מושלמת נשבר
+   פעם אחת ואז מפסיקים לנסות. */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('kyl.' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('kyl.' + k, JSON.stringify(v)); } catch {} }
+};
+
+function touchStreak() {
+  const today = isoDate(new Date());
+  const s = LS.get('streak', { last: '', n: 0, best: 0 });
+  if (s.last === today) return s;
+  const yest = isoDate(new Date(Date.now() - DAY));
+  s.n = s.last === yest ? s.n + 1 : 1;
+  s.last = today;
+  s.best = Math.max(s.best || 0, s.n);
+  LS.set('streak', s);
+  return s;
+}
+
+function renderStreak(s) {
+  const btn = $('streakBtn');
+  if (!s || s.n < 2) { hide(btn); return; }
+  $('streakText').textContent = `${s.n} ימים`;
+  btn.setAttribute('aria-label', `${s.n} ימים ברצף שהסתכלתם. השיא שלכם ${s.best}.`);
+  show(btn);
+}
+
+$('streakBtn').addEventListener('click', () => {
+  const s = LS.get('streak', { n: 0, best: 0 });
+  toast(`${s.n} ימים ברצף שהסתכלתם. השיא ${s.best}.`);
+  LS.set('streakNote', 1);
+});
+
+/* ── 2. שואלים, לא נוזפים ──
+   ‏קטגוריה חרגה. הדבר שאפליקציות עושות כאן הוא נורה אדומה, והדבר
+   שהיא גורמת הוא שמפסיקים לפתוח אותן. לכן: שאלה אחת, בלי שיפוט,
+   ועם אפשרות לא לענות. */
+const ASK_CHIPS = ['הוצאה חד פעמית', 'תכננתי נמוך מדי', 'פשוט הוצאתי יותר', 'לא יודע'];
+let askCtx = null;
+
+function haveReflection(kind, catId) {
+  return S.reflections.some(r => r.kind === kind &&
+    (catId ? r.category_id === catId : !r.category_id));
+}
+
+function openAsk(kind, cat) {
+  askCtx = { kind, cat };
+  if (kind === 'overspend') {
+    $('askTitle').textContent = 'שאלה אחת';
+    $('askSub').textContent =
+      `${cat.label} עבר את התכנון. זה קורה לכולם, ואין כאן ציון. רק שווה לדעת למה, כי זה מה שמשנה את החודש הבא.`;
+    $('askLbl').textContent = 'מה היה הסיפור?';
+  } else {
+    const prev = addMonths(S.month, -1);
+    $('askTitle').textContent = `${monthName(prev)} נגמר`;
+    $('askSub').textContent =
+      'שאלה אחת לפני שממשיכים. אין תשובה נכונה, ואף אחד לא קורא את זה חוץ מכם.';
+    $('askLbl').textContent = 'מה הדבר האחד שהייתם עושים אחרת?';
+  }
+  const box = $('askChips');
+  box.textContent = '';
+  const chips = kind === 'overspend' ? ASK_CHIPS
+    : ['להוציא פחות על בילויים', 'לרשום בזמן', 'לתכנן אחרת', 'שום דבר, היה בסדר'];
+  for (const c of chips) {
+    const b = el('button', 'chip', c);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => {
+      for (const o of box.children) o.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', 'true');
+    });
+    box.append(b);
+  }
+  $('askText').value = '';
+  openSheet($('askSheet'));
+}
+
+async function saveAsk(skipped) {
+  const ctx = askCtx;
+  closeSheet();
+  if (!ctx) return;
+  const chosen = [...$('askChips').children].find(b => b.getAttribute('aria-pressed') === 'true');
+  const row = {
+    household_id: S.hh,
+    kind: ctx.kind,
+    month: monthKey(ctx.kind === 'month_end' ? addMonths(S.month, -1) : S.month),
+    category_id: ctx.cat ? ctx.cat.id : null,
+    choice: skipped ? 'skipped' : (chosen ? chosen.textContent : null),
+    note: skipped ? null : ($('askText').value.trim() || null),
+    created_by: S.user.id
+  };
+  askCtx = null;
+  /* ‏נרשם מקומית לפני הנסיעה לשרת, כדי שלא נשאל שוב את אותה
+     שאלה אם הכתיבה נכשלה או אם הטבלה עוד לא קיימת. */
+  S.reflections.push(row);
+  const { error } = await sb.from('reflections').upsert(row, {
+    onConflict: ctx.cat ? 'household_id,kind,month,category_id' : undefined
+  });
+  if (!error && !skipped) toast('נרשם. תודה.');
+  renderInsight();
+}
+
+$('askSave').addEventListener('click', () => saveAsk(false));
+$('askSkip').addEventListener('click', () => saveAsk(true));
+
+/* ‏מופעל אחרי שהמסך התיישב, פעם אחת בביקור, ולא מיד אחרי ההקמה. */
+function maybeAsk() {
+  if (S.asked || openEl) return;
+  for (const c of outCats()) {
+    const p = planned(c.id), s = spentIn(c.id);
+    if (p > 0 && s > p && !haveReflection('overspend', c.id)) {
+      S.asked = true;
+      setTimeout(() => { if (!openEl && S.tab === 'home') openAsk('overspend', c); }, 900);
+      return;
+    }
+  }
+}
+
+/* ── 3 ו-4. השדים, ושאלת סוף החודש ──
+   ‏כל כלל כאן נגזר מנתון אמיתי. אין כאן משפטי עידוד כלליים שלא
+   מסתכלים על כלום, חוץ מהשורה האחרונה, שמוצגת רק כשאין לאפליקציה
+   שום דבר אמיתי להגיד. */
+const LINES = [
+  ['הכסף לא נעלם, הוא עובר', 'כל שקל שיצא החודש הלך למקום מסוים. ברגע שרואים לאן, ההחלטה הבאה כבר אחרת.'],
+  ['תקציב הוא לא דיאטה', 'הוא לא נשבר כשחורגים. הוא נשבר כשמפסיקים להסתכל.'],
+  ['הסכום הקטן הוא לא קטן', 'שלושים שקל ביום הם תשע מאות בחודש. אף אחד לא מרגיש את זה בזמן אמת.'],
+  ['החודש הבא מתחיל היום', 'מה שאתם רושמים עכשיו הוא מה שתוכלו להשוות אליו בעוד שלושים יום.']
+];
+
+async function renderInsight() {
+  const box = $('homeInsight');
+  const card = (title, text, acts) => {
+    box.textContent = '';
+    const d = el('div', 'insight');
+    d.append(el('h3', null, title));
+    d.append(el('p', null, text));
+    if (acts && acts.length) {
+      const row = el('div', 'acts');
+      for (const [label, fn] of acts) {
+        const b = el('button', null, label);
+        b.type = 'button';
+        b.addEventListener('click', fn);
+        row.append(b);
+      }
+      d.append(row);
+    }
+    box.append(d);
+  };
+
+  const now = new Date();
+  const current = sameMonth(S.month, now);
+
+  /* ‏שאלת סוף החודש. עד החמישי, ורק אם היה בחודש שעבר משהו
+     להסתכל עליו. */
+  if (current && now.getDate() <= 5 && !haveReflection('month_end', null)) {
+    const prev = await loadPrev();
+    if (prev.length >= 3) {
+      card(`${monthName(addMonths(S.month, -1))} נגמר`,
+        'שאלה אחת לפני שממשיכים. חודש שנגמר בלי להסתכל עליו הוא חודש שלא לימד כלום.',
+        [['לשאלה', () => openAsk('month_end', null)]]);
+      return;
+    }
+  }
+
+  /* ‏השד השלישי: אנחנו חוזרים על הדפוסים. הכלל הזה מחפש דפוס
+     אמיתי בין שני חודשים ואומר אותו בשמו. */
+  if (S.txs.length >= 4) {
+    const prev = await loadPrev();
+    if (prev.length >= 4) {
+      let worst = null;
+      for (const c of outCats()) {
+        const nowS = spentIn(c.id);
+        const prevS = prev.reduce((s, t) =>
+          s + (t.direction === 'out' && t.category_id === c.id ? t.amount_agorot : 0), 0);
+        if (prevS < 10000 || nowS <= prevS) continue;
+        const rise = (nowS - prevS) / prevS;
+        if (rise >= 0.25 && nowS - prevS >= 15000) {
+          if (!worst || nowS - prevS > worst.delta) {
+            worst = { c, delta: nowS - prevS, pct: Math.round(rise * 100) };
+          }
+        }
+      }
+      if (worst) {
+        card(`${worst.c.label} עלה ב־${worst.pct}% מול ${monthName(addMonths(S.month, -1))}`,
+          `זה ${fmt(worst.delta)} יותר. פעם אחת זה מקריות, פעמיים זה דפוס. שווה להסתכל על התנועות ולראות מה השתנה.`,
+          [['לתנועות', () => { S.filterCat = worst.c.id; tab('tx'); }]]);
+        return;
+      }
+    }
+  }
+
+  /* ‏הנזילות הקטנות. אף אחד לא מרגיש אותן בזמן אמת, ולכן האפליקציה
+     היא זו שצריכה להרגיש אותן בשבילו. */
+  const small = S.txs.filter(t => t.direction === 'out' && t.amount_agorot <= 5000);
+  const smallSum = small.reduce((s, t) => s + t.amount_agorot, 0);
+  if (small.length >= 8 && smallSum >= 25000) {
+    card(`${small.length} תנועות קטנות, ויחד ${fmt(smallSum)}`,
+      'כל אחת מהן נראתה כמו כלום. ביחד הן קטגוריה שלמה שלא תכננתם.',
+      [['לתנועות', () => { S.filterCat = null; tab('tx'); }]]);
+    return;
+  }
+
+  /* ‏חור ברישום. לא נזיפה, הזמנה. */
+  if (current && S.txs.length) {
+    const last = S.txs.reduce((m, t) => t.occurred_on > m ? t.occurred_on : m, '0000-00-00');
+    const gap = Math.floor((now - new Date(last + 'T12:00:00')) / DAY);
+    if (gap >= 4) {
+      card(`${gap} ימים בלי רישום`,
+        'לא נורא, וזה לא מחייב לשחזר הכול. מספיק להוסיף את מה שאתם זוכרים, והמספר למעלה יחזור להיות נכון.',
+        [['להוסיף עכשיו', openAdd]]);
+      return;
+    }
+  }
+
+  /* ‏השד הראשון: "זה לא בשבילי". הרגע שבו אפשר להראות שזה כן. */
+  if (!current || now.getDate() >= dayBeforeEnd()) {
+    const planned_ = outCats().filter(c => planned(c.id) > 0);
+    if (planned_.length >= 3 && planned_.every(c => spentIn(c.id) <= planned(c.id))) {
+      card('עמדתם בכל הקטגוריות', 'זה לא מקריות ולא מזל. זה מה שקורה כשמסתכלים. "זה לא בשבילי" הוא השד הראשון, וזה בדיוק הדבר שסותר אותו.');
+      return;
+    }
+  }
+
+  /* ‏השד השני: פחד להסתכל בחשבון. מוצג פעם אחת, כשיש כבר רצף
+     שמוכיח שהוא נשבר. */
+  const st = LS.get('streak', { n: 0 });
+  if (st.n >= 3 && !LS.get('streakNote', 0)) {
+    LS.set('streakNote', 1);
+    card(`${st.n} ימים ברצף שהסתכלתם`,
+      'הרצף הזה לא נספר על חודשים מושלמים, אלא על ימים שבהם פתחתם את זה. פחד להסתכל בחשבון הוא השד שעולה הכי הרבה כסף, והדבר הזה למעלה הוא ההוכחה שהוא כבר לא אצלכם.');
+    return;
+  }
+
+  const [t, p] = LINES[new Date().getDate() % LINES.length];
+  card(t, p);
+}
+
+function dayBeforeEnd() { return daysInMonth(S.month) - 2; }
+
+/* ═══════════════════════════════════════════ תנועות ══ */
+
+function renderTx() {
+  const box = $('txList');
+  box.textContent = '';
+
+  let rows = S.txs;
+  if (S.filterCat) {
+    const c = byId(S.filterCat);
+    rows = rows.filter(t => t.category_id === S.filterCat);
+    const chips = el('div', 'chips');
+    chips.style.marginBottom = '6px';
+    const b = el('button', 'chip', `${c ? c.label : 'קטגוריה'} ✕`);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', 'true');
+    b.setAttribute('aria-label', `מסונן לפי ${c ? c.label : 'קטגוריה'}. לחיצה מבטלת את הסינון`);
+    b.addEventListener('click', () => { S.filterCat = null; renderTx(); });
+    chips.append(b);
+    box.append(chips);
+  }
+
+  if (!rows.length) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, S.filterCat ? 'אין תנועות בקטגוריה הזאת' : 'החודש הזה עוד ריק'));
+    e.append(el('p', null, S.filterCat
+      ? 'אף תנועה לא נרשמה כאן בחודש הזה.'
+      : 'כל מה שתוסיפו יופיע כאן, לפי ימים, מהחדש לישן.'));
+    const b = el('button', 'btn', 'הוספת תנועה');
+    b.type = 'button';
+    b.addEventListener('click', openAdd);
+    e.append(b);
+    box.append(e);
+    return;
+  }
+
+  /* ‏מקובצות לפי יום. אדם זוכר "ביום חמישי" ולא "ב-14 בחודש",
+     ולכן הכותרת היא שם היום. */
+  let day = null;
+  for (const t of rows) {
+    if (t.occurred_on !== day) {
+      day = t.occurred_on;
+      const sum = rows.filter(r => r.occurred_on === day && r.direction === 'out')
+                      .reduce((s, r) => s + r.amount_agorot, 0);
+      const h = el('h2', 'sec-h', dayName(day) + (sum ? ' · ' + fmt(sum) : ''));
+      box.append(h);
+    }
+    const c = byId(t.category_id);
+    const row = el('button', 'tx');
+    row.type = 'button';
+
+    const ic = el('span', 'tx-ico', (c && c.icon) || '•');
+    ic.setAttribute('aria-hidden', 'true');
+    const mid = el('div', 'tx-mid');
+    mid.append(el('div', 't', t.description || (c ? c.label : 'תנועה')));
+    const sub = el('div', 's');
+    sub.textContent = t.description && c ? c.label : (t.source === 'import' ? 'מיובא' : '');
+    if (t.installment_no && t.installment_total) {
+      const tag = el('span', 'tag', `תשלום ${t.installment_no} מתוך ${t.installment_total}`);
+      sub.append(tag);
+    }
+    mid.append(sub);
+    const amt = el('span', 'tx-amt money' + (t.direction === 'in' ? ' in' : ''),
+      (t.direction === 'in' ? '+' : '') + fmt(t.amount_agorot));
+
+    row.setAttribute('aria-label',
+      `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}`);
+    row.append(ic, mid, amt);
+    row.addEventListener('click', () => openTx(t));
+    box.append(row);
+  }
+}
+
+let txCtx = null;
+function openTx(t) {
+  txCtx = t;
+  const c = byId(t.category_id);
+  $('txSheetTitle').textContent = t.description || (c ? c.label : 'תנועה');
+  $('txSheetSub').textContent =
+    `${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} של ${fmt(t.amount_agorot)}` +
+    `${c ? ', ' + c.label : ''}, ${dayName(t.occurred_on)}.`;
+  openSheet($('txSheet'));
+}
+$('txClose').addEventListener('click', closeSheet);
+
+$('txDelete').addEventListener('click', async () => {
+  const t = txCtx;
+  closeSheet();
+  if (!t) return;
+  const { error } = await sb.from('transactions').delete().eq('id', t.id);
+  if (error) { toast(human(error)); return; }
+  S.txs = S.txs.filter(x => x.id !== t.id);
+  renderHome(); renderTx();
+  toast('נמחק.');
+});
+
+/* ═════════════════════════════════════ הוספת תנועה ══ */
+
+let addDir = 'out';
+
+function setDir(d) {
+  addDir = d;
+  $('dirOut').setAttribute('aria-pressed', String(d === 'out'));
+  $('dirIn').setAttribute('aria-pressed', String(d === 'in'));
+  $('addTitle').textContent = d === 'out' ? 'מה הוצאתם?' : 'מה נכנס?';
+  $('addSub').textContent = d === 'out'
+    ? 'סכום, קטגוריה, וזה הכל. התיאור הוא לכם, לא לנו.'
+    : 'משכורת, החזר, מתנה. כל שקל שנכנס ולא תוכנן.';
+  fillAddCats();
+}
+$('dirOut').addEventListener('click', () => setDir('out'));
+$('dirIn').addEventListener('click', () => setDir('in'));
+
+let addCat = null;
+function fillAddCats() {
+  const box = $('txCats');
+  box.textContent = '';
+  const list = addDir === 'out' ? outCats() : inCats();
+  if (!list.some(c => c.id === addCat)) addCat = list.length ? list[0].id : null;
+  for (const c of list) {
+    const b = el('button', 'chip', `${c.icon || '•'} ${c.label}`);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(c.id === addCat));
+    b.addEventListener('click', () => {
+      addCat = c.id;
+      for (const o of box.children) o.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', 'true');
+    });
+    box.append(b);
+  }
+}
+
+function openAdd() {
+  setDir('out');
+  $('txAmount').value = '';
+  $('txDesc').value = '';
+  /* ‏ברירת המחדל היא היום, אלא אם מסתכלים על חודש שעבר. תנועה
+     שנרשמת לחודש שלא מסתכלים עליו פשוט נעלמת מהעיניים. */
+  const now = new Date();
+  const d = sameMonth(S.month, now)
+    ? now
+    : new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0);
+  $('txDate').value = isoDate(d);
+  $('txDate').min = monthKey(S.month);
+  $('txDate').max = isoDate(new Date(S.month.getFullYear(), S.month.getMonth() + 1, 0));
+  setErr($('addErr'), '');
+  openSheet($('addSheet'));
+}
+$('addBtn').addEventListener('click', openAdd);
+$('addCancel').addEventListener('click', closeSheet);
+
+$('addSave').addEventListener('click', async () => {
+  setErr($('addErr'), '');
+  const ag = toAgorot($('txAmount').value);
+  if (!ag) {
+    setErr($('addErr'), 'צריך סכום גדול מאפס.');
+    $('txAmount').focus(); return;
+  }
+  if (!addCat) { setErr($('addErr'), 'צריך לבחור קטגוריה.'); return; }
+  const on = $('txDate').value;
+  if (!on) { setErr($('addErr'), 'צריך תאריך.'); return; }
+
+  const btn = $('addSave');
+  btn.disabled = true; btn.textContent = 'מוסיף...';
+  try {
+    const row = {
+      household_id: S.hh,
+      occurred_on: on,
+      amount_agorot: ag,
+      direction: addDir,
+      category_id: addCat,
+      description: $('txDesc').value.trim() || null,
+      source: 'manual',
+      created_by: S.user.id
+    };
+    const { data, error } = await sb.from('transactions').insert(row).select().single();
+    if (error) throw error;
+
+    const t = { ...data, amount_agorot: Number(data.amount_agorot) };
+    /* ‏נכנס לרשימה במקום הנכון לפי תאריך, במקום טעינה מחדש של
+       כל החודש בשביל שורה אחת. */
+    S.txs.push(t);
+    S.txs.sort((a, b) => b.occurred_on.localeCompare(a.occurred_on) ||
+                         String(b.created_at).localeCompare(String(a.created_at)));
+    closeSheet();
+    renderHome();
+    if (S.tab === 'tx') renderTx();
+    toast(addDir === 'out' ? 'נרשם.' : 'נכנס.');
+    S.asked = false;
+    maybeAsk();
+  } catch (err) {
+    setErr($('addErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'הוספה';
+  }
+});
+
+/* ═══════════════════════════════════════════ תקציב ══ */
+
+function renderBudget() {
+  const box = $('budgetRows');
+  box.textContent = '';
+  setErr($('budgetErr'), '');
+
+  const group = (title, list) => {
+    if (!list.length) return;
+    const g = el('div', 'setup-group');
+    g.append(el('h2', null, title));
+    for (const c of list) {
+      const row = el('div', 'num-row');
+      const ic = el('span', 'ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
+      const lab = el('label', 'nm', c.label);
+      lab.htmlFor = 'b_' + c.id;
+      const sp = spentIn(c.id);
+      if (c.kind === 'expense' && sp > 0) lab.append(el('small', null, `יצא עד כה ${fmt(sp)}`));
+      const wrap = el('span', 'amt');
+      const inp = el('input');
+      inp.id = 'b_' + c.id;
+      inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off';
+      inp.placeholder = '0';
+      inp.dataset.cat = c.id;
+      const p = planned(c.id);
+      inp.value = p ? (p / 100).toString() : '';
+      wrap.append(inp);
+      row.append(ic, lab, wrap);
+      g.append(row);
+    }
+    box.append(g);
+  };
+
+  group('מה נכנס', inCats());
+  group('מה יוצא', outCats());
+  budgetLive();
+}
+
+function budgetNumbers() {
+  const out = {}, inc = {};
+  for (const inp of $('budgetRows').querySelectorAll('input[data-cat]')) {
+    const c = byId(inp.dataset.cat);
+    if (!c) continue;
+    (c.kind === 'income' ? inc : out)[c.id] = toAgorot(inp.value) || 0;
+  }
+  const sumOut = Object.values(out).reduce((a, b) => a + b, 0);
+  const sumIn  = Object.values(inc).reduce((a, b) => a + b, 0);
+  return { out, inc, sumOut, sumIn };
+}
+
+function budgetLive() {
+  const { sumOut, sumIn } = budgetNumbers();
+  $('budgetTotal').textContent = fmt(sumOut);
+  const left = sumIn - sumOut;
+  if (!sumIn) {
+    $('budgetHint').textContent = 'בלי הכנסה אין למה להשוות את התכנון.';
+  } else if (left > 0) {
+    $('budgetHint').textContent = `${fmt(left)} מההכנסה עוד לא שובצו לשום מקום.`;
+  } else if (left === 0) {
+    $('budgetHint').textContent = 'כל שקל שנכנס יש לו מקום.';
+  } else {
+    $('budgetHint').textContent = `התכנון גדול מההכנסה ב${fmt(left)}.`;
+  }
+}
+$('budgetRows').addEventListener('input', budgetLive);
+
+$('budgetSave').addEventListener('click', async () => {
+  setErr($('budgetErr'), '');
+  const { out, inc } = budgetNumbers();
+  const all = { ...inc, ...out };
+  const m = monthKey(S.month);
+  const rows = Object.entries(all).map(([category_id, planned_agorot]) =>
+    ({ household_id: S.hh, month: m, category_id, planned_agorot }));
+
+  const btn = $('budgetSave');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const { error } = await sb.from('budgets')
+      .upsert(rows, { onConflict: 'household_id,month,category_id' });
+    if (error) throw error;
+    S.budgets = new Map(Object.entries(all).map(([k, v]) => [k, v]));
+    renderHome();
+    toast('התקציב נשמר.');
+  } catch (err) {
+    setErr($('budgetErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'שמירת התקציב';
+  }
+});
+
+/* ───────────────────────────────────── קטגוריה חדשה ── */
+
+const ICONS = ['🏠','🛒','🚗','🏦','🎬','👶','🐾','💊','👕','✈️','📚','🎁','💡','☕','🏋️','•'];
+let newIcon = ICONS[0];
+
+$('catAddBtn').addEventListener('click', () => {
+  $('catName').value = '';
+  newIcon = ICONS[0];
+  const box = $('catIcons');
+  box.textContent = '';
+  for (const ic of ICONS) {
+    const b = el('button', 'chip chip-quiet', ic);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(ic === newIcon));
+    b.setAttribute('aria-label', 'סמל ' + ic);
+    b.addEventListener('click', () => {
+      newIcon = ic;
+      for (const o of box.children) o.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', 'true');
+    });
+    box.append(b);
+  }
+  setErr($('catErr'), '');
+  openSheet($('catSheet'));
+});
+$('catCancel').addEventListener('click', closeSheet);
+
+$('catSave').addEventListener('click', async () => {
+  setErr($('catErr'), '');
+  const label = $('catName').value.trim();
+  if (!label) { setErr($('catErr'), 'צריך שם לקטגוריה.'); $('catName').focus(); return; }
+  if (S.cats.some(c => c.label === label)) {
+    setErr($('catErr'), 'כבר יש קטגוריה בשם הזה.'); return;
+  }
+  const btn = $('catSave');
+  btn.disabled = true; btn.textContent = 'מוסיף...';
+  try {
+    const { data, error } = await sb.from('categories').insert({
+      household_id: S.hh, label, icon: newIcon, kind: 'expense', sort: 90
+    }).select().single();
+    if (error) throw error;
+    S.cats.push(data);
+    closeSheet();
+    renderBudget();
+    toast('הקטגוריה נוספה.');
+  } catch (err) {
+    setErr($('catErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'הוספה';
+  }
+});
+
+/* ═══════════════════════════════════════ בחירת חודש ══ */
+
+$('monthBtn').addEventListener('click', () => {
+  const box = $('monthChips');
+  box.textContent = '';
+  const now = monthOf(new Date());
+  for (let i = 0; i < 7; i++) {
+    const m = addMonths(now, -i);
+    const b = el('button', 'chip', monthName(m));
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(sameMonth(m, S.month)));
+    b.addEventListener('click', async () => {
+      closeSheet();
+      if (sameMonth(m, S.month)) return;
+      S.month = m;
+      S.filterCat = null;
+      S.lastLeft = null;
+      $('monthLabel').textContent = monthName(m);
+      try { await loadAll(); } catch (err) { toast(human(err)); }
+      if (S.tab === 'tx') renderTx();
+      if (S.tab === 'budget') renderBudget();
+    });
+    box.append(b);
+  }
+  openSheet($('monthSheet'));
+});
+$('monthClose').addEventListener('click', closeSheet);
+
+/* ═══════════════════════════════════════════ הגדרות ══ */
+
+function renderSet() {
+  $('setEmail').textContent = S.user?.email || '';
+  $('setName').textContent  = S.profile?.display_name || 'לא הוגדר';
+}
+
+$('setNameBtn').addEventListener('click', () => {
+  $('nameInput').value = S.profile?.display_name || '';
+  openSheet($('nameSheet'));
+});
+$('nameCancel').addEventListener('click', closeSheet);
+
+$('nameSave').addEventListener('click', async () => {
+  const name = $('nameInput').value.trim();
+  closeSheet();
+  const { error } = await sb.from('profiles')
+    .upsert({ user_id: S.user.id, display_name: name || null }, { onConflict: 'user_id' });
+  if (error) { toast(human(error)); return; }
+  S.profile = { display_name: name || null };
+  renderSet();
+  toast('נשמר.');
+});
+
+/* ‏הנתונים הם שלהם, ולכן הם צריכים להיות מסוגלים לקחת אותם
+   ולעזוב. BOM בתחילת הקובץ, אחרת אקסל בעברית פותח אותו כג'יבריש. */
+$('setExport').addEventListener('click', async () => {
+  toast('מכין את הקובץ...');
+  const { data, error } = await sb.from('transactions')
+    .select('occurred_on,direction,amount_agorot,category_id,description,source,installment_no,installment_total,charged_on')
+    .order('occurred_on', { ascending: false });
+  if (error) { toast(human(error)); return; }
+
+  const head = ['תאריך', 'סוג', 'סכום', 'קטגוריה', 'תיאור', 'מקור', 'תשלום', 'מתוך', 'מועד חיוב'];
+  const q = v => {
+    const s = String(v == null ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lines = [head.join(',')];
+  for (const t of (data || [])) {
+    const c = byId(t.category_id);
+    lines.push([
+      t.occurred_on,
+      t.direction === 'in' ? 'הכנסה' : 'הוצאה',
+      (Number(t.amount_agorot) / 100).toFixed(2),
+      c ? c.label : '',
+      t.description || '',
+      t.source === 'import' ? 'מיובא' : 'הוקלד',
+      t.installment_no || '',
+      t.installment_total || '',
+      t.charged_on || ''
+    ].map(q).join(','));
+  }
+
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `כמה-יש-לי-${isoDate(new Date())}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast(`${(data || []).length} תנועות ירדו אליכם.`);
+});
+
+/* ‏מחיקה היא מחיקה. שתי לחיצות ולא אישור של הדפדפן, כי חלון
+   אישור נלחץ בלי לקרוא אותו. */
+let wipeArmed = 0;
+$('setWipe').addEventListener('click', async () => {
+  const k = $('setWipe').querySelector('.k');
+  if (Date.now() - wipeArmed > 6000) {
+    wipeArmed = Date.now();
+    k.textContent = 'עוד לחיצה אחת מוחקת הכול, בלי דרך חזרה';
+    setTimeout(() => {
+      if (Date.now() - wipeArmed >= 6000) {
+        k.textContent = '';
+        k.append(document.createTextNode('מחיקת כל הנתונים'));
+        k.append(el('small', null, 'משק הבית, התקציב וכל התנועות'));
+      }
+    }, 6200);
+    return;
+  }
+  wipeArmed = 0;
+  const { error } = await sb.from('households').delete().eq('id', S.hh);
+  if (error) { toast(human(error)); return; }
+  toast('נמחק.');
+  setTimeout(() => location.reload(), 900);
+});
+
+/* ═══════════════════════════════════════════ הפעלה ══ */
+
+for (const b of document.querySelectorAll('.nav button[data-tab]')) {
+  b.addEventListener('click', () => {
+    if (b.dataset.tab !== 'tx') S.filterCat = null;
+    tab(b.dataset.tab);
+  });
+}
+
+async function enter(user) {
+  S.user = user;
+  try {
+    S.hh = await findHousehold();
+  } catch (err) {
+    /* ‏אם הטבלאות עוד לא קיימות, זה המקום היחיד שבו זה מתגלה,
+       ולכן זה המקום שבו צריך להגיד את זה בבירור. */
+    stage('gate');
+    show($('gateMain')); hide($('gateSent'));
+    setErr($('authErr'), human(err));
+    return;
+  }
+
+  if (!S.hh) {
+    stage('setup');
+    buildSetup();
+    $('s_income').focus({ preventScroll: true });
+    return;
+  }
+
+  try {
+    await loadAll();
+  } catch (err) {
+    stage('gate');
+    setErr($('authErr'), human(err));
+    return;
+  }
+
+  stage('app');
+  tab('home');
+  renderStreak(touchStreak());
+  renderInsight();
+  maybeAsk();
+}
+
+/* ‏מי שחזר מקישור האישור במייל מגיע לכאן עם מפתח בכתובת.
+   detectSessionInUrl קורא אותו, והמאזין הזה הוא מה שמכניס אותו
+   פנימה בלי שיצטרך להתחבר שוב. */
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !S.user) enter(session.user);
+  if (event === 'SIGNED_OUT') location.reload();
+});
+
+(async function boot() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) { await enter(session.user); return; }
+  } catch {}
+  stage('gate');
+  authMode('signup');
+})();

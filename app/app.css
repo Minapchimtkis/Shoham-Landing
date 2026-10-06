@@ -1,0 +1,679 @@
+/* ═══════════════════════════════════════════════════════════════
+   כמה יש לי · גלון הסגנון
+   ═══════════════════════════════════════════════════════════════
+
+   חמישה כללים שכל הקובץ הזה נשען עליהם:
+
+   1. ‏מספר אחד הוא הגיבור של כל מסך. כל השאר תומך בו.
+   2. ‏אין אדום. חריגה מתקציב היא ענבר, והיא מנוסחת כשאלה.
+   3. ‏כסף נכתב בסריף, מילים בסאנס. בכל מקום, בלי חריגים.
+   4. ‏משטח מורם אחד למסך, לא יותר. שאר התוכן יושב על הנייר.
+   5. ‏תנועה עונה על נגיעה. אין אנימציות שמתנגנות מעצמן.
+*/
+
+:root{
+  /* ── הנייר ── */
+  --paper:#ffffff;
+  --wash:#f7f5fb;          /* המשטח המורם היחיד, לבן בנטייה סגולה */
+  --wash-2:#f1eef8;
+
+  /* ── הדיו ──
+     שחור בנטייה סגולה ולא אפור כהה. נגזר מהסגול של המותג, ולכן
+     הוא מתיישב איתו במקום להתנגש בו. */
+  --ink:#16111f;
+  --ink-2:rgba(22,17,31,0.62);
+  --ink-3:rgba(22,17,31,0.42);
+
+  /* ── הסגול, ורק עליו ──
+     הערך החי, המצב הפעיל, הפעולה הראשית. שלושה תפקידים. אם הוא
+     יופיע על עוד משהו הוא יפסיק להגיד אותם. */
+  --violet:#6d28d9;        /* על לבן, לטקסט. יחס ניגודיות 6.5 */
+  --violet-fill:#7c3aed;   /* למילויים ולכפתורים */
+  --violet-soft:rgba(109,40,217,0.09);
+
+  /* ── ענבר, במקום אדום ──
+     חריגה אינה תקלה ואינה אזעקה. היא מידע. */
+  --amber:#b45309;
+  --amber-soft:rgba(180,83,9,0.10);
+
+  --gold:#f0c040;          /* הרצף, ושום דבר אחר */
+
+  --rule:rgba(22,17,31,0.09);
+  --rule-2:rgba(22,17,31,0.16);
+
+  --r:12px;
+  --r-lg:18px;
+  --r-pill:999px;
+
+  --pad:20px;              /* שולי הנייר, אחידים בכל המסכים */
+  --nav-h:62px;
+
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{
+  background:var(--wash-2);
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  font-family:'Heebo',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  font-size:16px;
+  line-height:1.5;
+  font-weight:400;
+  min-height:100svh;
+  /* ‏האפליקציה היא טלפון. על מסך רחב היא נשארת ברוחב טלפון
+     במקום להימרח, כי פריסה של טלפון שנמתחה ל-1400 פיקסל אינה
+     פריסה של שולחן עבודה, היא פריסה שבורה. */
+  max-width:460px;
+  margin-inline:auto;
+  position:relative;
+  box-shadow:0 0 0 1px var(--rule);
+}
+
+@media (min-width:520px){
+  body{min-height:100svh}
+}
+
+/* כסף. הכלל היחיד שחל על כל מספר באפליקציה.
+   ‏הסריף טעון רק עם הספרות והפסיק, ולכן הש"ח והנקודה נופלים
+   מעצמם ל-Heebo בלי שאצטרך לעטוף אותם. */
+.money{
+  font-family:'Frank Ruhl Libre','Heebo',serif;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-0.01em;
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+
+/* ─────────────────────────────────────────────── יסודות ── */
+
+button,input,select,textarea{
+  font:inherit;color:inherit;
+  background:none;border:none;
+}
+button{cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+input,textarea{-webkit-appearance:none;appearance:none}
+
+a{color:var(--violet);text-decoration:none}
+a:hover{text-decoration:underline}
+
+:focus-visible{
+  outline:2px solid var(--violet);
+  outline-offset:2px;
+  border-radius:4px;
+}
+
+.hidden{display:none!important}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* ─────────────────────────────────────────── שדות קלט ── */
+
+.field{display:block;margin-bottom:16px}
+.field > label,.lbl{
+  display:block;font-size:14px;font-weight:500;
+  color:var(--ink-2);margin-bottom:7px;
+}
+.inp{
+  width:100%;
+  /* ‏16 פיקסל ולא פחות. כל דבר מתחת לזה מקפיץ את הדף בספארי
+     של אייפון ברגע שנוגעים בשדה. */
+  font-size:16px;
+  padding:13px 14px;
+  background:var(--paper);
+  border:1px solid var(--rule-2);
+  border-radius:var(--r);
+  transition:border-color .14s var(--ease),box-shadow .14s var(--ease);
+}
+.inp::placeholder{color:var(--ink-3)}
+.inp:focus{
+  outline:none;
+  border-color:var(--violet);
+  box-shadow:0 0 0 3px var(--violet-soft);
+}
+.inp[aria-invalid="true"]{border-color:var(--amber)}
+
+/* שדה סכום. הוא המספר של המסך, ולכן הוא בסריף ובגודל אחר. */
+.amount-field{position:relative}
+.amount-field .inp{
+  font-family:'Frank Ruhl Libre','Heebo',serif;
+  font-weight:900;font-size:34px;
+  text-align:center;direction:ltr;
+  padding:16px 14px;
+  letter-spacing:-0.01em;
+}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;width:100%;
+  min-height:50px;padding:0 20px;
+  font-size:16px;font-weight:700;
+  border-radius:var(--r);
+  background:var(--violet-fill);color:#fff;
+  transition:transform .12s var(--ease),background-color .14s var(--ease),opacity .14s var(--ease);
+}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-ghost{
+  background:none;color:var(--ink-2);
+  font-weight:500;min-height:46px;
+  border:1px solid var(--rule-2);
+}
+.btn-quiet{
+  background:none;color:var(--violet);
+  font-weight:500;min-height:44px;width:auto;padding:0 6px;
+}
+.btn-danger{background:none;color:var(--amber);border:1px solid var(--amber-soft);font-weight:600}
+
+.err{
+  display:block;margin-top:10px;
+  font-size:14px;color:var(--amber);
+  background:var(--amber-soft);
+  padding:10px 12px;border-radius:var(--r);
+}
+.note{font-size:13px;color:var(--ink-3);line-height:1.6}
+
+/* ══════════════════════════════════════════ מסך הפתיחה ══ */
+
+.gate{
+  min-height:100svh;
+  display:flex;flex-direction:column;
+  padding:max(28px,env(safe-area-inset-top)) var(--pad) calc(24px + env(safe-area-inset-bottom));
+}
+
+.gate-brand{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;color:var(--ink-3);font-weight:500;
+}
+.gate-brand img{width:26px;height:26px;border-radius:7px;display:block}
+
+/* ‏השם הוא שאלה, ולכן הוא נכתב כשאלה, עם סימן השאלה שלה.
+   הוא הדבר הראשון והגדול ביותר במסך. */
+.gate-name{
+  margin-top:auto;
+  font-size:clamp(40px,13vw,54px);
+  font-weight:900;line-height:1.02;
+  letter-spacing:-0.035em;
+}
+.gate-name .q{color:var(--violet)}
+.gate-lede{
+  margin-top:16px;font-size:17px;line-height:1.55;
+  color:var(--ink-2);max-width:21em;
+}
+.gate-points{
+  margin-top:20px;display:flex;flex-direction:column;gap:9px;
+  font-size:15px;color:var(--ink-2);
+}
+.gate-points li{display:flex;gap:9px;align-items:flex-start;list-style:none}
+.gate-points svg{flex:none;width:17px;height:17px;margin-top:4px;color:var(--violet)}
+
+.gate-form{margin-top:28px}
+.gate-foot{
+  margin-top:18px;display:flex;flex-direction:column;gap:12px;
+  align-items:center;text-align:center;
+}
+.gate-switch{font-size:15px;color:var(--ink-2)}
+.gate-switch button{
+  color:var(--violet);font-weight:700;padding:4px;
+  min-height:32px;
+}
+
+.sent{
+  margin-top:auto;margin-bottom:auto;text-align:center;
+}
+.sent h2{font-size:26px;font-weight:900;letter-spacing:-0.02em}
+.sent p{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:1.6}
+.sent .mail{font-weight:700;color:var(--ink);word-break:break-all}
+
+/* ═══════════════════════════════════════════ ההקמה ══ */
+
+.setup{
+  min-height:100svh;
+  padding:max(24px,env(safe-area-inset-top)) var(--pad) 0;
+  padding-bottom:calc(132px + env(safe-area-inset-bottom));
+}
+.setup h1{
+  font-size:28px;font-weight:900;line-height:1.15;
+  letter-spacing:-0.025em;margin-bottom:10px;
+}
+.setup .note{margin-bottom:26px;font-size:15px;color:var(--ink-2)}
+
+.setup-group{margin-bottom:28px}
+.setup-group > h2{
+  font-size:14px;font-weight:700;color:var(--ink-3);
+  margin-bottom:4px;
+}
+
+/* ‏שורת מספר, לא כרטיס. התווית מימין, השדה משמאל, קו שיער
+   ביניהן. זה מראה של דף חשבון, והוא מה שגורם לשבעה מספרים
+   להיראות כמו רשימה קצרה ולא כמו טופס. */
+.num-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 0;border-bottom:1px solid var(--rule);
+}
+.num-row:last-child{border-bottom:none}
+.num-row .ico{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  background:var(--wash);display:grid;place-items:center;
+  font-size:16px;line-height:1;
+}
+.num-row .nm{flex:1;font-size:16px;font-weight:500;min-width:0}
+.num-row .nm small{display:block;font-size:13px;font-weight:400;color:var(--ink-3)}
+.num-row .amt{
+  flex:none;width:118px;position:relative;
+}
+.num-row .amt input{
+  width:100%;text-align:left;direction:ltr;
+  font-family:'Frank Ruhl Libre','Heebo',serif;
+  font-weight:900;font-size:18px;
+  padding:9px 10px;
+  background:var(--paper);
+  border:1px solid var(--rule-2);border-radius:10px;
+  transition:border-color .14s var(--ease),box-shadow .14s var(--ease);
+}
+.num-row .amt input:focus{
+  outline:none;border-color:var(--violet);
+  box-shadow:0 0 0 3px var(--violet-soft);
+}
+
+/* ‏הקורא החי. הוא הסיבה שההקמה היא מסך אחד ולא שישה שלבים:
+   כל מספר שנכנס מזיז אותו, ואז מילוי הטופס מפסיק להיות טופס
+   והופך למשחק עם מספר אחד. */
+.setup-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  max-width:460px;margin-inline:auto;
+  background:rgba(255,255,255,0.94);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid var(--rule);
+  padding:13px var(--pad) calc(13px + env(safe-area-inset-bottom));
+  z-index:30;
+}
+.setup-left{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:12px;margin-bottom:11px;
+}
+.setup-left .k{font-size:14px;color:var(--ink-2);font-weight:500}
+.setup-left .v{font-size:25px;color:var(--violet)}
+.setup-left .v.over{color:var(--amber)}
+.setup-hint{
+  font-size:13px;color:var(--ink-3);
+  margin-bottom:11px;line-height:1.5;
+}
+
+/* ═════════════════════════════════════════ מעטפת האפליקציה ══ */
+
+.screen{
+  padding:0 var(--pad);
+  padding-bottom:calc(var(--nav-h) + 26px + env(safe-area-inset-bottom));
+}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+  padding:max(14px,env(safe-area-inset-top)) 0 10px;
+}
+
+.month-pick{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:16px;font-weight:700;
+  padding:6px 10px;margin-inline-start:-10px;
+  border-radius:var(--r-pill);
+  min-height:40px;
+}
+.month-pick svg{width:15px;height:15px;color:var(--ink-3)}
+.month-pick:disabled{opacity:1}
+
+/* הרצף. זהב, ורק הוא. */
+.streak{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;color:var(--ink-2);
+  padding:7px 11px;min-height:38px;
+  background:var(--wash);border-radius:var(--r-pill);
+}
+.streak .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--gold);flex:none;
+  box-shadow:0 0 0 3px rgba(240,192,64,0.22);
+}
+
+/* ────────────────────────────────── הגיבור: השאלה והתשובה ── */
+
+.hero{padding:16px 0 24px}
+.hero .q{
+  font-size:16px;font-weight:700;color:var(--violet);
+  letter-spacing:-0.01em;
+}
+.hero .a{
+  display:block;margin-top:2px;
+  font-size:clamp(50px,16vw,66px);
+  line-height:1.02;letter-spacing:-0.03em;
+}
+.hero .a.over{color:var(--amber)}
+.hero .sub{
+  margin-top:10px;font-size:15px;color:var(--ink-2);
+  line-height:1.5;
+}
+.hero .sub b{font-weight:700;color:var(--ink)}
+
+/* ‏המספר נע רק כשהוא מתחלף, כי אז הוא מראה מה השתנה. */
+@keyframes bump{
+  0%{transform:translateY(0)}
+  38%{transform:translateY(-5px)}
+  100%{transform:translateY(0)}
+}
+.hero .a.bump{animation:bump .34s var(--ease)}
+
+/* ──────────────────────────────── שורות הקטגוריות ── */
+
+.rows{border-top:1px solid var(--rule)}
+
+.row{
+  display:block;width:100%;text-align:right;
+  padding:14px 0 15px;
+  border-bottom:1px solid var(--rule);
+  position:relative;
+}
+.row-top{
+  display:flex;align-items:baseline;gap:10px;
+  margin-bottom:9px;
+}
+.row-ico{
+  flex:none;font-size:15px;line-height:1;
+  width:22px;text-align:center;
+}
+.row-nm{flex:1;font-size:16px;font-weight:500;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-val{flex:none;font-size:17px}
+.row-val.over{color:var(--amber)}
+.row-of{
+  flex:none;font-size:13px;color:var(--ink-3);
+  font-family:'Frank Ruhl Libre','Heebo',serif;font-weight:900;
+  direction:ltr;unicode-bidi:isolate;
+}
+
+/* ‏הפס מתמלא מימין, כמו שהעין קוראת. שני פסים ולא אחד: הרקע
+   הוא המתוכנן, המילוי הוא מה שיצא. */
+.bar{
+  height:6px;border-radius:3px;
+  background:var(--wash-2);overflow:hidden;
+  position:relative;
+}
+.bar i{
+  position:absolute;top:0;right:0;bottom:0;
+  background:var(--violet-fill);border-radius:3px;
+  transition:width .4s var(--ease);
+}
+.bar i.over{background:var(--amber)}
+.bar i.none{background:var(--rule-2)}
+
+/* ‏ציון התאריך בחודש. בלעדיו אין משמעות ל"40 אחוז מהתקציב":
+   40 אחוז בעשירי בחודש הוא בעיה, ובעשרים ושמונה הוא מצוין. */
+.bar .today{
+  position:absolute;top:-3px;bottom:-3px;width:1px;
+  background:var(--ink-3);opacity:.5;
+}
+
+.cat-add{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:15px 0;
+  color:var(--violet);font-weight:600;font-size:15px;
+}
+.cat-add svg{width:17px;height:17px}
+
+/* ────────────────────────────── המשטח המורם היחיד ── */
+
+.insight{
+  margin-top:24px;padding:17px 18px;
+  background:var(--wash);border-radius:var(--r-lg);
+}
+.insight h3{
+  font-size:15px;font-weight:700;margin-bottom:6px;
+  line-height:1.4;
+}
+.insight p{font-size:14px;color:var(--ink-2);line-height:1.6}
+.insight .acts{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+.insight .acts button{
+  font-size:14px;font-weight:600;color:var(--violet);
+  background:var(--paper);
+  padding:8px 13px;min-height:38px;
+  border-radius:var(--r-pill);
+  box-shadow:0 0 0 1px var(--rule);
+}
+
+/* ──────────────────────────────────── מצבים ריקים ── */
+
+.empty{
+  padding:46px 8px;text-align:center;
+}
+.empty h2{font-size:19px;font-weight:700;margin-bottom:8px}
+.empty p{font-size:15px;color:var(--ink-2);line-height:1.6;max-width:24em;margin-inline:auto}
+.empty .btn{margin-top:20px;width:auto;padding:0 24px;display:inline-flex}
+
+.skel{
+  background:var(--wash-2);border-radius:8px;
+  height:14px;animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ──────────────────────────────── רשימת התנועות ── */
+
+.sec-h{
+  font-size:13px;font-weight:700;color:var(--ink-3);
+  padding:20px 0 7px;position:sticky;top:0;
+  background:var(--paper);z-index:2;
+}
+.tx{
+  display:flex;align-items:center;gap:12px;
+  width:100%;text-align:right;
+  padding:12px 0;border-bottom:1px solid var(--rule);
+}
+.tx-ico{
+  flex:none;width:36px;height:36px;border-radius:10px;
+  background:var(--wash);display:grid;place-items:center;
+  font-size:16px;line-height:1;
+}
+.tx-mid{flex:1;min-width:0}
+.tx-mid .t{
+  font-size:15px;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tx-mid .s{font-size:13px;color:var(--ink-3)}
+.tx-amt{flex:none;font-size:16px}
+.tx-amt.in{color:var(--violet)}
+
+.tag{
+  display:inline-block;font-size:11px;font-weight:700;
+  color:var(--ink-3);background:var(--wash-2);
+  padding:1px 6px;border-radius:5px;margin-inline-start:5px;
+  vertical-align:1px;
+}
+
+/* ──────────────────────────────────── ניווט תחתון ── */
+
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  max-width:460px;margin-inline:auto;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(16px) saturate(1.6);
+  -webkit-backdrop-filter:blur(16px) saturate(1.6);
+  border-top:1px solid var(--rule);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  align-items:stretch;z-index:40;
+}
+.nav button{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;
+  font-size:11px;font-weight:600;color:var(--ink-3);
+  transition:color .14s var(--ease);
+}
+.nav button svg{width:23px;height:23px}
+.nav button[aria-current="page"]{color:var(--violet)}
+
+/* ‏כפתור ההוספה במרכז. הוא הפעולה שתילחץ פי עשרה מכל השאר,
+   ולכן הוא לא עוד פריט בשורה. */
+.nav .add{position:relative}
+.nav .add span{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:50px;height:50px;border-radius:50%;
+  background:var(--violet-fill);color:#fff;
+  display:grid;place-items:center;
+  box-shadow:0 5px 16px rgba(109,40,217,0.34);
+  transition:transform .14s var(--ease);
+}
+.nav .add svg{width:25px;height:25px}
+
+/* ═══════════════════════════════════════════ גלונים ══ */
+
+.scrim{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(22,17,31,0.42);
+  opacity:0;transition:opacity .22s var(--ease);
+}
+.scrim.on{opacity:1}
+
+.sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:51;
+  max-width:460px;margin-inline:auto;
+  background:var(--paper);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  padding:8px var(--pad) calc(20px + env(safe-area-inset-bottom));
+  max-height:92svh;overflow-y:auto;
+  transform:translateY(100%);
+  transition:transform .26s var(--ease);
+  box-shadow:0 -8px 40px rgba(22,17,31,0.14);
+}
+.sheet.on{transform:translateY(0)}
+
+.grab{
+  width:38px;height:4px;border-radius:2px;
+  background:var(--rule-2);margin:6px auto 14px;
+}
+.sheet h2{
+  font-size:20px;font-weight:900;letter-spacing:-0.02em;
+  margin-bottom:4px;
+}
+.sheet .sub{font-size:14px;color:var(--ink-2);margin-bottom:18px;line-height:1.55}
+
+/* מתג כיוון. שני מצבים, ולכן מתג ולא תפריט. */
+.seg{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4px;padding:4px;margin-bottom:18px;
+  background:var(--wash-2);border-radius:var(--r);
+}
+.seg button{
+  min-height:40px;border-radius:9px;
+  font-size:15px;font-weight:600;color:var(--ink-2);
+  transition:background-color .14s var(--ease),color .14s var(--ease);
+}
+.seg button[aria-pressed="true"]{
+  background:var(--paper);color:var(--ink);
+  box-shadow:0 1px 3px rgba(22,17,31,0.09);
+}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:15px;font-weight:500;
+  padding:9px 13px;min-height:42px;
+  border-radius:var(--r-pill);
+  background:var(--paper);
+  box-shadow:0 0 0 1px var(--rule-2);
+  transition:box-shadow .14s var(--ease),background-color .14s var(--ease),color .14s var(--ease);
+}
+.chip[aria-pressed="true"]{
+  background:var(--violet-fill);color:#fff;
+  box-shadow:none;font-weight:600;
+}
+.chip-quiet{
+  font-size:14px;padding:8px 12px;min-height:38px;
+  color:var(--ink-2);
+}
+
+.sheet-row{display:flex;gap:10px;margin-top:18px}
+.sheet-row .btn{flex:1}
+
+/* ═══════════════════════════════════════════ הגדרות ══ */
+
+.set-group{margin-top:26px}
+.set-group > h2{
+  font-size:13px;font-weight:700;color:var(--ink-3);
+  margin-bottom:6px;
+}
+.set-row{
+  display:flex;align-items:center;gap:12px;
+  width:100%;text-align:right;
+  padding:14px 0;border-bottom:1px solid var(--rule);
+  font-size:16px;
+}
+.set-row .k{flex:1;min-width:0}
+.set-row .k small{display:block;font-size:13px;color:var(--ink-3);font-weight:400}
+.set-row .v{flex:none;color:var(--ink-3);font-size:15px;
+  max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.set-row svg{flex:none;width:16px;height:16px;color:var(--ink-3)}
+
+.credit{
+  margin-top:34px;padding-top:20px;
+  border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-3);line-height:1.7;
+}
+
+/* ═══════════════════════════════════════════ הודעה ══ */
+
+.toast{
+  position:fixed;z-index:70;
+  bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));
+  left:50%;transform:translate(-50%,10px);
+  max-width:calc(460px - 2 * var(--pad));width:max-content;
+  background:var(--ink);color:#fff;
+  font-size:14px;font-weight:500;
+  padding:11px 17px;border-radius:var(--r-pill);
+  box-shadow:0 6px 24px rgba(22,17,31,0.26);
+  opacity:0;pointer-events:none;
+  transition:opacity .18s var(--ease),transform .18s var(--ease);
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ═════════════════════════════════ ריחוף ומגע ══ */
+
+/* ‏ריחוף קיים רק למי שיש לו עכבר. בטלפון, חוק הריחוף נדבק
+     אחרי נגיעה והכפתור נשאר דלוק עד שנוגעים במקום אחר. */
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{background:#6d28d9}
+  .btn-ghost:hover,.btn-quiet:hover{background:var(--wash)}
+  .btn-danger:hover{background:var(--amber-soft)}
+  .row:hover,.tx:hover,.set-row:hover{background:var(--wash)}
+  .chip:hover{box-shadow:0 0 0 1px var(--rule-2),0 0 0 4px var(--violet-soft)}
+  .chip[aria-pressed="true"]:hover{box-shadow:none;background:#6d28d9}
+  .nav button:hover{color:var(--ink-2)}
+  .nav button[aria-current="page"]:hover{color:var(--violet)}
+  .month-pick:hover,.streak:hover{background:var(--wash)}
+  .insight .acts button:hover{background:var(--wash-2)}
+}
+
+/* ‏לחיצה. אחרי חוקי הריחוף ולא לפניהם: לשניהם אותה ספציפיות,
+   ולכן מי שנכתב אחרון הוא מי שמנצח. */
+.btn:active{transform:scale(.985)}
+.chip:active{transform:scale(.97)}
+.nav .add:active span{transform:translate(-50%,-50%) scale(.93)}
+.row:active,.tx:active,.set-row:active{background:var(--wash-2)}
+.month-pick:active,.streak:active{background:var(--wash-2)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}
