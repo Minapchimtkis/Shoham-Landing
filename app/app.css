@@ -86,11 +86,14 @@ body{
 /* כסף. הכלל היחיד שחל על כל מספר באפליקציה.
    ‏הסריף טעון רק עם הספרות והפסיק, ולכן הש"ח והנקודה נופלים
    מעצמם ל-Heebo בלי שאצטרך לעטוף אותם. */
+/* ‏ספרות ברוחב אחיד, ולא לנוי: המספר הגדול מתעדכן חי, ובלי
+   tabular-nums הוא קופץ בכל שינוי ספרה. נבדק, ו-Sora אכן
+   מכבד אותו. */
 .money{
-  font-family:'Frank Ruhl Libre','Heebo',serif;
-  font-weight:900;
+  font-family:'Sora','Heebo',sans-serif;
+  font-weight:800;
   font-variant-numeric:tabular-nums;
-  letter-spacing:-0.01em;
+  letter-spacing:-0.015em;
   direction:ltr;
   unicode-bidi:isolate;
 }
@@ -168,8 +171,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 /* שדה סכום. הוא המספר של המסך, ולכן הוא בסריף ובגודל אחר. */
 .amount-field{position:relative}
 .amount-field .inp{
-  font-family:'Frank Ruhl Libre','Heebo',serif;
-  font-weight:900;font-size:34px;
+  font-family:'Sora','Heebo',sans-serif;
+  font-weight:800;font-size:34px;
   text-align:center;direction:ltr;
   padding:16px 14px;
   letter-spacing:-0.01em;
@@ -297,8 +300,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   /* ‏הספרות נצמדות לצד שבו נמצאת התווית, ולא לקצה הרחוק ממנה.
      כך גם נוצר טור מיושר של מספרים לאורך הטופס. */
   width:100%;text-align:right;direction:ltr;
-  font-family:'Frank Ruhl Libre','Heebo',serif;
-  font-weight:900;font-size:18px;
+  font-family:'Sora','Heebo',sans-serif;
+  font-weight:800;font-size:18px;
   padding:9px 10px;
   background:var(--paper);
   border:1px solid var(--rule-2);border-radius:10px;
@@ -423,11 +426,11 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:flex;align-items:baseline;gap:3px;
 }
 /* ‏המספר המתוכנן שקט יותר מזה שיצא: שם היא השאלה, כאן רק הרקע. */
-.row-of .money{font-size:13px;font-weight:700}
+.row-of .money{font-size:13px;font-weight:600}
 
 /* ‏אפס אינו מידע, ולכן הוא לא נכתב בשחור מלא. שורה שלא קרה בה
    כלום לא צריכה למשוך את העין יותר משורה שכן. */
-.row-val.zero{color:var(--ink-3);font-weight:700}
+.row-val.zero{color:var(--ink-3);font-weight:600}
 
 /* ‏הפס מתמלא מימין, כמו שהעין קוראת. שני פסים ולא אחד: הרקע
    הוא המתוכנן, המילוי הוא מה שיצא. */
