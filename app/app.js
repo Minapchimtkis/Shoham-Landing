@@ -252,7 +252,8 @@ const S = {
   asked: false,             // לא שואלים יותר מפעם אחת בביקור
   lastLeft: null,
   ever: true,               // ‏האם היה במשק הבית אי פעם תקציב או תנועה
-  assets: []                // ‏החסכונות והנכסים, נקראים פעם אחת לטעינה
+  assets: [],               // ‏החסכונות והנכסים, נקראים פעם אחת לטעינה
+  debts: []                 // ‏החובות, גם הם
 };
 
 const byId  = id => S.cats.find(c => c.id === id);
@@ -346,13 +347,14 @@ function stage(name) {
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
 const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set',
-              assets: 'set', privacy: 'set' };
+              assets: 'set', privacy: 'set', debts: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
                 import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
-                year: 'scYear', assets: 'scAssets', privacy: 'scPrivacy' };
+                year: 'scYear', assets: 'scAssets', privacy: 'scPrivacy',
+                debts: 'scDebts' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -371,6 +373,7 @@ function tab(name) {
   if (name === 'goals') renderGoals();
   if (name === 'year') renderYear();
   if (name === 'assets') renderAssets();
+  if (name === 'debts') renderDebts();
   window.scrollTo({ top: 0 });
 }
 
@@ -744,7 +747,7 @@ async function loadAll() {
   /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
      ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
      ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
-  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast] = await Promise.all([
+  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
@@ -760,7 +763,9 @@ async function loadAll() {
        ‏ההגדרות ומסך הנכסים עצמו קוראים את אותו דבר. קודם כל אחד
        ‏מהם שלח שאילתה משלו. */
     sb.from('assets').select('*').eq('archived', false)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: true }),
+    sb.from('debts').select('*').eq('archived', false)
+      .order('balance_agorot', { ascending: false })
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
@@ -771,6 +776,9 @@ async function loadAll() {
   S.assets = ast.error ? [] : (ast.data || []).map(a => ({ ...a,
     amount_agorot: Number(a.amount_agorot),
     liability_agorot: Number(a.liability_agorot || 0) }));
+  S.debts = dbt.error ? [] : (dbt.data || []).map(d => ({ ...d,
+    balance_agorot: Number(d.balance_agorot),
+    monthly_agorot: Number(d.monthly_agorot) }));
   S.cats = cats.data || [];
   S.budgets = new Map((buds.data || []).map(b => [b.category_id, Number(b.planned_agorot)]));
   S.txs = (txs.data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
@@ -2318,7 +2326,9 @@ function renderAssets() {
 
   const total = assetRows.reduce((s, a) => s + Number(a.amount_agorot), 0);
   const debts = assetRows.reduce((s, a) => s + Number(a.liability_agorot || 0), 0);
-  const worth = total - debts;
+  /* ‏אותו מספר שמופיע בבית · נכסים פחות כל החובות, גם אלה שאינם
+     ‏רשומים על נכס. שני מסכים שמראים שווי שונה הם באג. */
+  const worth = netWorth();
 
   /* ── המספר, והבטחה להסביר אותו ── */
   const head = el('button', 'worth');
@@ -2342,9 +2352,12 @@ function renderAssets() {
   head.addEventListener('click', openWorth);
   box.append(head);
 
-  if (debts) {
-    box.append(el('p', 'note',
-      `סך הנכסים ${fmt(total)}, ומתוכם ${fmt(debts)} עוד לא שלכם.`));
+  const other = debtTotal();
+  if (debts || other) {
+    const bits = [`סך הנכסים ${fmt(total)}`];
+    if (debts) bits.push(`${fmt(debts)} עוד לא שלכם`);
+    if (other) bits.push(`ועוד ${fmt(other)} חובות אחרים`);
+    box.append(el('p', 'note', bits.join(', ') + '.'));
   }
 
   /* ── לפי סוגים ── */
@@ -2413,19 +2426,20 @@ function openWorth() {
     line(g.label, list.reduce((s, a) => s + Number(a.amount_agorot), 0));
   }
 
-  const debts = assetRows.reduce((s, a) => s + Number(a.liability_agorot || 0), 0);
-  if (debts) {
+  const minus = (label, amount) => {
     const r = el('div', 'worth-row');
-    r.append(el('span', 'k', 'פחות הלוואות על הנכסים'));
+    r.append(el('span', 'k', label));
     const v = el('span', 'v money minus');
-    setMoney(v, debts);
+    setMoney(v, amount);
     v.prepend(document.createTextNode('−'));
     r.append(v);
     body.append(r);
-  }
+  };
+  const debts = assetRows.reduce((s, a) => s + Number(a.liability_agorot || 0), 0);
+  if (debts) minus('פחות הלוואות על הנכסים', debts);
+  if (debtTotal()) minus('פחות שאר החובות', debtTotal());
 
-  const total = assetRows.reduce((s, a) => s + assetWorth(a), 0);
-  line('השווי הפיננסי שלי', total, 'total');
+  line('השווי הפיננסי שלי', netWorth(), 'total');
   openSheet($('worthSheet'));
 }
 $('worthClose').addEventListener('click', closeSheet);
@@ -2521,6 +2535,265 @@ $('assetDelete').addEventListener('click', async () => {
   toast('נמחק.');
   await reloadAssets();
   renderAssets();
+  renderHome();
+});
+
+/* ═══════════════════════════════════════════ החובות ══ */
+
+/* ‏מה שקטגוריית "החזרים" לא יודעת להגיד: לא כמה יוצא בחודש אלא
+   ‏כמה נשאר לשלם. שתי השאלות של המסך הזה הן בדיוק אלה.
+
+   ‏הכלל של מסך הנכסים חל גם כאן · הוא ממפה ואינו ממליץ. אין
+   ‏דירוג בין סוגי חוב, אין "כדאי לסגור קודם", ואין תחזית. */
+
+const DEBT_KINDS = [
+  { key: 'mortgage',  icon: '🏠', label: 'משכנתא' },
+  { key: 'loan',      icon: '🏦', label: 'הלוואה' },
+  { key: 'overdraft', icon: '📉', label: 'מינוס' },
+  { key: 'credit',    icon: '💳', label: 'אשראי' },
+  { key: 'other',     icon: '•',  label: 'אחר' }
+];
+const debtKindOf = k => DEBT_KINDS.find(x => x.key === k) || DEBT_KINDS[DEBT_KINDS.length - 1];
+
+let debtEdit = null;
+let debtKind = 'loan';
+
+/* ‏שתי יתרות משתי טבלאות. משכנתא יכולה להירשם כאן וגם כהתחייבות
+   ‏על הדירה, ושתיהן נספרות · לכן אסור לנו לחבר בשקט ולקוות. */
+const assetLiab = () => S.assets.reduce((t, a) => t + a.liability_agorot, 0);
+const debtTotal = () => S.debts.reduce((t, d) => t + d.balance_agorot, 0);
+const owedAll   = () => debtTotal() + assetLiab();
+const monthlyAll = () => S.debts.reduce((t, d) => t + d.monthly_agorot, 0);
+
+/* ‏ריבית נשמרת בנקודות בסיס. 525 הם 5.25 אחוז. */
+const rateText = bp => bp == null ? '' : (bp / 100).toFixed(2).replace(/\.?0+$/, '') + '%';
+
+function monthsLeft(iso) {
+  if (!iso) return null;
+  const m = Math.round((new Date(iso + 'T12:00:00') - new Date()) / (30.4 * DAY));
+  return m;
+}
+
+async function reloadDebts() {
+  try {
+    const { data, error } = await sb.from('debts')
+      .select('*').eq('archived', false).order('balance_agorot', { ascending: false });
+    if (error) throw error;
+    S.debts = (data || []).map(d => ({ ...d,
+      balance_agorot: Number(d.balance_agorot),
+      monthly_agorot: Number(d.monthly_agorot) }));
+  } catch { /* ‏נשארים עם מה שיש בזיכרון */ }
+}
+
+function setDebtsLine() {
+  const n = $('debtsNow');
+  if (!n) return;
+  n.textContent = owedAll()
+    ? `${fmt(owedAll())}, ומתוכם ${fmt(monthlyAll())} בחודש`
+    : 'הלוואות, מינוס, אשראי, משכנתא';
+}
+
+function renderDebts() {
+  const box = $('debtsBody');
+  box.textContent = '';
+
+  const liab = assetLiab();
+  if (!S.debts.length && !liab) {
+    const e = el('div', 'empty');
+    e.append(el('h2', null, 'אין כאן חובות'));
+    e.append(el('p', null, 'משכנתא, הלוואה, מינוס או חוב באשראי. אם אין לכם · מצוין. אם יש, עדיף לראות אותם במקום אחד מאשר לזכור אותם בערך.'));
+    const b = el('button', 'btn', 'הוספת החוב הראשון');
+    b.type = 'button';
+    b.addEventListener('click', () => openDebt(null));
+    e.append(b);
+    box.append(e);
+    return;
+  }
+
+  /* ── שני המספרים ── */
+  const head = el('div', 'owe');
+  const r1 = el('div', 'owe-row');
+  r1.append(el('span', 'k', 'סך החובות'));
+  const v1 = el('span', 'v money'); setMoney(v1, owedAll());
+  r1.append(v1);
+  const r2 = el('div', 'owe-row');
+  r2.append(el('span', 'k', 'יוצא כל חודש'));
+  const v2 = el('span', 'v money sm'); setMoney(v2, monthlyAll());
+  r2.append(v2);
+  head.append(r1, r2);
+  head.setAttribute('aria-label',
+    `סך החובות ${fmt(owedAll())}, ומתוכם ${fmt(monthlyAll())} יוצאים כל חודש`);
+  box.append(head);
+
+  /* ── החובות עצמם, מהגדול לקטן ──
+     ‏הסדר נקבע כאן ולא רק בשאילתה · כך הוא זהה גם אחרי שמירה
+     ‏שרעננה את הרשימה, ולא תלוי בסדר שהשרת החזיר. */
+  for (const d of [...S.debts].sort((a, b) => b.balance_agorot - a.balance_agorot)) {
+    const k = debtKindOf(d.kind);
+    const row = el('button', 'asset');
+    row.type = 'button';
+    const ic = el('span', 'asset-ico', k.icon); ic.setAttribute('aria-hidden', 'true');
+    const mid = el('div', 'asset-mid');
+    mid.append(el('div', 't', d.name));
+
+    /* ‏שם שכבר אומר את הסוג · "מינוס" מתחת ל"מינוס" הוא רעש. */
+    const bits = [];
+    if (d.name.trim() !== k.label) bits.push(k.label);
+    if (d.rate_bp != null) bits.push(rateText(d.rate_bp));
+    if (d.ends_on) {
+      const m = monthsLeft(d.ends_on);
+      bits.push(m > 0 ? `עוד ${m} ${m === 1 ? 'חודש' : 'חודשים'}` : 'התאריך עבר');
+    }
+    if (d.note) bits.push(d.note);
+    if (bits.length) mid.append(el('div', 's', bits.join(' · ')));
+
+    /* ‏ההחזר החודשי בטור של הכסף ולא בשורת ההסבר · הוא מספר,
+       ‏והוא נקרא יחד עם היתרה שמעליו. */
+    const end = el('div', 'asset-end');
+    const money = el('span', 'v money');
+    setMoney(money, d.balance_agorot);
+    end.append(money);
+    if (d.monthly_agorot) end.append(el('span', 'sub', `${fmt(d.monthly_agorot)} בחודש`));
+    row.append(ic, mid, end);
+    row.setAttribute('aria-label',
+      `${d.name}, ${k.label}. נשאר לשלם ${fmt(d.balance_agorot)}` +
+      (d.monthly_agorot ? `, החזר חודשי ${fmt(d.monthly_agorot)}` : ''));
+    row.addEventListener('click', () => openDebt(d));
+    box.append(row);
+  }
+
+  /* ── מה שרשום על נכס, ולא כאן ── */
+  if (liab) {
+    const wrap = el('div', 'ag');
+    const h = el('h2');
+    h.append(el('span', null, 'רשום על נכס'));
+    const tv = el('span', 't money'); setMoney(tv, liab);
+    h.append(tv);
+    wrap.append(h);
+    for (const a of S.assets.filter(x => x.liability_agorot > 0)) {
+      const row = el('button', 'asset');
+      row.type = 'button';
+      const ic = el('span', 'asset-ico', kindOf(a.kind).icon); ic.setAttribute('aria-hidden', 'true');
+      const mid = el('div', 'asset-mid');
+      mid.append(el('div', 't', a.name));
+      mid.append(el('div', 's', `${kindOf(a.kind).label} · נספר כאן, ונערך במסך הנכסים`));
+      const end = el('div', 'asset-end');
+      const money = el('span', 'v money'); setMoney(money, a.liability_agorot);
+      end.append(money);
+      row.append(ic, mid, end);
+      row.setAttribute('aria-label', `${a.name}, יתרת הלוואה ${fmt(a.liability_agorot)}. לחיצה פותחת את הנכס`);
+      row.addEventListener('click', () => { tab('assets'); openAsset(a); });
+      wrap.append(row);
+    }
+    box.append(wrap);
+
+    /* ‏כפילות אפשרית. אנחנו אומרים אותה במקום לתקן בשקט · תיקון
+       ‏שקט היה מציג מספר שהמשתמש לא מבין מאיפה הגיע. */
+    if (S.debts.some(d => d.kind === 'mortgage')) {
+      const warn = el('p', 'note warn-note');
+      warn.textContent = 'רשומה כאן משכנתא, וגם התחייבות על נכס. אם זאת אותה משכנתא, היא נספרת פעמיים · כדאי להשאיר אותה רק במקום אחד.';
+      box.append(warn);
+    }
+  }
+}
+
+/* ─────────────────────────── הטופס ── */
+
+function setDebtKind(k) {
+  debtKind = k;
+  for (const b of $('debtKinds').children)
+    b.setAttribute('aria-pressed', String(b.dataset.kind === k));
+  $('debtBalanceLbl').textContent = k === 'overdraft' ? 'כמה המינוס היום' : 'כמה נשאר לשלם';
+}
+
+function openDebt(d) {
+  debtEdit = d || null;
+  $('debtTitle').textContent = d ? 'החוב' : 'חוב חדש';
+  $('debtName').value = d ? d.name : '';
+  $('debtBalance').value = d ? (d.balance_agorot / 100).toString() : '';
+  $('debtMonthly').value = d && d.monthly_agorot ? (d.monthly_agorot / 100).toString() : '';
+  $('debtRate').value = d && d.rate_bp != null ? (d.rate_bp / 100).toString() : '';
+  $('debtEnds').value = d && d.ends_on ? d.ends_on : '';
+  $('debtNote').value = d && d.note ? d.note : '';
+  $('debtDelRow').classList.toggle('hidden', !d);
+
+  const box = $('debtKinds');
+  box.textContent = '';
+  for (const k of DEBT_KINDS) {
+    const b = el('button', 'chip', k.icon + ' ' + k.label);
+    b.type = 'button';
+    b.dataset.kind = k.key;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => setDebtKind(k.key));
+    box.append(b);
+  }
+  setDebtKind(d ? d.kind : 'loan');
+  setErr($('debtErr'), '');
+  openSheet($('debtSheet'));
+}
+
+$('setDebts').addEventListener('click', () => tab('debts'));
+$('debtsBack').addEventListener('click', () => tab('set'));
+$('debtAdd').addEventListener('click', () => openDebt(null));
+$('debtCancel').addEventListener('click', closeSheet);
+
+$('debtSave').addEventListener('click', async () => {
+  setErr($('debtErr'), '');
+  const name = $('debtName').value.trim();
+  if (!name) { setErr($('debtErr'), 'צריך שם, כדי שתדעו מה זה כשתראו את זה בעוד חודש.'); $('debtName').focus(); return; }
+  const balance = toAgorot($('debtBalance').value);
+  if (balance == null) { setErr($('debtErr'), 'צריך לכתוב כמה נשאר לשלם. מספר בערך מספיק.'); $('debtBalance').focus(); return; }
+
+  /* ‏הריבית נכתבת באחוזים ונשמרת בנקודות בסיס. 5.25 הופכים ל-525,
+     ‏וכך החשבון נשאר שלם בדיוק כמו הכסף באגורות. */
+  const rawRate = $('debtRate').value.trim().replace('%', '').replace(',', '.');
+  let rate = null;
+  if (rawRate) {
+    const n = Number(rawRate);
+    if (!isFinite(n) || n < 0 || n > 100) {
+      setErr($('debtErr'), 'הריבית נכתבת באחוזים, בין 0 ל-100. לדוגמה 5.25.');
+      $('debtRate').focus(); return;
+    }
+    rate = Math.round(n * 100);
+  }
+
+  const btn = $('debtSave');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const row = {
+      kind: debtKind, name: name.slice(0, 60),
+      balance_agorot: balance,
+      monthly_agorot: toAgorot($('debtMonthly').value) || 0,
+      rate_bp: rate,
+      ends_on: $('debtEnds').value || null,
+      note: $('debtNote').value.trim().slice(0, 300) || null,
+      updated_at: new Date().toISOString()
+    };
+    const { error } = debtEdit
+      ? await sb.from('debts').update(row).eq('id', debtEdit.id)
+      : await sb.from('debts').insert({ ...row, household_id: S.hh, created_by: S.user.id });
+    if (error) throw error;
+    closeSheet();
+    toast(debtEdit ? 'עודכן.' : 'נוסף.');
+    await reloadDebts();
+    renderDebts();
+    renderHome();
+  } catch (err) {
+    setErr($('debtErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'שמירה';
+  }
+});
+
+$('debtDelete').addEventListener('click', async () => {
+  const d = debtEdit;
+  closeSheet();
+  if (!d) return;
+  const { error } = await sb.from('debts').delete().eq('id', d.id);
+  if (error) { toast(human(error)); return; }
+  toast('נמחק.');
+  await reloadDebts();
+  renderDebts();
   renderHome();
 });
 
@@ -2790,15 +3063,18 @@ $('cycleSave').addEventListener('click', async () => {
 /* ‏השורה שמובילה לנכסים הראתה עד היום משפט קבוע. עכשיו היא
    ‏מראה את המספר עצמו · זאת שאלה שאנשים פותחים את האפליקציה
    ‏כדי לענות עליה, ואין סיבה להסתיר אותה מאחורי עוד לחיצה. */
+/* ‏נכסים פחות ההתחייבויות שעליהם, פחות כל החובות האחרים. חוב
+   ‏שאינו רשום על נכס הוא עדיין חוב, והשווי שלא מחסיר אותו משקר. */
 const netWorth = () => S.assets.reduce((t, a) =>
-  t + a.amount_agorot - a.liability_agorot, 0);
+  t + a.amount_agorot - a.liability_agorot, 0) - debtTotal();
 
 function setAssetsLine() {
   const n = $('assetsNow');
   if (!n) return;
   n.textContent = S.assets.length
-    ? `השווי הפיננסי שלכם ${fmt(netWorth())}`
+    ? `סך הנכסים ${fmt(S.assets.reduce((t, a) => t + a.amount_agorot, 0))}`
     : 'כמה יש לי מעבר לעובר ושב';
+  setDebtsLine();
 }
 
 /* ═══════════════════════════════════════════ מטרות ══ */

@@ -395,6 +395,13 @@
         </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      <button class="set-row" id="setDebts" type="button">
+        <span class="k">
+          החובות שלי
+          <small id="debtsNow">הלוואות, מינוס, אשראי, משכנתא</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
 
     <div class="set-group">
@@ -570,6 +577,23 @@
       נמצא. הוא אינו ממליץ על מסלול, על מוצר או על נכס, ואינו
       אומר מה כדאי לקנות, למכור או להעביר. הסכומים הם מה שרשמתם,
       והם אינם מתעדכנים מעצמם.
+    </p>
+  </main>
+
+  <!-- ─────────────────────────────────── החובות ── -->
+  <main class="screen hidden" id="scDebts">
+    <button class="back" id="debtsBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">החובות שלי</h1>
+    <div id="debtsBody"></div>
+    <button class="btn" id="debtAdd" type="button" style="margin-top:20px">הוספת חוב או הלוואה</button>
+
+    <p class="credit" id="debtsNote">
+      גם כאן זאת מפה ולא ייעוץ. המסך מראה מה שרשמתם, ואינו אומר
+      מה כדאי לסגור קודם, מה למחזר או מה להשאיר. הסכומים אינם
+      מתעדכנים מעצמם, ולכן כדאי לרענן אותם כשמגיע דוח יתרות.
     </p>
   </main>
 
@@ -1183,6 +1207,57 @@
 </div>
 
 <!-- ממה מורכב השווי -->
+<div class="sheet hidden" id="debtSheet" role="dialog" aria-modal="true" aria-labelledby="debtTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="debtTitle">חוב חדש</h2>
+  <p class="sub">כמה נשאר לשלם, וכמה יוצא כל חודש. השאר אופציונלי.</p>
+
+  <div class="field">
+    <span class="lbl" id="debtKindLbl">מה זה</span>
+    <div class="chips" id="debtKinds" role="group" aria-labelledby="debtKindLbl"></div>
+  </div>
+
+  <div class="field">
+    <label for="debtName">איך לקרוא לזה</label>
+    <input class="inp" id="debtName" type="text" maxlength="60" autocomplete="off" placeholder="הלוואה בבנק">
+  </div>
+
+  <div class="field">
+    <label for="debtBalance" id="debtBalanceLbl">כמה נשאר לשלם</label>
+    <input class="inp" id="debtBalance" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+  </div>
+
+  <div class="field">
+    <label for="debtMonthly">החזר חודשי</label>
+    <input class="inp" id="debtMonthly" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+    <p class="note" style="margin-top:6px">אם אין החזר קבוע, אפשר להשאיר ריק.</p>
+  </div>
+
+  <div class="field">
+    <label for="debtRate">ריבית שנתית, אם אתם יודעים</label>
+    <input class="inp" id="debtRate" type="text" inputmode="decimal" autocomplete="off" placeholder="לדוגמה 5.25" dir="ltr" style="text-align:right">
+  </div>
+
+  <div class="field">
+    <label for="debtEnds">מתי זה נגמר, אם ידוע</label>
+    <input class="inp" id="debtEnds" type="date">
+  </div>
+
+  <div class="field">
+    <label for="debtNote">הערה, אם בא לכם</label>
+    <input class="inp" id="debtNote" type="text" maxlength="300" autocomplete="off" placeholder="אופציונלי">
+  </div>
+
+  <p class="err hidden" id="debtErr" role="alert"></p>
+  <div class="sheet-row pin">
+    <button class="btn btn-ghost" id="debtCancel" type="button">ביטול</button>
+    <button class="btn" id="debtSave" type="button">שמירה</button>
+  </div>
+  <div class="sheet-row hidden" id="debtDelRow">
+    <button class="btn btn-danger" id="debtDelete" type="button">מחיקה</button>
+  </div>
+</div>
+
 <div class="sheet hidden" id="worthSheet" role="dialog" aria-modal="true" aria-labelledby="worthTitle">
   <div class="grab" aria-hidden="true"></div>
   <h2 id="worthTitle">ממה מורכב השווי</h2>

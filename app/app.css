@@ -1305,6 +1305,32 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .chip[aria-pressed="true"] small{color:rgba(255,255,255,.78)}
 
+/* ═══════════════════════════════════════════ החובות ══ */
+
+/* ‏שני מספרים ולא אחד · "כמה אני חייב" ו"כמה יוצא לי בחודש" הן
+   ‏שתי שאלות, והשנייה היא זו שמרגישים כל חודש. */
+.owe{
+  padding:18px 0 20px;
+  border-bottom:1px solid var(--rule);
+  margin-bottom:6px;
+}
+.owe-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:12px;
+}
+.owe-row + .owe-row{margin-top:8px}
+.owe-row .k{font-size:15px;color:var(--ink-2);font-weight:500}
+.owe-row .v{font-size:30px;letter-spacing:-0.02em;color:var(--red)}
+.owe-row .v.sm{font-size:20px;color:var(--ink-2)}
+
+/* ‏הכפילות האפשרית בין משכנתא שנרשמה פעמיים. נאמרת ולא מתוקנת
+   ‏בשקט · תיקון שקט מציג מספר שאי אפשר להסביר. */
+.warn-note{
+  margin-top:16px;padding:11px 13px;
+  background:var(--amber-soft);border-radius:var(--r);
+  color:var(--amber);font-size:13px;line-height:1.6;
+}
+
 /* ═══════════════════════════════════ חסכונות ונכסים ══ */
 
 /* ‏המספר הגדול כאן הוא כפתור, כי הוא מבטיח הסבר. */
