@@ -15,10 +15,14 @@ import * as P from './parse.js';
 
 /* ‏שתי הספריות נטענות רק כשבאמת בוחרים קובץ מהסוג שלהן. יחד
    הן כשני מגהבייט, ואין שום סיבה שמי שלא ייבא דבר ישלם עליהן. */
-const CDN = {
-  xlsx: 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm',
-  pdf:  'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.mjs',
-  pdfWorker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs'
+/* ‏הנתיבים נגזרים מכתובת הקובץ הזה עצמו ולא מכתובת הדף, כדי
+   ‏שהעובד של pdf.js ימצא את עצמו גם אם האפליקציה תוגש מתיקייה
+   ‏אחרת יום אחד. */
+const V = p => new URL('./vendor/' + p, import.meta.url).href;
+const LIB = {
+  xlsx:      V('xlsx.js'),
+  pdf:       V('pdf.js'),
+  pdfWorker: V('pdf.worker.js')
 };
 
 const DOC_KINDS = [
@@ -72,7 +76,7 @@ export function mountImport(A) {
     if (name.endsWith('.xlsx') || name.endsWith('.xls') ||
         (file.type || '').includes('spreadsheet') || (file.type || '').includes('ms-excel')) {
       let XLSX;
-      try { XLSX = await import(/* @vite-ignore */ CDN.xlsx); }
+      try { XLSX = await import(/* @vite-ignore */ LIB.xlsx); }
       catch {
         return { ok: false, reason: 'no-xlsx', rows: [] };
       }
@@ -92,8 +96,8 @@ export function mountImport(A) {
     if (name.endsWith('.pdf') || file.type === 'application/pdf') {
       let pdfjs;
       try {
-        pdfjs = await import(/* @vite-ignore */ CDN.pdf);
-        pdfjs.GlobalWorkerOptions.workerSrc = CDN.pdfWorker;
+        pdfjs = await import(/* @vite-ignore */ LIB.pdf);
+        pdfjs.GlobalWorkerOptions.workerSrc = LIB.pdfWorker;
       } catch {
         return { ok: false, reason: 'no-pdf', rows: [] };
       }

@@ -17,7 +17,10 @@
       המסך נכון והנתון בבסיס לא.
 */
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+/* ‏הספרייה יושבת אצלנו ולא ב-CDN. ספרייה שנטענת מרשת זרה רצה
+   ‏אצל המשתמש עם ההרשאות שלו ורואה כל מה שהוא רואה, ולייבוא ESM
+   ‏אין SRI · אין דרך לומר "רק הקובץ הזה ולא אחר". ראה app/vendor. */
+import { createClient } from './vendor/supabase.js';
 import { mountImport } from './import.js';
 
 /* ‏אותו פרויקט ואותו מפתח פרסום כמו בשאר הדפים. אין כאן סוד:
