@@ -395,6 +395,13 @@
 
     <div class="set-group">
       <h2>החשבון</h2>
+      <button class="set-row" id="setLock" type="button">
+        <span class="k">
+          נעילה בקוד
+          <small id="lockNow">כבויה</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <div class="set-row">
         <span class="k">אימייל</span>
         <span class="v" id="setEmail" dir="ltr"></span>
@@ -826,6 +833,52 @@
 </div>
 
 <!-- מתי מתחיל החודש התקציבי -->
+<!-- ‏נעילה בקוד. שומרת על האפליקציה מפני מי שהרים את הטלפון, ולא
+     ‏מפני מי שלקח אותו למעבדה · מפתח הגישה עצמו ממשיך לשבת במכשיר.
+     ‏זה כתוב במסך עצמו, כי הבטחה שאינה מדויקת גרועה מכלום. -->
+<div class="sheet hidden" id="lockSheet" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="lockTitle">נעילה בקוד</h2>
+  <p class="sub">
+    קוד של ארבע ספרות לפני שרואים את המספרים. שימושי כשהטלפון
+    עובר יד, או נשאר על השולחן.
+  </p>
+
+  <div class="field" id="lockWhenWrap">
+    <span class="lbl" id="lockWhenLbl">מתי לנעול</span>
+    <div class="chips" id="lockChips" role="group" aria-labelledby="lockWhenLbl"></div>
+  </div>
+
+  <div class="sheet-row pin" id="lockActions">
+    <button class="btn" id="lockSet" type="button">בחירת קוד</button>
+    <button class="btn-quiet hidden" id="lockClear" type="button">ביטול הנעילה</button>
+  </div>
+
+  <p class="note" id="lockNote" style="margin-top:14px">
+    הקוד נשמר במכשיר הזה בלבד, מעורבל, ולא נשלח לשום מקום. הוא
+    עוצר מישהו שהרים את הטלפון · הוא לא מחליף את נעילת המכשיר
+    עצמו, וזאת עדיין ההגנה החשובה ביותר.
+  </p>
+</div>
+
+<!-- ‏מסך הנעילה. אינו גלון אלא שכבה אטומה מעל הכול, כי כשהוא פתוח
+     ‏אסור שייראה שקל אחד מאחוריו. -->
+<div class="lock hidden" id="lockScreen" role="dialog" aria-modal="true" aria-labelledby="lockHead">
+  <div class="lock-top">
+    <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 10V7a5 5 0 0110 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <rect x="4.5" y="10" width="15" height="10.5" rx="3" fill="currentColor"/>
+    </svg>
+    <h2 id="lockHead">הקוד שלכם</h2>
+    <p class="lock-sub" id="lockMsg">ארבע ספרות, וחוזרים פנימה.</p>
+    <div class="dots" id="lockDots" aria-hidden="true"></div>
+  </div>
+
+  <div class="pad" id="lockPad" role="group" aria-labelledby="lockHead"></div>
+
+  <button class="btn-quiet" id="lockForgot" type="button">שכחתי את הקוד</button>
+</div>
+
 <div class="sheet hidden" id="cycleSheet" role="dialog" aria-modal="true" aria-labelledby="cycleTitle">
   <div class="grab" aria-hidden="true"></div>
   <h2 id="cycleTitle">מתי מתחיל החודש</h2>

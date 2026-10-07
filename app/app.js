@@ -229,6 +229,7 @@ function human(error) {
 const S = {
   user: null,
   recovery: false,          // ‏באמצע החלפת סיסמה · לא נכנסים לאפליקציה
+  locked: false,            // ‏מסך הנעילה פתוח מעל הכול
   hh: null,
   profile: null,
   month: monthOf(new Date()),
@@ -2743,8 +2744,278 @@ async function enter(user) {
   tab('home');
   renderStreak(touchStreak());
   renderInsight();
+  renderLockRow();
   maybeAsk();
 }
+
+/* ═══════════════════════════════════════ נעילה בקוד ══ */
+
+/* ‏מה הנעילה הזאת כן ומה היא לא. היא עוצרת מי שהרים את הטלפון
+   ‏מהשולחן · הסיטואציה שבאמת קורית. היא אינה עוצרת מי שלקח את
+   ‏המכשיר למעבדה, כי מפתח הגישה ממשיך לשבת בזיכרון הדפדפן, וכל
+   ‏נעילה שנאכפת בצד הלקוח היא בסופו של דבר רק צד הלקוח. זה כתוב
+   ‏גם במסך ההגדרות, כי הבטחה לא מדויקת גרועה מכלום.
+
+   ‏הקוד עצמו לא נשמר. נשמר ממנו גיבוב SHA-256 עם מלח אקראי לכל
+   ‏מכשיר, כך שמי שקורא את הזיכרון המקומי אינו מקבל את הספרות. */
+
+const PIN_LEN = 4;
+const LOCK_WHEN = [
+  { v: null, label: 'כבויה'  },
+  { v: 0,    label: 'מיד'    },
+  { v: 1,    label: 'דקה'    },
+  { v: 5,    label: '5 דקות' },
+  { v: 15,   label: '15 דקות'}
+];
+const BAD_MAX = 5;
+
+const lockCfg = () => LS.get('lock', { mins: null, salt: '', hash: '' });
+const lockArmed = () => { const c = lockCfg(); return !!c.hash && c.mins !== null; };
+
+async function pinHash(pin, salt) {
+  const buf = new TextEncoder().encode(salt + ':' + pin);
+  const d = await crypto.subtle.digest('SHA-256', buf);
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+let pinBuf = '';
+let pinMode = 'verify';     // verify · set · confirm
+let pinFirst = '';
+
+function renderDots() {
+  const box = $('lockDots');
+  box.textContent = '';
+  for (let i = 0; i < PIN_LEN; i++) {
+    const d = el('i');
+    if (i < pinBuf.length) d.classList.add('on');
+    box.append(d);
+  }
+}
+
+/* ‏המקלדת נבנית פעם אחת. אפס בשורה האחרונה באמצע, ומחיקה לידו ·
+   ‏הסדר שכל טלפון מלמד מגיל אפס. */
+function buildPad() {
+  const pad = $('lockPad');
+  if (pad.childElementCount) return;
+  const tap = v => {
+    if (v === 'del') { pinBuf = pinBuf.slice(0, -1); renderDots(); return; }
+    if (pinBuf.length >= PIN_LEN) return;
+    pinBuf += v;
+    renderDots();
+    if (pinBuf.length === PIN_LEN) setTimeout(submitPin, 120);
+  };
+  for (const k of ['1','2','3','4','5','6','7','8','9','', '0', 'del']) {
+    if (k === '') { pad.append(el('span')); continue; }
+    const b = el('button', k === 'del' ? 'ghost' : null);
+    b.type = 'button';
+    if (k === 'del') {
+      b.setAttribute('aria-label', 'מחיקת ספרה');
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M9 5h10a2 2 0 012 2v10a2 2 0 01-2 2H9l-6-7 6-7zm2.5 4.5l5 5m0-5l-5 5');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '1.9');
+      path.setAttribute('stroke-linecap', 'round');
+      svg.append(path);
+      b.append(svg);
+    } else {
+      b.textContent = k;
+    }
+    b.addEventListener('click', () => tap(k));
+    pad.append(b);
+  }
+}
+
+function lockSay(msg, bad) {
+  const n = $('lockMsg');
+  n.textContent = msg;
+  n.classList.toggle('bad', !!bad);
+}
+
+function wrongShake() {
+  const d = $('lockDots');
+  d.classList.add('wrong');
+  setTimeout(() => d.classList.remove('wrong'), 420);
+  pinBuf = '';
+  setTimeout(renderDots, 420);
+}
+
+/* ‏האפליקציה שמאחור מנוטרלת ולא רק מוסתרת · inert מוציא אותה גם
+   ‏מהטאב ומקורא המסך, אחרת אפשר לשוטט בה עם מקלדת מבעד לשכבה. */
+function inertApp(on) {
+  for (const id of ['app', 'gate', 'setup']) {
+    const n = $(id);
+    if (n) n.inert = on;
+  }
+}
+
+function showLock(mode) {
+  pinMode = mode || 'verify';
+  pinBuf = ''; pinFirst = '';
+  buildPad();
+  renderDots();
+  S.locked = true;
+  if (openEl) closeSheet();
+  lockSay(pinMode === 'set' ? 'בחרו ארבע ספרות שתזכרו.' : 'ארבע ספרות, וחוזרים פנימה.');
+  $('lockHead').textContent = pinMode === 'set' ? 'קוד חדש' : 'הקוד שלכם';
+  $('lockForgot').classList.toggle('hidden', pinMode !== 'verify');
+  show($('lockScreen'));
+  inertApp(true);
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('lockPad').querySelector('button')?.focus({ preventScroll: true }), 60);
+}
+
+function hideLock() {
+  S.locked = false;
+  hide($('lockScreen'));
+  inertApp(false);
+  document.body.style.overflow = '';
+  LS.set('hidAt', 0);
+}
+
+async function submitPin() {
+  const pin = pinBuf;
+
+  if (pinMode === 'set') {
+    pinFirst = pin; pinBuf = ''; pinMode = 'confirm';
+    renderDots();
+    lockSay('שוב, כדי לוודא.');
+    return;
+  }
+
+  if (pinMode === 'confirm') {
+    if (pin !== pinFirst) {
+      pinMode = 'set'; pinFirst = '';
+      wrongShake();
+      lockSay('לא אותו קוד. ננסה שוב.', true);
+      return;
+    }
+    const salt = [...crypto.getRandomValues(new Uint8Array(16))]
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+    const c = lockCfg();
+    LS.set('lock', { mins: c.mins === null ? 5 : c.mins, salt, hash: await pinHash(pin, salt) });
+    LS.set('lockBad', 0);
+    hideLock();
+    renderLockRow();
+    toast('הנעילה פעילה.');
+    return;
+  }
+
+  const c = lockCfg();
+  if (await pinHash(pin, c.salt) === c.hash) {
+    LS.set('lockBad', 0);
+    hideLock();
+    return;
+  }
+
+  /* ‏מונה הניסיונות נשמר בזיכרון המקומי ולא בזיכרון הדף, אחרת
+     ‏רענון מאפס אותו וחמישה ניסיונות הם אינסוף ניסיונות. */
+  const bad = LS.get('lockBad', 0) + 1;
+  LS.set('lockBad', bad);
+  if (bad >= BAD_MAX) {
+    LS.set('lockBad', 0);
+    lockSay('יותר מדי ניסיונות. מוציא אתכם מהחשבון.', true);
+    setTimeout(async () => { await sb.auth.signOut(); location.reload(); }, 900);
+    return;
+  }
+  wrongShake();
+  lockSay(`לא נכון. נשארו ${BAD_MAX - bad} ניסיונות.`, true);
+}
+
+$('lockForgot').addEventListener('click', async () => {
+  lockSay('מוציא אתכם מהחשבון. אפשר להיכנס עם הסיסמה.');
+  await sb.auth.signOut();
+  location.reload();
+});
+
+/* ‏מלכודת טאב משל עצמה · מסך הנעילה אינו גלון, והמלכודת של
+   ‏הגלונות לא חלה עליו. */
+document.addEventListener('keydown', e => {
+  if (!S.locked) return;
+  if (e.key === 'Escape') { e.preventDefault(); return; }
+  if (/^[0-9]$/.test(e.key)) {
+    e.preventDefault();
+    if (pinBuf.length < PIN_LEN) {
+      pinBuf += e.key; renderDots();
+      if (pinBuf.length === PIN_LEN) setTimeout(submitPin, 120);
+    }
+    return;
+  }
+  if (e.key === 'Backspace') { e.preventDefault(); pinBuf = pinBuf.slice(0, -1); renderDots(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...$('lockScreen').querySelectorAll('button')].filter(n => n.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+/* ─────────────────────────── מתי נועלים ── */
+
+function maybeLock() {
+  if (!lockArmed() || S.locked || !S.user) return;
+  const c = lockCfg();
+  const hid = LS.get('hidAt', 0);
+  if (!hid) return;
+  if (Date.now() - hid >= c.mins * 60000) showLock('verify');
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    if (lockArmed() && !S.locked) LS.set('hidAt', Date.now());
+  } else {
+    maybeLock();
+  }
+});
+
+/* ‏טעינה מחדש של הדף היא תמיד "חזרנו מבחוץ", ולכן היא נועלת בלי
+   ‏קשר לכמה זמן עבר · האפליקציה נסגרה. */
+function lockOnLoad() {
+  if (lockArmed()) showLock('verify');
+}
+
+/* ─────────────────────────── המסך בהגדרות ── */
+
+function renderLockRow() {
+  const c = lockCfg();
+  const w = LOCK_WHEN.find(x => x.v === c.mins);
+  $('lockNow').textContent = !c.hash ? 'כבויה'
+    : c.mins === null ? 'כבויה'
+    : w ? `אחרי ${w.label}` : 'פעילה';
+}
+
+function renderLockSheet() {
+  const c = lockCfg();
+  const box = $('lockChips');
+  box.textContent = '';
+  for (const o of LOCK_WHEN) {
+    const b = el('button', 'chip', o.label);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(c.mins === o.v));
+    if (c.mins === o.v) b.classList.add('on');
+    b.addEventListener('click', () => {
+      const cur = lockCfg();
+      if (o.v !== null && !cur.hash) { closeSheet(); showLock('set'); return; }
+      LS.set('lock', { ...cur, mins: o.v });
+      renderLockSheet(); renderLockRow();
+    });
+    box.append(b);
+  }
+  $('lockSet').textContent = c.hash ? 'החלפת הקוד' : 'בחירת קוד';
+  $('lockClear').classList.toggle('hidden', !c.hash);
+}
+
+$('setLock').addEventListener('click', () => { renderLockSheet(); openSheet($('lockSheet')); });
+$('lockSet').addEventListener('click', () => { closeSheet(); showLock('set'); });
+$('lockClear').addEventListener('click', () => {
+  LS.set('lock', { mins: null, salt: '', hash: '' });
+  LS.set('lockBad', 0);
+  renderLockSheet(); renderLockRow();
+  toast('הנעילה כבויה.');
+});
 
 /* ‏מי שחזר מקישור האישור במייל מגיע לכאן עם מפתח בכתובת.
    detectSessionInUrl קורא אותו, והמאזין הזה הוא מה שמכניס אותו
@@ -2769,7 +3040,7 @@ sb.auth.onAuthStateChange((event, session) => {
       return;
     }
 
-    if (session?.user) { await enter(session.user); return; }
+    if (session?.user) { await enter(session.user); lockOnLoad(); return; }
   } catch {}
   stage('gate');
   authMode('signup');
