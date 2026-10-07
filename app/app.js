@@ -27,9 +27,33 @@ import { mountImport } from './import.js';
 const SUPABASE_URL = 'https://vplqocqmlquajwwnyeby.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
 
+/* ‏נקרא לפני יצירת הלקוח, כי detectSessionInUrl מנקה את הכתובת
+   ‏ברגע שהוא קם. הסימן הוא פרמטר משלנו ולא ה-hash של Supabase,
+   ‏כי ה-hash משתנה בין זרימת הטוקן לזרימת ה-PKCE והפרמטר שלנו
+   ‏שורד את שתיהן. בלי הסימן הזה מי שחוזר מהמייל נכנס ישר
+   ‏לאפליקציה · עם סשן תקף, ובלי שהחליף סיסמה. */
+const FROM_MAIL_RESET = new URLSearchParams(location.search).get('mode') === 'reset';
+
 const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
+
+/* ‏עשרה תווים ולא שמונה. זה החשבון שמחזיק דוח יתרות וסילוקין,
+   ‏וכל תו נוסף שווה יותר מכל כלל "אות גדולה וסימן" שרק גורם
+   ‏לאנשים לבחור Password1!. את הבדיקה מול סיסמאות שדלפו עושה
+   ‏Supabase עצמו, בהגדרה בפרויקט. */
+const MIN_PASS = 10;
+
+/* ‏סיסמה שהיא האימייל, או רק ספרות, היא לא סיסמה. שתי הבדיקות
+   ‏האלה תופסות את רוב מה שאנשים באמת מקלידים. */
+function passProblem(pass, email) {
+  if (pass.length < MIN_PASS) return `הסיסמה צריכה להיות באורך ${MIN_PASS} תווים לפחות.`;
+  if (/^\d+$/.test(pass)) return 'סיסמה שכולה ספרות קלה מדי לניחוש. כדאי להוסיף מילה.';
+  const local = (email || '').split('@')[0].toLowerCase();
+  if (local.length >= 4 && pass.toLowerCase().includes(local))
+    return 'הסיסמה מכילה את האימייל שלכם. כדאי משהו אחר.';
+  return null;
+}
 
 /* ───────────────────────────────────────────────── עזרים ── */
 
@@ -179,9 +203,13 @@ function human(error) {
   if (m.includes('invalid login')) return 'האימייל או הסיסמה אינם נכונים.';
   if (m.includes('already registered') || m.includes('already been registered'))
     return 'כבר יש חשבון עם האימייל הזה. אפשר להיכנס איתו.';
-  if (m.includes('password') && m.includes('6'))  return 'הסיסמה צריכה להיות באורך שמונה תווים לפחות.';
+  if (m.includes('password') && m.includes('6'))  return `הסיסמה צריכה להיות באורך ${MIN_PASS} תווים לפחות.`;
+  if (m.includes('pwned') || m.includes('compromised') || m.includes('leaked'))
+    return 'הסיסמה הזאת מופיעה בדליפות ידועות. כדאי לבחור אחרת.';
   if (m.includes('weak') || m.includes('password should'))
-    return 'הסיסמה קצרה או פשוטה מדי. שמונה תווים לפחות.';
+    return `הסיסמה קצרה או פשוטה מדי. ${MIN_PASS} תווים לפחות.`;
+  if (m.includes('same password') || m.includes('should be different'))
+    return 'זאת הסיסמה הקודמת. צריך לבחור אחת חדשה.';
   if (m.includes('email') && m.includes('invalid')) return 'כתובת האימייל אינה תקינה.';
   if (m.includes('email not confirmed')) return 'החשבון עוד לא אושר. יש לפתוח את הקישור שנשלח במייל.';
   if (m.includes('rate limit') || m.includes('too many'))
@@ -197,6 +225,7 @@ function human(error) {
 
 const S = {
   user: null,
+  recovery: false,          // ‏באמצע החלפת סיסמה · לא נכנסים לאפליקציה
   hh: null,
   profile: null,
   month: monthOf(new Date()),
@@ -342,7 +371,14 @@ function authMode(mode) {
   $('authSwitchText').textContent = signup ? 'יש לכם כבר חשבון?' : 'עוד אין לכם חשבון?';
   $('authToggle').textContent     = signup ? 'כניסה' : 'פתיחת חשבון';
   $('authPass').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  /* ‏בכניסה מקלידים סיסמה קיימת, ולכן מספר התווים הנדרש אינו
+     ‏רלוונטי שם · הוא רק נראה כמו דרישה שהמשתמש כבר לא יכול
+     ‏לעמוד בה אם החשבון שלו ישן. */
+  $('authPass').placeholder = signup ? `לפחות ${MIN_PASS} תווים` : 'הסיסמה שלכם';
+  if (signup) $('authPass').setAttribute('minlength', MIN_PASS);
+  else        $('authPass').removeAttribute('minlength');
   $('authLegal').classList.toggle('hidden', !signup);
+  $('forgotLine').classList.toggle('hidden', signup);
   setErr($('authErr'), '');
 }
 
@@ -358,9 +394,11 @@ $('authForm').addEventListener('submit', async e => {
     setErr($('authErr'), 'צריך כתובת אימייל תקינה.');
     $('authEmail').focus(); return;
   }
-  if (pass.length < 8) {
-    setErr($('authErr'), 'הסיסמה צריכה להיות באורך שמונה תווים לפחות.');
-    $('authPass').focus(); return;
+  /* ‏רק בהרשמה. בכניסה סיסמה קיימת וקצרה היא עניין של השרת,
+     ‏וחסימה מקומית שלה רק מונעת ממי שיש לו חשבון ישן להיכנס. */
+  if (S.mode === 'signup') {
+    const bad = passProblem(pass, email);
+    if (bad) { setErr($('authErr'), bad); $('authPass').focus(); return; }
   }
 
   const btn = $('authBtn');
@@ -388,8 +426,11 @@ $('authForm').addEventListener('submit', async e => {
         setErr($('authErr'), 'כבר יש חשבון עם האימייל הזה. אפשר להיכנס איתו.');
         return;
       }
+      $('sentHead').textContent = 'שלחנו לכם מייל';
       $('sentMail').textContent = email;
-      hide($('gateMain')); show($('gateSent'));
+      $('sentWhy').textContent =
+        'ולחצו על הקישור כדי לאשר את החשבון. אחר כך חוזרים לכאן ונכנסים.';
+      gateScreen('sent');
       return;
     }
 
@@ -409,8 +450,130 @@ $('authForm').addEventListener('submit', async e => {
 });
 
 $('sentBack').addEventListener('click', () => {
-  show($('gateMain')); hide($('gateSent'));
+  gateScreen('main');
   authMode('login');
+});
+
+/* ════════════════════════════════════ איפוס סיסמה ══ */
+
+/* ‏ארבעה מסכים בתוך השער, ואחד מהם גלוי בכל רגע. */
+function gateScreen(which) {
+  for (const [k, id] of [['main','gateMain'], ['sent','gateSent'],
+                         ['forgot','gateForgot'], ['new','gateNew']]) {
+    $(id).classList.toggle('hidden', k !== which);
+  }
+}
+
+$('authForgot').addEventListener('click', () => {
+  $('forgotEmail').value = $('authEmail').value.trim();
+  setErr($('forgotErr'), '');
+  gateScreen('forgot');
+  $('forgotEmail').focus();
+});
+
+$('forgotBack').addEventListener('click', () => gateScreen('main'));
+
+/* ‏השהיה מקומית, כדי שלחיצה חוזרת לא תיתקל בחסימת הקצב של
+   ‏השרת ותחזיר שגיאה שנראית כאילו משהו שבור. לפי כתובת ולא
+   ‏גלובלית · מי שהקליד את האימייל בטעות צריך לתקן ולשלוח מיד,
+   ‏ולא לחכות דקה בגלל שגיאת הקלדה. */
+const sentAt = new Map();
+
+$('forgotForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setErr($('forgotErr'), '');
+  const email = $('forgotEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    setErr($('forgotErr'), 'צריך כתובת אימייל תקינה.');
+    $('forgotEmail').focus(); return;
+  }
+  const key = email.toLowerCase();
+  const wait = Math.ceil((60000 - (Date.now() - (sentAt.get(key) || 0))) / 1000);
+  if (wait > 0) {
+    setErr($('forgotErr'), `כבר שלחנו. אפשר לנסות שוב בעוד ${wait} שניות.`);
+    return;
+  }
+
+  const btn = $('forgotBtn');
+  btn.disabled = true;
+  btn.textContent = 'שולח...';
+  try {
+    /* ‏הכתובת שחוזרים אליה נושאת סימן משלנו, כדי שהאפליקציה
+       ‏תדע שזאת חזרה מאיפוס ולא כניסה רגילה. */
+    await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + location.pathname + '?mode=reset'
+    });
+    sentAt.set(key, Date.now());
+  } catch {}
+  finally {
+    btn.disabled = false;
+    btn.textContent = 'שליחת קישור';
+  }
+
+  /* ‏אותו מסך בדיוק גם אם אין חשבון כזה. אחרת הטופס הזה הופך
+     ‏לכלי שבודק אילו כתובות רשומות אצלנו. */
+  $('sentHead').textContent = 'שלחנו לכם קישור';
+  $('sentMail').textContent = email;
+  $('sentWhy').textContent =
+    'אם יש חשבון עם הכתובת הזאת, הקישור לבחירת סיסמה חדשה כבר בדרך. הוא תקף לשעה.';
+  gateScreen('sent');
+});
+
+/* ‏החזרה מהקישור. המשתמש כבר מחובר כאן, ולכן שני הדברים
+   ‏החשובים הם לא להכניס אותו פנימה לפני שהחליף, ולנתק אחר כך
+   ‏כל מכשיר אחר שעוד מחזיק סשן ישן. */
+function openNewPass(msg) {
+  S.recovery = true;
+  stage('gate');
+  gateScreen('new');
+  setErr($('newErr'), msg || '');
+  $('newPass').focus();
+}
+
+$('newForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setErr($('newErr'), '');
+  const a = $('newPass').value, b = $('newPass2').value;
+
+  const bad = passProblem(a, '');
+  if (bad) { setErr($('newErr'), bad); $('newPass').focus(); return; }
+  if (a !== b) {
+    setErr($('newErr'), 'שתי הסיסמאות אינן זהות.');
+    $('newPass2').focus(); return;
+  }
+
+  const btn = $('newBtn');
+  btn.disabled = true;
+  btn.textContent = 'שומר...';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('recovery expired');
+
+    const { error } = await sb.auth.updateUser({ password: a });
+    if (error) throw error;
+
+    /* ‏מי שאיפס סיסמה עשה את זה לרוב כי משהו הדאיג אותו. כל סשן
+       ‏אחר שנשאר פתוח במכשיר אחר נסגר כאן. אם גרסת הספרייה לא
+       ‏מכירה את ה-scope הזה, לא נורא · הסיסמה כבר הוחלפה. */
+    try { await sb.auth.signOut({ scope: 'others' }); } catch {}
+
+    S.recovery = false;
+    history.replaceState(null, '', location.pathname);
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) { await enter(user); toast('הסיסמה הוחלפה.'); return; }
+    throw new Error('no user');
+
+  } catch (err) {
+    const m = String(err?.message || '').toLowerCase();
+    if (m.includes('expired') || m.includes('no user') || m.includes('session')) {
+      setErr($('newErr'), 'הקישור כבר לא תקף. אפשר לבקש קישור חדש ממסך הכניסה.');
+    } else {
+      setErr($('newErr'), human(err));
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'שמירה וכניסה';
+  }
 });
 
 $('setOut').addEventListener('click', async () => {
@@ -2547,7 +2710,7 @@ async function enter(user) {
     /* ‏אם הטבלאות עוד לא קיימות, זה המקום היחיד שבו זה מתגלה,
        ולכן זה המקום שבו צריך להגיד את זה בבירור. */
     stage('gate');
-    show($('gateMain')); hide($('gateSent'));
+    gateScreen('main');
     setErr($('authErr'), human(err));
     return;
   }
@@ -2584,6 +2747,9 @@ async function enter(user) {
    detectSessionInUrl קורא אותו, והמאזין הזה הוא מה שמכניס אותו
    פנימה בלי שיצטרך להתחבר שוב. */
 sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') { openNewPass(); return; }
+  /* ‏באמצע החלפת סיסמה אין כניסה לאפליקציה, גם אם יש סשן תקף. */
+  if (S.recovery) return;
   if (event === 'SIGNED_IN' && session?.user && !S.user) enter(session.user);
   if (event === 'SIGNED_OUT') location.reload();
 });
@@ -2591,6 +2757,15 @@ sb.auth.onAuthStateChange((event, session) => {
 (async function boot() {
   try {
     const { data: { session } } = await sb.auth.getSession();
+
+    /* ‏חזרה מקישור האיפוס. הסשן קיים, אבל המסך הוא החלפת סיסמה
+       ‏ולא הבית · ואם הקישור פג, אומרים את זה במקום לזרוק החוצה. */
+    if (FROM_MAIL_RESET) {
+      openNewPass(session ? '' : 'הקישור כבר לא תקף. אפשר לבקש קישור חדש ממסך הכניסה.');
+      if (!session) { gateScreen('new'); }
+      return;
+    }
+
     if (session?.user) { await enter(session.user); return; }
   } catch {}
   stage('gate');

@@ -245,6 +245,14 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   margin-top:18px;display:flex;flex-direction:column;gap:12px;
   align-items:center;text-align:center;
 }
+/* ‏השורה הזאת מופיעה רק במצב כניסה, ולכן היא שקטה יותר
+   ‏משורת המעבר · היא תשובה למצוקה, לא הזמנה לפעולה. */
+.gate-forgot{margin-bottom:2px}
+.gate-forgot button{
+  color:var(--ink-3);font-size:14px;font-weight:600;
+  padding:4px 8px;min-height:44px;
+}
+
 .gate-switch{font-size:15px;color:var(--ink-2)}
 .gate-switch button{
   color:var(--violet);font-weight:700;padding:4px 8px;
@@ -744,6 +752,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .nav button[aria-current="page"]:hover{color:var(--violet)}
   .month-pick:hover,.streak:hover{background:var(--wash)}
   .insight .acts button:hover{background:var(--wash-2)}
+  .gate-forgot button:hover{color:var(--ink-2)}
 }
 
 /* ‏לחיצה. אחרי חוקי הריחוף ולא לפניהם: לשניהם אותה ספציפיות,

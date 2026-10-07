@@ -90,14 +90,17 @@
       <div class="field">
         <label for="authPass">סיסמה</label>
         <input class="inp" type="password" id="authPass" name="password"
-               autocomplete="current-password" required minlength="8"
-               placeholder="לפחות שמונה תווים">
+               autocomplete="current-password" required minlength="10"
+               placeholder="לפחות 10 תווים">
       </div>
       <button class="btn" id="authBtn" type="submit">פתיחת חשבון</button>
       <p class="err hidden" id="authErr" role="alert"></p>
     </form>
 
     <div class="gate-foot">
+      <p class="gate-forgot hidden" id="forgotLine">
+        <button type="button" id="authForgot">שכחתי את הסיסמה</button>
+      </p>
       <p class="gate-switch" id="authSwitch">
         <span id="authSwitchText">יש לכם כבר חשבון?</span>
         <button type="button" id="authToggle">כניסה</button>
@@ -110,14 +113,55 @@
     </div>
   </div>
 
+  <!-- ‏בקשת איפוס. מסך נפרד ולא שדה שמופיע בתוך הטופס, כי אדם
+       ‏שהגיע לכאן כבר לא זוכר כלום ולא צריך לראות שני שדות. -->
+  <div id="gateForgot" class="sent hidden">
+    <h2>קורה לכולם</h2>
+    <p>תכתבו את האימייל שלכם ונשלח קישור לבחירת סיסמה חדשה.</p>
+    <form id="forgotForm" class="gate-form" style="margin-top:22px" novalidate>
+      <div class="field">
+        <label for="forgotEmail">אימייל</label>
+        <input class="inp" type="email" id="forgotEmail" name="email"
+               autocomplete="email" inputmode="email" required
+               placeholder="you@example.com" dir="ltr">
+      </div>
+      <button class="btn" id="forgotBtn" type="submit">שליחת קישור</button>
+      <p class="err hidden" id="forgotErr" role="alert"></p>
+    </form>
+    <button class="btn-quiet" id="forgotBack" type="button" style="margin-top:18px">חזרה</button>
+  </div>
+
+  <!-- ‏החזרה מהקישור שבמייל. כאן המשתמש כבר מחובר זמנית, והדבר
+       ‏היחיד שהמסך הזה עושה הוא להחליף את הסיסמה. -->
+  <div id="gateNew" class="sent hidden">
+    <h2>סיסמה חדשה</h2>
+    <p>בחרו סיסמה שתזכרו. אחרי השמירה אנחנו נכנסים ישר פנימה.</p>
+    <form id="newForm" class="gate-form" style="margin-top:22px" novalidate>
+      <div class="field">
+        <label for="newPass">הסיסמה החדשה</label>
+        <input class="inp" type="password" id="newPass" name="new-password"
+               autocomplete="new-password" required minlength="10"
+               placeholder="לפחות 10 תווים">
+      </div>
+      <div class="field">
+        <label for="newPass2">שוב, כדי לוודא</label>
+        <input class="inp" type="password" id="newPass2" name="new-password"
+               autocomplete="new-password" required minlength="10"
+               placeholder="אותה סיסמה">
+      </div>
+      <button class="btn" id="newBtn" type="submit">שמירה וכניסה</button>
+      <p class="err hidden" id="newErr" role="alert"></p>
+    </form>
+  </div>
+
   <!-- ‏אם אישור אימייל פעיל בפרויקט, ההרשמה לא מחזירה מפתח גישה
        והמשתמש צריך ללחוץ על קישור במייל. המסך הזה הוא מה שהוא
        רואה אז, במקום טופס שנראה כאילו לא קרה בו כלום. -->
   <div id="gateSent" class="sent hidden">
-    <h2>שלחנו לכם מייל</h2>
+    <h2 id="sentHead">שלחנו לכם מייל</h2>
     <p>
       פתחו את <span class="mail" id="sentMail"></span>
-      ולחצו על הקישור כדי לאשר את החשבון. אחר כך חוזרים לכאן ונכנסים.
+      <span id="sentWhy">ולחצו על הקישור כדי לאשר את החשבון. אחר כך חוזרים לכאן ונכנסים.</span>
     </p>
     <p class="note" style="margin-top:18px">אם המייל לא הגיע תוך דקה, כדאי לבדוק בספאם.</p>
     <button class="btn-quiet" id="sentBack" type="button" style="margin-top:20px">חזרה</button>
