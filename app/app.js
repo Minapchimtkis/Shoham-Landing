@@ -364,6 +364,9 @@ function tab(name) {
   }
   document.querySelector('.topbar').classList.toggle('hidden', !!SUB[name]);
 
+  /* ‏חזרה לבית מציירת מחדש · בלי זה, אחרי שהתובנות דילגו על ציור
+     ‏שנעשה ממסך אחר, הבית היה מראה כרטיס ישן. */
+  if (name === 'home') renderHome();
   if (name === 'tx') renderTx();
   if (name === 'budget') renderBudget();
   if (name === 'set') renderSet();
@@ -1267,6 +1270,11 @@ function weeklyRule(today) {
 }
 
 async function renderInsight() {
+  /* ‏renderHome נקרא אחרי כל שמירה, גם כשהמשתמש עומד על מסך אחר
+     ‏לגמרי. בלי השורה הזאת, תובנה שמוצגת פעם בחודש נשרפת בציור
+     ‏שאיש לא ראה · נתפס בפועל: הוספת נכס שנייה בלעה את כרטיס
+     ‏"הכסף הנזיל מכסה 3.5 חודשים" לפני שהמסך הראה אותו. */
+  if (S.tab !== 'home') return;
   const box = $('homeInsight');
   const card = (title, text, acts, opt) => {
     box.textContent = '';
@@ -1431,6 +1439,92 @@ async function renderInsight() {
     card('לחשבון שלכם אין עדיין כתובת',
       'הנתונים עצמם שמורים בשרת ולא במכשיר, אבל המפתח אליהם יושב רק בדפדפן הזה. ניקוי של נתוני הדפדפן אינו מוחק אותם · הוא פשוט סוגר את הדרך חזרה, ואין לאן לשלוח קישור שחזור. דקה אחת, ואימייל פותר את זה.',
       [['לחבר אימייל', () => { tab('set'); setTimeout(() => $('setSave').click(), 300); }]]);
+    return;
+  }
+
+  /* ═══ מה שמעבר לחודש ═══
+     ‏חמישה כללים שקוראים את הנכסים ואת החובות ולא את התנועות.
+     ‏כולם עובדות ולא עצות: כמה, מתוך מה, ומתי. אין כאן "כדאי",
+     ‏אין סף מומלץ, ואין דירוג · ברגע שמוסיפים את אלה זה הופך
+     ‏לייעוץ, וזה לא מה שהכלי הזה.
+
+     ‏כל אחד מהם אומר את עצמו פעם בחודש לכל היותר. עובדה איטית
+     ‏שחוזרת כל יום מפסיקה להיות מידע והופכת לרעש. */
+  const sparse = (key, days) => {
+    const t = LS.get('ins.' + key, 0);
+    const age = Date.now() - t;
+    /* ‏כבר נבחר היום · ממשיכים להראות אותו. בלי זה הכרטיס נעלם
+       ‏ברגע שהמשתמש עובר ללשונית וחוזר, והוא לא יבין למה. */
+    if (age < DAY) return true;
+    if (age < days * DAY) return false;
+    LS.set('ins.' + key, Date.now());
+    return true;
+  };
+
+  /* 1. ‏חוב שנגמר בקרוב. הדבר היחיד כאן שתלוי בזמן, ולכן ראשון. */
+  const ending = S.debts
+    .filter(d => d.ends_on && d.monthly_agorot > 0)
+    .map(d => ({ d, m: monthsLeft(d.ends_on) }))
+    .filter(x => x.m !== null && x.m >= 0 && x.m <= 3)
+    .sort((a, b) => a.m - b.m)[0];
+  if (ending && sparse('debt-end-' + ending.d.id, 25)) {
+    const { d, m } = ending;
+    /* ‏"נגמר" או "נגמרת" תלוי בשם שהמשתמש כתב, ואי אפשר לדעת
+       ‏אותו. ניסוח שלא נשען על המין עובד תמיד. */
+    card(m === 0 ? `זה החודש האחרון של ${d.name}`
+         : m === 1 ? `נשאר חודש אחד ל${d.name}`
+         : `נשארו ${m} חודשים ל${d.name}`,
+      `ואז ${fmt(d.monthly_agorot)} בחודש מפסיקים לצאת. זה לא כסף חדש, זה כסף שכבר היה לכם והלך לשם.`,
+      [['לחובות', () => tab('debts')]]);
+    return;
+  }
+
+  /* 2. ‏תכנון להחזרים בלי חוב רשום. הזמנה, ופעם אחת. */
+  const repayCat = outCats().find(c => c.key === 'debt');
+  const repayPlan = repayCat ? planned(repayCat.id) : 0;
+  if (repayPlan > 0 && !S.debts.length && sparse('no-debts', 60)) {
+    card('תכננתם החזרים, אבל אין חוב רשום',
+      `${fmt(repayPlan)} בחודש יוצאים להחזרים, והאפליקציה לא יודעת על מה. רישום החוב עצמו מראה גם כמה נשאר לשלם ולא רק כמה יוצא.`,
+      [['לרשום חוב', () => tab('debts')]]);
+    return;
+  }
+
+  /* 3. ‏כמה חודשים מכסה הכסף הנזיל. בלי סף מומלץ · הסף הוא
+        ‏שיחה, לא מספר שאפליקציה מכריזה עליו. */
+  const LIQUID = new Set(['bank_savings', 'deposit', 'cash', 'money_market']);
+  const liquid = S.assets.filter(a => LIQUID.has(a.kind))
+                         .reduce((t, a) => t + a.amount_agorot, 0);
+  const burn = plannedOut() || spentAll();
+  if (liquid > 0 && burn > 0 && sparse('runway', 30)) {
+    const months = liquid / burn;
+    const txt = months >= 1 ? months.toFixed(1).replace(/\.0$/, '') : months.toFixed(1);
+    card(`הכסף הנזיל שלכם מכסה ${txt} חודשים של הוצאות`,
+      `${fmt(liquid)} בחיסכון ובעובר ושב, מול ${fmt(burn)} ${plannedOut() ? 'שתכננתם להוציא' : 'שיצאו'} בחודש. פנסיה וקרן השתלמות אינן נספרות כאן, כי אי אפשר למשוך אותן מחר.`,
+      [['לנכסים', () => tab('assets')]]);
+    return;
+  }
+
+  /* 4. ‏יחס ההחזרים להכנסה. מספר, בלי שיפוט. */
+  const income = plannedIn() || gotAll();
+  const repay = monthlyAll();
+  if (repay > 0 && income > 0 && sparse('debt-ratio', 30)) {
+    card(`${Math.round(repay / income * 100)}% מההכנסה הולכים להחזרי חובות`,
+      `${fmt(repay)} מתוך ${fmt(income)} בחודש. זה המספר כפי שהוא, בלי לומר אם הוא גבוה או נמוך · זה תלוי בדברים שהאפליקציה לא יודעת.`,
+      [['לחובות', () => tab('debts')]]);
+    return;
+  }
+
+  /* 5. ‏נכס שלא עודכן חצי שנה. הסכומים כאן אינם ציטוט חי, ואם
+        ‏אף אחד לא נוגע בהם המסך מתחיל לשקר בשקט. */
+  const stale = S.assets
+    .map(a => ({ a, d: Math.floor((Date.now() - new Date(a.updated_at || a.created_at)) / DAY) }))
+    .filter(x => x.d >= 180)
+    .sort((a, b) => b.d - a.d)[0];
+  if (stale && sparse('stale-' + stale.a.id, 45)) {
+    const m = Math.round(stale.d / 30.4);
+    card(`${stale.a.name} לא עודכן ${m} חודשים`,
+      'הסכומים כאן הם מה שהקלדתם, והם אינם מתעדכנים מעצמם. דקה אחת מול הדוח האחרון, והתמונה חוזרת להיות נכונה.',
+      [['לעדכן', () => { tab('assets'); openAsset(stale.a); }]]);
     return;
   }
 
