@@ -14,8 +14,8 @@
 :root{
   /* ── הנייר ── */
   --paper:#ffffff;
-  --wash:#f7f5fb;          /* המשטח המורם היחיד, לבן בנטייה סגולה */
-  --wash-2:#f1eef8;
+  --wash:#f4eafa;          /* המשטח המורם היחיד, לבן בנטייה סגולה */
+  --wash-2:#efe4f7;       /* ‏דיו 3 עליו הוא 4.54. כל צעד כהה יותר מפיל אותו */
 
   /* ── הדיו ──
      שחור בנטייה סגולה ולא אפור כהה. נגזר מהסגול של המותג, ולכן
@@ -30,15 +30,17 @@
   /* ── הסגול, ורק עליו ──
      הערך החי, המצב הפעיל, הפעולה הראשית. שלושה תפקידים. אם הוא
      יופיע על עוד משהו הוא יפסיק להגיד אותם. */
-  --violet:#6d28d9;        /* על לבן, לטקסט. יחס ניגודיות 6.5 */
+  --violet:#8c2cc3;        /* על לבן, לטקסט. יחס ניגודיות 6.4 */
   --navy:#150946;          /* ‏הכחול של הכתוב בלוגו. ניגודיות 18.1 */
-  --violet-fill:#7c3aed;   /* למילויים ולכפתורים */
-  --violet-soft:rgba(109,40,217,0.09);
+  --violet-fill:#9a35cf;   /* למילויים ולכפתורים */
+  --violet-soft:rgba(140,44,195,0.09);
 
   /* ── ענבר, במקום אדום ──
-     חריגה אינה תקלה ואינה אזעקה. היא מידע. */
-  --amber:#b45309;
-  --amber-soft:rgba(180,83,9,0.10);
+     חריגה אינה תקלה ואינה אזעקה. היא מידע.
+     ‏הענבר הועמק כשהמשטח קיבל נטייה סגולה חזקה יותר. הערך הקודם
+     ירד שם ל-4.30, מתחת לסף. a4490a נותן 5.09 על המשטח. */
+  --amber:#a4490a;
+  --amber-soft:rgba(164,73,10,0.10);
 
   --gold:#f0c040;          /* הרצף, ושום דבר אחר */
 
@@ -799,7 +801,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   width:50px;height:50px;border-radius:50%;
   background:var(--violet-fill);color:#fff;
   display:grid;place-items:center;
-  box-shadow:0 5px 16px rgba(109,40,217,0.34);
+  box-shadow:0 5px 16px rgba(140,44,195,0.34);
   transition:transform .14s var(--ease);
 }
 .nav .add svg{width:25px;height:25px}
@@ -948,12 +950,12 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
      אחרי נגיעה והכפתור נשאר דלוק עד שנוגעים במקום אחר. */
 @media (hover:hover) and (pointer:fine){
   a:hover{text-decoration:underline}
-  .btn:hover{background:#6d28d9}
+  .btn:hover{background:#7a23ac}
   .btn-ghost:hover,.btn-quiet:hover{background:var(--wash)}
   .btn-danger:hover{background:var(--amber-soft)}
   .row:hover,.tx:hover,.set-row:hover{background:var(--wash)}
   .chip:hover{box-shadow:0 0 0 1px var(--rule-2),0 0 0 4px var(--violet-soft)}
-  .chip[aria-pressed="true"]:hover{box-shadow:none;background:#6d28d9}
+  .chip[aria-pressed="true"]:hover{box-shadow:none;background:#7a23ac}
   .nav button:hover{color:var(--ink-2)}
   .nav button[aria-current="page"]:hover{color:var(--violet)}
   .month-pick:hover,.streak:hover{background:var(--wash)}
