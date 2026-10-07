@@ -232,8 +232,11 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   color:var(--navy);
 }
 /* ‏גם סימן השאלה בכחול של הלוגו · שם הוא חלק מהכתוב, וכאן הוא
-   ‏חלק מאותו שם. */
-.gate-name .q{color:var(--navy)}
+   ‏חלק מאותו שם.
+   ‏והמרווח: הכותרת כולה בריווח אותיות שלילי, ובגודל הזה הוא
+   ‏מדביק את סימן השאלה ל"לי" עד אפס פיקסלים. המרווח הזה מחזיר
+   ‏לו אוויר בלי לשחרר את שאר המילים. */
+.gate-name .q{color:var(--navy);margin-inline-start:0.12em}
 .gate-lede{
   margin-top:16px;font-size:17px;line-height:1.55;
   color:var(--ink-2);max-width:21em;
@@ -403,6 +406,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   font-size:16px;font-weight:700;color:var(--violet);
   letter-spacing:-0.01em;
 }
+.hero .q .qm{margin-inline-start:0.1em}
 .hero .a{
   display:block;margin-top:2px;
   font-size:clamp(50px,16vw,66px);

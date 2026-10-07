@@ -842,7 +842,11 @@ function renderHome() {
   /* ‏כשחרגנו, השאלה משתנה יחד עם התשובה. אפליקציה שמראה מספר
      שלילי מתחת לכיתוב "כמה יש לי" נותנת תשובה לא נכונה לשאלה
      שהיא עצמה שאלה. */
-  $('heroQ').textContent = over ? 'כמה חרגתי?' : 'כמה יש לי?';
+  /* ‏סימן השאלה בתגית משלו, כדי שיהיה אפשר להרחיק אותו מהמילה
+     ‏שלפניו · textContent לבדו היה מוחק את התגית שבדף בכל ציור. */
+  const hq = $('heroQ');
+  hq.textContent = over ? 'כמה חרגתי' : 'כמה יש לי';
+  hq.append(el('span', 'qm', '?'));
   const a = $('heroA');
   setMoney(a, left);
   a.setAttribute('aria-label', (over ? 'חרגתם ב' : 'נשאר לכם ') + fmt(left));
