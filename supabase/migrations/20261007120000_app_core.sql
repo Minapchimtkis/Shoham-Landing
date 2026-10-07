@@ -134,23 +134,45 @@ alter table public.budgets           enable row level security;
 alter table public.transactions      enable row level security;
 
 drop policy if exists hh_rw        on public.households;
+drop policy if exists hh_read      on public.households;
+drop policy if exists hh_update    on public.households;
+drop policy if exists hh_delete    on public.households;
 drop policy if exists hm_read      on public.household_members;
 drop policy if exists hm_self      on public.household_members;
+drop policy if exists hm_read_self on public.household_members;
+drop policy if exists hm_read_house on public.household_members;
+drop policy if exists hm_leave     on public.household_members;
 drop policy if exists pr_rw        on public.profiles;
 drop policy if exists cat_read     on public.categories;
 drop policy if exists cat_write    on public.categories;
 drop policy if exists bud_rw       on public.budgets;
 drop policy if exists tx_rw        on public.transactions;
 
-create policy hh_rw on public.households for all to authenticated
+-- ‏קריאה ועדכון לכל חבר, מחיקה רק לבעלים, ויצירה בשום מקום חוץ
+-- ‏מ-setup_household. מחיקת משק בית גוררת בשרשרת את כל מה שבתוכו.
+create policy hh_read on public.households for select to authenticated
+  using (public.is_member(id));
+create policy hh_update on public.households for update to authenticated
   using (public.is_member(id)) with check (public.is_member(id));
+create policy hh_delete on public.households for delete to authenticated
+  using (exists (select 1 from public.household_members m
+                  where m.household_id = households.id
+                    and m.user_id = auth.uid()
+                    and m.role = 'owner'));
 
 -- ‏שורת החברות של עצמך נראית תמיד, גם ברגע ההקמה שבו עוד אין
--- משק בית להיות חבר בו.
-create policy hm_self on public.household_members for all to authenticated
-  using (user_id = auth.uid()) with check (user_id = auth.uid());
-create policy hm_read on public.household_members for select to authenticated
+-- משק בית להיות חבר בו ולכן is_member עוד אינה יכולה להחזיר true.
+create policy hm_read_self on public.household_members for select to authenticated
+  using (user_id = auth.uid());
+create policy hm_read_house on public.household_members for select to authenticated
   using (public.is_member(household_id));
+-- ‏לצאת אפשר רק את עצמך, ורק אם אינך הבעלים.
+create policy hm_leave on public.household_members for delete to authenticated
+  using (user_id = auth.uid() and role <> 'owner');
+-- ‏אין מדיניות INSERT ואין UPDATE על החברות. ההצטרפות היחידה
+-- ‏למשק בית עוברת ב-setup_household, שהיא security definer, וכך גם
+-- ‏כל פונקציית הזמנה שתיכתב בעתיד. בלי זה כל משתמש מחובר יכול
+-- ‏להוסיף את עצמו למשק בית שמזההו ידוע לו, ומזהה אינו הרשאה.
 
 create policy pr_rw on public.profiles for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
@@ -171,8 +193,12 @@ create policy tx_rw on public.transactions for all to authenticated
 revoke all on table public.households, public.household_members, public.profiles,
                     public.categories, public.budgets, public.transactions from anon;
 grant select, insert, update, delete on table
-  public.households, public.household_members, public.profiles,
-  public.categories, public.budgets, public.transactions to authenticated;
+  public.profiles, public.categories, public.budgets,
+  public.transactions to authenticated;
+-- ‏משק בית נוצר, ומצורפים אליו, רק בתוך setup_household. ולכן אין
+-- ‏למשתמש הרשאת INSERT עליהם בכלל · לא במדיניות ולא בהרשאה עצמה.
+grant select, update, delete on table public.households        to authenticated;
+grant select,         delete on table public.household_members to authenticated;
 
 -- ────────────────────────────────────────── ההקמה הראשונה ──
 -- ‏נקראת פעם אחת, אחרי ההרשמה. יוצרת משק בית, מצרפת את המשתמש
