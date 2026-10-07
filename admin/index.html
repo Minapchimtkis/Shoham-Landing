@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<!-- ‏מדיניות אבטחת תוכן. הדף הזה מציג את כל הלידים, ולכן הוא
+     ‏המקום שבו הכי חשוב שלא ירוץ כאן קוד זר. 'unsafe-inline'
+     ‏נחוץ כי כל הדשבורד הוא סקריפט אחד בתוך הדף, אבל החשוב נשמר:
+     ‏אי אפשר לטעון סקריפט משום מקור אחר, ואי אפשר לשלוח נתונים
+     ‏לשום יעד חוץ מ-Supabase. שמות הלידים מוצגים ב-textContent
+     ‏ולא ב-innerHTML, ולכן אין דרך להזריק קוד דרך טופס באתר. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data:;
+  connect-src 'self' https://vplqocqmlquajwwnyeby.supabase.co;
+  base-uri 'none';
+  form-action 'none';
+  object-src 'none';
+  frame-src 'none'">
 <link rel="icon" href="../assets/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <meta name="theme-color" content="#070914">
@@ -548,7 +565,7 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 <div id="toast" class="toast hidden"></div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from '../vendor/supabase.js';
 
 const SUPABASE_URL='https://vplqocqmlquajwwnyeby.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';

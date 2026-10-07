@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+<!-- ‏מדיניות אבטחת תוכן. אחרי שכל הקוד עבר להיות שלנו, אפשר לומר
+     ‏את זה בפירוש: שום סקריפט שאינו מהאתר הזה לא ירוץ כאן, ושום
+     ‏נתון לא ייצא לשום מקום חוץ מ-Supabase. גם אם מישהו ימצא דרך
+     ‏להזריק תגית script לדף, הדפדפן פשוט לא יטען אותה.
+     ‏'unsafe-inline' קיים רק לסגנונות, כי בדף 29 תכונות style
+     ‏נקודתיות. אין בקוד שום innerHTML, ולכן אין בכלל דרך להזריק
+     ‏סגנון · זה ויתור על הנייר ולא בפועל.
+     ‏frame-ancestors אינו נתמך ב-meta, ולכן הגנת ה-clickjacking
+     ‏דורשת כותרת HTTP ש-GitHub Pages אינו מאפשר. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self';
+  style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'self' https://vplqocqmlquajwwnyeby.supabase.co;
+  worker-src 'self' blob:;
+  manifest-src 'self';
+  base-uri 'none';
+  form-action 'none';
+  object-src 'none';
+  frame-src 'none'">
+
 <title>כמה יש לי | אפליקציה לניהול תקציב אישי</title>
 <meta name="description" content="אפליקציה חינמית לניהול תקציב אישי בעברית. רושמים הוצאות, רואים מספר אחד שאומר כמה נשאר לחודש. מבית שוהם אבו, יועץ כלכלי.">
 <link rel="canonical" href="https://shohamfinance.co.il/app/">

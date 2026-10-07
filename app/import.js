@@ -18,7 +18,7 @@ import * as P from './parse.js';
 /* ‏הנתיבים נגזרים מכתובת הקובץ הזה עצמו ולא מכתובת הדף, כדי
    ‏שהעובד של pdf.js ימצא את עצמו גם אם האפליקציה תוגש מתיקייה
    ‏אחרת יום אחד. */
-const V = p => new URL('./vendor/' + p, import.meta.url).href;
+const V = p => new URL('../vendor/' + p, import.meta.url).href;
 const LIB = {
   xlsx:      V('xlsx.js'),
   pdf:       V('pdf.js'),
