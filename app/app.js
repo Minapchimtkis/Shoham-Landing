@@ -334,7 +334,7 @@ $('scrim').addEventListener('click', closeSheet);
 /* ─────────────────────────────────────── מסכים ראשיים ── */
 
 function stage(name) {
-  for (const id of ['boot', 'gate', 'setup', 'app']) {
+  for (const id of ['boot', 'welcome', 'gate', 'setup', 'app']) {
     id === name ? show($(id)) : hide($(id));
   }
   $('boot').removeAttribute('aria-busy');
@@ -457,6 +457,68 @@ $('authForm').addEventListener('submit', async e => {
     btn.textContent = S.mode === 'signup' ? 'פתיחת חשבון' : 'כניסה';
   }
 });
+
+/* ═══════════════════════════════════ מסך הפתיחה ══ */
+
+/* ‏מה שרואים לפני שמחליטים. הוא מופיע בביקור הראשון בלבד · מי
+   ‏שכבר ראה אותו ויצא מהחשבון מגיע ישר לשער, כי הוא כבר יודע מה
+   ‏זה. מהשער יש קישור חזרה לכאן, כדי שזאת לא תהיה דלת חד כיוונית. */
+
+const seenWelcome = () => !!LS.get('seen', 0);
+
+/* ‏הנקודה הפעילה נקבעת לפי מי שבאמת נראה במסך ולא לפי scrollLeft ·
+   ‏ב-RTL מנועים שונים מחזירים ממנו ערכים שונים, חיוביים ושליליים,
+   ‏וזה מקור ידוע לנקודה שזזה הפוך. מה שנראה הוא מה שנספר. */
+function mountDeck() {
+  const deck = $('wlcDeck');
+  const dots = $('wlcDots');
+  const cards = [...deck.querySelectorAll('.card')];
+  if (!cards.length || dots.childElementCount) return;
+
+  for (const _ of cards) dots.append(el('i'));
+  const paint = i => [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+  paint(0);
+
+  const io = new IntersectionObserver(entries => {
+    let best = null;
+    for (const e of entries) if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+    if (best && best.intersectionRatio > 0.5) paint(cards.indexOf(best.target));
+  }, { root: deck, threshold: [0.5, 0.75, 1] });
+  for (const c of cards) io.observe(c);
+
+  /* ‏מקלדת · חץ אחד מזיז כרטיסייה אחת, בכיוון הנכון לדף שכולו
+     ‏מימין לשמאל. */
+  deck.addEventListener('keydown', e => {
+    const step = e.key === 'ArrowLeft' ? 1 : e.key === 'ArrowRight' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const cur = [...dots.children].findIndex(d => d.classList.contains('on'));
+    const next = cards[Math.min(cards.length - 1, Math.max(0, cur + step))];
+    if (next) next.scrollIntoView({ block: 'nearest', inline: 'center' });
+  });
+}
+
+function showWelcome() {
+  mountDeck();
+  stage('welcome');
+}
+
+$('wlcSignup').addEventListener('click', () => {
+  LS.set('seen', 1);
+  stage('gate');
+  gateScreen('main');
+  authMode('signup');
+});
+
+$('wlcGuest').addEventListener('click', () => {
+  LS.set('seen', 1);
+  stage('gate');
+  gateScreen('main');
+  authMode('signup');
+  $('authGuest').click();
+});
+
+$('backToWlc').addEventListener('click', showWelcome);
 
 /* ═══════════════════════════════════════ אורחים ══ */
 
@@ -3138,6 +3200,7 @@ sb.auth.onAuthStateChange((event, session) => {
 
     if (session?.user) { await enter(session.user); lockOnLoad(); return; }
   } catch {}
+  if (!seenWelcome()) { showWelcome(); return; }
   stage('gate');
   authMode('signup');
 })();

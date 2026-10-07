@@ -82,6 +82,80 @@
 </div>
 
 <!-- ═══════════════════════════════════════ כניסה והרשמה ══ -->
+<!-- ═════════════════════════════════ מסך הפתיחה ══ -->
+<!-- ‏מה שרואים לפני שמחליטים. כרטיסיות שמחליקים ביניהן, ולא עמוד
+     ‏טקסט · אדם שנכנס לראות מה זה לא קורא פסקה, הוא מחליק. הגלילה
+     ‏היא גלילה אמיתית עם scroll-snap ולא ספרייה, ולכן היא מרגישה
+     ‏נכון בכל מכשיר ואינה מוסיפה שורת קוד שרצה. -->
+<main id="welcome" class="wlc hidden">
+  <div class="wlc-brand">שוהם אבו · ייעוץ וליווי פיננסי</div>
+
+  <h1 class="wlc-name">כמה יש לי<span class="q">?</span></h1>
+
+  <div class="deck" id="wlcDeck" tabindex="0" role="group"
+       aria-label="מה האפליקציה עושה, החליקו בין הכרטיסיות">
+
+    <article class="card">
+      <span class="card-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16M4 12h10M4 17h6"/>
+        </svg>
+      </span>
+      <h2>לעשות סדר בכסף בלי להסתבך</h2>
+      <p>פחות טבלאות, פחות כאב ראש · יותר סדר.</p>
+    </article>
+
+    <article class="card">
+      <span class="card-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v18M7 8l5-5 5 5M7 16l5 5 5-5"/>
+        </svg>
+      </span>
+      <h2>לדעת כמה נכנס, כמה יצא וכמה באמת נשאר</h2>
+      <p>מספר אחד על המסך, ולא חיפוש בין דפי חשבון.</p>
+    </article>
+
+    <article class="card">
+      <span class="card-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v8.5l6 4.2"/>
+        </svg>
+      </span>
+      <h2>לראות לאן הכסף שלך הולך</h2>
+      <p>כל הוצאה מקבלת שם, והתמונה מתבהרת מעצמה.</p>
+    </article>
+
+    <article class="card">
+      <span class="card-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/>
+        </svg>
+      </span>
+      <h2>לקבל תמונה ברורה של המצב הפיננסי שלך</h2>
+      <p>לנהל את הכסף בצורה פשוטה ונוחה, בלי אקסל ובלי מומחיות.</p>
+    </article>
+
+    <!-- ‏הכרטיסייה שמסבירה מי בנה. היא אחרונה בכוונה · קודם מה
+         ‏האפליקציה עושה בשבילך, ורק אחר כך מי עומד מאחוריה. -->
+    <article class="card who">
+      <img src="../assets/shoham-avatar.webp" width="464" height="464"
+           loading="lazy" decoding="async" alt="">
+      <h2>נבנתה על ידי שוהם אבו, יועץ לכלכלת המשפחה</h2>
+      <p>מתוך הבנה של הצרכים האמיתיים של אנשים והתנהלות פיננסית בחיי היום־יום.</p>
+    </article>
+  </div>
+
+  <div class="dots deck-dots" id="wlcDots" aria-hidden="true"></div>
+
+  <div class="wlc-actions">
+    <button class="btn" id="wlcSignup" type="button">הרשמה</button>
+    <button class="btn btn-ghost" id="wlcGuest" type="button">כניסה כאורח</button>
+    <p class="note" style="text-align:center;margin-top:12px">
+      אפשר להיכנס כאורח, להסתכל, ולהחליט אחר כך.
+    </p>
+  </div>
+</main>
+
 <main id="gate" class="gate hidden">
   <div class="gate-brand">
     <span>שוהם אבו · ייעוץ וליווי פיננסי</span>
@@ -135,6 +209,9 @@
     </p>
 
     <div class="gate-foot">
+      <p class="gate-forgot">
+        <button type="button" id="backToWlc">מה זה כמה יש לי?</button>
+      </p>
       <p class="gate-forgot hidden" id="forgotLine">
         <button type="button" id="authForgot">שכחתי את הסיסמה</button>
       </p>
