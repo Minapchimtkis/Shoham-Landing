@@ -383,18 +383,10 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .sent p{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:1.6}
 .sent .mail{font-weight:700;color:var(--ink);word-break:break-all}
 
-/* ═══════════════════════════════════════════ ההקמה ══ */
+/* ════════════════════════════════════ שורות מספרים ══ */
 
-.setup{
-  min-height:100svh;
-  padding:max(24px,env(safe-area-inset-top)) var(--pad) 0;
-  padding-bottom:calc(132px + env(safe-area-inset-bottom));
-}
-.setup h1{
-  font-size:28px;font-weight:900;line-height:1.15;
-  letter-spacing:-0.025em;margin-bottom:10px;
-}
-.setup .note{margin-bottom:26px;font-size:15px;color:var(--ink-2)}
+/* ‏הצורה הזאת נבנתה בשביל אשף ההקמה, והאשף ירד · המספרים נכנסים
+   ‏עכשיו מבפנים, במסך התקציב, והוא זה שמשתמש בה. */
 
 .setup-group{margin-bottom:28px}
 .setup-group > h2{
@@ -403,7 +395,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 
 /* ‏שורת מספר, לא כרטיס. התווית מימין, השדה משמאל, קו שיער
-   ביניהן. זה מראה של דף חשבון, והוא מה שגורם לשבעה מספרים
+   ביניהן. זה מראה של דף חשבון, והוא מה שגורם לרשימת הקטגוריות
    להיראות כמו רשימה קצרה ולא כמו טופס. */
 .num-row{
   display:flex;align-items:center;gap:12px;
@@ -436,18 +428,18 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   box-shadow:0 0 0 3px var(--violet-soft);
 }
 
-/* ‏הקורא החי. הוא הסיבה שההקמה היא מסך אחד ולא שישה שלבים:
-   כל מספר שנכנס מזיז אותו, ואז מילוי הטופס מפסיק להיות טופס
-   והופך למשחק עם מספר אחד. */
-.setup-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  max-width:460px;margin-inline:auto;
-  background:rgba(255,255,255,0.94);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-top:1px solid var(--rule);
-  padding:13px var(--pad) calc(13px + env(safe-area-inset-bottom));
-  z-index:30;
+/* ‏קטגוריה שהם הוסיפו · השם שלה הוא כפתור, והעיפרון לצידו הוא
+   ‏כל ההבדל בינה לבין קטגוריה של המערכת. הכפתור תופס את מקום
+   ‏התווית בדיוק, ולכן טור המספרים נשאר מיושר לאורך הטופס. */
+.nm-edit{
+  display:flex;align-items:center;flex-wrap:wrap;gap:7px;
+  text-align:start;min-height:44px;
 }
+.nm-edit .pen{flex:none;width:16px;height:16px;color:var(--ink-3)}
+.nm-edit small{flex-basis:100%}
+
+/* ‏הקורא החי · כל מספר שנכנס מזיז את הסיכום שמתחתיו, ואז מילוי
+   ‏הטופס מפסיק להיות טופס והופך למשחק עם מספר אחד. */
 .setup-left{
   display:flex;align-items:baseline;justify-content:space-between;
   gap:12px;margin-bottom:11px;
@@ -719,6 +711,41 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .dots.wrong{animation:none}
 }
 
+/* ────────────────────────────────────── היום הראשון ── */
+
+/* ‏המשטח המורם היחיד של המסך הזה · הענן של התובנה מוסתר כל עוד
+   ‏אין מה לדעת, ולכן אין כאן שני משטחים. */
+.first{margin-top:2px}
+.first .steps{
+  background:var(--wash);border-radius:var(--r-lg);
+  padding:4px 18px 18px;
+  counter-reset:step;list-style:none;
+}
+.first .steps li{
+  padding:17px 0;border-bottom:1px solid var(--rule);
+  counter-increment:step;
+}
+.first .steps li:last-child{border-bottom:none}
+.first .steps h2{
+  font-size:17px;font-weight:700;
+  display:flex;align-items:center;gap:9px;
+}
+.first .steps h2::before{
+  content:counter(step);
+  flex:none;width:23px;height:23px;border-radius:50%;
+  background:var(--violet-fill);color:#fff;
+  font-size:13px;font-weight:700;
+  display:grid;place-items:center;
+}
+.first .steps p{
+  font-size:14px;color:var(--ink-2);line-height:1.6;
+  margin:6px 0 14px;padding-inline-start:32px;
+}
+.first-note{
+  margin:22px 0 2px;
+  font-size:14px;color:var(--ink-2);line-height:1.6;
+}
+
 /* ──────────────────────────────────── מצבים ריקים ── */
 
 .empty{
@@ -961,6 +988,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .month-pick:hover,.streak:hover{background:var(--wash)}
   .insight .acts button:hover{background:var(--wash-2)}
   .gate-forgot button:hover{color:var(--ink-2)}
+  .nm-edit:hover .pen{color:var(--violet)}
 }
 
 /* ‏לחיצה. אחרי חוקי הריחוף ולא לפניהם: לשניהם אותה ספציפיות,
@@ -970,6 +998,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .nav .add:active span{transform:translate(-50%,-50%) scale(.93)}
 .row:active,.tx:active,.set-row:active{background:var(--wash-2)}
 .month-pick:active,.streak:active{background:var(--wash-2)}
+.nm-edit:active{opacity:.6}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{

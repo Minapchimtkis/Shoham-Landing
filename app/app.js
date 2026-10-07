@@ -250,7 +250,8 @@ const S = {
   hist: null,
   mode: 'signup',
   asked: false,             // לא שואלים יותר מפעם אחת בביקור
-  lastLeft: null
+  lastLeft: null,
+  ever: true                // ‏האם היה במשק הבית אי פעם תקציב או תנועה
 };
 
 const byId  = id => S.cats.find(c => c.id === id);
@@ -334,7 +335,7 @@ $('scrim').addEventListener('click', closeSheet);
 /* ─────────────────────────────────────── מסכים ראשיים ── */
 
 function stage(name) {
-  for (const id of ['boot', 'welcome', 'gate', 'setup', 'app']) {
+  for (const id of ['boot', 'welcome', 'gate', 'app']) {
     id === name ? show($(id)) : hide($(id));
   }
   $('boot').removeAttribute('aria-busy');
@@ -723,116 +724,6 @@ $('setOut').addEventListener('click', async () => {
   location.reload();
 });
 
-/* ═══════════════════════════════════════════ ההקמה ══ */
-
-/* ‏שש קטגוריות, לא שלוש עשרה. רשימה ארוכה בהקמה הראשונה היא
-   הדרך הבטוחה לכך שאיש לא ימלא אותה. */
-const SETUP_ROWS = [
-  { key: 'housing',   icon: '🏠', label: 'דיור',    hint: 'שכירות או משכנתא, ארנונה, חשמל, ועד' },
-  { key: 'food',      icon: '🛒', label: 'מזון',    hint: 'סופר, שוק, אוכל בחוץ' },
-  { key: 'transport', icon: '🚗', label: 'תחבורה',  hint: 'דלק, ביטוח, רב קו' },
-  { key: 'debt',      icon: '🏦', label: 'החזרים',  hint: 'הלוואות, מינוס, כרטיס' },
-  { key: 'fun',       icon: '🎬', label: 'בילויים', hint: 'מסעדות, חופשות, מנויים' },
-  { key: 'other',     icon: '•',  label: 'כל השאר', hint: 'מה שלא נכנס למעלה' }
-];
-
-function buildSetup() {
-  const box = $('setupCats');
-  box.textContent = '';
-  for (const r of SETUP_ROWS) {
-    const row = el('div', 'num-row');
-    const ic = el('span', 'ico', r.icon); ic.setAttribute('aria-hidden', 'true');
-    const lab = el('label', 'nm', r.label);
-    lab.htmlFor = 's_' + r.key;
-    lab.append(el('small', null, r.hint));
-    const wrap = el('span', 'amt');
-    const inp = el('input');
-    inp.id = 's_' + r.key;
-    inp.type = 'text'; inp.inputMode = 'decimal';
-    inp.autocomplete = 'off'; inp.placeholder = '0';
-    inp.dataset.key = r.key;
-    wrap.append(inp);
-    row.append(ic, lab, wrap);
-    box.append(row);
-  }
-  $('setup').addEventListener('input', setupLive);
-
-  /* ‏הסרגל התחתון קבוע במקומו ולכן הוא מכסה את השורה האחרונה.
-     הרמז שבתוכו מתחלף לפי מה שהוקלד, ולכן גם הגובה שלו מתחלף,
-     ומספר קבוע בגיליון הסגנון היה נכון רק לאחד הנוסחים. נמדד. */
-  const bar = document.querySelector('.setup-bar');
-  const fit = () => { $('setup').style.paddingBottom = (bar.offsetHeight + 26) + 'px'; };
-  if (window.ResizeObserver) new ResizeObserver(fit).observe(bar);
-  fit();
-
-  setupLive();
-}
-
-function setupNumbers() {
-  const income = toAgorot($('s_income').value) || 0;
-  let out = 0;
-  const budget = {};
-  for (const r of SETUP_ROWS) {
-    const v = toAgorot($('s_' + r.key).value) || 0;
-    if (v > 0) budget[r.key] = v;
-    out += v;
-  }
-  return { income, out, budget };
-}
-
-/* ‏הקורא החי. הוא הסיבה שההקמה היא מסך אחד ולא שישה שלבים: כל
-   מספר שנכנס מזיז מספר אחד למטה, ואז מילוי טופס הופך למשחק. */
-function setupLive() {
-  const { income, out } = setupNumbers();
-  const left = income - out;
-  const v = $('setupLeft');
-  setMoney(v, left, true);
-  v.classList.toggle('over', left < 0);
-
-  if (!income) {
-    $('setupLeftLabel').textContent = 'נשאר לתכנן';
-    $('setupHint').textContent = 'מתחילים מההכנסה.';
-  } else if (left > 0) {
-    $('setupLeftLabel').textContent = 'נשאר לתכנן';
-    $('setupHint').textContent = 'זה מה שעוד לא שובץ לשום מקום. אם הוא נשאר ככה, הוא ההפרש שלכם בסוף החודש.';
-  } else if (left === 0) {
-    $('setupLeftLabel').textContent = 'הכול משובץ';
-    $('setupHint').textContent = 'כל שקל שנכנס יש לו מקום. זה תכנון מדויק, ואין בו מרווח.';
-  } else {
-    $('setupLeftLabel').textContent = 'חסר';
-    $('setupHint').textContent = 'התכנון גדול מההכנסה. זה לא תקלה בטופס, זה מה שקורה בפועל אצל רבים, ובדיוק בשביל זה אנחנו כאן.';
-  }
-}
-
-$('setupBtn').addEventListener('click', async () => {
-  setErr($('setupErr'), '');
-  const { income, out, budget } = setupNumbers();
-
-  if (!income && !out) {
-    setErr($('setupErr'), 'צריך לפחות מספר אחד כדי להתחיל. ההכנסה היא המקום הטבעי.');
-    $('s_income').focus(); return;
-  }
-
-  const btn = $('setupBtn');
-  btn.disabled = true; btn.textContent = 'מקים...';
-  try {
-    const name = $('s_name').value.trim();
-    const { data, error } = await sb.rpc('setup_household', {
-      p_name: name || null, p_income: income, p_budget: budget
-    });
-    if (error) throw error;
-    S.hh = data;
-    await loadAll();
-    stage('app');
-    tab('home');
-    toast('הכול מוכן. ברוכים הבאים.');
-  } catch (err) {
-    setErr($('setupErr'), human(err));
-  } finally {
-    btn.disabled = false; btn.textContent = 'סיימתי, קחו אותי לפנים';
-  }
-});
-
 /* ═══════════════════════════════════════ טעינת נתונים ══ */
 
 async function findHousehold() {
@@ -848,18 +739,26 @@ async function loadAll() {
   const m0 = monthKey(S.month);
   const { from: p0, to: p1 } = periodRange(S.month);
 
-  const [cats, buds, txs, refl, prof, hh] = await Promise.all([
-    sb.from('categories').select('*').eq('archived', false),
+  /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
+     ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
+     ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
+  const [cats, buds, txs, refl, prof, hh, anyB, anyT] = await Promise.all([
+    sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
       .order('occurred_on', { ascending: false }).order('created_at', { ascending: false }),
     sb.from('reflections').select('*').eq('month', m0),
     sb.from('profiles').select('display_name').limit(1),
-    sb.from('households').select('cycle_start').limit(1)
+    sb.from('households').select('cycle_start').limit(1),
+    /* ‏"היה כאן אי פעם משהו" · בלי זה חודש חדש וריק אצל מי
+       ‏שמשתמש חצי שנה היה נראה לו כמו היום הראשון. */
+    sb.from('budgets').select('category_id').limit(1),
+    sb.from('transactions').select('id').limit(1)
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
 
+  S.ever = !!(((anyB.data || []).length) || ((anyT.data || []).length));
   S.cats = cats.data || [];
   S.budgets = new Map((buds.data || []).map(b => [b.category_id, Number(b.planned_agorot)]));
   S.txs = (txs.data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
@@ -888,10 +787,50 @@ async function loadPrev() {
   return S.prevTxs;
 }
 
+/* ───────────────────────────────────── היום הראשון ── */
+
+/* ‏S.ever הוא מה שנמצא בבסיס הנתונים ברגע הטעינה · מה שנשמר מאז
+   ‏יושב כבר בזיכרון, ולכן נספר כאן גם הוא. בלי זה המסך הזה היה
+   ‏נשאר על המסך גם אחרי שההכנסה הראשונה נשמרה. */
+const haveAny = () => S.ever || !!S.txs.length || !!plannedOut() || !!plannedIn();
+
+
+/* ‏מסך אחד, שני צעדים, ושורה שקטה למי שיש לו דף בנק. הוא נעלם
+   ‏לתמיד ברגע שנשמר הדבר הראשון, ואינו חוזר בחודש ריק אחר כך. */
+function renderFirst() {
+  const hq = $('heroQ');
+  hq.textContent = 'כמה יש לי';
+  hq.append(el('span', 'qm', '?'));
+  hide($('heroA'));
+  $('heroSub').textContent =
+    'עוד אין לי מה לענות. שני מספרים, וזה מתחיל לעבוד.';
+  show($('firstRun'));
+  hide($('homeRows'));
+  hide($('homeInsight'));
+  S.lastLeft = null;
+}
+
+/* ‏ההכנסה אינה מקבלת מסך משלה · היא שורה אחת במסך התקציב, וזה
+   ‏גם המקום שאליו יחזרו בחודש הבא. עדיף ללמד אותו עכשיו. */
+$('firstIncome').addEventListener('click', () => {
+  tab('budget');
+  const first = $('budgetRows').querySelector('input[data-cat]');
+  if (first) first.focus({ preventScroll: true });
+});
+$('firstExpense').addEventListener('click', () => openAdd());
+$('firstImport').addEventListener('click', () => tab('import'));
+
 /* ═══════════════════════════════════════════ הבית ══ */
 
 function renderHome() {
   $('monthLabel').textContent = periodLabel(S.month);
+
+  /* ‏היום הראשון. "כמה יש לי?" ומתחתיו אפס גדול היא תשובה לא
+     ‏נכונה · יש להם כסף, פשוט עוד לא אמרו לנו כמה. במקום המספר
+     ‏באים שני צעדים, והוא חוזר ברגע שיש לו מה להגיד. */
+  if (!haveAny()) { renderFirst(); return; }
+  show($('homeRows')); show($('homeInsight')); hide($('firstRun'));
+  show($('heroA'));
 
   const now = new Date();
   const current = inCurrentPeriod();
@@ -1703,10 +1642,9 @@ function renderBudget() {
     for (const c of list) {
       const row = el('div', 'num-row');
       const ic = el('span', 'ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
-      const lab = el('label', 'nm', c.label);
-      lab.htmlFor = 'b_' + c.id;
       const sp = spentIn(c.id);
-      if (c.kind === 'expense' && sp > 0) lab.append(el('small', null, `יצא עד כה ${fmt(sp)}`));
+      const hint = (c.kind === 'expense' && sp > 0) ? `יצא עד כה ${fmt(sp)}` : '';
+
       const wrap = el('span', 'amt');
       const inp = el('input');
       inp.id = 'b_' + c.id;
@@ -1716,7 +1654,40 @@ function renderBudget() {
       const p = planned(c.id);
       inp.value = p ? (p / 100).toString() : '';
       wrap.append(inp);
-      row.append(ic, lab, wrap);
+
+      /* ‏קטגוריה שהם הוסיפו אפשר לשנות ולהסיר · קטגוריות המערכת
+         ‏משותפות לכולם ולכן אינן שלהם לשנות. העיפרון הוא ההסבר,
+         ‏ואין צורך לכתוב אותו.
+
+         ‏הוא יושב בשם ולא בקצה השורה · טור המספרים מיושר לאורך
+         ‏כל הטופס, וכפתור בקצה היה מזיז שורה אחת ממנו. */
+      let nameNode;
+      if (c.household_id) {
+        nameNode = el('button', 'nm nm-edit');
+        nameNode.type = 'button';
+        nameNode.append(document.createTextNode(c.label));
+        const pen = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        pen.setAttribute('viewBox', '0 0 24 24');
+        pen.setAttribute('aria-hidden', 'true');
+        pen.setAttribute('class', 'pen');
+        const d = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        d.setAttribute('d', 'M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3z');
+        d.setAttribute('fill', 'none'); d.setAttribute('stroke', 'currentColor');
+        d.setAttribute('stroke-width', '1.8'); d.setAttribute('stroke-linejoin', 'round');
+        pen.append(d);
+        nameNode.append(pen);
+        if (hint) nameNode.append(el('small', null, hint));
+        nameNode.setAttribute('aria-label', 'עריכת הקטגוריה ' + c.label);
+        nameNode.addEventListener('click', () => openCat(c));
+        /* ‏השדה איבד את התווית שלו ברגע שהיא הפכה לכפתור. */
+        inp.setAttribute('aria-label', 'תכנון ל' + c.label);
+      } else {
+        nameNode = el('label', 'nm', c.label);
+        nameNode.htmlFor = inp.id;
+        if (hint) nameNode.append(el('small', null, hint));
+      }
+
+      row.append(ic, nameNode, wrap);
       g.append(row);
     }
     box.append(g);
@@ -1724,6 +1695,14 @@ function renderBudget() {
 
   group('מה נכנס', inCats());
   group('מה יוצא', outCats());
+
+  /* ‏בפעם הראשונה המסך הזה אינו "התקציב" אלא השורה הראשונה שבו.
+     ‏מי שעוד לא תכנן כלום צריך לדעת מאיפה מתחילים, ולא מה הקשר
+     ‏בין החודש הזה לחודשים אחרים. */
+  $('budgetNote').textContent = (plannedIn() || plannedOut())
+    ? 'כמה תכננתם לכל קטגוריה בחודש הזה. שינוי כאן לא נוגע בחודשים אחרים, ולכן אפשר לתכנן חודש עמוס אחרת.'
+    : 'מתחילים מההכנסה · כמה נכנס לכם בחודש. את השאר אפשר למלא עכשיו, או להשאיר ריק ולראות לאן הכסף הולך בפועל.';
+
   budgetLive();
 }
 
@@ -1783,10 +1762,22 @@ $('budgetSave').addEventListener('click', async () => {
 
 const ICONS = ['🏠','🛒','🚗','🏦','🎬','👶','🐾','💊','👕','✈️','📚','🎁','💡','☕','🏋️','•'];
 let newIcon = ICONS[0];
+let editCat = null;            // ‏הקטגוריה שבעריכה, או null ליצירה
 
-$('catAddBtn').addEventListener('click', () => {
-  $('catName').value = '';
-  newIcon = ICONS[0];
+/* ‏גלון אחד לשני התפקידים. רוב מה שבו זהה, ומה שנבדל הוא
+   ‏הכותרת, מילת הכפתור, וכפתור ההסרה שקיים רק בעריכה. */
+function openCat(c) {
+  editCat = c || null;
+  $('catName').value = c ? c.label : '';
+  newIcon = c ? (c.icon || ICONS[0]) : ICONS[0];
+
+  $('catTitle').textContent = c ? 'עריכת הקטגוריה' : 'קטגוריה חדשה';
+  $('catSub').textContent = c
+    ? 'השם והסמל. התנועות שכבר רשומות בה נשארות איתה.'
+    : 'רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.';
+  $('catSave').textContent = c ? 'שמירה' : 'הוספה';
+  $('catDelete').classList.toggle('hidden', !c);
+
   const box = $('catIcons');
   box.textContent = '';
   for (const ic of ICONS) {
@@ -1802,32 +1793,93 @@ $('catAddBtn').addEventListener('click', () => {
     box.append(b);
   }
   setErr($('catErr'), '');
+  disarmCat();
   openSheet($('catSheet'));
-});
+}
+
+$('catAddBtn').addEventListener('click', () => openCat(null));
 $('catCancel').addEventListener('click', closeSheet);
 
 $('catSave').addEventListener('click', async () => {
   setErr($('catErr'), '');
   const label = $('catName').value.trim();
   if (!label) { setErr($('catErr'), 'צריך שם לקטגוריה.'); $('catName').focus(); return; }
-  if (S.cats.some(c => c.label === label)) {
+  if (S.cats.some(c => c.label === label && !c.archived && c !== editCat)) {
     setErr($('catErr'), 'כבר יש קטגוריה בשם הזה.'); return;
   }
   const btn = $('catSave');
-  btn.disabled = true; btn.textContent = 'מוסיף...';
+  const word = editCat ? 'שמירה' : 'הוספה';
+  btn.disabled = true; btn.textContent = editCat ? 'שומר...' : 'מוסיף...';
   try {
-    const { data, error } = await sb.from('categories').insert({
-      household_id: S.hh, label, icon: newIcon, kind: 'expense', sort: 90
-    }).select().single();
-    if (error) throw error;
-    S.cats.push(data);
-    closeSheet();
-    renderBudget();
-    toast('הקטגוריה נוספה.');
+    if (editCat) {
+      const { error } = await sb.from('categories')
+        .update({ label, icon: newIcon }).eq('id', editCat.id);
+      if (error) throw error;
+      editCat.label = label; editCat.icon = newIcon;
+      closeSheet();
+      renderBudget();
+      renderHome();
+      toast('הקטגוריה עודכנה.');
+    } else {
+      const { data, error } = await sb.from('categories').insert({
+        household_id: S.hh, label, icon: newIcon, kind: 'expense', sort: 90
+      }).select().single();
+      if (error) throw error;
+      S.cats.push(data);
+      closeSheet();
+      renderBudget();
+      toast('הקטגוריה נוספה.');
+    }
   } catch (err) {
     setErr($('catErr'), human(err));
   } finally {
-    btn.disabled = false; btn.textContent = 'הוספה';
+    btn.disabled = false; btn.textContent = word;
+  }
+});
+
+/* ‏הסרה ולא מחיקה. מחיקה אמיתית הייתה מנתקת את התנועות שכבר
+   ‏רשומות בה ומשאירה אותן בלי שם · הקטגוריה יורדת מהרשימות
+   ‏וממשיכה להחזיק את ההיסטוריה שלה.
+
+   ‏האישור הוא לחיצה שנייה על אותו כפתור, כמו במחיקת הכול · אין
+   ‏באפליקציה הזאת חלונות של הדפדפן. */
+let catArmed = 0;
+
+function disarmCat() {
+  catArmed = 0;
+  $('catDelete').textContent = 'הסרת הקטגוריה';
+}
+
+$('catDelete').addEventListener('click', async () => {
+  if (!editCat) return;
+  const btn = $('catDelete');
+
+  if (Date.now() - catArmed > 6000) {
+    catArmed = Date.now();
+    const used = S.txs.filter(t => t.category_id === editCat.id).length;
+    btn.textContent = used
+      ? `עוד לחיצה מסירה · ${used} תנועות החודש ישארו רשומות בה`
+      : 'עוד לחיצה אחת מסירה אותה';
+    setTimeout(() => { if (Date.now() - catArmed >= 6000) disarmCat(); }, 6200);
+    return;
+  }
+
+  catArmed = 0;
+  btn.disabled = true; btn.textContent = 'מסיר...';
+  try {
+    const { error } = await sb.from('categories')
+      .update({ archived: true }).eq('id', editCat.id);
+    if (error) throw error;
+    editCat.archived = true;
+    closeSheet();
+    renderBudget();
+    renderHome();
+    toast('הקטגוריה הוסרה.');
+  } catch (err) {
+    setErr($('catErr'), human(err));
+  } finally {
+    btn.disabled = false;
+    disarmCat();
   }
 });
 
@@ -2714,9 +2766,8 @@ $('goalDelete').addEventListener('click', async () => {
 
 /* ═══════════════════════════════════════════ הגדרות ══ */
 
-/* ‏הכול כאן ולא ב-enter, כי enter חוזר מוקדם כשמשתמש חדש נשלח
-   ‏להקמה · ואז השורות האלה לא היו נצבעות אף פעם אצל מי שרק נרשם.
-   ‏המסך הזה נצבע בכל כניסה אליו, ולכן הוא המקום הנכון. */
+/* ‏הכול כאן ולא ב-enter · המסך הזה נצבע בכל כניסה אליו, וכך הוא
+   ‏מראה תמיד את המצב העדכני ולא את זה שהיה ברגע הכניסה. */
 function renderSet() {
   /* ‏לאורח אין כתובת, ושדה ריק נראה כמו תקלה. */
   $('setEmail').textContent = S.user?.email || (isGuest() ? 'אורח, בלי אימייל' : '');
@@ -2878,11 +2929,21 @@ async function enter(user) {
     return;
   }
 
+  /* ‏אין אשף. משק הבית נפתח ריק ברגע הראשון, והמספרים נכנסים
+     ‏מבפנים · אחרי שכבר ראו מה האפליקציה עושה, ולא לפני. */
   if (!S.hh) {
-    stage('setup');
-    buildSetup();
-    $('s_income').focus({ preventScroll: true });
-    return;
+    try {
+      const { data, error } = await sb.rpc('setup_household', {
+        p_name: null, p_income: 0, p_budget: {}
+      });
+      if (error) throw error;
+      S.hh = data;
+    } catch (err) {
+      stage('gate');
+      gateScreen('main');
+      setErr($('authErr'), human(err));
+      return;
+    }
   }
 
   try {
@@ -3004,7 +3065,7 @@ function wrongShake() {
 /* ‏האפליקציה שמאחור מנוטרלת ולא רק מוסתרת · inert מוציא אותה גם
    ‏מהטאב ומקורא המסך, אחרת אפשר לשוטט בה עם מקלדת מבעד לשכבה. */
 function inertApp(on) {
-  for (const id of ['app', 'gate', 'setup']) {
+  for (const id of ['app', 'gate']) {
     const n = $(id);
     if (n) n.inert = on;
   }

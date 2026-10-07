@@ -287,52 +287,6 @@
   </div>
 </main>
 
-<!-- ═══════════════════════════════════════════ ההקמה ══ -->
-<main id="setup" class="setup hidden">
-  <h1>שבעה מספרים, ואנחנו בפנים</h1>
-  <p class="note">
-    לא צריך לדייק. מה שאתם זוכרים בערך מספיק טוב כדי להתחיל, ואפשר
-    לשנות הכול אחר כך. המספר למטה זז בזמן שאתם מקלידים.
-  </p>
-
-  <form id="setupForm" novalidate>
-    <div class="setup-group">
-      <h2>מה נכנס</h2>
-      <div class="num-row">
-        <span class="ico" aria-hidden="true">💼</span>
-        <label class="nm" for="s_income">
-          הכנסה חודשית
-          <small>נטו, מה שנכנס לחשבון</small>
-        </label>
-        <span class="amt"><input id="s_income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></span>
-      </div>
-    </div>
-
-    <div class="setup-group">
-      <h2>מה יוצא</h2>
-      <div id="setupCats"></div>
-    </div>
-
-    <div class="setup-group">
-      <h2>איך לקרוא לכם</h2>
-      <div class="field">
-        <label for="s_name">השם שלכם</label>
-        <input class="inp" id="s_name" type="text" autocomplete="name" placeholder="שוהם" maxlength="60">
-      </div>
-    </div>
-  </form>
-
-  <div class="setup-bar">
-    <div class="setup-left">
-      <span class="k" id="setupLeftLabel">נשאר לתכנן</span>
-      <span class="v money" id="setupLeft">0</span>
-    </div>
-    <p class="setup-hint" id="setupHint">מתחילים מההכנסה.</p>
-    <button class="btn" id="setupBtn" type="button">סיימתי, קחו אותי לפנים</button>
-    <p class="err hidden" id="setupErr" role="alert"></p>
-  </div>
-</main>
-
 <!-- ═══════════════════════════════════════ האפליקציה ══ -->
 <div id="app" class="hidden">
 
@@ -356,6 +310,25 @@
       <p class="sub" id="heroSub"></p>
     </section>
 
+    <!-- ‏היום הראשון. אין מספרים, ולכן אין מה לענות · במקום אפס
+         ‏גדול שהוא תשובה לא נכונה, שני צעדים וסוף. -->
+    <section class="first hidden" id="firstRun">
+      <ol class="steps">
+        <li>
+          <h2>מה נכנס לכם בחודש</h2>
+          <p>משכורת, קצבה, עסק · מה שנכנס לחשבון.</p>
+          <button class="btn" id="firstIncome" type="button">קביעת ההכנסה</button>
+        </li>
+        <li>
+          <h2>הוצאה אחת שאתם זוכרים</h2>
+          <p>לא צריך להתחיל מהכול. אחת מספיקה כדי לראות את זה עובד.</p>
+          <button class="btn btn-ghost" id="firstExpense" type="button">הוספת הוצאה</button>
+        </li>
+      </ol>
+      <p class="first-note">יש לכם דף בנק או כרטיס אשראי? אפשר לייבא אותו, והחודש יתמלא לבד.</p>
+      <button class="btn-quiet" id="firstImport" type="button">ייבוא מקובץ</button>
+    </section>
+
     <h2 class="sr-only">הקטגוריות של החודש</h2>
     <div class="rows" id="homeRows"></div>
 
@@ -377,10 +350,7 @@
   <!-- ──────────────────────────────────────── תקציב ── -->
   <main class="screen hidden" id="scBudget">
     <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">התקציב</h1>
-    <p class="note" style="margin-bottom:18px">
-      כמה תכננתם לכל קטגוריה בחודש הזה. שינוי כאן לא נוגע בחודשים
-      אחרים, ולכן אפשר לתכנן חודש עמוס אחרת.
-    </p>
+    <p class="note" id="budgetNote" style="margin-bottom:18px"></p>
     <form id="budgetForm" novalidate>
       <div id="budgetRows"></div>
       <button class="cat-add" id="catAddBtn" type="button">
@@ -797,7 +767,7 @@
 <div class="sheet hidden" id="catSheet" role="dialog" aria-modal="true" aria-labelledby="catTitle">
   <div class="grab" aria-hidden="true"></div>
   <h2 id="catTitle">קטגוריה חדשה</h2>
-  <p class="sub">רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.</p>
+  <p class="sub" id="catSub">רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.</p>
   <div class="field">
     <label for="catName">השם</label>
     <input class="inp" id="catName" type="text" maxlength="30" autocomplete="off" placeholder="חיות מחמד">
@@ -811,6 +781,7 @@
     <button class="btn btn-ghost" id="catCancel" type="button">ביטול</button>
     <button class="btn" id="catSave" type="button">הוספה</button>
   </div>
+  <button class="btn btn-danger hidden" id="catDelete" type="button" style="margin-top:10px">הסרת הקטגוריה</button>
 </div>
 
 <!-- ‏השאלה. לא נזיפה: הקטגוריה חרגה, וזה הזמן לשאול למה ולא
