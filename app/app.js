@@ -251,7 +251,8 @@ const S = {
   mode: 'signup',
   asked: false,             // לא שואלים יותר מפעם אחת בביקור
   lastLeft: null,
-  ever: true                // ‏האם היה במשק הבית אי פעם תקציב או תנועה
+  ever: true,               // ‏האם היה במשק הבית אי פעם תקציב או תנועה
+  assets: []                // ‏החסכונות והנכסים, נקראים פעם אחת לטעינה
 };
 
 const byId  = id => S.cats.find(c => c.id === id);
@@ -743,7 +744,7 @@ async function loadAll() {
   /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
      ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
      ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
-  const [cats, buds, txs, refl, prof, hh, anyB, anyT] = await Promise.all([
+  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
@@ -754,12 +755,22 @@ async function loadAll() {
     /* ‏"היה כאן אי פעם משהו" · בלי זה חודש חדש וריק אצל מי
        ‏שמשתמש חצי שנה היה נראה לו כמו היום הראשון. */
     sb.from('budgets').select('category_id').limit(1),
-    sb.from('transactions').select('id').limit(1)
+    sb.from('transactions').select('id').limit(1),
+    /* ‏הנכסים נקראים פעם אחת ויושבים בזיכרון · מסך הבית, שורת
+       ‏ההגדרות ומסך הנכסים עצמו קוראים את אותו דבר. קודם כל אחד
+       ‏מהם שלח שאילתה משלו. */
+    sb.from('assets').select('*').eq('archived', false)
+      .order('created_at', { ascending: true })
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
 
   S.ever = !!(((anyB.data || []).length) || ((anyT.data || []).length));
+  /* ‏טבלת הנכסים נוספה אחרי שכבר היו משקי בית. אם המיגרציה שלה
+     ‏עוד לא רצה, האפליקציה עובדת בלעדיה במקום ליפול. */
+  S.assets = ast.error ? [] : (ast.data || []).map(a => ({ ...a,
+    amount_agorot: Number(a.amount_agorot),
+    liability_agorot: Number(a.liability_agorot || 0) }));
   S.cats = cats.data || [];
   S.budgets = new Map((buds.data || []).map(b => [b.category_id, Number(b.planned_agorot)]));
   S.txs = (txs.data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
@@ -808,6 +819,8 @@ function renderFirst() {
   show($('firstRun'));
   hide($('homeRows'));
   hide($('homeInsight'));
+  hide($('homePulse'));
+  hide($('homeWorth'));
   S.lastLeft = null;
 }
 
@@ -819,6 +832,12 @@ $('firstIncome').addEventListener('click', () => {
   if (first) first.focus({ preventScroll: true });
 });
 $('firstExpense').addEventListener('click', () => openAdd());
+/* ‏יש נכסים · אל הפירוט. אין · ישר אל הטופס, כי השורה ממילא
+   ‏אומרת "טרם הוזן" והלחיצה היא התשובה לה. */
+$('homeWorth').addEventListener('click', () => {
+  if (!S.assets.length) { tab('assets'); openAsset(null); return; }
+  tab('assets');
+});
 $('firstImport').addEventListener('click', () => tab('import'));
 
 /* ═══════════════════════════════════════════ הבית ══ */
@@ -910,8 +929,83 @@ function renderHome() {
   if (moved > 0) line(document.createTextNode('ועוד '), strong(moved),
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
+  renderPulse(current, dim, now);
+  renderWorth();
   renderRows(current, dim, now);
   renderInsight();
+}
+
+/* ───────────────────────────────── מחוון המצב ── */
+
+/* ‏שלושה מצבים, מילה אחת לכל אחד. הוא מופיע רק כשיש תכנון
+   ‏להשוות אליו · בלי תכנון אין על מה לפסוק, ומחוון ירוק קבוע
+   ‏הוא רעש ולא מידע.
+
+   ‏"כדאי לשים לב" אינו אמצע שרירותי: הוא נדלק כשקצב ההוצאה
+   ‏מקדים את היום בחודש ביותר מ-12 אחוז. בעשירי בחודש הוצאתם
+   ‏חצי מהתכנון · זה לא חריגה, אבל זה הזמן שבו עוד אפשר להחליט,
+   ‏ואחרי שכבר חרגתם כבר אין מה להחליט. */
+function renderPulse(current, dim, now) {
+  const el_ = $('homePulse');
+  const plan = plannedOut();
+  if (!plan) { hide(el_); return; }
+
+  const spent = spentAll();
+  const left = leftToSpend();
+  const share = spent / plan;
+  const pace = current ? dayOfPeriod(S.month, now) / dim : 1;
+
+  let state, word;
+  if (left < 0)                    { state = 'red';   word = 'מעל התכנון'; }
+  else if (!current)               { state = 'green'; word = 'עמדתי בתכנון'; }
+  else if (share > pace + 0.12)    { state = 'amber'; word = 'כדאי לשים לב'; }
+  else                             { state = 'green'; word = 'בשליטה'; }
+
+  el_.className = 'pulse ' + state;
+  $('pulseWord').textContent = word;
+  el_.setAttribute('aria-label', 'מצב החודש: ' + word);
+  show(el_);
+}
+
+/* ─────────────────────────── מה יש לי בסך הכל ── */
+
+/* ‏החודש עונה על "כמה נשאר לי", והרצועה הזאת על "כמה יש לי".
+   ‏שתי שאלות שונות, ושתיהן בשם של האפליקציה.
+
+   ‏כשאין נכסים היא אינה מציגה אפס · אפס כאן הוא תשובה לא נכונה
+   ‏למי שיש לו קרן השתלמות ופשוט עוד לא הקליד אותה. */
+function renderWorth() {
+  const strip = $('homeWorth');
+  const v = $('worthNow');
+  const parts = $('worthParts');
+
+  if (!S.assets.length) {
+    strip.classList.add('blank');
+    v.textContent = 'טרם הוזן';
+    v.classList.remove('money');
+    parts.textContent = 'חיסכון, קרן השתלמות, פנסיה, דירה';
+    strip.setAttribute('aria-label', 'מה יש לי בסך הכל. טרם הוזן. לחיצה מוסיפה חיסכון או נכס');
+    show(strip);
+    return;
+  }
+
+  strip.classList.remove('blank');
+  v.classList.add('money');
+  const worth = netWorth();
+  setMoney(v, worth, true);
+  v.classList.toggle('over', worth < 0);
+
+  /* ‏שלוש הקבוצות הגדולות, ולא כולן · שורה אחת שנקראת במבט. */
+  const byGroup = ASSET_GROUPS.map(g => {
+    const keys = ASSET_KINDS.filter(k => k.group === g.key).map(k => k.key);
+    const sum = S.assets.filter(a => keys.includes(a.kind))
+                        .reduce((t, a) => t + a.amount_agorot - a.liability_agorot, 0);
+    return { label: g.label, sum };
+  }).filter(x => x.sum !== 0).sort((a, b) => b.sum - a.sum).slice(0, 2);
+
+  parts.textContent = byGroup.map(x => `${x.label} ${fmt(x.sum)}`).join(' · ');
+  strip.setAttribute('aria-label', `מה יש לי בסך הכל, ${fmt(worth)}. לחיצה מראה את הפירוט`);
+  show(strip);
 }
 
 function renderRows(current, dim, now) {
@@ -974,7 +1068,17 @@ function renderRows(current, dim, now) {
       bar.append(t);
     }
 
+    /* ‏"כמה נשאר לי בקטגוריה" ו"כמה מזה כבר הלך" · שני המספרים
+       ‏שהפס מראה בעין אבל לא במילים. בלי תכנון אין מה לומר. */
     row.append(top, bar);
+    if (p > 0) {
+      const foot = el('div', 'row-foot' + (over ? ' over' : ''));
+      const amt = el('span', 'money');
+      setMoney(amt, over ? s - p : p - s);
+      foot.append(document.createTextNode(over ? 'חריגה של ' : 'נשארו '), amt);
+      foot.append(el('span', 'pct', Math.round(s / p * 100) + '%'));
+      row.append(foot);
+    }
     row.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
     frag.append(row);
   }
@@ -2182,16 +2286,23 @@ function updatedAgo(iso) {
 
 const assetWorth = a => Number(a.amount_agorot) - Number(a.liability_agorot || 0);
 
-async function renderAssets() {
-  const box = $('assetsBody');
-  const { data, error } = await sb.from('assets')
-    .select('*').eq('archived', false).order('created_at', { ascending: true });
-  box.textContent = '';
-  if (error) { box.append(el('p', 'note', human(error))); return; }
+/* ‏קורא רענון מהשרת אל S.assets. נקרא אחרי כל שמירה, ולא לפני
+   ‏כל ציור · הציור עצמו קורא מהזיכרון ולכן הוא מיידי. */
+async function reloadAssets() {
+  try {
+    const { data, error } = await sb.from('assets')
+      .select('*').eq('archived', false).order('created_at', { ascending: true });
+    if (error) throw error;
+    S.assets = (data || []).map(a => ({ ...a,
+      amount_agorot: Number(a.amount_agorot),
+      liability_agorot: Number(a.liability_agorot || 0) }));
+  } catch { /* ‏נשארים עם מה שיש בזיכרון */ }
+}
 
-  assetRows = (data || []).map(a => ({ ...a,
-    amount_agorot: Number(a.amount_agorot),
-    liability_agorot: Number(a.liability_agorot || 0) }));
+function renderAssets() {
+  const box = $('assetsBody');
+  box.textContent = '';
+  assetRows = S.assets;
 
   if (!assetRows.length) {
     const e = el('div', 'empty');
@@ -2391,7 +2502,9 @@ $('assetSave').addEventListener('click', async () => {
     if (error) throw error;
     closeSheet();
     toast(assetEdit ? 'עודכן.' : 'נוסף.');
+    await reloadAssets();
     renderAssets();
+    renderHome();
   } catch (err) {
     setErr($('assetErr'), human(err));
   } finally {
@@ -2406,7 +2519,9 @@ $('assetDelete').addEventListener('click', async () => {
   const { error } = await sb.from('assets').delete().eq('id', a.id);
   if (error) { toast(human(error)); return; }
   toast('נמחק.');
+  await reloadAssets();
   renderAssets();
+  renderHome();
 });
 
 /* ═══════════════════════════════════════ סיכום שנה ══ */
@@ -2672,23 +2787,18 @@ $('cycleSave').addEventListener('click', async () => {
    ‏מראה את המספר עצמו · זאת שאלה שאנשים פותחים את האפליקציה
    ‏כדי לענות עליה, ואין סיבה להסתיר אותה מאחורי עוד לחיצה.
    ‏נכשלה? השורה חוזרת למשפט המזמין, ושום דבר לא נשבר. */
-async function setAssetsLine() {
+/* ‏השורה שמובילה לנכסים הראתה עד היום משפט קבוע. עכשיו היא
+   ‏מראה את המספר עצמו · זאת שאלה שאנשים פותחים את האפליקציה
+   ‏כדי לענות עליה, ואין סיבה להסתיר אותה מאחורי עוד לחיצה. */
+const netWorth = () => S.assets.reduce((t, a) =>
+  t + a.amount_agorot - a.liability_agorot, 0);
+
+function setAssetsLine() {
   const n = $('assetsNow');
   if (!n) return;
-  try {
-    const { data, error } = await sb.from('assets')
-      .select('amount_agorot,liability_agorot').eq('archived', false);
-    if (error) throw error;
-    if (!data || !data.length) {
-      n.textContent = 'כמה יש לי מעבר לעובר ושב';
-      return;
-    }
-    const worth = data.reduce((t, a) =>
-      t + Number(a.amount_agorot) - Number(a.liability_agorot || 0), 0);
-    n.textContent = `השווי הפיננסי שלכם ${fmt(worth)}`;
-  } catch {
-    n.textContent = 'כמה יש לי מעבר לעובר ושב';
-  }
+  n.textContent = S.assets.length
+    ? `השווי הפיננסי שלכם ${fmt(netWorth())}`
+    : 'כמה יש לי מעבר לעובר ושב';
 }
 
 /* ═══════════════════════════════════════════ מטרות ══ */

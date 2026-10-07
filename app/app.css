@@ -5,7 +5,8 @@
    חמישה כללים שכל הקובץ הזה נשען עליהם:
 
    1. ‏מספר אחד הוא הגיבור של כל מסך. כל השאר תומך בו.
-   2. ‏אין אדום. חריגה מתקציב היא ענבר, והיא מנוסחת כשאלה.
+   2. ‏חריגה מנוסחת כשאלה ולא כנזיפה. הצבע שלה ענבר כשהיא בדרך,
+      ‏ואדום עמוק ומרוסן כשהיא כבר קרתה · לא אדום של אזעקה.
    3. ‏כסף נכתב בסריף, מילים בסאנס. בכל מקום, בלי חריגים.
    4. ‏משטח מורם אחד למסך, לא יותר. שאר התוכן יושב על הנייר.
    5. ‏תנועה עונה על נגיעה. אין אנימציות שמתנגנות מעצמן.
@@ -41,6 +42,16 @@
      ירד שם ל-4.30, מתחת לסף. a4490a נותן 5.09 על המשטח. */
   --amber:#a4490a;
   --amber-soft:rgba(164,73,10,0.10);
+
+  /* ── ירוק ואדום, ורק במחוון המצב ──
+     ‏שלושה מצבים: בשליטה, כדאי לשים לב, מעל התכנון. הם אומרים
+     ‏בשנייה אחת מה שהמספר אומר בשתיים. שניהם עמוקים ומרוסנים
+     ‏בכוונה · אדום של אזעקה מזין בדיוק את הפחד להסתכל בחשבון,
+     ‏שהוא השד שהמוצר הזה נבנה נגדו. */
+  --green:#2e7050;         /* 5.92 על לבן */
+  --green-soft:rgba(46,112,80,0.10);
+  --red:#a62e35;           /* 6.85 על לבן */
+  --red-soft:rgba(166,46,53,0.10);
 
   --gold:#f0c040;          /* הרצף, ושום דבר אחר */
 
@@ -501,12 +512,60 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   font-size:clamp(50px,16vw,66px);
   line-height:1.02;letter-spacing:-0.03em;
 }
-.hero .a.over{color:var(--amber)}
+/* ‏חרגתי · זה כבר קרה, ולכן אדום ולא ענבר. ענבר שמור למה
+   ‏שעוד אפשר למנוע. */
+.hero .a.over{color:var(--red)}
 .hero .sub{
   margin-top:10px;font-size:15px;color:var(--ink-2);
   line-height:1.5;
 }
 .hero .sub b{font-weight:700;color:var(--ink)}
+
+/* ‏מחוון המצב · נקודה ומילה. הוא יושב בין המספר לשורת המשנה,
+   ‏כי שם הוא נקרא יחד עם המספר ולא כהערה נפרדת. */
+.pulse{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:9px;padding:5px 11px;
+  font-size:13px;font-weight:700;
+  border-radius:var(--r-pill);
+}
+.pulse .dot{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:currentColor;
+}
+.pulse.green{color:var(--green);background:var(--green-soft)}
+.pulse.amber{color:var(--amber);background:var(--amber-soft)}
+.pulse.red  {color:var(--red);  background:var(--red-soft)}
+
+/* ‏רצועת "מה יש לי בסך הכל". שורה על הנייר ולא כרטיס מורם · ענן
+   ‏התובנה הוא המשטח המורם היחיד של המסך הזה. */
+/* ‏פלקס ולא גריד · ב-Chromium כפתור שהוא מיכל גריד מותח את
+   ‏עצמו מעבר לשורות שלו, והרצועה יצאה גבוהה ב-60 פיקסל מהתוכן.
+   ‏עמודה פנימית אחת פותרת את זה, וזה גם מה ש-set-row כבר עושה. */
+.worth-strip{
+  display:flex;align-items:center;gap:10px;
+  width:100%;text-align:right;
+  padding:15px 0;margin-bottom:4px;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+.worth-strip .col{flex:1;min-width:0}
+.worth-strip .k{display:block;font-size:14px;color:var(--ink-2);font-weight:500}
+.worth-strip .v{
+  display:block;font-size:26px;letter-spacing:-0.02em;
+  color:var(--ink);line-height:1.2;margin-top:1px;
+}
+.worth-strip .v.over{color:var(--red)}
+.worth-strip .s{
+  display:block;font-size:13px;color:var(--ink-3);
+  line-height:1.5;margin-top:4px;
+}
+.worth-strip svg{flex:none;width:16px;height:16px;color:var(--ink-3)}
+/* ‏כשטרם הוזן · "טרם הוזן" הוא מילים ולא כסף, ולכן הוא שקט
+   ‏יותר מהמספר שיבוא במקומו, ובסגול שאומר שיש כאן מה לעשות.
+   ‏blank ולא empty · empty היא כבר מחלקה של מצב ריק שלם, עם
+   ‏ריפוד של 46 פיקסל, והיא מתחה את הרצועה פי שניים. */
+.worth-strip.blank .v{font-size:19px;font-weight:700;color:var(--violet)}
 
 /* ‏המספר נע רק כשהוא מתחלף, כי אז הוא מראה מה השתנה. */
 @keyframes bump{
@@ -537,7 +596,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .row-nm{flex:1;font-size:16px;font-weight:500;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-val{flex:none;font-size:17px}
-.row-val.over{color:var(--amber)}
+.row-val.over{color:var(--red)}
 .row-of{
   flex:none;font-size:13px;color:var(--ink-3);
   display:flex;align-items:baseline;gap:3px;
@@ -565,8 +624,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
    אחוזים וחריגה של שבעים אחוזים הן אותה תמונה, וזה איבוד מידע
    בדיוק במקום שבו הוא הכי נחוץ. עכשיו המסילה היא התכנון, והקטע
    המלא הוא החריגה עצמה. */
-.bar.over{background:var(--amber-soft)}
-.bar i.over{background:var(--amber);right:auto;left:0}
+.bar.over{background:var(--red-soft)}
+.bar i.over{background:var(--red);right:auto;left:0}
 .bar i.none{background:var(--rule-2)}
 
 /* ‏ציון התאריך בחודש. בלעדיו אין משמעות ל"40 אחוז מהתקציב":
@@ -575,6 +634,17 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   position:absolute;top:-3px;bottom:-3px;width:1px;
   background:var(--ink-3);opacity:.5;
 }
+
+/* ‏השורה השלישית בשורת הקטגוריה · כמה נשאר, וכמה אחוז כבר הלך.
+   ‏האחוז בקצה השני, כי הוא נקרא כטור משלו לאורך הרשימה. */
+.row-foot{
+  display:flex;align-items:baseline;gap:5px;
+  margin-top:7px;font-size:13px;color:var(--ink-3);
+}
+.row-foot .money{font-weight:700;color:var(--ink-2);font-size:13px}
+.row-foot.over{color:var(--red)}
+.row-foot.over .money{color:var(--red)}
+.row-foot .pct{margin-inline-start:auto;font-variant-numeric:tabular-nums}
 
 .cat-add{
   display:flex;align-items:center;gap:8px;
@@ -992,6 +1062,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .btn-ghost:hover,.btn-quiet:hover{background:var(--wash)}
   .btn-danger:hover{background:var(--amber-soft)}
   .row:hover,.tx:hover,.set-row:not(.ro):hover{background:var(--wash)}
+  .worth-strip:hover .v{color:var(--violet)}
   .chip:hover{box-shadow:0 0 0 1px var(--rule-2),0 0 0 4px var(--violet-soft)}
   .chip[aria-pressed="true"]:hover{box-shadow:none;background:#7a23ac}
   .nav button:hover{color:var(--ink-2)}
@@ -1008,6 +1079,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .chip:active{transform:scale(.97)}
 .nav .add:active span{transform:translate(-50%,-50%) scale(.93)}
 .row:active,.tx:active,.set-row:not(.ro):active{background:var(--wash-2)}
+.worth-strip:active{opacity:.65}
 .month-pick:active,.streak:active{background:var(--wash-2)}
 .nm-edit:active{opacity:.6}
 
@@ -1245,7 +1317,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:block;margin-top:2px;
   font-size:clamp(38px,12vw,50px);line-height:1.05;letter-spacing:-0.03em;
 }
-.worth .v.neg{color:var(--amber)}
+.worth .v.neg{color:var(--red)}
 .worth .how{
   display:inline-flex;align-items:center;gap:4px;
   margin-top:8px;font-size:14px;font-weight:600;color:var(--violet);
@@ -1298,7 +1370,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .worth-row .k{color:var(--ink-2)}
 .worth-row.total .k{color:var(--ink)}
 .worth-row .v{font-size:16px}
-.worth-row .v.minus{color:var(--amber)}
+.worth-row .v.minus{color:var(--red)}
 
 @media (hover:hover) and (pointer:fine){
   .asset:hover,.worth:hover{background:var(--wash)}

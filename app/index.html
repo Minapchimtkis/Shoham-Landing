@@ -308,8 +308,22 @@
     <section class="hero">
       <h1 class="q" id="heroQ">כמה יש לי<span class="qm">?</span></h1>
       <span class="a money" id="heroA" role="status" aria-live="polite">0</span>
+      <!-- ‏מילה אחת שאומרת בשנייה מה שהמספר אומר בשתיים. מופיעה רק
+           ‏כשיש תכנון להשוות אליו · בלעדיו אין על מה לפסוק. -->
+      <p class="pulse hidden" id="homePulse"><span class="dot" aria-hidden="true"></span><span id="pulseWord"></span></p>
       <p class="sub" id="heroSub"></p>
     </section>
+
+    <!-- ‏התמונה הגדולה, מתחת לחודש. היא עונה על "מה יש לי" שהחודש
+         ‏לבדו אינו עונה עליו, ומובילה אל הפירוט המלא. -->
+    <button class="worth-strip hidden" id="homeWorth" type="button">
+      <span class="col">
+        <span class="k">מה יש לי בסך הכל</span>
+        <span class="v money" id="worthNow">0</span>
+        <span class="s" id="worthParts"></span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
 
     <!-- ‏היום הראשון. אין מספרים, ולכן אין מה לענות · במקום אפס
          ‏גדול שהוא תשובה לא נכונה, שני צעדים וסוף. -->
