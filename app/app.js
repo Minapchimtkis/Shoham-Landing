@@ -35,7 +35,8 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY
    ‏כי ה-hash משתנה בין זרימת הטוקן לזרימת ה-PKCE והפרמטר שלנו
    ‏שורד את שתיהן. בלי הסימן הזה מי שחוזר מהמייל נכנס ישר
    ‏לאפליקציה · עם סשן תקף, ובלי שהחליף סיסמה. */
-const FROM_MAIL_RESET = new URLSearchParams(location.search).get('mode') === 'reset';
+const MAIL_MODE = new URLSearchParams(location.search).get('mode');
+const FROM_MAIL_RESET = MAIL_MODE === 'reset' || MAIL_MODE === 'newpass';
 
 const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -215,6 +216,10 @@ function human(error) {
     return 'זאת הסיסמה הקודמת. צריך לבחור אחת חדשה.';
   if (m.includes('email') && m.includes('invalid')) return 'כתובת האימייל אינה תקינה.';
   if (m.includes('email not confirmed')) return 'החשבון עוד לא אושר. יש לפתוח את הקישור שנשלח במייל.';
+  if (m.includes('anonymous') && (m.includes('disabled') || m.includes('not enabled')))
+    return 'הכניסה בלי חשבון סגורה כרגע. אפשר לפתוח חשבון עם אימייל, וזה לוקח חצי דקה.';
+  if (m.includes('email address') && m.includes('already'))
+    return 'כבר יש חשבון עם האימייל הזה. אי אפשר לחבר אותו לחשבון הזה.';
   if (m.includes('rate limit') || m.includes('too many'))
     return 'יותר מדי ניסיונות. כדאי לנסות שוב בעוד דקה.';
   if (m.includes('relation') && m.includes('does not exist'))
@@ -450,6 +455,77 @@ $('authForm').addEventListener('submit', async e => {
        כל שגיאה שהגיעה מהשרת נכתבה ונמחקה באותו רגע, ומי שהקליד
        סיסמה שגויה ראה טופס שלא קרה בו כלום. רק התווית חוזרת. */
     btn.textContent = S.mode === 'signup' ? 'פתיחת חשבון' : 'כניסה';
+  }
+});
+
+/* ═══════════════════════════════════════ אורחים ══ */
+
+/* ‏מי שנכנס בלי חשבון מקבל משתמש אנונימי אמיתי ב-Supabase, ולא
+   ‏מסלול נתונים מקביל. כל השאר · ההקמה, אבטחת השורות, הייבוא ·
+   ‏עובד בדיוק אותו דבר, והמזהה שלו נשאר אותו מזהה גם אחרי שיחבר
+   ‏אימייל. כלומר אין הגירה של נתונים ואין מה לאבד.
+
+   ‏המחיר, והוא אמיתי: חשבון כזה חי רק בזיכרון של הדפדפן הזה.
+   ‏ניקוי נתוני הדפדפן מוחק אותו בלי דרך חזרה, כי אין כתובת
+   ‏לשחזר דרכה. לכן זה כתוב בשער, וגם ננעץ בהגדרות ובתובנה. */
+const isGuest = () => !!(S.user && S.user.is_anonymous);
+
+$('authGuest').addEventListener('click', async () => {
+  const btn = $('authGuest');
+  setErr($('authErr'), '');
+  btn.disabled = true;
+  btn.textContent = 'רגע...';
+  try {
+    const { data, error } = await sb.auth.signInAnonymously();
+    if (error) throw error;
+    await enter(data.user);
+  } catch (err) {
+    setErr($('authErr'), human(err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'להתחיל בלי חשבון';
+  }
+});
+
+/* ‏הפיכת אורח למשתמש קבוע. Supabase דורש שהאימייל יאומת לפני
+   ‏שאפשר לקבוע סיסמה, ולכן כאן נשלח רק האימייל · והסיסמה נבחרת
+   ‏אחרי האישור, במסך שכבר נבנה לאיפוס סיסמה. */
+$('setSave').addEventListener('click', () => {
+  setErr($('saveErr'), '');
+  $('saveEmail').value = '';
+  openSheet($('saveSheet'));
+});
+
+$('saveForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setErr($('saveErr'), '');
+  const email = $('saveEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    setErr($('saveErr'), 'צריך כתובת אימייל תקינה.');
+    $('saveEmail').focus(); return;
+  }
+
+  const btn = $('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'שולח...';
+  try {
+    const { error } = await sb.auth.updateUser(
+      { email },
+      { emailRedirectTo: location.origin + location.pathname + '?mode=newpass' }
+    );
+    if (error) throw error;
+    closeSheet();
+    stage('gate');
+    $('sentHead').textContent = 'שלחנו לכם מייל';
+    $('sentMail').textContent = email;
+    $('sentWhy').textContent =
+      'לחצו על הקישור שבו, ואז תבחרו סיסמה. הנתונים שלכם ממשיכים לחכות כאן, שום דבר לא זז.';
+    gateScreen('sent');
+  } catch (err) {
+    setErr($('saveErr'), human(err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'שליחת קישור אישור';
   }
 });
 
@@ -1226,6 +1302,17 @@ async function renderInsight() {
     LS.set('streakNote', 1);
     card(`${st.n} ימים ברצף שהסתכלתם`,
       'הרצף הזה לא נספר על חודשים מושלמים, אלא על ימים שבהם פתחתם את זה. פחד להסתכל בחשבון הוא השד שעולה הכי הרבה כסף, והדבר הזה למעלה הוא ההוכחה שהוא כבר לא אצלכם.');
+    return;
+  }
+
+  /* ‏לאורח שכבר הצטברו לו נתונים יש מה לאבד, ולכן זה הרגע שבו
+     ‏ההזמנה לחבר אימייל הופכת לדבר אמיתי ולא להצקה. מופיעה פעם
+     ‏אחת, ואחרי שמונה תנועות · לפני כן אין על מה לדבר. */
+  if (isGuest() && S.txs.length >= 8 && !LS.get('saveNote', 0)) {
+    LS.set('saveNote', 1);
+    card('הנתונים האלה קיימים רק במכשיר הזה',
+      'אתם כבר כמה שבועות בפנים, וזה נשמר בדפדפן ולא בחשבון. ניקוי של נתוני הדפדפן מוחק את הכול, ואין דרך לשחזר כי אין כתובת לשלוח אליה. דקה אחת, ואימייל פותר את זה.',
+      [['לחבר אימייל', () => { tab('set'); setTimeout(() => $('setSave').click(), 300); }]]);
     return;
   }
 
@@ -2561,10 +2648,16 @@ $('goalDelete').addEventListener('click', async () => {
 
 /* ═══════════════════════════════════════════ הגדרות ══ */
 
+/* ‏הכול כאן ולא ב-enter, כי enter חוזר מוקדם כשמשתמש חדש נשלח
+   ‏להקמה · ואז השורות האלה לא היו נצבעות אף פעם אצל מי שרק נרשם.
+   ‏המסך הזה נצבע בכל כניסה אליו, ולכן הוא המקום הנכון. */
 function renderSet() {
-  $('setEmail').textContent = S.user?.email || '';
+  /* ‏לאורח אין כתובת, ושדה ריק נראה כמו תקלה. */
+  $('setEmail').textContent = S.user?.email || (isGuest() ? 'אורח, בלי אימייל' : '');
   $('setName').textContent  = S.profile?.display_name || 'לא הוגדר';
   $('cycleNow').textContent = cycleLabel(S.cycle || 1);
+  $('setSave').classList.toggle('hidden', !isGuest());
+  renderLockRow();
 }
 
 $('setNameBtn').addEventListener('click', () => {
@@ -2744,7 +2837,6 @@ async function enter(user) {
   tab('home');
   renderStreak(touchStreak());
   renderInsight();
-  renderLockRow();
   maybeAsk();
 }
 

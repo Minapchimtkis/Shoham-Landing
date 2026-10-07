@@ -247,6 +247,18 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 /* ‏השורה הזאת מופיעה רק במצב כניסה, ולכן היא שקטה יותר
    ‏משורת המעבר · היא תשובה למצוקה, לא הזמנה לפעולה. */
+/* ‏המפריד של "או". קו משני הצדדים ומילה באמצע, כדי שהדרך
+   ‏השלישית תיראה כאפשרות ולא כהמשך של הטופס. */
+.or{
+  display:flex;align-items:center;gap:12px;
+  margin:20px 0 14px;
+  color:var(--ink-3);font-size:13px;
+}
+.or::before,.or::after{
+  content:'';flex:1;height:1px;background:var(--rule);
+}
+.guest-note{margin-top:10px;text-align:center}
+
 .gate-forgot{margin-bottom:2px}
 .gate-forgot button{
   color:var(--ink-3);font-size:14px;font-weight:600;
@@ -788,6 +800,13 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .set-row,.set-row:hover{color:var(--ink);text-decoration:none}
 /* ‏חוץ מאחת, במכוון. */
 .set-row.lead .k{color:var(--violet);font-weight:600}
+
+/* ‏שמירת החשבון אינה הזמנה אלא אזהרה · נתונים שעלולים ללכת
+   ‏לאיבוד. סגול בשורה הזאת היה הופך אותה למתחרה של ההזמנה
+   ‏היחידה שמותר שתהיה במסך, וענבר הוא ממילא הצבע של "שימו לב"
+   ‏בכל שאר האפליקציה. */
+.set-row.warn .k{color:var(--amber);font-weight:600}
+.set-row.warn svg{color:var(--amber)}
 /* ‏הסמל של וואטסאפ בירוק שלו, וזאת החריגה היחידה מהסגול באפליקציה.
    הוא מזוהה בצורה הזאת, וצביעה שלו בסגול רק תאט את הזיהוי. */
 .set-row svg.wa{width:21px;height:21px;color:#25D366}
