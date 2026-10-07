@@ -1,0 +1,43 @@
+# ═══ ‏כותרות שאי אפשר לשלוח מתוך HTML ═══
+#
+# ‏הקובץ הזה פועל ב-Cloudflare Pages בלבד. GitHub Pages אינו מאפשר
+# ‏לשנות כותרות בכלל, וזאת הסיבה היחידה לשקול מעבר.
+#
+# ‏מה שאפשר להגיד מתוך הדף כבר נאמר שם · ה-CSP יושב בתגית meta בכל
+# ‏עמוד, והיא נשארת מקור האמת היחיד למדיניות התוכן. כאן רק מה שתגית
+# ‏אינה יכולה לעשות: frame-ancestors, ושכבת התעבורה.
+#
+# ‏כל ההערות בעמודה הראשונה בכוונה · זה תקף בוודאות בכל מימוש של
+# ‏הפורמט הזה, ולא בדקתי אם הערה בתוך בלוק נחשבת הערה או כותרת.
+
+# ‏frame-ancestors · מי שמטמיע את האתר בתוך iframe יכול לשים כפתור
+# ‏שקוף מעל כפתור אמיתי ולגרום לאדם ללחוץ על משהו אחר ממה שהוא רואה.
+# ‏זה המקום היחיד שבו אפשר לחסום את זה. X-Frame-Options הוא אותו
+# ‏דבר לדפדפנים ישנים.
+#
+# ‏HSTS · שנה שבה הדפדפן מסרב לגשת לאתר ב-HTTP, גם אם יקלידו http
+# ‏במפורש. לא הפיך מיידית: דפדפן שקיבל את הכותרת יזכור אותה עד שתפוג.
+# ‏כל הדומיין כבר ב-HTTPS, ולכן זה בטוח כאן.
+#
+# ‏nosniff · קובץ שהוכרז כתמונה יטופל כתמונה, גם אם יש בתוכו משהו אחר.
+#
+# ‏Referrer-Policy · אתר שעוברים אליו מכאן יראה שהגיעו משוהם, אבל לא
+# ‏מאיזה עמוד בדיוק.
+#
+# ‏Permissions-Policy · האתר אינו צריך מצלמה, מיקרופון, מיקום או
+# ‏תשלומים. כשכתוב שלא, גם סקריפט שיוזרק יום אחד לא יוכל לבקש אותם.
+#
+# ‏COOP · חלון שנפתח מכאן לא יקבל גישה לחלון שפתח אותו.
+/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# ‏הדשבורד לא אמור להופיע בשום מנוע חיפוש. זה כבר כתוב בתגית robots
+# ‏שבדף, וכותרת אומרת את זה גם למי שלא קורא HTML.
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive
