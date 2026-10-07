@@ -231,7 +231,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
      ‏וכשהוא מופיע כטקסט הוא צריך להיות אותו צבע. */
   color:var(--navy);
 }
-.gate-name .q{color:var(--violet)}
+/* ‏גם סימן השאלה בכחול של הלוגו · שם הוא חלק מהכתוב, וכאן הוא
+   ‏חלק מאותו שם. */
+.gate-name .q{color:var(--navy)}
 .gate-lede{
   margin-top:16px;font-size:17px;line-height:1.55;
   color:var(--ink-2);max-width:21em;
