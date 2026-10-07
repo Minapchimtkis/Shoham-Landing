@@ -31,6 +31,7 @@
      הערך החי, המצב הפעיל, הפעולה הראשית. שלושה תפקידים. אם הוא
      יופיע על עוד משהו הוא יפסיק להגיד אותם. */
   --violet:#6d28d9;        /* על לבן, לטקסט. יחס ניגודיות 6.5 */
+  --navy:#150946;          /* ‏הכחול של הכתוב בלוגו. ניגודיות 18.1 */
   --violet-fill:#7c3aed;   /* למילויים ולכפתורים */
   --violet-soft:rgba(109,40,217,0.09);
 
@@ -218,7 +219,6 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:flex;align-items:center;gap:10px;
   font-size:14px;color:var(--ink-3);font-weight:500;
 }
-.gate-brand img{width:26px;height:26px;border-radius:7px;display:block}
 
 /* ‏השם הוא שאלה, ולכן הוא נכתב כשאלה, עם סימן השאלה שלה.
    הוא הדבר הראשון והגדול ביותר במסך. */
@@ -227,6 +227,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   font-size:clamp(40px,13vw,54px);
   font-weight:900;line-height:1.02;
   letter-spacing:-0.035em;
+  /* ‏אותו כחול בדיוק שבלוגו, ולא הדיו הכללי · השם הוא הלוגו,
+     ‏וכשהוא מופיע כטקסט הוא צריך להיות אותו צבע. */
+  color:var(--navy);
 }
 .gate-name .q{color:var(--violet)}
 .gate-lede{
