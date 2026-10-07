@@ -40,12 +40,13 @@ grant execute on function public.is_staff() to authenticated;
 -- ──────────────────────────────────────────────── האכלוס ──
 -- ‏לפי כתובת, כי מזהה המשתמש אינו ידוע מראש. מי שהמייל שלו אינו
 -- ‏ברשימה פשוט לא ייכנס, והבדיקה מיד אחרי תעצור את ההרצה.
+-- ‏נבדק מול הפרויקט: זה המשתמש היחיד שקיים בו, והוא זה שמתחבר
+-- ‏לדשבורד. להוספת אדם נוסף בעתיד, שורה אחת מכאן:
+--   insert into public.staff(user_id, note)
+--   select id, 'מי זה' from auth.users where lower(email) = 'כתובת';
 insert into public.staff (user_id, note)
 select id, 'הדשבורד' from auth.users
- where lower(email) in (
-   'shohamfinance23@gmail.com',
-   'shohamabo@gmail.com'
- )
+ where lower(email) = 'shohamabo@gmail.com'
 on conflict (user_id) do nothing;
 
 -- ‏עצירה בטוחה. עדיף שההרצה תיפול מאשר שהדשבורד יינעל בפני בעליו.
