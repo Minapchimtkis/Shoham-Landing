@@ -2334,6 +2334,19 @@ section {
 .gift-ico.tile svg { width: 22px; height: 22px; color: #fff; }
 .gift-ico img { width: 100%; height: 100%; display: block; }
 
+/* The side column mirrors the text column: a marker on top, the arrow
+   under it. Inside the sentence the word "חינם" interrupted the line and
+   had to be read around; out here it is seen without being read. */
+.gift-side {
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
 .gift-text { flex: 1; min-width: 0; }
 .gift-card h3 {
   font-size: 15.5px;
@@ -2348,12 +2361,17 @@ section {
   color: rgba(255,255,255,0.62);
 }
 .gift-free {
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
   color: var(--gold);
-  font-weight: 700;
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.32);
+  padding: 4px 9px;
+  border-radius: 100px;
 }
 
 .gift-go {
-  flex: none;
   width: 15px; height: 15px;
   color: var(--p6);
   transition: transform 0.3s;
@@ -4321,9 +4339,12 @@ footer {
       </span>
       <span class="gift-text">
         <h3>מחשבון ביטחון כלכלי</h3>
-        <p><b class="gift-free">חינם</b> · מתי הכסף יתחיל לעבוד במקומכם</p>
+        <p>מתי הכסף יתחיל לעבוד במקומכם</p>
       </span>
-      <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      <span class="gift-side">
+        <b class="gift-free">חינם</b>
+        <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      </span>
     </a>
 
     <a class="gift-card" href="/app/">
@@ -4333,9 +4354,12 @@ footer {
       </span>
       <span class="gift-text">
         <h3>כמה יש לי</h3>
-        <p><b class="gift-free">חינם</b> · תקציב אישי במספר אחד</p>
+        <p>כמה נשאר לכם עד סוף החודש</p>
       </span>
-      <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      <span class="gift-side">
+        <b class="gift-free">חינם</b>
+        <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      </span>
     </a>
   </div>
 </section>
