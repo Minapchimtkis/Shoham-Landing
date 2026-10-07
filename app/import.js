@@ -409,6 +409,10 @@ export function mountImport(A) {
       const e = el('div', 'empty');
       e.append(el('h2', null, 'עוד אין כאן מסמכים'));
       e.append(el('p', null, 'דוח יתרות וסילוקין מהבנק, חשבון חשמל, ארנונה. כל נייר שתרצו למצוא בלי לחפש במיילים.'));
+      const b = el('button', 'btn', 'העלאת המסמך הראשון');
+      b.type = 'button';
+      b.addEventListener('click', () => $('docAdd').click());
+      e.append(b);
       box.append(e);
       return;
     }

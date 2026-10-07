@@ -949,6 +949,17 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .set-row svg{flex:none;width:16px;height:16px;color:var(--ink-3)}
 
+/* ‏שורה שהיא מידע ולא פעולה · מסך הפרטיות עשוי רובו משורות כאלה.
+   ‏אין בה חץ, אין לחיצה, ולכן גם אין לה רקע במגע, והמשפט המסביר
+   ‏בה ארוך מ-small הרגיל ולכן הוא זוכה לרווח שורה אמיתי. */
+.set-row.ro{align-items:flex-start}
+.set-row.ro .k{font-weight:600}
+.set-row.ro .sm{
+  display:block;margin-top:4px;
+  font-size:14px;font-weight:400;color:var(--ink-2);
+  line-height:1.6;
+}
+
 .credit{
   margin-top:34px;padding-top:20px;
   border-top:1px solid var(--rule);
@@ -980,7 +991,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .btn:hover{background:#7a23ac}
   .btn-ghost:hover,.btn-quiet:hover{background:var(--wash)}
   .btn-danger:hover{background:var(--amber-soft)}
-  .row:hover,.tx:hover,.set-row:hover{background:var(--wash)}
+  .row:hover,.tx:hover,.set-row:not(.ro):hover{background:var(--wash)}
   .chip:hover{box-shadow:0 0 0 1px var(--rule-2),0 0 0 4px var(--violet-soft)}
   .chip[aria-pressed="true"]:hover{box-shadow:none;background:#7a23ac}
   .nav button:hover{color:var(--ink-2)}
@@ -996,7 +1007,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .btn:active{transform:scale(.985)}
 .chip:active{transform:scale(.97)}
 .nav .add:active span{transform:translate(-50%,-50%) scale(.93)}
-.row:active,.tx:active,.set-row:active{background:var(--wash-2)}
+.row:active,.tx:active,.set-row:not(.ro):active{background:var(--wash-2)}
 .month-pick:active,.streak:active{background:var(--wash-2)}
 .nm-edit:active{opacity:.6}
 

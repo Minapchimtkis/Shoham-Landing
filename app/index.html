@@ -204,8 +204,9 @@
     </div>
     <button class="btn btn-ghost" id="authGuest" type="button">להתחיל בלי חשבון</button>
     <p class="note guest-note" id="guestNote">
-      נכנסים ישר פנימה. הנתונים נשמרים במכשיר הזה, ואפשר לחבר
-      אימייל מתי שתרצו בלי לאבד כלום.
+      נכנסים ישר פנימה. הנתונים נשמרים בחשבון, אבל לחשבון הזה אין
+      עדיין כתובת, והדרך היחידה אליו היא הדפדפן הזה. אימייל פותר
+      את זה מתי שתרצו, בלי לאבד כלום.
     </p>
 
     <div class="gate-foot">
@@ -438,6 +439,13 @@
 
     <div class="set-group">
       <h2>הנתונים</h2>
+      <button class="set-row" id="setPrivacy" type="button">
+        <span class="k">
+          איפה המידע שלי יושב
+          <small>מה נשמר, איפה, ומי יכול להגיע אליו</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <button class="set-row" id="setExport" type="button">
         <span class="k">
           הורדת כל הנתונים
@@ -459,7 +467,7 @@
       <button class="set-row warn hidden" id="setSave" type="button">
         <span class="k">
           שמירת החשבון
-          <small>חיבור אימייל, כדי שהנתונים לא יהיו תלויים במכשיר הזה</small>
+          <small>חיבור אימייל, כדי שהכניסה לא תהיה תלויה בדפדפן הזה</small>
         </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -651,6 +659,106 @@
     </p>
     <button class="btn" id="goalAdd" type="button">מטרה חדשה</button>
     <div id="goalsList" style="margin-top:22px"></div>
+  </main>
+
+  <!-- ─────────────────────────────────────── פרטיות ── -->
+  <!-- ‏כל משפט כאן נבדק מול הקוד. אם משהו בקוד ישתנה ולא יעודכן
+       ‏כאן, המסך הזה הופך מהבטחה לשקר · זה המסך היחיד באפליקציה
+       ‏שבו דיוק חשוב יותר מניסוח יפה. -->
+  <main class="screen hidden" id="scPrivacy">
+    <button class="back" id="privacyBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">איפה המידע שלי יושב</h1>
+    <p class="note" style="margin-bottom:22px">
+      אתם מקלידים כאן משכורת, חובות וגובה פנסיה. מגיע לכם לדעת
+      בדיוק מה קורה עם זה, ובלי מילים כמו "מאובטח" שלא אומרות כלום.
+    </p>
+
+    <div class="set-group">
+      <h2>איפה הנתונים</h2>
+      <div class="set-row ro">
+        <span class="k">
+          במסד נתונים אחד, בשירות בשם Supabase
+          <small>לא במכשיר שלכם. לכן אותם נתונים מופיעים בכל מכשיר שתיכנסו ממנו</small>
+        </span>
+      </div>
+      <div class="set-row ro">
+        <span class="k">
+          המסמכים שאתם מעלים יושבים שם בנפרד
+          <small>כל פתיחה של מסמך מייצרת קישור חד פעמי שתקף לדקה</small>
+        </span>
+      </div>
+      <div class="set-row ro">
+        <span class="k">
+          כל תנועה ברשת היא מוצפנת בדרך
+          <small>HTTPS, כמו בכל אתר שיש בו מנעול בשורת הכתובת</small>
+        </span>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <h2>מי יכול להגיע אליהם</h2>
+      <div class="set-row ro">
+        <span class="k">
+          אתם, ומי שהזמנתם למשק הבית
+          <span class="sm">מסד הנתונים אוכף את זה בעצמו, שורה אחר שורה. משתמש אחר אינו יכול לקרוא את השורות שלכם גם אם ינסה · נבדק בפועל מול התקפה אמיתית.</span>
+        </span>
+      </div>
+      <div class="set-row ro warn">
+        <span class="k">
+          ולשוהם, שהוא בעל הפרויקט
+          <span class="sm">הוא אינו מסתכל בנתונים שלכם, אבל בעלים של מסד נתונים יכול טכנית לפתוח אותו. ההבדל בין "לא מסתכל" ל"לא יכול" הוא אמיתי, ומגיע לכם לדעת אותו.</span>
+        </span>
+      </div>
+      <div class="set-row ro">
+        <span class="k">
+          ולאף אחד אחר
+          <span class="sm">אין באפליקציה גוגל אנליטיקס, אין פיקסל של פייסבוק, ואין שום כלי מדידה. הדפדפן עצמו חוסם כל חיבור חוץ ממסד הנתונים · זה כתוב בכותרת אבטחה בדף ואפשר לראות אותה.</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <h2>מה כן נשמר במכשיר</h2>
+      <div class="set-row ro">
+        <span class="k">
+          דברים קטנים בלבד
+          <span class="sm">רצף הימים שהסתכלתם, איזה כלל אצבע כבר ראיתם, הקטגוריה האחרונה שבחרתם, והמפתח שמחזיק אתכם מחוברים. אין במכשיר שום סכום כסף.</span>
+        </span>
+      </div>
+      <div class="set-row ro">
+        <span class="k">
+          קוד הנעילה, מעורבל
+          <span class="sm">נשמר ממנו גיבוב ולא הספרות עצמן. הנעילה עוצרת מי שהרים את הטלפון מהשולחן, והיא אינה הצפנה של הנתונים.</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <h2>מה אתם יכולים לעשות</h2>
+      <button class="set-row" id="privExport" type="button">
+        <span class="k">
+          להוריד הכל
+          <small>קובץ CSV של כל התנועות, שלכם לשמור</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="privWipe" type="button">
+        <span class="k">
+          למחוק הכל
+          <small>מחיקה אמיתית מהשרת, בלי דרך חזרה</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2m-8 0l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <p class="credit">
+      דבר אחד שכדאי שתדעו גם אם הוא לא נעים: הגופנים של האפליקציה
+      נטענים מגוגל, ולכן גוגל רואה שביקרתם כאן. היא אינה רואה שום
+      נתון שלכם, רק את הבקשה לגופן.
+    </p>
   </main>
 
   <!-- ────────────────────────────────────── מסמכים ── -->
@@ -920,8 +1028,9 @@
   <div class="grab" aria-hidden="true"></div>
   <h2 id="saveTitle">שמירת החשבון</h2>
   <p class="sub">
-    כרגע הכול שמור במכשיר הזה בלבד. אימייל הופך אותו לחשבון אמיתי ·
-    אפשר להיכנס מכל מכשיר, ואם הטלפון הולך לאיבוד הנתונים לא.
+    הנתונים שלכם כבר שמורים בשרת, אבל לחשבון שלהם אין כתובת · הדרך
+    היחידה אליו היא הדפדפן הזה. אימייל נותן לו כתובת, ואז אפשר
+    להיכנס מכל מכשיר, וגם אם הטלפון הולך לאיבוד הנתונים לא.
   </p>
   <form id="saveForm" class="gate-form" novalidate>
     <div class="field">

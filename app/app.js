@@ -344,13 +344,14 @@ function stage(name) {
 /* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
-const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set', assets: 'set' };
+const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set',
+              assets: 'set', privacy: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
                 import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
-                year: 'scYear', assets: 'scAssets' };
+                year: 'scYear', assets: 'scAssets', privacy: 'scPrivacy' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -1315,8 +1316,8 @@ async function renderInsight() {
      ‏אחת, ואחרי שמונה תנועות · לפני כן אין על מה לדבר. */
   if (isGuest() && S.txs.length >= 8 && !LS.get('saveNote', 0)) {
     LS.set('saveNote', 1);
-    card('הנתונים האלה קיימים רק במכשיר הזה',
-      'אתם כבר כמה שבועות בפנים, וזה נשמר בדפדפן ולא בחשבון. ניקוי של נתוני הדפדפן מוחק את הכול, ואין דרך לשחזר כי אין כתובת לשלוח אליה. דקה אחת, ואימייל פותר את זה.',
+    card('לחשבון שלכם אין עדיין כתובת',
+      'הנתונים עצמם שמורים בשרת ולא במכשיר, אבל המפתח אליהם יושב רק בדפדפן הזה. ניקוי של נתוני הדפדפן אינו מוחק אותם · הוא פשוט סוגר את הדרך חזרה, ואין לאן לשלוח קישור שחזור. דקה אחת, ואימייל פותר את זה.',
       [['לחבר אימייל', () => { tab('set'); setTimeout(() => $('setSave').click(), 300); }]]);
     return;
   }
@@ -2016,6 +2017,10 @@ async function renderSum() {
     const e = el('div', 'empty');
     e.append(el('h2', null, 'אין מה לסכם עדיין'));
     e.append(el('p', null, 'בחודש הזה לא נרשמה אף תנועה. אחרי כמה רישומים יהיה כאן מה לראות.'));
+    const b = el('button', 'btn', 'הוספת תנועה');
+    b.type = 'button';
+    b.addEventListener('click', () => openAdd());
+    e.append(b);
     box.append(e);
     return;
   }
@@ -2192,6 +2197,10 @@ async function renderAssets() {
     const e = el('div', 'empty');
     e.append(el('h2', null, 'עוד לא מיפינו כלום'));
     e.append(el('p', null, 'חיסכון בבנק, קרן השתלמות, פנסיה, דירה. כל מקום שיש בו כסף שלכם ואינו העובר ושב. אחרי שניים שלושה פריטים כבר רואים תמונה.'));
+    const b = el('button', 'btn', 'הוספת החיסכון הראשון');
+    b.type = 'button';
+    b.addEventListener('click', () => openAsset(null));
+    e.append(b);
     box.append(e);
     return;
   }
@@ -2659,6 +2668,29 @@ $('cycleSave').addEventListener('click', async () => {
   }
 });
 
+/* ‏השורה שמובילה לנכסים הראתה עד היום משפט קבוע. עכשיו היא
+   ‏מראה את המספר עצמו · זאת שאלה שאנשים פותחים את האפליקציה
+   ‏כדי לענות עליה, ואין סיבה להסתיר אותה מאחורי עוד לחיצה.
+   ‏נכשלה? השורה חוזרת למשפט המזמין, ושום דבר לא נשבר. */
+async function setAssetsLine() {
+  const n = $('assetsNow');
+  if (!n) return;
+  try {
+    const { data, error } = await sb.from('assets')
+      .select('amount_agorot,liability_agorot').eq('archived', false);
+    if (error) throw error;
+    if (!data || !data.length) {
+      n.textContent = 'כמה יש לי מעבר לעובר ושב';
+      return;
+    }
+    const worth = data.reduce((t, a) =>
+      t + Number(a.amount_agorot) - Number(a.liability_agorot || 0), 0);
+    n.textContent = `השווי הפיננסי שלכם ${fmt(worth)}`;
+  } catch {
+    n.textContent = 'כמה יש לי מעבר לעובר ושב';
+  }
+}
+
 /* ═══════════════════════════════════════════ מטרות ══ */
 
 let goalEdit = null;
@@ -2674,6 +2706,10 @@ async function renderGoals() {
     const e = el('div', 'empty');
     e.append(el('h2', null, 'עוד אין מטרה'));
     e.append(el('p', null, 'קרן חירום של שלוש משכורות, טיול, דירה. מטרה אחת שיש לה סכום ותאריך שווה יותר משבע כוונות.'));
+    const b = el('button', 'btn', 'המטרה הראשונה שלי');
+    b.type = 'button';
+    b.addEventListener('click', () => openGoal(null));
+    e.append(b);
     box.append(e);
     return;
   }
@@ -2782,6 +2818,7 @@ function renderSet() {
   $('cycleNow').textContent = cycleLabel(S.cycle || 1);
   $('setSave').classList.toggle('hidden', !isGuest());
   renderLockRow();
+  setAssetsLine();
 }
 
 $('setNameBtn').addEventListener('click', () => {
@@ -2899,6 +2936,12 @@ $('setWa').addEventListener('click', () => {
   } catch {}
 });
 
+$('setPrivacy').addEventListener('click', () => tab('privacy'));
+$('privacyBack').addEventListener('click', () => tab('set'));
+/* ‏שתי הפעולות שבתחתית מסך הפרטיות הן בדיוק אלה שבהגדרות · אותו
+   ‏קוד, ולא עותק שני שיתיישן. */
+$('privExport').addEventListener('click', () => $('setExport').click());
+$('privWipe').addEventListener('click', () => { tab('set'); setTimeout(() => $('setWipe').click(), 320); });
 $('setImport').addEventListener('click', () => tab('import'));
 $('setDocs').addEventListener('click', () => tab('docs'));
 $('setSum').addEventListener('click', () => tab('sum'));
