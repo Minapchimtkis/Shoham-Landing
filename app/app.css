@@ -1437,6 +1437,13 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ‏התוצאה מופיעה רק כשיש מה לחשב, ולכן היא לא צריכה להתחרות
    ‏בשדות · משטח שקט מתחתיהם, ובתוכו מספר אחד גדול. */
+/* ‏מה חסר, בשורה אחת · לא אדום ולא שגיאה. המשתמש לא טעה,
+   ‏הוא פשוט עוד לא סיים. */
+.calc-need{
+  font-size:14px;color:var(--ink-3);
+  line-height:1.5;margin-top:4px;
+}
+
 .calc-res{
   margin-top:26px;padding:18px;
   background:var(--wash);border-radius:var(--r-lg);

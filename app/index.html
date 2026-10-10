@@ -639,13 +639,20 @@
         <input class="inp" id="gMonthly" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
       <div class="field">
+        <!-- ‏ערך ולא רמז. "10" אפור נראה כאילו הוא כבר שם, ואדם
+             ‏שמקליד את שני הסכומים ומקבל מסך ריק מסיק שהמחשבון
+             ‏שבור · נתפס בדיוק כך. ההנחה כתובה בתוצאה במילים,
+             ‏ואפשר לשנות אותה. -->
         <label for="gYears">לכמה שנים</label>
-        <input class="inp" id="gYears" type="text" inputmode="decimal" autocomplete="off" placeholder="10">
+        <input class="inp" id="gYears" type="text" inputmode="decimal" autocomplete="off" value="10">
       </div>
       <div class="field">
         <label for="gRate">תשואה שנתית שאתם מניחים, באחוזים</label>
-        <input class="inp" id="gRate" type="text" inputmode="decimal" autocomplete="off" placeholder="4" dir="ltr" style="text-align:right">
+        <input class="inp" id="gRate" type="text" inputmode="decimal" autocomplete="off" value="4" dir="ltr" style="text-align:right">
       </div>
+      <!-- ‏כשחסר מספר · אומרים אותו. מסך שמתרוקן בשקט נקרא
+           ‏כמו מחשבון שבור. -->
+      <p class="calc-need hidden" id="gResNeed">המחשבון צריך סכום אחד לפחות · כמה יש היום או כמה מוסיפים כל חודש.</p>
       <div class="calc-res hidden" id="gRes">
         <span class="k" id="gResK">בסוף התקופה</span>
         <span class="v money" id="gResV">0</span>
@@ -669,9 +676,12 @@
       </div>
       <div class="field">
         <label for="pRate">ריבית שנתית, באחוזים</label>
-        <input class="inp" id="pRate" type="text" inputmode="decimal" autocomplete="off" placeholder="5" dir="ltr" style="text-align:right">
+        <input class="inp" id="pRate" type="text" inputmode="decimal" autocomplete="off" value="5" dir="ltr" style="text-align:right">
       </div>
       <div class="chips hidden" id="pFrom" role="group" aria-label="מילוי מחוב קיים" style="margin-bottom:18px"></div>
+      <!-- ‏כשחסר מספר · אומרים אותו. מסך שמתרוקן בשקט נקרא
+           ‏כמו מחשבון שבור. -->
+      <p class="calc-need hidden" id="pResNeed">המחשבון צריך שני מספרים: כמה נשאר לשלם, וכמה יוצא כל חודש.</p>
       <div class="calc-res hidden" id="pRes">
         <span class="k" id="pResK">זמן לסגירה</span>
         <span class="v" id="pResV">0</span>

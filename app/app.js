@@ -3034,8 +3034,19 @@ function growLive() {
   const monthly = toAgorot($('gMonthly').value) || 0;
   const years = numOf($('gYears').value);
   const rate = numOf($('gRate').value);
-  const box = $('gRes');
-  if ((!start && !monthly) || years <= 0) { hide(box); return; }
+  const box = $('gRes'), need = $('gResNeed');
+  if ((!start && !monthly) || years <= 0) {
+    hide(box);
+    /* ‏ריק לגמרי הוא מצב פתיחה ולא חוסר · השורה מופיעה רק אחרי
+       ‏שהתחילו להקליד ומשהו עדיין חסר. */
+    const touched = $('gStart').value || $('gMonthly').value || $('gYears').value;
+    need.textContent = years <= 0
+      ? 'צריך גם לכמה שנים.'
+      : 'המחשבון צריך סכום אחד לפחות · כמה יש היום או כמה מוסיפים כל חודש.';
+    need.classList.toggle('hidden', !touched);
+    return;
+  }
+  hide(need);
 
   const end = toShekel(futureValue(start, monthly, years, rate));
   const put = toShekel(start + monthly * Math.round(years * 12));
@@ -3053,8 +3064,17 @@ function payLive() {
   const balance = toAgorot($('pBalance').value) || 0;
   const monthly = toAgorot($('pMonthly').value) || 0;
   const rate = numOf($('pRate').value);
-  const box = $('pRes');
-  if (!balance || !monthly) { hide(box); return; }
+  const box = $('pRes'), need = $('pResNeed');
+  if (!balance || !monthly) {
+    hide(box);
+    const touched = $('pBalance').value || $('pMonthly').value;
+    need.textContent = !balance && monthly ? 'צריך גם כמה נשאר לשלם.'
+                     : balance && !monthly ? 'צריך גם כמה יוצא כל חודש.'
+                     : 'המחשבון צריך שני מספרים: כמה נשאר לשלם, וכמה יוצא כל חודש.';
+    need.classList.toggle('hidden', !touched);
+    return;
+  }
+  hide(need);
 
   const months = payoffMonths(balance, monthly, rate);
   const v = $('pResV');
