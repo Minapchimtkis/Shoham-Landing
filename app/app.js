@@ -347,14 +347,14 @@ function stage(name) {
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
 const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set',
-              assets: 'set', privacy: 'set', debts: 'set' };
+              assets: 'set', privacy: 'set', debts: 'set', tools: 'set' };
 
 function tab(name) {
   S.tab = name;
   const map = { home: 'scHome', tx: 'scTx', budget: 'scBudget', set: 'scSet',
                 import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
                 year: 'scYear', assets: 'scAssets', privacy: 'scPrivacy',
-                debts: 'scDebts' };
+                debts: 'scDebts', tools: 'scTools' };
   for (const [k, v] of Object.entries(map)) k === name ? show($(v)) : hide($(v));
 
   const current = SUB[name] || name;
@@ -377,6 +377,7 @@ function tab(name) {
   if (name === 'year') renderYear();
   if (name === 'assets') renderAssets();
   if (name === 'debts') renderDebts();
+  if (name === 'tools') openTools();
   window.scrollTo({ top: 0 });
 }
 
@@ -2891,6 +2892,140 @@ $('debtDelete').addEventListener('click', async () => {
   renderHome();
 });
 
+/* ═══════════════════════════════════════════ מחשבונים ══ */
+
+/* ‏שני מחשבונים, ולא ארבעה. שניים מהארבעה שתוכננו כבר קיימים
+   ‏באפליקציה במקום שבו משתמשים בהם: "הכנסה מול הוצאות" הוא מסך
+   ‏הבית ומסך התקציב, ו"מחשבון יעד" הוא טופס המטרה, שמחשב עכשיו
+   ‏בזמן הקלדה. מחשבון נפרד לאותו דבר הוא עוד מסך לתחזק ועוד
+   ‏מקום שבו אותו חישוב יכול להתפצל.
+
+   ‏שום מספר כאן אינו נשמר. אלה חישובים ולא נתונים. */
+
+/* ‏ערך עתידי עם הפקדה חודשית, הפקדה בסוף תקופה. נבדק מול
+   ‏סימולציה חודש אחר חודש · אפס הפרש בחמישה מקרים, כולל
+   ‏תשואה אפס שבה הנוסחה הכללית מתחלקת באפס. */
+function futureValue(start, monthly, years, ratePct) {
+  const n = Math.round(years * 12), i = ratePct / 100 / 12;
+  if (n <= 0) return start;
+  if (i === 0) return start + monthly * n;
+  const f = Math.pow(1 + i, n);
+  return start * f + monthly * (f - 1) / i;
+}
+
+/* ‏כמה חודשים לסגירת חוב בהחזר קבוע. מחזיר null כשההחזר אינו
+   ‏מכסה אפילו את הריבית · זה מצב אמיתי שקורה לאנשים, והוא
+   ‏חייב להיאמר ולא להתגלגל למספר ענק חסר משמעות. */
+function payoffMonths(balance, monthly, ratePct) {
+  const i = ratePct / 100 / 12;
+  if (monthly <= 0 || balance <= 0) return null;
+  if (i === 0) return balance / monthly;
+  if (monthly <= balance * i) return null;
+  return -Math.log(1 - balance * i / monthly) / Math.log(1 + i);
+}
+
+const numOf = v => {
+  const n = Number(String(v || '').trim().replace(/,/g, '').replace('%', ''));
+  return isFinite(n) ? n : 0;
+};
+/* ‏תחזית לעשר שנים שמוצגת עם אגורות היא דיוק מדומה · מעגלים
+   ‏לשקל שלם בכל מה שיוצא מהמחשבונים. */
+const toShekel = ag => Math.round(ag / 100) * 100;
+
+/* ‏"ו" נצמדת למילה הבאה בעברית, ולכן "ו10" נדבק. מקף אסור כאן,
+   ‏ו"ועוד" פותר את שניהם וגם נשמע טבעי. */
+const yearsText = m => {
+  const y = Math.floor(m / 12), r = m % 12;
+  const a = y ? `${y} ${y === 1 ? 'שנה' : 'שנים'}` : '';
+  const b = r ? `${r} ${r === 1 ? 'חודש' : 'חודשים'}` : '';
+  return [a, b].filter(Boolean).join(' ועוד ') || 'פחות מחודש';
+};
+
+function growLive() {
+  const start = toAgorot($('gStart').value) || 0;
+  const monthly = toAgorot($('gMonthly').value) || 0;
+  const years = numOf($('gYears').value);
+  const rate = numOf($('gRate').value);
+  const box = $('gRes');
+  if ((!start && !monthly) || years <= 0) { hide(box); return; }
+
+  const end = toShekel(futureValue(start, monthly, years, rate));
+  const put = toShekel(start + monthly * Math.round(years * 12));
+  setMoney($('gResV'), end);
+  $('gResK').textContent = `בעוד ${yearsText(Math.round(years * 12))}`;
+  /* ‏שני המספרים שמסבירים את הגדול: כמה מזה כסף שהכנסתם, וכמה
+     ‏מזה צמח. בלעדיהם המספר נראה כמו קסם. */
+  $('gResS').textContent = rate > 0
+    ? `מתוכם ${fmt(put)} כסף שהכנסתם, ו${fmt(end - put)} רווח בהנחת ${rate}% בשנה.`
+    : `בלי תשואה · זה בדיוק מה שהכנסתם.`;
+  show(box);
+}
+
+function payLive() {
+  const balance = toAgorot($('pBalance').value) || 0;
+  const monthly = toAgorot($('pMonthly').value) || 0;
+  const rate = numOf($('pRate').value);
+  const box = $('pRes');
+  if (!balance || !monthly) { hide(box); return; }
+
+  const months = payoffMonths(balance, monthly, rate);
+  const v = $('pResV');
+  if (months === null) {
+    v.classList.remove('money');
+    v.textContent = 'לא נסגר';
+    $('pResK').textContent = 'בהחזר הזה';
+    $('pResS').textContent =
+      `הריבית לבדה היא ${fmt(toShekel(balance * rate / 100 / 12))} בחודש, וההחזר קטן ממנה · היתרה גדלה במקום לקטון.`;
+    box.classList.add('stuck');
+    show(box);
+    return;
+  }
+  box.classList.remove('stuck');
+  const n = Math.ceil(months);
+  const paid = toShekel(monthly * months);
+  v.classList.remove('money');
+  v.textContent = yearsText(n);
+  $('pResK').textContent = 'זמן לסגירה';
+  $('pResS').textContent = rate > 0
+    ? `${n} תשלומים, ${fmt(paid)} בסך הכל · מתוכם ${fmt(paid - balance)} ריבית.`
+    : `${n} תשלומים, ${fmt(paid)} בסך הכל.`;
+  show(box);
+}
+
+function pickTool(which) {
+  $('toolGrow').setAttribute('aria-pressed', String(which === 'grow'));
+  $('toolPay').setAttribute('aria-pressed', String(which === 'pay'));
+  $('calcGrow').classList.toggle('hidden', which !== 'grow');
+  $('calcPay').classList.toggle('hidden', which !== 'pay');
+}
+
+/* ‏למי שכבר רשם חובות · שבב לכל חוב שממלא את השדות. עדיף על
+   ‏הקלדה חוזרת של מספרים שהאפליקציה כבר יודעת. */
+function openTools() {
+  const box = $('pFrom');
+  box.textContent = '';
+  const withBalance = S.debts.filter(d => d.balance_agorot > 0);
+  box.classList.toggle('hidden', !withBalance.length);
+  for (const d of withBalance) {
+    const b = el('button', 'chip chip-quiet', d.name);
+    b.type = 'button';
+    b.addEventListener('click', () => {
+      $('pBalance').value = (d.balance_agorot / 100).toString();
+      $('pMonthly').value = d.monthly_agorot ? (d.monthly_agorot / 100).toString() : '';
+      $('pRate').value = d.rate_bp != null ? (d.rate_bp / 100).toString() : '';
+      payLive();
+    });
+    box.append(b);
+  }
+}
+
+$('setTools').addEventListener('click', () => tab('tools'));
+$('toolsBack').addEventListener('click', () => tab('set'));
+$('toolGrow').addEventListener('click', () => pickTool('grow'));
+$('toolPay').addEventListener('click', () => pickTool('pay'));
+$('calcGrow').addEventListener('input', growLive);
+$('calcPay').addEventListener('input', payLive);
+
 /* ═══════════════════════════════════════ סיכום שנה ══ */
 
 /* ‏תמיד קלנדרי, מינואר עד דצמבר, בלי קשר ליום שבו המשתמש בחר
@@ -3243,8 +3378,34 @@ function openGoal(g) {
   $('goalDate').value = g && g.target_date ? g.target_date : '';
   $('goalDelRow').classList.toggle('hidden', !g);
   setErr($('goalErr'), '');
+  goalPace();
   openSheet($('goalSheet'));
 }
+
+/* ‏"מחשבון יעד" · לא מסך נפרד אלא שורה חיה בטופס עצמו. המספר
+   ‏היחיד שהופך מטרה ממשאלה לתוכנית הוא כמה להפריש כל חודש, והוא
+   ‏צריך להופיע בזמן שבוחרים את התאריך ולא אחרי שמירה. */
+function goalPace() {
+  const out = $('goalPace');
+  const target = toAgorot($('goalTarget').value) || 0;
+  const saved = toAgorot($('goalSaved').value) || 0;
+  const date = $('goalDate').value;
+  const left = target - saved;
+
+  if (!target || !date) { hide(out); return; }
+  if (left <= 0) {
+    out.textContent = 'כבר הגעתם ליעד.';
+    show(out); return;
+  }
+  const months = Math.round((new Date(date + 'T12:00:00') - new Date()) / (30.4 * DAY));
+  if (months <= 0) { out.textContent = 'התאריך כבר עבר.'; show(out); return; }
+  /* ‏מעגלים כלפי מעלה לעשרות שקלים · סכום כמו 1,247 בחודש נשמע
+     ‏מדויק ואינו, כי התאריך עצמו מעוגל לחודשים. */
+  const per = Math.ceil(left / months / 1000) * 1000;
+  out.textContent = `כדי להגיע בזמן צריך ${fmt(per)} בחודש, במשך ${months} ${months === 1 ? 'חודש' : 'חודשים'}.`;
+  show(out);
+}
+$('goalSheet').addEventListener('input', goalPace);
 
 $('goalAdd').addEventListener('click', () => openGoal(null));
 $('goalCancel').addEventListener('click', closeSheet);
@@ -3387,6 +3548,20 @@ $('setWipe').addEventListener('click', async () => {
 /* ‏מודול הייבוא מקבל את מה שהוא צריך במקום לייבא מכאן: ייבוא
    הדדי בין שני קבצים הוא מעגל, והוא נשבר בדיוק בסדר שבו קשה
    לשחזר אותו. */
+/* ‏עובד השירות · רק כדי שהאפליקציה תיפתח בלי רשת. הוא נרשם
+   ‏אחרי שהדף כבר עומד, כי הוא אינו דחוף לציור הראשון, והוא
+   ‏לעולם אינו חוסם אותו · נפל, אין לו רשת, הדפדפן אינו תומך ·
+   ‏הכל ממשיך לעבוד בדיוק כמו קודם.
+
+   ‏הבדיקות רצות מול שרת מקומי בלי HTTPS ובלי כוונה לבדוק קאש,
+   ‏ולכן הוא מדלג עליהן · עובד שירות שנרשם באמצע חבילת בדיקות
+   ‏מגיש להן קבצים ישנים ושובר אותן בלי קשר לקוד שנבדק. */
+if ('serviceWorker' in navigator && !location.hostname.match(/^(127\.|localhost$)/)) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 const IMP = mountImport({
   sb, S, $, el, show, hide, toast, openSheet, closeSheet,
   fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,

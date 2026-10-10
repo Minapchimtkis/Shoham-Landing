@@ -405,6 +405,17 @@
     </div>
 
     <div class="set-group">
+      <h2>כלים</h2>
+      <button class="set-row" id="setTools" type="button">
+        <span class="k">
+          מחשבונים
+          <small>ריבית דריבית, וכמה זמן ייקח לסגור חוב</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="set-group">
       <h2>התמונה</h2>
       <button class="set-row" id="setYear" type="button">
         <span class="k">
@@ -577,6 +588,83 @@
       נמצא. הוא אינו ממליץ על מסלול, על מוצר או על נכס, ואינו
       אומר מה כדאי לקנות, למכור או להעביר. הסכומים הם מה שרשמתם,
       והם אינם מתעדכנים מעצמם.
+    </p>
+  </main>
+
+  <!-- ──────────────────────────────────── כלים ── -->
+  <main class="screen hidden" id="scTools">
+    <button class="back" id="toolsBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">מחשבונים</h1>
+
+    <span class="lbl" id="toolPickLbl">מה לחשב</span>
+    <div class="seg" role="group" aria-labelledby="toolPickLbl" style="margin-bottom:22px">
+      <button type="button" id="toolGrow" aria-pressed="true">כמה יצמח</button>
+      <button type="button" id="toolPay" aria-pressed="false">סגירת חוב</button>
+    </div>
+
+    <!-- ‏ריבית דריבית -->
+    <section id="calcGrow">
+      <p class="note" style="margin-bottom:20px">
+        כמה יהיה בעוד כמה שנים, אם משאירים סכום במקום ומוסיפים אליו
+        כל חודש. התשואה היא מספר שאתם מניחים, ולא הבטחה · שוק אמיתי
+        עולה ויורד, והמספר כאן הוא חשבון בלבד.
+      </p>
+      <div class="field">
+        <label for="gStart">כמה יש היום</label>
+        <input class="inp" id="gStart" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="gMonthly">כמה מוסיפים כל חודש</label>
+        <input class="inp" id="gMonthly" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="gYears">לכמה שנים</label>
+        <input class="inp" id="gYears" type="text" inputmode="decimal" autocomplete="off" placeholder="10">
+      </div>
+      <div class="field">
+        <label for="gRate">תשואה שנתית שאתם מניחים, באחוזים</label>
+        <input class="inp" id="gRate" type="text" inputmode="decimal" autocomplete="off" placeholder="4" dir="ltr" style="text-align:right">
+      </div>
+      <div class="calc-res hidden" id="gRes">
+        <span class="k" id="gResK">בסוף התקופה</span>
+        <span class="v money" id="gResV">0</span>
+        <span class="s" id="gResS"></span>
+      </div>
+    </section>
+
+    <!-- ‏סגירת חוב -->
+    <section id="calcPay" class="hidden">
+      <p class="note" style="margin-bottom:20px">
+        כמה זמן ייקח לסגור חוב בהחזר קבוע, וכמה מזה ריבית. זה חשבון
+        על המספרים שתכתבו, ולא המלצה לשנות משהו.
+      </p>
+      <div class="field">
+        <label for="pBalance">כמה נשאר לשלם</label>
+        <input class="inp" id="pBalance" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="pMonthly">החזר חודשי</label>
+        <input class="inp" id="pMonthly" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="pRate">ריבית שנתית, באחוזים</label>
+        <input class="inp" id="pRate" type="text" inputmode="decimal" autocomplete="off" placeholder="5" dir="ltr" style="text-align:right">
+      </div>
+      <div class="chips hidden" id="pFrom" role="group" aria-label="מילוי מחוב קיים" style="margin-bottom:18px"></div>
+      <div class="calc-res hidden" id="pRes">
+        <span class="k" id="pResK">זמן לסגירה</span>
+        <span class="v" id="pResV">0</span>
+        <span class="s" id="pResS"></span>
+      </div>
+    </section>
+
+    <p class="credit">
+      המחשבונים כאן הם חשבון ולא ייעוץ. הם אינם יודעים מה המס שלכם,
+      מה העמלות, ומה יקרה בשוק · ולכן התוצאה שלהם היא כיוון, לא
+      הבטחה. שום מספר כאן אינו נשמר באפליקציה.
     </p>
   </main>
 
@@ -1044,6 +1132,7 @@
   <div class="field">
     <label for="goalDate">עד מתי, אם יש תאריך</label>
     <input class="inp" id="goalDate" type="date">
+    <p class="note calc-out hidden" id="goalPace"></p>
   </div>
   <p class="err hidden" id="goalErr" role="alert"></p>
   <div class="sheet-row pin">

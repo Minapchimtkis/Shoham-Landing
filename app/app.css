@@ -1305,6 +1305,35 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .chip[aria-pressed="true"] small{color:rgba(255,255,255,.78)}
 
+/* ═══════════════════════════════════════════ מחשבונים ══ */
+
+/* ‏התוצאה מופיעה רק כשיש מה לחשב, ולכן היא לא צריכה להתחרות
+   ‏בשדות · משטח שקט מתחתיהם, ובתוכו מספר אחד גדול. */
+.calc-res{
+  margin-top:26px;padding:18px;
+  background:var(--wash);border-radius:var(--r-lg);
+}
+.calc-res .k{display:block;font-size:14px;color:var(--ink-2);font-weight:500}
+.calc-res .v{
+  display:block;margin-top:3px;
+  font-size:32px;letter-spacing:-0.02em;color:var(--ink);
+  line-height:1.15;
+}
+.calc-res .s{
+  display:block;margin-top:8px;
+  font-size:14px;color:var(--ink-2);line-height:1.6;
+}
+/* ‏החזר שאינו מכסה את הריבית. זה לא כישלון של המחשבון אלא
+   ‏התשובה עצמה, ולכן היא נאמרת בצבע של עובדה שכבר קרתה. */
+.calc-res.stuck{background:var(--red-soft)}
+.calc-res.stuck .v{color:var(--red)}
+
+/* ‏החישוב החי בטופס המטרה · הערה ולא תוצאה, כי הטופס עצמו
+   ‏הוא העיקר כאן. */
+.calc-out{
+  margin-top:9px;color:var(--violet);font-weight:600;
+}
+
 /* ═══════════════════════════════════════════ החובות ══ */
 
 /* ‏שני מספרים ולא אחד · "כמה אני חייב" ו"כמה יוצא לי בחודש" הן
