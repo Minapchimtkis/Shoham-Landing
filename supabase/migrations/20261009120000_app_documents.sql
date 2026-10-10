@@ -2,16 +2,16 @@
 --  אפליקציית התקציב, שלב שלישי: המסמכים
 -- ═══════════════════════════════════════════════════════════════
 --
--- ‏לא כל קובץ שאדם מעלה הוא רשימת תנועות.
+-- לא כל קובץ שאדם מעלה הוא רשימת תנועות.
 --
---   ‏דף עו"ש ופירוט אשראי הם רשימות. הם נקראים, מוצגים לאישור,
+--   דף עו"ש ופירוט אשראי הם רשימות. הם נקראים, מוצגים לאישור,
 --   והופכים לשורות ב-transactions. הם לא נשמרים כאן.
 --
---   ‏דוח יתרות וסילוקין וחשבון של חשמל הם מסמכים. יש בהם מספר
+--   דוח יתרות וסילוקין וחשבון של חשמל הם מסמכים. יש בהם מספר
 --   אחד או שניים שחשובים, והשאר הוא נייר שרוצים שיהיה שמור.
 --   הם נשמרים כאן, עם מה שחולץ מהם.
 --
--- ‏הקובץ עצמו יושב ב-Storage ולא בטבלה. דוח סילוקין הוא מאות
+-- הקובץ עצמו יושב ב-Storage ולא בטבלה. דוח סילוקין הוא מאות
 -- קילובייטים, וטבלה שמחזיקה אותם הופכת כל שאילתה עליה לאיטית
 -- גם כשלא ביקשו את הקובץ.
 --
@@ -22,7 +22,7 @@ create table if not exists public.documents(
   id           uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
 
-  -- ‏loan הוא דוח יתרות וסילוקין, bill הוא חשבון של ספק,
+  -- loan הוא דוח יתרות וסילוקין, bill הוא חשבון של ספק,
   -- statement הוא דף שנשמר כאסמכתא, other הוא כל השאר.
   kind         text not null default 'other'
                check (kind in ('loan','bill','statement','other')),
@@ -31,20 +31,20 @@ create table if not exists public.documents(
   provider     text,                      -- חברת חשמל, מזרחי טפחות
   period       date,                      -- לאיזה חודש המסמך שייך
 
-  -- ‏שני המספרים שנשלפים כמעט מכל מסמך: כמה, ועד מתי. השאר
+  -- שני המספרים שנשלפים כמעט מכל מסמך: כמה, ועד מתי. השאר
   -- יושב ב-data, כי מה שיש בדוח סילוקין אינו מה שיש בחשבון מים
   -- ועמודה לכל שדה אפשרי הייתה טבלה עם ארבעים עמודות ריקות.
   amount_agorot bigint check (amount_agorot is null or amount_agorot >= 0),
   due_on       date,
   data         jsonb not null default '{}'::jsonb,
 
-  -- ‏הנתיב ב-Storage. תמיד מתחיל במזהה משק הבית, כי מדיניות
+  -- הנתיב ב-Storage. תמיד מתחיל במזהה משק הבית, כי מדיניות
   -- הגישה לקבצים נגזרת מהתיקייה הראשונה בנתיב.
   storage_path text,
   mime         text,
   size_bytes   integer check (size_bytes is null or size_bytes >= 0),
 
-  -- ‏כשחשבון הופך להוצאה, הקשר נשמר. בלעדיו אותו חשבון נכנס
+  -- כשחשבון הופך להוצאה, הקשר נשמר. בלעדיו אותו חשבון נכנס
   -- פעמיים: פעם מהקובץ ופעם מדף העו"ש.
   transaction_id uuid references public.transactions(id) on delete set null,
 
@@ -68,7 +68,7 @@ revoke all on table public.documents from anon;
 grant select, insert, update, delete on table public.documents to authenticated;
 
 -- ────────────────────────────────────────── מקור הייבוא ──
--- ‏כדי שאפשר יהיה לבטל ייבוא שלם אחרי שהתברר שהוא היה הקובץ
+-- כדי שאפשר יהיה לבטל ייבוא שלם אחרי שהתברר שהוא היה הקובץ
 -- הלא נכון, ולדעת מה כבר נקרא כדי לא לקרוא אותו פעמיים.
 create table if not exists public.imports(
   id           uuid primary key default gen_random_uuid(),
@@ -78,7 +78,7 @@ create table if not exists public.imports(
   kind         text not null default 'bank'
                check (kind in ('bank','credit','other')),
   file_name    text,
-  -- ‏טביעת אצבע של הקובץ. אותו קובץ שמועלה שוב מזוהה לפני
+  -- טביעת אצבע של הקובץ. אותו קובץ שמועלה שוב מזוהה לפני
   -- שמציגים למשתמש מאתיים שורות שהוא כבר אישר פעם אחת.
   file_hash    text,
   rows_total   integer not null default 0 check (rows_total >= 0),
@@ -101,7 +101,7 @@ create policy imp_rw on public.imports for all to authenticated
 revoke all on table public.imports from anon;
 grant select, insert, update, delete on table public.imports to authenticated;
 
--- ‏כל תנועה יודעת מאיזה ייבוא היא הגיעה. מחיקת הייבוא משאירה
+-- כל תנועה יודעת מאיזה ייבוא היא הגיעה. מחיקת הייבוא משאירה
 -- את התנועות ומנתקת אותן, כי מחיקה של היסטוריה כלכלית בגלל
 -- ניקיון של רשומת ייבוא היא לא מה שמישהו התכוון אליו.
 alter table public.transactions
@@ -111,7 +111,7 @@ create index if not exists tx_import_idx on public.transactions (import_id)
   where import_id is not null;
 
 -- ───────────────────────────────────── הקבצים עצמם ──
--- ‏דלי פרטי. בלי הדלי הזה אין איפה לשמור את הקובץ, ואם הוא
+-- דלי פרטי. בלי הדלי הזה אין איפה לשמור את הקובץ, ואם הוא
 -- נוצר ציבורי, כל מי שמנחש נתיב מוריד דוח סילוקין של מישהו.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('docs', 'docs', false, 15728640,
@@ -123,7 +123,7 @@ on conflict (id) do update
       file_size_limit = excluded.file_size_limit,
       allowed_mime_types = excluded.allowed_mime_types;
 
--- ‏התיקייה הראשונה בנתיב היא מזהה משק הבית, ולכן היא גם
+-- התיקייה הראשונה בנתיב היא מזהה משק הבית, ולכן היא גם
 -- ההרשאה. קובץ בנתיב של משק בית אחר אינו נראה ואינו נכתב.
 drop policy if exists docs_read   on storage.objects;
 drop policy if exists docs_write  on storage.objects;

@@ -4,17 +4,17 @@
 --
 -- שלוש החלטות שקשה לשנות אחר כך, ולכן הן כאן מההתחלה:
 --
--- 1. ‏היחידה היא משק בית ולא משתמש. גם כשיש משתמש אחד, הכול תלוי
+-- 1. היחידה היא משק בית ולא משתמש. גם כשיש משתמש אחד, הכול תלוי
 --    ב-household. זה מה שיאפשר להוסיף בן או בת זוג בלי הגירה.
 --
--- 2. ‏כסף נשמר כמספר שלם באגורות. לעולם לא עשרוני. 14500 ולא
+-- 2. כסף נשמר כמספר שלם באגורות. לעולם לא עשרוני. 14500 ולא
 --    145.00. זה הבאג שתופס כל מערכת פיננסית שלא עשתה את זה ביום
 --    הראשון, והוא מתגלה רק כשכבר יש נתונים.
 --
--- 3. ‏חודש הוא תאריך של ה-1 בחודש, לא מחרוזת. מחרוזת לא יודעת
+-- 3. חודש הוא תאריך של ה-1 בחודש, לא מחרוזת. מחרוזת לא יודעת
 --    להשוות, למיין או לחסר חודשים.
 --
--- ‏וכל הגישה עוברת דרך household_members בלבד. אין שום מסלול אחר
+-- וכל הגישה עוברת דרך household_members בלבד. אין שום מסלול אחר
 -- לנתונים, ולכן אי אפשר לקרוא משק בית אחר גם מי שמשנה מזהה בכתובת.
 --
 -- להרצה בעורך ה-SQL של Supabase. הרצה חוזרת אינה מזיקה.
@@ -44,7 +44,7 @@ create table if not exists public.profiles(
   created_at   timestamptz not null default now()
 );
 
--- ‏פונקציית העזר שכל מדיניות נשענת עליה. stable כדי שהמתכנן יקרא
+-- פונקציית העזר שכל מדיניות נשענת עליה. stable כדי שהמתכנן יקרא
 -- לה פעם אחת לשאילתה ולא לכל שורה.
 create or replace function public.is_member(p_household uuid)
 returns boolean
@@ -56,7 +56,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
 $$;
 
 -- ───────────────────────────────────────────────── קטגוריות ──
--- ‏household_id ריק הוא קטגוריית מערכת, שכולם רואים ואיש לא משנה.
+-- household_id ריק הוא קטגוריית מערכת, שכולם רואים ואיש לא משנה.
 create table if not exists public.categories(
   id           uuid primary key default gen_random_uuid(),
   household_id uuid references public.households(id) on delete cascade,
@@ -73,7 +73,7 @@ create index if not exists categories_household_idx on public.categories (househ
 create unique index if not exists categories_system_key_idx
   on public.categories (key) where household_id is null;
 
--- ‏שש, ולא שלוש עשרה. רשימה ארוכה בהקמה הראשונה היא הדרך הבטוחה
+-- שש, ולא שלוש עשרה. רשימה ארוכה בהקמה הראשונה היא הדרך הבטוחה
 -- לכך שאיש לא ימלא אותה. אפשר להוסיף אחר כך.
 insert into public.categories (household_id, key, label, icon, kind, sort) values
   (null, 'housing',   'דיור',        '🏠', 'expense', 10),
@@ -107,12 +107,12 @@ create table if not exists public.transactions(
   description   text,
   source        text not null default 'manual' check (source in ('manual','import')),
 
-  -- ‏ישראל. קנייה ב-12 תשלומים מופיעה בפירוט כסכום חודשי, ואפליקציה
+  -- ישראל. קנייה ב-12 תשלומים מופיעה בפירוט כסכום חודשי, ואפליקציה
   -- שלא יודעת את זה סופרת אותה כהוצאה חודשית קבועה ומשקרת למשתמש.
   installment_no    integer check (installment_no    is null or installment_no    > 0),
   installment_total integer check (installment_total is null or installment_total > 0),
 
-  -- ‏כרטיס אשראי ישראלי מחייב בסכום אחד ב-2 או ב-10 לחודש, ולכן
+  -- כרטיס אשראי ישראלי מחייב בסכום אחד ב-2 או ב-10 לחודש, ולכן
   -- "ההוצאות של החודש" בחשבון אינן ההוצאות של החודש. מוצג לפי
   -- תאריך העסקה, ומועד החיוב נשמר בנפרד.
   charged_on    date,
@@ -125,7 +125,7 @@ create index if not exists tx_household_date_idx on public.transactions (househo
 create index if not exists tx_category_idx       on public.transactions (household_id, category_id);
 
 -- ──────────────────────────────────────────── אבטחת שורות ──
--- ‏חוסם כברירת מחדל. כל גישה נגזרת מ-is_member ומשום מקום אחר.
+-- חוסם כברירת מחדל. כל גישה נגזרת מ-is_member ומשום מקום אחר.
 alter table public.households        enable row level security;
 alter table public.household_members enable row level security;
 alter table public.profiles          enable row level security;
@@ -148,8 +148,8 @@ drop policy if exists cat_write    on public.categories;
 drop policy if exists bud_rw       on public.budgets;
 drop policy if exists tx_rw        on public.transactions;
 
--- ‏קריאה ועדכון לכל חבר, מחיקה רק לבעלים, ויצירה בשום מקום חוץ
--- ‏מ-setup_household. מחיקת משק בית גוררת בשרשרת את כל מה שבתוכו.
+-- קריאה ועדכון לכל חבר, מחיקה רק לבעלים, ויצירה בשום מקום חוץ
+-- מ-setup_household. מחיקת משק בית גוררת בשרשרת את כל מה שבתוכו.
 create policy hh_read on public.households for select to authenticated
   using (public.is_member(id));
 create policy hh_update on public.households for update to authenticated
@@ -160,24 +160,24 @@ create policy hh_delete on public.households for delete to authenticated
                     and m.user_id = auth.uid()
                     and m.role = 'owner'));
 
--- ‏שורת החברות של עצמך נראית תמיד, גם ברגע ההקמה שבו עוד אין
+-- שורת החברות של עצמך נראית תמיד, גם ברגע ההקמה שבו עוד אין
 -- משק בית להיות חבר בו ולכן is_member עוד אינה יכולה להחזיר true.
 create policy hm_read_self on public.household_members for select to authenticated
   using (user_id = auth.uid());
 create policy hm_read_house on public.household_members for select to authenticated
   using (public.is_member(household_id));
--- ‏לצאת אפשר רק את עצמך, ורק אם אינך הבעלים.
+-- לצאת אפשר רק את עצמך, ורק אם אינך הבעלים.
 create policy hm_leave on public.household_members for delete to authenticated
   using (user_id = auth.uid() and role <> 'owner');
--- ‏אין מדיניות INSERT ואין UPDATE על החברות. ההצטרפות היחידה
--- ‏למשק בית עוברת ב-setup_household, שהיא security definer, וכך גם
--- ‏כל פונקציית הזמנה שתיכתב בעתיד. בלי זה כל משתמש מחובר יכול
--- ‏להוסיף את עצמו למשק בית שמזההו ידוע לו, ומזהה אינו הרשאה.
+-- אין מדיניות INSERT ואין UPDATE על החברות. ההצטרפות היחידה
+-- למשק בית עוברת ב-setup_household, שהיא security definer, וכך גם
+-- כל פונקציית הזמנה שתיכתב בעתיד. בלי זה כל משתמש מחובר יכול
+-- להוסיף את עצמו למשק בית שמזההו ידוע לו, ומזהה אינו הרשאה.
 
 create policy pr_rw on public.profiles for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- ‏קטגוריות המערכת גלויות לכולם, ושל משק בית רק לחבריו.
+-- קטגוריות המערכת גלויות לכולם, ושל משק בית רק לחבריו.
 create policy cat_read on public.categories for select to authenticated
   using (household_id is null or public.is_member(household_id));
 create policy cat_write on public.categories for all to authenticated
@@ -195,16 +195,16 @@ revoke all on table public.households, public.household_members, public.profiles
 grant select, insert, update, delete on table
   public.profiles, public.categories, public.budgets,
   public.transactions to authenticated;
--- ‏משק בית נוצר, ומצורפים אליו, רק בתוך setup_household. ולכן אין
--- ‏למשתמש הרשאת INSERT עליהם בכלל · לא במדיניות ולא בהרשאה עצמה.
+-- משק בית נוצר, ומצורפים אליו, רק בתוך setup_household. ולכן אין
+-- למשתמש הרשאת INSERT עליהם בכלל · לא במדיניות ולא בהרשאה עצמה.
 grant select, update, delete on table public.households        to authenticated;
 grant select,         delete on table public.household_members to authenticated;
 
 -- ────────────────────────────────────────── ההקמה הראשונה ──
--- ‏נקראת פעם אחת, אחרי ההרשמה. יוצרת משק בית, מצרפת את המשתמש
+-- נקראת פעם אחת, אחרי ההרשמה. יוצרת משק בית, מצרפת את המשתמש
 -- אליו, וכותבת את התקציב ההתחלתי משש המספרים.
 --
--- ‏הכול בקריאה אחת ובטרנזקציה אחת, אחרת משתמש שהדפדפן שלו נסגר
+-- הכול בקריאה אחת ובטרנזקציה אחת, אחרת משתמש שהדפדפן שלו נסגר
 -- באמצע נשאר עם משק בית בלי תקציב ובלי דרך חזרה.
 create or replace function public.setup_household(
   p_name    text,
@@ -223,7 +223,7 @@ begin
     raise exception 'not signed in';
   end if;
 
-  -- ‏מי שכבר יש לו משק בית מקבל אותו בחזרה במקום עוד אחד.
+  -- מי שכבר יש לו משק בית מקבל אותו בחזרה במקום עוד אחד.
   select household_id into v_hh from public.household_members
    where user_id = v_user limit 1;
   if v_hh is not null then
@@ -241,12 +241,12 @@ begin
   values (v_user, left(nullif(btrim(p_name),''), 60))
   on conflict (user_id) do nothing;
 
-  -- ‏ההכנסה נשמרת כתקציב של קטגוריית ההכנסה, ולא כשדה נפרד, כדי
+  -- ההכנסה נשמרת כתקציב של קטגוריית ההכנסה, ולא כשדה נפרד, כדי
   -- שהיא תוכל להשתנות מחודש לחודש כמו כל השאר.
   if coalesce(p_income,0) > 0 then
     select id into v_cat from public.categories
      where household_id is null and key = 'salary';
-    -- ‏בלי הבדיקה הזאת, קטגוריה חסרה הופכת ל-category_id ריק
+    -- בלי הבדיקה הזאת, קטגוריה חסרה הופכת ל-category_id ריק
     -- והפונקציה נופלת על אילוץ במקום פשוט לדלג. זה לא אמור לקרות,
     -- אבל "לא אמור" הוא לא אותו דבר כמו "לא יכול".
     if v_cat is not null then

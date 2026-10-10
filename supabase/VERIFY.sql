@@ -38,9 +38,9 @@ with c(n, what, ok) as (values
     (select coalesce((select not has_table_privilege('anon','public.transactions','SELECT')
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
      where n.nspname='public' and c.relname='transactions'), false))),
- -- ‏לא נוגעים בתוכן הטבלה · אזכור ישיר שלה מפיל את כל השאילתה
- -- ‏אם היא עוד לא קיימת, במקום לדווח על כישלון אחד. שהיא אינה
- -- ‏ריקה מובטח ממילא · המיגרציה עוצרת אם אין בה אף אחד.
+ -- לא נוגעים בתוכן הטבלה · אזכור ישיר שלה מפיל את כל השאילתה
+ -- אם היא עוד לא קיימת, במקום לדווח על כישלון אחד. שהיא אינה
+ -- ריקה מובטח ממילא · המיגרציה עוצרת אם אין בה אף אחד.
  (13,'יש רשימת צוות ופונקציית is_staff',
     (select to_regclass('public.staff') is not null
         and exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
@@ -48,8 +48,8 @@ with c(n, what, ok) as (values
  (14,'רשימת הצוות עצמה סגורה לגמרי',
     (select not exists (select 1 from pg_policies
        where schemaname='public' and tablename='staff'))),
- -- ‏טבלה שאינה קיימת אינה כישלון · bool_and על אפס שורות מחזיר
- -- ‏ריק, ולכן הניסוח הוא "אין אף מדיניות שאינה דרך הצוות".
+ -- טבלה שאינה קיימת אינה כישלון · bool_and על אפס שורות מחזיר
+ -- ריק, ולכן הניסוח הוא "אין אף מדיניות שאינה דרך הצוות".
  (15,'הלידים נעולים לצוות בלבד',
     (select not exists (select 1 from pg_policies
       where schemaname='public' and tablename='leads'
