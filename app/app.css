@@ -575,6 +575,42 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .hero .a.bump{animation:bump .34s var(--ease)}
 
+/* ──────────────────────────────── נכנס ויצא ── */
+
+/* ‏זוג אחד, שני מספרים, בלי משפט. הכותרת עונה על "כמה נשאר",
+   ‏והזוג הזה על "מאיפה זה יצא" · שתי השאלות שהמשתמש שואל
+   ‏בשנייה הראשונה, ושעד היום היו קבורות בפרוזה מתחת למספר.
+
+   ‏ההוצאות אינן אדומות. הן המשטח הרגיל, בדיוק כמו ההכנסות ·
+   ‏הוצאה אינה חריגה, והיא נצבעת רק כשהיא עברה את התכנון. זאת
+   ‏הסיבה שהעיצוב של שאר האפליקציות משקר כאן: הוא צובע באדום
+   ‏את עצם העובדה שחיים עולים כסף. */
+.flow{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin:2px 0 16px;
+}
+.flow .cell{
+  padding:12px 13px;border-radius:14px;
+  background:var(--wash);min-width:0;
+}
+.flow .cell.in{background:var(--green-soft)}
+.flow .cell.out.over{background:var(--red-soft)}
+.flow .k{
+  display:block;font-size:12.5px;font-weight:600;
+  color:var(--ink-2);letter-spacing:0;
+}
+.flow .v{
+  display:block;font-size:21px;font-weight:800;
+  letter-spacing:-0.02em;line-height:1.25;
+  margin-top:3px;color:var(--ink);
+}
+.flow .cell.in .v{color:var(--green)}
+.flow .cell.out.over .v{color:var(--red)}
+.flow .s{
+  display:block;font-size:12px;color:var(--ink-3);
+  line-height:1.45;margin-top:3px;
+}
+
 /* ──────────────────────────────── שורות הקטגוריות ── */
 
 .rows{border-top:1px solid var(--rule)}

@@ -314,6 +314,21 @@
       <p class="sub" id="heroSub"></p>
     </section>
 
+    <!-- ‏נכנס ויצא, זה ליד זה. מחליף שתי שורות פרוזה שאמרו את
+         ‏אותם שני מספרים במשפט · מספר נקרא בהצצה, משפט לא. -->
+    <div class="flow hidden" id="homeFlow">
+      <div class="cell in">
+        <span class="k">נכנס החודש</span>
+        <span class="v money" id="flowIn">0</span>
+        <span class="s" id="flowInSub"></span>
+      </div>
+      <div class="cell out" id="flowOutCell">
+        <span class="k">יצא החודש</span>
+        <span class="v money" id="flowOut">0</span>
+        <span class="s" id="flowOutSub"></span>
+      </div>
+    </div>
+
     <!-- ‏התמונה הגדולה, מתחת לחודש. היא עונה על "מה יש לי" שהחודש
          ‏לבדו אינו עונה עליו, ומובילה אל הפירוט המלא. -->
     <button class="worth-strip hidden" id="homeWorth" type="button">

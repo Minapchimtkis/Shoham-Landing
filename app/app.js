@@ -833,6 +833,7 @@ function renderFirst() {
   hide($('homeInsight'));
   hide($('homePulse'));
   hide($('homeWorth'));
+  hide($('homeFlow'));
   S.lastLeft = null;
 }
 
@@ -862,7 +863,7 @@ function renderHome() {
      ‏באים שני צעדים, והוא חוזר ברגע שיש לו מה להגיד. */
   if (!haveAny()) { renderFirst(); return; }
   show($('homeRows')); show($('homeInsight')); hide($('firstRun'));
-  show($('heroA'));
+  show($('heroA')); show($('homeFlow'));
 
   const now = new Date();
   const current = inCurrentPeriod();
@@ -903,16 +904,11 @@ function renderHome() {
 
   if (!plannedOut() && !plannedIn()) {
     if (spentAll() || gotAll()) {
-      line(document.createTextNode('הוצאתי '), strong(spentAll()));
       line(document.createTextNode('אין תקציב לחודש הזה, אז זה מה שנכנס פחות מה שיצא.'));
     } else {
       line(document.createTextNode('עוד אין תקציב לחודש הזה. אפשר לבנות אותו בלשונית התקציב.'));
     }
   } else {
-    const spent = spentAll(), plan = plannedOut();
-    line(document.createTextNode('הוצאתי '), strong(spent),
-         ...(plan ? [document.createTextNode(' מתוך '), strong(plan)] : []));
-
     if (current && daysLeft > 0) {
       if (over) {
         line(document.createTextNode('מעל התכנון. נשארו '),
@@ -928,23 +924,54 @@ function renderHome() {
     }
   }
 
-  /* ‏"נכנסו 18,500 מתוך 18,500 שתוכננו" הוא אותו מספר פעמיים,
-     ושורה מודגשת שאינה אומרת כלום מתחרה במספר הגדול. ההכנסה
-     נאמרת רק כשהיא שונה ממה שתוכנן, כי אז זה מידע. */
-  const got = gotAll(), pin = plannedIn(), moved = movedAll();
-  const offPlan = pin > 0 && Math.abs(got - pin) / pin >= 0.02;
-  if (got > 0 && pin > 0 && offPlan)
-    line(document.createTextNode(got > pin ? 'נכנסו ' : 'נכנסו רק '), strong(got),
-         document.createTextNode(' מתוך '), strong(pin), document.createTextNode(' שתוכננו'));
-  else if (got > 0 && !pin)
-    line(document.createTextNode('נכנסו החודש '), strong(got));
+  const moved = movedAll();
   if (moved > 0) line(document.createTextNode('ועוד '), strong(moved),
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
+  renderFlow();
   renderPulse(current, dim, now);
   renderWorth();
   renderRows(current, dim, now);
   renderInsight();
+}
+
+/* ────────────────────────────────── נכנס ויצא ── */
+
+/* ‏שני מספרים שהיו עד היום שתי שורות פרוזה מתחת לכותרת. מספר
+   ‏בכרטיס נקרא בהצצה, ומשפט צריך קריאה · וזה המסך שאנשים
+   ‏פותחים לשתי שניות בתור בסופר.
+
+   ‏השורה הקטנה אומרת את התכנון רק כשהוא מוסיף מידע. "נכנסו
+   ‏18,500 מתוך 18,500 שתוכננו" הוא אותו מספר פעמיים · בהכנסה
+   ‏היא מופיעה רק כשיש פער של שני אחוז ומעלה, כי רק אז קרה
+   ‏משהו. בהוצאה התכנון הוא תמיד מידע, כי הוא המרחק שנשאר. */
+function renderFlow() {
+  const got = gotAll(), spent = spentAll();
+  const pin = plannedIn(), pout = plannedOut();
+
+  /* ‏הכרטיס נצבע מול המספר שהוא עצמו מציג, ולא מול הכותרת. זה
+     ‏נראה כמו פרט · זה לא. "יצא 12,000 מתוך 12,000 שתוכננו"
+     ‏בשחור, בזמן שהתכנון בדיוק נגמר, הוא שקר קטן. ובכיוון
+     ‏השני: מי שהכניס החודש יותר מהרגיל עדיין חרג מהתכנון
+     ‏שלו להוצאות, וזה בדיוק מה שהוא ביקש לדעת. */
+  const over = pout > 0 && spent > pout;
+
+  setMoney($('flowIn'), got);
+  setMoney($('flowOut'), spent);
+
+  const offPlan = pin > 0 && Math.abs(got - pin) / pin >= 0.02;
+  $('flowInSub').textContent = offPlan
+    ? (got > pin ? 'מעל ' : 'מתוך ') + fmt(pin) + ' שתוכננו'
+    : '';
+
+  $('flowOutSub').textContent = pout ? 'מתוך ' + fmt(pout) + ' שתוכננו' : '';
+
+  /* ‏ההוצאה נצבעת רק כשהיא עברה את התכנון · לא עצם קיומה. */
+  $('flowOutCell').classList.toggle('over', !!over);
+
+  $('flowIn').setAttribute('aria-label', 'נכנס החודש ' + fmt(got));
+  $('flowOut').setAttribute('aria-label',
+    'יצא החודש ' + fmt(spent) + (over ? ', מעל התכנון' : ''));
 }
 
 /* ───────────────────────────────── מחוון המצב ── */
