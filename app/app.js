@@ -1073,6 +1073,99 @@ function sortArrows(c, first, last) {
   return box;
 }
 
+/* ─────────────────────────────────── הטבעות ── */
+
+/* ‏מה שמצא חן בעיני שוהם אצל המתחרים: כל הקטגוריות במבט אחד,
+   ‏בלי לקרוא. מה שלא מועתק משם:
+
+   ‏במרכז יושב כמה נשאר, ולא "0 מתוך 450". "0/450" הוא ניסוח
+   ‏של מחסן, ואדם בסופר שואל כמה עוד מותר לו.
+
+   ‏ויש סימן קטן על הטבעת · איפה אתה אמור להיות לפי היום בחודש.
+   ‏בלעדיו "הוצאתי ארבעים אחוז" אינו מידע: ארבעים אחוז בעשירי
+   ‏הוא בעיה, ובעשרים ושמונה הוא מצוין. זה ההבדל היחיד שבאמת
+   ‏משנה בין טבעת לפס, והוא מה שאין להם.
+
+   ‏הרשימה המלאה נשארת מתחת · גלילה אופקית מחביאה קטגוריות,
+   ‏ואסור שקטגוריה תיעלם רק כי היא השביעית. */
+
+const RING = { size: 72, stroke: 6.5 };
+
+function ringFor(c, p, sp, current, dim, now) {
+  const over = p > 0 && sp > p;
+  const r = (RING.size - RING.stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const frac = p > 0 ? Math.min(1, sp / p) : (sp > 0 ? 1 : 0);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const mk = (n, a) => { const e = document.createElementNS(ns, n);
+    for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+  const item = el('button', 'ring' + (over ? ' over' : '') + (!p ? ' plain' : ''));
+  item.type = 'button';
+  item.setAttribute('role', 'listitem');
+  item.setAttribute('aria-label',
+    p > 0
+      ? `${c.label}. ${over ? 'חריגה של ' + fmt(sp - p) : 'נשארו ' + fmt(p - sp)}` +
+        `, מתוך ${fmt(p)} שתוכננו. לשינוי התכנון`
+      : `${c.label}. יצא ${fmt(sp)}, לא תוכנן. לשינוי התכנון`);
+
+  const svg = mk('svg', { viewBox: `0 0 ${RING.size} ${RING.size}`,
+                          class: 'ring-svg', 'aria-hidden': 'true' });
+  const cx = RING.size / 2;
+  svg.append(mk('circle', { class: 'ring-track', cx, cy: cx, r,
+                            fill: 'none', 'stroke-width': RING.stroke }));
+  if (frac > 0) {
+    svg.append(mk('circle', { class: 'ring-fill', cx, cy: cx, r, fill: 'none',
+      'stroke-width': RING.stroke, 'stroke-linecap': 'round',
+      'stroke-dasharray': `${(circ * frac).toFixed(2)} ${circ.toFixed(2)}`,
+      transform: `rotate(-90 ${cx} ${cx})` }));
+  }
+  /* ‏סימן היום · רק בחודש הפעיל, ורק כשיש תכנון להשוות אליו. */
+  if (current && p > 0) {
+    const pace = dayOfPeriod(S.month, now) / dim;
+    svg.append(mk('circle', { class: 'ring-today', cx, cy: cx, r, fill: 'none',
+      'stroke-width': RING.stroke + 3,
+      'stroke-dasharray': `1.6 ${circ.toFixed(2)}`,
+      'stroke-dashoffset': (-circ * pace).toFixed(2),
+      transform: `rotate(-90 ${cx} ${cx})` }));
+  }
+
+  const mid = el('span', 'ring-mid');
+  const v = el('span', 'ring-v');
+  v.textContent = fmtNum(p > 0 ? (over ? sp - p : p - sp) : sp);
+  mid.append(v);
+  if (over) mid.append(el('span', 'ring-k', 'חריגה'));
+
+  const wrap = el('span', 'ring-art');
+  wrap.append(svg, mid);
+  item.append(wrap, el('span', 'ring-nm', c.label));
+  item.addEventListener('click', () => editFromRing(c));
+  return item;
+}
+
+/* ‏לחיצה על טבעת פותחת את העריכה בשורה שמתחת, לא גלון חדש ·
+   ‏מקום אחד שבו משנים מספר, ולא שניים. */
+function editFromRing(c) {
+  const row = [...$('homeRows').querySelectorAll('.row')]
+    .find(r => r.dataset.cat === c.id);
+  if (!row) return;
+  const val = row.querySelector('.row-val');
+  if (!val) return;
+  row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  openPlan(c, val);
+}
+
+function renderRings(rows, current, dim, now) {
+  const box = $('homeRings');
+  box.textContent = '';
+  if (rows.length < 2) { hide(box); return; }
+  show(box);
+  const frag = document.createDocumentFragment();
+  for (const { c, p, s: sp } of rows) frag.append(ringFor(c, p, sp, current, dim, now));
+  box.append(frag);
+}
+
 /* ───────────────────────────── ההכנסות בבית ── */
 
 /* ‏אותה שורה בדיוק, בלי פס ובלי "נשארו" · בהכנסה אין תקרה
@@ -1225,6 +1318,12 @@ function liveRedraw() {
   hq.append(el('span', 'qm', '?'));
   renderFlow();
   renderPulse(current, dim, now);
+  /* ‏הטבעות נבנות מחדש במלואן · אין בהן פוקוס שאפשר להרוג,
+     ‏והן שש תמונות קטנות. השורות, לעומת זאת, מחזיקות את השדה
+     ‏הפתוח, ולכן מהן מתעדכן רק הפס. */
+  renderRings(outCats()
+    .map(c => ({ c, p: planned(c.id), s: spentIn(c.id) }))
+    .filter(r => r.p > 0 || r.s > 0), current, dim, now);
   for (const { c, box } of liveBars) {
     const p = planned(c.id), sp = spentIn(c.id);
     const ov = p > 0 && sp > p;
@@ -1341,6 +1440,8 @@ function renderRows(current, dim, now) {
     return;
   }
 
+  renderRings(rows, current, dim, now);
+
   const frag = document.createDocumentFragment();
   for (const [idx, { c, p, s }] of rows.entries()) {
     const over = p > 0 && s > p;
@@ -1348,6 +1449,7 @@ function renderRows(current, dim, now) {
        ‏כפתור אינו HTML תקין, ושני היעדים כאן שונים: השם מוביל
        ‏לתנועות, והמספר נפתח לעריכת התכנון במקום. */
     const row = el('div', 'row');
+    row.dataset.cat = c.id;
 
     const top = el('div', 'row-top');
     const go = el('button', 'row-go');

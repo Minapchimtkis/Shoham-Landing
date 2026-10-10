@@ -755,6 +755,60 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ──────────────────────────────── שורות הקטגוריות ── */
 
+/* ────────────────────────────────── הטבעות ── */
+
+/* ‏גלילה אופקית עם scroll-snap · האצבע עוצרת על טבעת שלמה
+   ‏ולא באמצע אחת. */
+.rings{
+  display:flex;gap:10px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  /* ‏יוצאת אל שולי הנייר ובחזרה · טבעת שנחתכת בקצה המסך
+     ‏אומרת "יש עוד", וקצה ריק אומר "זה הכול". */
+  margin:2px calc(var(--pad) * -1) 14px;
+  padding:2px var(--pad) 4px;
+}
+.rings::-webkit-scrollbar{display:none}
+
+.ring{
+  flex:none;scroll-snap-align:start;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:76px;padding:4px 2px;
+  border-radius:14px;
+}
+.ring-art{position:relative;display:block;width:72px;height:72px}
+.ring-svg{display:block;width:72px;height:72px}
+.ring-track{stroke:var(--wash-2)}
+.ring-fill{stroke:var(--violet-fill)}
+.ring.over .ring-track{stroke:var(--red-soft)}
+.ring.over .ring-fill{stroke:var(--red)}
+.ring.plain .ring-fill{stroke:var(--rule-2)}
+/* ‏סימן היום · דיו ולא סגול, כי הוא אינו ערך אלא סרגל. */
+.ring-today{stroke:var(--ink-3);opacity:.55}
+
+.ring-mid{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:0;
+}
+.ring-v{
+  font-size:15px;font-weight:var(--w-amount);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-0.02em;line-height:1.1;
+  color:var(--ink);direction:ltr;
+}
+.ring.over .ring-v{color:var(--red)}
+.ring.plain .ring-v{color:var(--ink-2)}
+.ring-k{font-size:10px;font-weight:600;color:var(--red);line-height:1.2}
+.ring-nm{
+  font-size:12px;font-weight:var(--w-ui-soft);
+  color:var(--ink-2);line-height:1.25;
+  max-width:76px;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
 /* ‏כותרת קבוצה · הוצאות והכנסות באותו מסך, כל אחת עם הכותרת
    ‏שלה, כדי שלא ייראו כרשימה אחת מעורבבת. */
 .grp-h{
