@@ -66,6 +66,27 @@
   --nav-h:62px;
 
   --ease:cubic-bezier(.22,.61,.36,1);
+
+  /* ── הטיפוגרפיה ──
+     ‏Heebo נטען כגופן משתנה בטווח 300 עד 900, ולכן כל משקל כאן
+     ‏הוא מופע אמיתי בקובץ ולא הערכה של הדפדפן.
+
+     ‏קודם נטענו חמישה משקלים בלבד · 300, 400, 500, 700 ו-900 ·
+     ‏בעוד הקוד ביקש 600 בעשרים ושניים מקומות ו-800 בשישה. נמדד
+     ‏בדפדפן: "כמה יש לי בחודש" יצא 303 פיקסל גם ב-600 וגם ב-700,
+     ‏ו-314 גם ב-800 וגם ב-900. שני שלבים שלמים בהיררכיה פשוט לא
+     ‏היו קיימים. הטווח המשתנה גם קל יותר: 41 קילובייט לכל
+     ‏המשקלים, מול 205 לחמישה סטטיים. */
+  --font:'Heebo',system-ui,-apple-system,'Segoe UI',sans-serif;
+
+  --w-amount:800;          /* ‏סכומים ויתרות · המספר של המסך */
+  --w-display:800;         /* ‏שם גדול במסך פתיחה · 44 עד 54 פיקסל */
+  --w-amount-sm:700;       /* ‏סכום בתוך שורה, לצד טקסט */
+  --w-h1:700;              /* ‏כותרת ראשית */
+  --w-h2:600;              /* ‏כותרת משנה */
+  --w-ui:600;              /* ‏כפתורים, ניווט, תוויות */
+  --w-ui-soft:500;         /* ‏תווית שקטה, שם בשורה */
+  --w-body:400;            /* ‏טקסט רגיל והסברים */
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -77,12 +98,12 @@ html{
 }
 
 body{
-  font-family:'Heebo',system-ui,sans-serif;
+  font-family:var(--font);
   color:var(--ink);
   background:var(--paper);
   font-size:16px;
   line-height:1.5;
-  font-weight:400;
+  font-weight:var(--w-body);
   min-height:100svh;
   /* ‏האפליקציה היא טלפון. על מסך רחב היא נשארת ברוחב טלפון
      במקום להימרח, כי פריסה של טלפון שנמתחה ל-1400 פיקסל אינה
@@ -101,24 +122,34 @@ body{
    ‏הסריף טעון רק עם הספרות והפסיק, ולכן הש"ח והנקודה נופלים
    מעצמם ל-Heebo בלי שאצטרך לעטוף אותם. */
 /* ‏ספרות ברוחב אחיד, ולא לנוי: המספר הגדול מתעדכן חי, ובלי
-   tabular-nums הוא קופץ בכל שינוי ספרה. נבדק, ו-Sora אכן
-   מכבד אותו. */
+   ‏רוחב קבוע הוא קופץ בכל שינוי ספרה. נמדד ב-Heebo: רוחב כל
+   ‏עשר הספרות זהה לחלוטין, פיזור אפס, גם בלי tabular-nums.
+   ‏ההכרזה נשארת כהצהרת כוונה למקרה שהגופן יוחלף יום אחד. */
 .money{
-  font-family:'Sora','Heebo',sans-serif;
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:var(--w-amount);
   font-variant-numeric:tabular-nums;
   letter-spacing:-0.015em;
   direction:ltr;
   unicode-bidi:isolate;
+  /* ‏הסכום הוא ריצה משמאל לימין בתוך דף ימני, ולכן כשהוא אלמנט
+     ‏בלוק הוא נצמד לשמאל הקופסה בעוד כל השאר נצמד לימין. במסך
+     ‏הבית זה היה המספר הגדול ביותר בעמוד, יושב בפינה ההפוכה
+     ‏מהכותרת שלו · נמדד: 4,090 התחיל ב-20 פיקסל משמאל בזמן
+     ‏ש"כמה יש לי?" נגמר ב-20 פיקסל מימין. */
+  text-align:right;
 }
 
-/* ‏סימן השקל יושב ליד המספר, לא בתוכו. בלי הכלל הזה הוא נופל
-   ל-Heebo במשקל 900, יוצא בלוק כבד לצד ספרות סריף, ומתחרה
-   במספר במקום להגיד מה היחידה שלו. */
+/* ‏סימן השקל יושב ליד המספר, לא בתוכו. בלי הכלל הזה הוא יורש
+   ‏את משקל הסכום, יוצא בלוק כבד לצד הספרות, ומתחרה במספר
+   ‏במקום להגיד מה היחידה שלו. */
 .money .cur{
-  font-family:'Heebo',sans-serif;
-  font-weight:500;
-  font-size:0.66em;
+  font-family:var(--font);
+  font-weight:var(--w-ui-soft);
+  /* ‏רצפה של 11 פיקסל. 0.66em לבדו ירד ל-9.9 על סכום בן 15
+     ‏פיקסל · נמדד בשבעה מקומות במסך הבית. סימן מטבע קטן מדי
+     ‏מפסיק להיות יחידה ומתחיל להיות רעש. */
+  font-size:max(11px, 0.68em);
   margin-inline-end:0.1em;
   vertical-align:0.06em;
 }
@@ -184,8 +215,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 /* שדה סכום. הוא המספר של המסך, ולכן הוא בסריף ובגודל אחר. */
 .amount-field{position:relative}
 .amount-field .inp{
-  font-family:'Sora','Heebo',sans-serif;
-  font-weight:800;font-size:34px;
+  font-family:var(--font);
+  font-weight:var(--w-amount);font-size:34px;
   text-align:center;direction:ltr;
   padding:16px 14px;
   letter-spacing:-0.01em;
@@ -195,7 +226,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:inline-flex;align-items:center;justify-content:center;
   gap:8px;width:100%;
   min-height:50px;padding:0 20px;
-  font-size:16px;font-weight:700;
+  font-size:16px;font-weight:var(--w-h1);
   border-radius:var(--r);
   background:var(--violet-fill);color:#fff;
   transition:transform .12s var(--ease),background-color .14s var(--ease),opacity .14s var(--ease);
@@ -242,7 +273,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   padding:0 var(--pad);
   margin-top:10px;
   font-size:clamp(34px,10.5vw,44px);
-  font-weight:900;line-height:1.05;letter-spacing:-0.035em;
+  font-weight:var(--w-display);line-height:1.05;letter-spacing:-0.035em;
   color:var(--navy);
 }
 .wlc-name .q{color:var(--navy);margin-inline-start:0.12em}
@@ -283,7 +314,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .card-ico svg{width:23px;height:23px;color:#fff}
 .card h2{
-  font-size:19px;font-weight:800;line-height:1.3;
+  font-size:19px;font-weight:var(--w-h2);line-height:1.3;
   letter-spacing:-0.01em;
 }
 .card p{
@@ -333,7 +364,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .gate-name{
   margin-top:auto;
   font-size:clamp(40px,13vw,54px);
-  font-weight:900;line-height:1.02;
+  font-weight:var(--w-display);line-height:1.02;
   letter-spacing:-0.035em;
   /* ‏אותו כחול בדיוק שבלוגו, ולא הדיו הכללי · השם הוא הלוגו,
      ‏וכשהוא מופיע כטקסט הוא צריך להיות אותו צבע. */
@@ -390,7 +421,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .sent{
   margin-top:auto;margin-bottom:auto;text-align:center;
 }
-.sent h2{font-size:26px;font-weight:900;letter-spacing:-0.02em}
+.sent h2{font-size:26px;font-weight:var(--w-h1);letter-spacing:-0.02em}
 .sent p{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:1.6}
 .sent .mail{font-weight:700;color:var(--ink);word-break:break-all}
 
@@ -427,8 +458,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   /* ‏הספרות נצמדות לצד שבו נמצאת התווית, ולא לקצה הרחוק ממנה.
      כך גם נוצר טור מיושר של מספרים לאורך הטופס. */
   width:100%;text-align:right;direction:ltr;
-  font-family:'Sora','Heebo',sans-serif;
-  font-weight:800;font-size:18px;
+  font-family:var(--font);
+  font-weight:var(--w-amount);font-size:18px;
   padding:9px 10px;
   background:var(--paper);
   border:1px solid var(--rule-2);border-radius:10px;
@@ -512,6 +543,16 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   font-size:clamp(50px,16vw,66px);
   line-height:1.02;letter-spacing:-0.03em;
 }
+/* ‏בגודל הזה 0.66em הם 41 פיקסל · סימן שקל בגובה של מספר שלם,
+   ‏בגופן אחר, שנקרא כאילו הוא חלק מהסכום. היחידה צריכה להיות
+   ‏קטנה מהכמות. */
+.hero .a .cur{
+  font-size:0.36em;font-weight:600;
+  vertical-align:0.16em;
+  margin-inline-end:0.09em;
+  color:var(--ink-2);
+}
+.hero .a.over .cur{color:var(--red)}
 /* ‏חרגתי · זה כבר קרה, ולכן אדום ולא ענבר. ענבר שמור למה
    ‏שעוד אפשר למנוע. */
 .hero .a.over{color:var(--red)}
@@ -561,11 +602,20 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   line-height:1.5;margin-top:4px;
 }
 .worth-strip svg{flex:none;width:16px;height:16px;color:var(--ink-3)}
-/* ‏כשטרם הוזן · "טרם הוזן" הוא מילים ולא כסף, ולכן הוא שקט
-   ‏יותר מהמספר שיבוא במקומו, ובסגול שאומר שיש כאן מה לעשות.
-   ‏blank ולא empty · empty היא כבר מחלקה של מצב ריק שלם, עם
-   ‏ריפוד של 46 פיקסל, והיא מתחה את הרצועה פי שניים. */
-.worth-strip.blank .v{font-size:19px;font-weight:700;color:var(--violet)}
+/* ‏במצב הריק הרצועה היא שורה אחת של 44 פיקסל ולא בלוק של 100:
+   ‏כותרת שקטה והזמנה לצידה. blank ולא empty · empty היא כבר
+   ‏מחלקה של מצב ריק שלם, עם ריפוד של 46 פיקסל, והיא מתחה את
+   ‏הרצועה פי שניים. */
+.worth-strip.blank{padding:11px 0}
+.worth-strip.blank .col{display:flex;align-items:baseline;gap:7px}
+.worth-strip.blank .col::after{display:none}
+.worth-strip.blank .k::after{content:' ·';color:var(--ink-3)}
+.worth-strip.blank .v{display:none}
+.worth-strip.blank .k{flex:none}
+.worth-strip.blank .s{
+  margin-top:0;color:var(--violet);font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 
 /* ‏המספר נע רק כשהוא מתחלף, כי אז הוא מראה מה השתנה. */
 @keyframes bump{
@@ -600,7 +650,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   color:var(--ink-2);letter-spacing:0;
 }
 .flow .v{
-  display:block;font-size:21px;font-weight:800;
+  display:block;font-size:21px;font-weight:var(--w-amount);
   letter-spacing:-0.02em;line-height:1.25;
   margin-top:3px;color:var(--ink);
 }
@@ -615,15 +665,17 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 .rows{border-top:1px solid var(--rule)}
 
+/* ‏שורה של 53 פיקסל במקום 97. שורה אחת ופס · לא שלוש שורות
+   ‏ואותו מספר בארבע צורות. */
 .row{
   display:block;width:100%;text-align:right;
-  padding:14px 0 15px;
+  padding:11px 0 10px;
   border-bottom:1px solid var(--rule);
   position:relative;
 }
 .row-top{
-  display:flex;align-items:baseline;gap:10px;
-  margin-bottom:9px;
+  display:flex;align-items:baseline;gap:9px;
+  margin-bottom:8px;
 }
 .row-ico{
   flex:none;font-size:15px;line-height:1;
@@ -631,29 +683,27 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .row-nm{flex:1;font-size:16px;font-weight:500;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row-val{flex:none;font-size:17px}
-.row-val.over{color:var(--red)}
-.row-of{
+/* ‏"נשארו" ו"חריגה של" הן מילות עזר ולכן שקטות · המספר הוא
+   ‏מה שהעין צריכה למצוא כשהיא סורקת את הטור מלמעלה למטה. */
+.row-val{
   flex:none;font-size:13px;color:var(--ink-3);
-  display:flex;align-items:baseline;gap:3px;
+  white-space:nowrap;
 }
-/* ‏המספר המתוכנן שקט יותר מזה שיצא: שם היא השאלה, כאן רק הרקע. */
-.row-of .money{font-size:13px;font-weight:600}
-
-/* ‏אפס אינו מידע, ולכן הוא לא נכתב בשחור מלא. שורה שלא קרה בה
-   כלום לא צריכה למשוך את העין יותר משורה שכן. */
-.row-val.zero{color:var(--ink-3);font-weight:600}
+.row-val .money{font-size:16px;color:var(--ink);font-weight:700}
+.row-val.over{color:var(--red)}
+.row-val.over .money{color:var(--red)}
+.row-val.plain .money{color:var(--ink-2)}
 
 /* ‏הפס מתמלא מימין, כמו שהעין קוראת. שני פסים ולא אחד: הרקע
    הוא המתוכנן, המילוי הוא מה שיצא. */
 .bar{
-  height:6px;border-radius:3px;
+  height:4px;border-radius:2px;
   background:var(--wash-2);overflow:hidden;
   position:relative;
 }
 .bar i{
   position:absolute;top:0;right:0;bottom:0;
-  background:var(--violet-fill);border-radius:3px;
+  background:var(--violet-fill);border-radius:2px;
   transition:width .4s var(--ease);
 }
 /* ‏קודם כל חריגה נראתה אותו דבר: פס ענבר מלא. חריגה של שישה
@@ -673,14 +723,14 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ‏השורה השלישית בשורת הקטגוריה · כמה נשאר, וכמה אחוז כבר הלך.
    ‏האחוז בקצה השני, כי הוא נקרא כטור משלו לאורך הרשימה. */
-.row-foot{
-  display:flex;align-items:baseline;gap:5px;
-  margin-top:7px;font-size:13px;color:var(--ink-3);
+/* ‏במטרה "מתוך" הוא עדיין מידע · היעד הוא כל העניין, ובלעדיו
+   ‏הסכום שנחסך אינו אומר דבר. בקטגוריה התכנון יושב במסך התקציב,
+   ‏וכאן אין לו מקום אחר. */
+.goal-of{
+  flex:none;font-size:13px;color:var(--ink-3);
+  display:flex;align-items:baseline;gap:3px;
 }
-.row-foot .money{font-weight:700;color:var(--ink-2);font-size:13px}
-.row-foot.over{color:var(--red)}
-.row-foot.over .money{color:var(--red)}
-.row-foot .pct{margin-inline-start:auto;font-variant-numeric:tabular-nums}
+.goal-of .money{font-size:13px;font-weight:600}
 
 .cat-add{
   display:flex;align-items:center;gap:8px;
@@ -753,7 +803,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:flex;flex-direction:column;align-items:center;
 }
 .lock-ico{width:30px;height:30px;color:var(--violet);margin-bottom:14px}
-.lock h2{font-size:21px;font-weight:800;letter-spacing:-0.01em}
+.lock h2{font-size:21px;font-weight:var(--w-h1);letter-spacing:-0.01em}
 .lock-sub{
   margin-top:7px;font-size:14px;color:var(--ink-3);
   line-height:1.5;max-width:22em;
@@ -795,7 +845,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .pad button{
   width:72px;height:72px;border-radius:50%;
-  font-family:'Sora','Heebo',sans-serif;
+  font-family:var(--font);
   font-size:27px;font-weight:600;
   font-variant-numeric:tabular-nums;
   color:var(--ink);background:var(--wash);
@@ -919,7 +969,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .nav button{
   display:flex;flex-direction:column;align-items:center;
   justify-content:center;gap:3px;
-  font-size:11px;font-weight:600;color:var(--ink-3);
+  font-size:11px;font-weight:var(--w-ui);color:var(--ink-3);
   transition:color .14s var(--ease);
 }
 .nav button svg{width:23px;height:23px}
@@ -966,7 +1016,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   background:var(--rule-2);margin:6px auto 14px;
 }
 .sheet h2{
-  font-size:20px;font-weight:900;letter-spacing:-0.02em;
+  font-size:20px;font-weight:var(--w-h1);letter-spacing:-0.02em;
   margin-bottom:4px;
 }
 .sheet .sub{font-size:14px;color:var(--ink-2);margin-bottom:18px;line-height:1.55}
@@ -1138,7 +1188,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .back svg{width:16px;height:16px}
 
 .pg-title{
-  font-size:27px;font-weight:900;letter-spacing:-0.025em;
+  font-size:27px;font-weight:var(--w-h1);letter-spacing:-0.025em;
   padding:6px 0 10px;
 }
 

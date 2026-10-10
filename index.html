@@ -203,12 +203,36 @@
 <meta name="twitter:description" content="ליווי וייעוץ פיננסי אישי לצעירים, לזוגות ולמשפחות צעירות. יועץ כלכלי מוסמך מטעם חברת UNI פיננסים, בפיקוח אוניברסיטת אריאל.">
 <meta name="twitter:image" content="https://shohamfinance.co.il/assets/share-home.jpg">
 <link rel="preload" as="image" href="assets/logo.webp?v=7ad752ae" fetchpriority="high">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@900&amp;text=0123456789&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ‏רכיבי טופס אינם יורשים גופן מהדפדפן · בלי השורה הזאת הם
+   ‏נופלים ל-Arial של מערכת ההפעלה. נתפס במדידה: שדות הטופס
+   ‏ושני כפתורי הסגירה היו היחידים בדף שלא ב-Heebo. רק המשפחה
+   ‏נקבעת כאן, לא הגודל ולא המשקל, כדי שדבר לא יזוז. */
+button, input, select, textarea { font-family: inherit; }
+
+
 :root {
+  /* ── הטיפוגרפיה ──
+     ‏Heebo כגופן משתנה בטווח 300 עד 900, ולכן כל משקל כאן הוא
+     ‏מופע אמיתי בקובץ. קודם נטענו שישה משקלים דיסקרטיים בעוד
+     ‏הקוד ביקש גם 600, והדפדפן נפל ל-700 · נמדד. הטווח גם קל
+     ‏יותר: 41 קילובייט לכל המשקלים מול 205 לחמישה סטטיים.
+     ‏אותם שמות בדיוק יושבים גם ב-app/app.css, כדי שהאתר
+     ‏והאפליקציה יהיו מערכת אחת ולא שתיים. */
+  --font: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --w-amount: 800;
+  --w-display: 800;
+  --w-h1: 700;
+  --w-h2: 600;
+  --w-ui: 600;
+  --w-ui-soft: 500;
+  --w-body: 400;
+
   --p1: #0c0b11;
   --p2: #161322;
   --p3: #2e1148;
@@ -377,7 +401,7 @@ a, input, textarea, label, summary { touch-action: manipulation; }
 
 
 body {
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   background: radial-gradient(ellipse 120% 80% at 50% -10%, #1a1230 0%, var(--p1) 50%) var(--p1);
   color: var(--white);
   direction: rtl;
@@ -804,7 +828,7 @@ section {
   background: none;
   border: none;
   color: rgba(255,255,255,0.45);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -1037,7 +1061,7 @@ section {
   display: inline-block;
   background: linear-gradient(135deg, var(--p4), var(--p5));
   color: white;
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 17px;
   font-weight: 700;
   padding: 18px 44px;
@@ -1291,7 +1315,7 @@ section {
 .step.visible > * { opacity: calc(0.4 + 0.6 * var(--focus)); }
 
 .step-num {
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: var(--font);
   /* The number is what announces whose turn it is, so it takes the light
      rather than merely brightening with the rest. */
   color: rgba(196,132,252, calc(0.2 + 0.75 * var(--focus)));
@@ -1561,7 +1585,7 @@ section {
 }
 
 .phil-num {
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: var(--font);
   font-size: 48px;
   font-weight: 900;
   color: rgba(168,85,247,0.18);
@@ -1876,7 +1900,7 @@ section {
   border: 1px solid rgba(216,180,254,0.30);
   background: rgba(168,85,247,0.07);
   color: var(--p6);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.4px;
@@ -1933,7 +1957,7 @@ section {
   border: 1px solid rgba(168,85,247,0.3);
   border-radius: 12px;
   padding: 16px 20px;
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   /* ‏שישה עשר ולא חמישה עשר. מתחת לסף הזה ספארי באייפון מזגזג את
      העמוד פנימה ברגע שנוגעים בשדה, ולא חוזר אחורה כשעוזבים אותו.
      הדרך הנפוצה לעקוף את זה היא לחסום זום בכלל, וזה כשל נגישות.
@@ -2084,7 +2108,7 @@ section {
   border: 1px solid rgba(168,85,247,0.4);
   box-shadow: 0 12px 34px -10px rgba(0,0,0,0.8);
   color: rgba(255,255,255,0.9);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 13.5px;
   font-weight: 500;
   white-space: nowrap;
@@ -2159,6 +2183,7 @@ section {
 .privacy-overlay.open .privacy-modal { transform: none; }
 
 .privacy-close {
+  font-family: var(--font);
   position: absolute;
   top: 14px;
   inset-inline-end: 14px;
@@ -2440,7 +2465,7 @@ section {
   background: none;
   border: none;
   color: rgba(255,255,255,0.42);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 13.5px;
   cursor: pointer;
   padding: 8px;
@@ -2848,7 +2873,7 @@ footer {
   background: #25d366;
   color: #ffffff;
   text-decoration: none;
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 700;
   padding: 12px 10px;
@@ -2898,6 +2923,7 @@ footer {
 
 /* close button */
 .iphone-close {
+  font-family: var(--font);
   background: rgba(20,8,48,0.85);
   border: 1px solid rgba(168,85,247,0.25);
   color: rgba(255,255,255,0.5);
@@ -2946,7 +2972,7 @@ footer {
 }
 
 .faq-title {
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 800;
   color: var(--white);
@@ -2988,7 +3014,7 @@ footer {
   background: none;
   border: none;
   padding: 22px 4px;
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 16px;
   font-weight: 700;
   color: var(--white);
@@ -3056,7 +3082,7 @@ footer {
   background: none;
   border: none;
   color: rgba(255,255,255,0.45);
-  font-family: 'Heebo', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -3220,7 +3246,7 @@ footer {
   justify-content: center;
   font-size: 22px;
   font-weight: 900;
-  font-family: 'Frank Ruhl Libre', serif;
+  font-family: var(--font);
   /* Dim until the line reaches it, then it takes the light — so the
      numbers come on one at a time, in order, as the page is read. */
   --focus: inherit;

@@ -250,6 +250,7 @@ const S = {
   hist: null,
   mode: 'signup',
   asked: false,             // לא שואלים יותר מפעם אחת בביקור
+  askCat: null,             // ‏והקטגוריה שעליה נשאל, לכרטיס במסך
   lastLeft: null,
   ever: true,               // ‏האם היה במשק הבית אי פעם תקציב או תנועה
   assets: [],               // ‏החסכונות והנכסים, נקראים פעם אחת לטעינה
@@ -1018,11 +1019,15 @@ function renderWorth() {
   const v = $('worthNow');
   const parts = $('worthParts');
 
+  /* ‏כשאין נכסים הרצועה מתכווצת לשורה אחת. קודם היא תפסה מאה
+     ‏פיקסל בראש המסך כדי לומר "טרם הוזן" · מאית מהמסך שאינה
+     ‏מידע. היא נשארת, כי "כמה יש לי" הוא שם האפליקציה והכניסה
+     ‏לשם צריכה להיות גלויה, אבל בגודל של הזמנה ולא של תשובה. */
   if (!S.assets.length) {
     strip.classList.add('blank');
-    v.textContent = 'טרם הוזן';
+    v.textContent = '';
     v.classList.remove('money');
-    parts.textContent = 'חיסכון, קרן השתלמות, פנסיה, דירה';
+    parts.textContent = 'להוסיף חיסכון, קרן השתלמות או דירה';
     strip.setAttribute('aria-label', 'מה יש לי בסך הכל. טרם הוזן. לחיצה מוסיפה חיסכון או נכס');
     show(strip);
     return;
@@ -1073,16 +1078,32 @@ function renderRows(current, dim, now) {
     const row = el('button', 'row');
     row.type = 'button';
     row.setAttribute('aria-label',
-      p > 0 ? `${c.label}. יצא ${fmt(s)} מתוך ${fmt(p)} שתוכננו${over ? '. חריגה' : ''}`
+      p > 0 ? `${c.label}. יצא ${fmt(s)} מתוך ${fmt(p)} שתוכננו. ` +
+              (over ? `חריגה של ${fmt(s - p)}` : `נשארו ${fmt(p - s)}`)
             : `${c.label}. יצא ${fmt(s)}, לא תוכנן`);
 
     const top = el('div', 'row-top');
     const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
     const nm = el('span', 'row-nm', c.label);
-    const val = moneyEl(s, 'row-val' + (over ? ' over' : '') + (s === 0 ? ' zero' : ''));
-    const of = el('span', 'row-of');
-    if (p > 0) { of.append(document.createTextNode('מתוך ')); of.append(moneyEl(p)); }
-    top.append(ic, nm, val, of);
+
+    /* ‏עובדה אחת לשורה. השורה הזאת החזיקה פעם ארבע צורות של אותו
+       ‏מספר · "430 מתוך 2,500", פס, "17%" ו"נשארו 2,070" · ונמתחה
+       ‏ל-97 פיקסל. שש כאלה הן יותר מחצי מסך של חזרה על עצמה.
+       ‏מה שנשאר הוא המספר היחיד שאדם באמת שואל עליו כשהוא עומד
+       ‏בסופר: כמה עוד מותר לי כאן. מה שיצא נמצא במסך התקציב,
+       ‏ולחיצה על השורה פותחת את התנועות עצמן. */
+    const val = el('span', 'row-val' + (over ? ' over' : '') + (!p ? ' plain' : ''));
+    if (over) {
+      val.append(document.createTextNode('חריגה של '));
+      val.append(moneyEl(s - p, 'money'));
+    } else if (p > 0) {
+      val.append(moneyEl(p - s, 'money'));
+      val.append(document.createTextNode(' נשארו'));
+    } else {
+      val.append(moneyEl(s, 'money'));
+      val.append(document.createTextNode(' יצא'));
+    }
+    top.append(ic, nm, val);
 
     const bar = el('div', 'bar' + (over ? ' over' : ''));
     bar.setAttribute('aria-hidden', 'true');
@@ -1110,14 +1131,6 @@ function renderRows(current, dim, now) {
     /* ‏"כמה נשאר לי בקטגוריה" ו"כמה מזה כבר הלך" · שני המספרים
        ‏שהפס מראה בעין אבל לא במילים. בלי תכנון אין מה לומר. */
     row.append(top, bar);
-    if (p > 0) {
-      const foot = el('div', 'row-foot' + (over ? ' over' : ''));
-      const amt = el('span', 'money');
-      setMoney(amt, over ? s - p : p - s);
-      foot.append(document.createTextNode(over ? 'חריגה של ' : 'נשארו '), amt);
-      foot.append(el('span', 'pct', Math.round(s / p * 100) + '%'));
-      row.append(foot);
-    }
     row.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
     frag.append(row);
   }
@@ -1234,14 +1247,22 @@ async function saveAsk(skipped) {
 $('askSave').addEventListener('click', () => saveAsk(false));
 $('askSkip').addEventListener('click', () => saveAsk(true));
 
-/* ‏מופעל אחרי שהמסך התיישב, פעם אחת בביקור, ולא מיד אחרי ההקמה. */
+/* ‏פעם אחת בביקור, ולא מיד אחרי ההקמה.
+
+   ‏קודם זה פתח גלון חוסם תשע מאות אלפיות שנייה אחרי שהמסך
+   ‏התיישב. נתפס בבדיקה: רשמתי מסעדה ב-1,200 מול תכנון של 1,000,
+   ‏והגלון חסם את כל המסך בדיוק ברגע שסיימתי לרשום. זה הרגע
+   ‏הגרוע ביותר לעצור אדם · הוא עשה בדיוק את מה שרצינו שיעשה.
+   ‏עכשיו זה כרטיס במסך, כמו שאלת סוף החודש שהייתה כזאת מלכתחילה,
+   ‏והגלון נפתח רק אם הוא לוחץ עליו. */
 function maybeAsk() {
-  if (S.asked || openEl) return;
+  if (S.asked) return;
   for (const c of outCats()) {
     const p = planned(c.id), s = spentIn(c.id);
     if (p > 0 && s > p && !haveReflection('overspend', c.id)) {
       S.asked = true;
-      setTimeout(() => { if (!openEl && S.tab === 'home') openAsk('overspend', c); }, 900);
+      S.askCat = c;
+      renderInsight();
       return;
     }
   }
@@ -1336,6 +1357,17 @@ async function renderInsight() {
         [['לשאלה', () => openAsk('month_end', null)]]);
       return;
     }
+  }
+
+  /* ‏החריגה שכבר קרתה · הזמנה, לא חקירה. היא יורדת ברגע שענו
+     ‏עליה או שבחרו לא עכשיו, ואינה חוזרת באותו חודש. */
+  if (S.askCat && !haveReflection('overspend', S.askCat.id)) {
+    const c = S.askCat;
+    card('שאלה אחת על ' + c.label,
+      `${c.label} עבר את התכנון. זה קורה לכולם, ואין כאן ציון · רק שווה לדעת למה, כי זה מה שמשנה את החודש הבא.`,
+      [['לענות', () => openAsk('overspend', c)],
+       ['לא עכשיו', () => { askCtx = { kind: 'overspend', cat: c }; saveAsk(true); }]]);
+    return;
   }
 
   /* ‏אזהרה לפני החריגה ולא אחריה, ופעם אחת לכל קטגוריה בחודש.
@@ -3366,7 +3398,7 @@ async function renderGoals() {
     const top = el('div', 'goal-top');
     top.append(el('span', 'goal-nm', g.title));
     const v = el('span', 'goal-v money'); setMoney(v, saved);
-    const of = el('span', 'row-of');
+    const of = el('span', 'goal-of');
     of.append(document.createTextNode('מתוך '));
     const ofv = el('span', 'money'); setMoney(ofv, target); of.append(ofv);
     top.append(v, of);
