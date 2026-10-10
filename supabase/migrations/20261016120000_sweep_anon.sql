@@ -8,9 +8,10 @@
 -- ‏שורות ריקות. הפונקציה הזאת מוחקת אותם.
 --
 -- ‏מה שהיא לא עושה, וזה העיקר: היא לא נוגעת באורח שיש לו משהו.
--- ‏תנועה אחת, מסמך אחד, נכס אחד או מטרה אחת · והחשבון נשאר, בלי
--- ‏קשר לכמה זמן עבר. אדם שניהל תקציב חודשיים ועזב לחופשה חוזר
--- ‏ומוצא את הנתונים שלו.
+-- ‏תנועה אחת, מסמך אחד, נכס אחד, מטרה אחת, חוב אחד, מחשבה אחת,
+-- ‏ייבוא אחד או קטגוריה שהוא הוסיף בעצמו · והחשבון נשאר, בלי קשר
+-- ‏לכמה זמן עבר. אדם שניהל תקציב חודשיים ועזב לחופשה חוזר ומוצא
+-- ‏את הנתונים שלו.
 
 create or replace function public.sweep_anon(p_days integer default 14)
 returns table(users_removed integer, households_removed integer)
@@ -36,7 +37,13 @@ begin
               exists (select 1 from public.transactions t where t.household_id = m.household_id) or
               exists (select 1 from public.documents    d where d.household_id = m.household_id) or
               exists (select 1 from public.assets       a where a.household_id = m.household_id) or
-              exists (select 1 from public.goals        g where g.household_id = m.household_id)
+              exists (select 1 from public.goals        g where g.household_id = m.household_id) or
+              exists (select 1 from public.debts        b where b.household_id = m.household_id) or
+              exists (select 1 from public.reflections  r where r.household_id = m.household_id) or
+              exists (select 1 from public.imports      i where i.household_id = m.household_id) or
+              -- ‏קטגוריה שהמשתמש הוסיף בעצמו. קטגוריות המערכת יושבות
+              -- ‏בלי משק בית, ולכן אינן נספרות כאן.
+              exists (select 1 from public.categories   c where c.household_id = m.household_id)
             )
        )
   )
