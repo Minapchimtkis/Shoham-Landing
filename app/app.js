@@ -797,6 +797,35 @@ async function loadAll() {
   S.prevTxs = null;
 
   renderHome();
+  snapNetWorth();
+}
+
+/* ─────────────────────── תצלום ההון העצמי ── */
+
+/* ‏טבלת הנכסים מחזיקה את הסכום הנוכחי בלבד, ו-debts את היתרה
+   ‏הנוכחית בלבד. כשאדם מעדכן את הפנסיה מ-200 ל-210 אלף, המספר
+   ‏הקודם נמחק · ולכן אי אפשר לצייר הון עצמי לאחור. הנתון פשוט
+   ‏אינו קיים, וציור שלו בכל זאת היה המצאה.
+
+   ‏מכאן והלאה הוא כן קיים. שורה אחת לחודש, נכתבת מחדש בכל
+   ‏פתיחה באותו חודש · כך החודש הנוכחי תמיד עדכני והחודשים
+   ‏שעברו קפואים כפי שהיו.
+
+   ‏לא נכתב כלום כשאין נכסים ואין חובות. אפס כזה אינו "אין לי
+   ‏כלום" אלא "עוד לא הזנתי", וקו שטוח על אפס הוא שקר שקט. */
+async function snapNetWorth() {
+  if (!S.hh || (!S.assets.length && !S.debts.length)) return;
+  const row = {
+    household_id: S.hh,
+    as_of: monthKey(new Date()),
+    assets_agorot: S.assets.reduce((t, a) => t + a.amount_agorot, 0),
+    liabilities_agorot: assetLiab(),
+    debts_agorot: debtTotal()
+  };
+  /* ‏שקט ביודעין: אם המיגרציה עוד לא רצה, האפליקציה ממשיכה
+     ‏לעבוד בדיוק כמו קודם ורק הקו השני לא יצויר. */
+  try { await sb.from('net_worth_snapshots').upsert(row, { onConflict: 'household_id,as_of' }); }
+  catch { /* ‏אין טבלה · אין תצלום */ }
 }
 
 /* ‏החודש שלפני, ורק בשביל ההשוואה. נטען אחרי הציור הראשון כדי
@@ -3095,6 +3124,92 @@ $('calcPay').addEventListener('input', payLive);
 
 let yearPicked = null;
 
+
+/* ═════════════════════════════════ גרף הקו ══ */
+
+/* ‏גרף מנייתי: ציר זמן אופקי, סכום אנכי, וקו שצבעו נקבע לפי
+   ‏הכיוון. הזמן רץ משמאל לימין גם בדף ימני · זאת המוסכמה שכל
+   ‏גרף פיננסי בעולם משתמש בה, והיפוך שלה היה מבלבל יותר ממה
+   ‏שהוא פותר.
+
+   ‏SVG ולא ספרייה: ‏cdn.jsdelivr חסום מהסביבה הזאת, ה-CSP מרשה
+   ‏סקריפטים מאיתנו בלבד, וקו עם שתים עשרה נקודות אינו שווה
+   ‏מאתיים קילובייט.
+
+   ‏pts הוא [{label, value}]. הצבע נקבע מהנקודה הראשונה לאחרונה,
+   ‏ולא מקטע אחרון · משתמש שרואה ירוק רוצה לדעת שהשנה טובה, לא
+   ‏שהחודש האחרון במקרה עלה. */
+function lineChart(pts, opts = {}) {
+  const W = 320, H = 132, PAD_X = 6, PAD_T = 10, PAD_B = 22;
+  const wrap = el('div', 'chart');
+  const ns = 'http://www.w3.org/2000/svg';
+  const mk = (n, attrs) => { const e = document.createElementNS(ns, n);
+    for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+  const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, class: 'chart-svg',
+                          preserveAspectRatio: 'none', 'aria-hidden': 'true' });
+  svg.setAttribute('focusable', 'false');
+
+  const vals = pts.map(p => p.value);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  /* ‏קו שטוח לגמרי מחלק באפס. הרחבה מלאכותית קטנה שמה אותו
+     ‏באמצע הגובה במקום בקצה. */
+  if (hi === lo) { hi += Math.abs(hi) * 0.1 || 100; lo -= Math.abs(lo) * 0.1 || 100; }
+  const span = hi - lo;
+  const x = i => PAD_X + (pts.length === 1 ? (W - PAD_X * 2) / 2
+                : i * (W - PAD_X * 2) / (pts.length - 1));
+  const y = v => PAD_T + (hi - v) / span * (H - PAD_T - PAD_B);
+
+  const rising = vals[vals.length - 1] >= vals[0];
+  const dir = rising ? 'up' : 'down';
+  wrap.classList.add(dir);
+
+  /* ‏קו האפס, רק כשהוא בתוך התחום · בלעדיו גרף שחוצה לשלילי
+     ‏נראה כמו גרף שרק יורד. */
+  if (lo < 0 && hi > 0) {
+    svg.append(mk('line', { class: 'zero', x1: PAD_X, x2: W - PAD_X,
+                            y1: y(0).toFixed(1), y2: y(0).toFixed(1) }));
+  }
+
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+  const base = y(Math.max(lo, Math.min(hi, 0)));
+  svg.append(mk('path', { class: 'area',
+    d: `${d} L${x(pts.length - 1).toFixed(1)},${base.toFixed(1)} L${x(0).toFixed(1)},${base.toFixed(1)} Z` }));
+  svg.append(mk('path', { class: 'line', d, fill: 'none' }));
+
+  for (const [i, p] of pts.entries())
+    svg.append(mk('circle', { class: 'dot', cx: x(i).toFixed(1), cy: y(p.value).toFixed(1), r: 2.6 }));
+
+  wrap.append(svg);
+
+  /* ‏שתי תוויות בלבד · הראשונה והאחרונה. שתים עשרה תוויות על
+     ‏רוחב טלפון נדחסות זו לזו ואי אפשר לקרוא אף אחת. */
+  if (pts.length > 1) {
+    const ax = el('div', 'chart-x');
+    ax.append(el('span', null, pts[0].label));
+    ax.append(el('span', null, pts[pts.length - 1].label));
+    wrap.append(ax);
+  }
+
+  /* ‏מה שהעין רואה בקו, במילים · זה מה שקורא מסך מקבל. */
+  const first = vals[0], last = vals[vals.length - 1];
+  const delta = last - first;
+  const cap = el('p', 'chart-cap');
+  if (pts.length === 1) {
+    cap.textContent = 'נקודה אחת בלבד · הקו יתחיל להיראות בחודש הבא.';
+  } else {
+    const word = delta > 0 ? 'עלה ב' : delta < 0 ? 'ירד ב' : 'לא זז';
+    cap.textContent = delta === 0
+      ? `${opts.noun || 'הסכום'} לא זז בין ${pts[0].label} ל${pts[pts.length-1].label}.`
+      : `${opts.noun || 'הסכום'} ${word}${fmt(Math.abs(delta))} בין ${pts[0].label} ל${pts[pts.length-1].label}.`;
+  }
+  wrap.append(cap);
+  wrap.setAttribute('role', 'img');
+  wrap.setAttribute('aria-label',
+    (opts.noun || 'הסכום') + '. ' + pts.map(p => `${p.label} ${fmt(p.value)}`).join(', ') + '.');
+  return wrap;
+}
+
 async function renderYear() {
   const now = new Date();
   const thisYear = now.getFullYear();
@@ -3115,9 +3230,18 @@ async function renderYear() {
   box.append(el('p', 'note', 'טוען...'));
 
   const from = `${yearPicked}-01-01`, to = `${yearPicked}-12-31`;
-  const { data, error } = await sb.from('transactions')
-    .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
-    .gte('occurred_on', from).lte('occurred_on', to);
+  /* ‏התצלומים נטענים במקביל ובשקט · אם המיגרציה שלהם עוד לא
+     ‏רצה, המסך מצייר את מה שיש ולא נופל. */
+  const [{ data, error }, snapRes] = await Promise.all([
+    sb.from('transactions')
+      .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
+      .gte('occurred_on', from).lte('occurred_on', to),
+    sb.from('net_worth_snapshots').select('as_of,net_agorot')
+      .gte('as_of', from).lte('as_of', to).order('as_of')
+      .then(r => r, () => ({ error: true, data: null }))
+  ]);
+  const snaps = (snapRes && !snapRes.error ? (snapRes.data || []) : [])
+    .map(r => ({ as_of: r.as_of, net: Number(r.net_agorot) }));
   if (error) { box.textContent = ''; box.append(el('p', 'note', human(error))); return; }
 
   const rows = (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
@@ -3128,10 +3252,36 @@ async function renderYear() {
   box.textContent = '';
   $('yearTitle').textContent = 'סיכום ' + yearPicked;
 
+  const netPts0 = snaps.map(r => ({
+    label: MFMT.format(new Date(r.as_of + 'T12:00:00')), value: r.net
+  }));
+
   if (!rows.length) {
+    /* ‏אין תנועות · אבל אם יש מדידות הון עצמי, יש בהחלט מה
+       ‏להראות. מי שמנהל נכסים ולא רושם תנועות קיבל כאן קודם
+       ‏"אין נתונים" ולא ראה את הקו שלו בכלל. */
+    if (netPts0.length >= 2) {
+      const cb = el('div', 'sum-block');
+      cb.append(el('h2', null, 'ההון העצמי לאורך השנה'));
+      cb.append(lineChart(netPts0, { noun: 'ההון העצמי' }));
+      cb.append(el('p', 'chart-note',
+        'נכסים פחות התחייבויות פחות חובות, כפי שהיו בכל חודש.'));
+      box.append(cb);
+      box.append(el('p', 'note',
+        'בשנה הזאת עוד לא נרשמה אף תנועה, ולכן אין פירוט חודשי. אפשר לייבא דפי בנק אחורה.'));
+      const b0 = el('button', 'btn btn-ghost', 'לייבוא קובץ');
+      b0.type = 'button';
+      b0.addEventListener('click', () => tab('import'));
+      box.append(b0);
+      return;
+    }
     const e = el('div', 'empty');
     e.append(el('h2', null, 'אין נתונים ל' + yearPicked));
-    e.append(el('p', null, 'בשנה הזאת לא נרשמה אף תנועה. אפשר לייבא דפי בנק אחורה, והשנה תתמלא מעצמה.'));
+    /* ‏מדידה אחת אינה קו, אבל היא גם אינה "אין נתונים" · אדם
+       ‏שהזין את הנכסים שלו ראה כאן קודם שאין לו כלום. */
+    e.append(el('p', null, netPts0.length === 1
+      ? 'יש מדידה אחת של ההון העצמי, והקו מתחיל להיראות מהחודש השני. בשנה הזאת עוד לא נרשמה אף תנועה · אפשר לייבא דפי בנק אחורה.'
+      : 'בשנה הזאת לא נרשמה אף תנועה. אפשר לייבא דפי בנק אחורה, והשנה תתמלא מעצמה.'));
     const b = el('button', 'btn', 'לייבוא קובץ');
     b.type = 'button';
     b.addEventListener('click', () => tab('import'));
@@ -3186,6 +3336,71 @@ async function renderYear() {
     blk.append(row);
   }
   box.append(blk);
+
+  /* ── שני הקווים ──
+     ‏הראשון נגזר מהתנועות ולכן יש לו היסטוריה מלאה. השני נשען
+     ‏על התצלומים, שמתחילים להיאסף מהיום שהמיגרציה רצה · ולכן
+     ‏הוא מופיע רק כשיש לו לפחות שתי נקודות להעביר קו ביניהן. */
+  const mName = i => MFMT.format(new Date(yearPicked, i, 1));
+
+  let run = 0;
+  const kept12 = perMonth
+    .filter(m => m.out || m.in)
+    .map(m => { run += m.in - m.out; return { label: mName(m.i), value: run }; });
+
+  const netPts = netPts0;
+
+  if (kept12.length >= 2 || netPts.length >= 2) {
+    const cb = el('div', 'sum-block');
+    const title = el('h2', null, 'לאורך השנה');
+    cb.append(title);
+
+    const slot = el('div');
+    const views = [];
+    if (kept12.length >= 2)
+      views.push(['מה שנשאר', () => lineChart(kept12, { noun: 'מה שנשאר אצלכם' }),
+                  'סכום רץ של ההכנסות פחות ההוצאות, חודש אחרי חודש.']);
+    if (netPts.length >= 2)
+      views.push(['ההון העצמי', () => lineChart(netPts, { noun: 'ההון העצמי' }),
+                  'נכסים פחות התחייבויות פחות חובות, כפי שהיו בכל חודש.']);
+
+    let picked = 0;
+    const draw = () => {
+      slot.textContent = '';
+      const [, make, sub] = views[picked];
+      slot.append(make());
+      slot.append(el('p', 'chart-note', sub));
+    };
+
+    if (views.length > 1) {
+      const chips = el('div', 'chips');
+      chips.style.marginBottom = '12px';
+      views.forEach(([label], i) => {
+        const b = el('button', 'chip', label);
+        b.type = 'button';
+        b.setAttribute('aria-pressed', String(i === picked));
+        b.addEventListener('click', () => {
+          picked = i;
+          for (const o of chips.children) o.setAttribute('aria-pressed', 'false');
+          b.setAttribute('aria-pressed', 'true');
+          draw();
+        });
+        chips.append(b);
+      });
+      cb.append(chips);
+    }
+    draw();
+    cb.append(slot);
+    box.append(cb);
+  } else if (netPts.length === 1 && kept12.length < 2) {
+    /* ‏נקודה אחת אינה קו. אומרים את זה במילים במקום לצייר
+       ‏משהו שנראה כמו מגמה ואינו. */
+    const cb = el('div', 'sum-block');
+    cb.append(el('h2', null, 'לאורך השנה'));
+    cb.append(el('p', 'note',
+      'יש כרגע מדידה אחת של ההון העצמי. הקו מתחיל להיראות מהחודש השני.'));
+    box.append(cb);
+  }
 
   const active = perMonth.filter(m => m.out > 0);
   if (active.length >= 2) {
