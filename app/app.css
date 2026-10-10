@@ -26,7 +26,11 @@
      הייתה 0.42, שהם 2.74 בלבד, ולכן כל טקסט משני באפליקציה
      היה מתחת לסף הקריאות. 0.60 נותן 4.85. */
   --ink-2:rgba(22,17,31,0.76);
-  --ink-3:rgba(22,17,31,0.60);
+  /* ‏0.64 ולא 0.60. הקרקע כבר אינה לבנה, והרבע הזה הוא מה
+     ‏שמאפשר לרקע להיות רקע · נמדד: ב-0.60 ההילה החזקה ביותר
+     ‏שעוברת היא חלשה פי 2.6. על לבן זה 5.1 במקום 4.85, כלומר
+     ‏גם קריא יותר. */
+  --ink-3:rgba(22,17,31,0.64);
 
   /* ── הסגול, ורק עליו ──
      הערך החי, המצב הפעיל, הפעולה הראשית. שלושה תפקידים. אם הוא
@@ -49,9 +53,21 @@
      ‏בכוונה · אדום של אזעקה מזין בדיוק את הפחד להסתכל בחשבון,
      ‏שהוא השד שהמוצר הזה נבנה נגדו. */
   --green:#2e7050;         /* 5.92 על לבן */
-  --green-soft:rgba(46,112,80,0.10);
+  --green-soft:rgba(15,157,107,0.141);
   --red:#a62e35;           /* 6.85 על לבן */
-  --red-soft:rgba(166,46,53,0.10);
+  /* ‏שני הגוונים הרכים מאוזנים זה מול זה במדידה ולא בעין.
+     ‏המדד הוא כרומה · המרחק מאפור · ולא רוויית HSL, שמטעה
+     ‏בצבעים בהירים: #f6eaeb ו-#f9d8db יוצאים שם 40 ו-75 אחוז
+     ‏בעוד הכרומה שלהם היא 12 ו-34.
+
+     ‏מה שהיה: ירוק כרומה 7 ובהירות 86, אדום כרומה 34 ובהירות
+     ‏74. האדום היה חזק פי חמישה וכהה ב-12 נקודות, ולכן בלע את
+     ‏הירוק. עכשיו שניהם כרומה 20, והפער בבהירות הוא 0.3.
+
+     ‏הירוק נגזר מ-#0f9d6b ולא מ---green · הירוק של הטקסט כהה
+     ‏מדי, וכדי להגיע ממנו לכרומה 20 היה צריך שקיפות שמכהה את
+     ‏הכרטיס כולו. */
+  --red-soft:rgba(224,36,55,0.106);
 
   --gold:#f0c040;          /* הרצף, ושום דבר אחר */
 
@@ -87,6 +103,30 @@
   --w-ui:600;              /* ‏כפתורים, ניווט, תוויות */
   --w-ui-soft:500;         /* ‏תווית שקטה, שם בשורה */
   --w-body:400;            /* ‏טקסט רגיל והסברים */
+
+  /* ── האווירה ──
+     ‏שכבת האור שמאחורי הכול. היא קיימת כדי שהמסך ירגיש עמוק
+     ‏ולא שטוח, ולכן היא חייבת להישאר חלשה: כל הילה כאן נחלשת
+     ‏עד לעוצמה של --wash לכל היותר, כי --wash הוא המשטח הכהה
+     ‏ביותר שעליו נמדד שדיו 3 עדיין עובר. חזק מזה היה הופך כל
+     ‏טקסט באפליקציה לבדיקת ניגודיות מחדש.
+
+     ‏היא סטטית. שום דבר באפליקציה לא זז מעצמו. */
+  /* ‏הבסיס מגוון ולא לבן · זה מה שגורם לכרטיס לבן להתרומם
+     ‏בלי צל, בדיוק כמו ברקע הכחול שבהשראה. הוא נשאר בהיר
+     ‏בבירור מ---wash (#f4eafa), כדי שהמשטח המורם האמיתי של
+     ‏האפליקציה עדיין ייראה מורם מעליו. */
+  --aura-base:#f7f4fb;
+  /* ‏העוצמות האלה לא נבחרו בעין. הן נמצאו בחיפוש בינארי על
+     ‏הדף עצמו: ציור, צילום, סריקה של 329,160 פיקסלים, איתור
+     ‏הפיקסל הכהה ביותר, וחישוב ניגודיות מולו · עד לערך הגדול
+     ‏ביותר שעדיין מחזיק 4.6 לכל צבע. הכהה ביותר שיוצא הוא
+     ‏rgb(236,223,245), וה---green הוא שנוגע בתקרה. */
+  --aura-1:rgba(140,44,195,0.068);  /* ‏ההילה הראשית, מימין למעלה */
+  --aura-2:rgba(21,9,70,0.032);     /* ‏הכחול של הלוגו, משמאל */
+  --aura-3:rgba(140,44,195,0.038);  /* ‏חזרה שקטה בתחתית */
+  --aura-line:rgba(140,44,195,0.056);/* ‏קשת מופשטת, קו אחד */
+  --page:#f1ecf7;                   /* ‏מחוץ לעמודה, במסך רחב */
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -97,10 +137,15 @@ html{
   -webkit-tap-highlight-color:transparent;
 }
 
+/* ‏מחוץ לעמודה של הטלפון, על מסך רחב. */
+html{background:var(--page)}
+
 body{
   font-family:var(--font);
   color:var(--ink);
-  background:var(--paper);
+  /* ‏שקוף · הנייר עצמו מצויר בשכבת האווירה שמתחת, כדי שההילות
+     ‏יישארו קבועות בזמן גלילה במקום לזוז עם התוכן. */
+  background:transparent;
   font-size:16px;
   line-height:1.5;
   font-weight:var(--w-body);
@@ -116,6 +161,45 @@ body{
 
 @media (min-width:520px){
   body{min-height:100svh}
+}
+
+/* ─────────────────────────────────── האווירה ── */
+
+/* ‏שלוש הילות וקשת אחת, קבועות ביחס למסך. z-index שלילי מניח
+   ‏אותן מאחורי כל התוכן, ו-body שקוף כדי שלא יכסה אותן.
+
+   ‏גרדיאנטים ולא blur על אלמנט גדול: blur של 300 פיקסל על
+   ‏שטח מסך מלא הוא עבודה אמיתית למעבד הגרפי בטלפון, וגרדיאנט
+   ‏רדיאלי נותן את אותה תמונה בחינם. */
+.aura{
+  position:fixed;
+  top:0;bottom:0;left:0;right:0;
+  max-width:460px;margin-inline:auto;
+  z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(118% 62% at 88% -10%, var(--aura-1), transparent 64%),
+    radial-gradient(96% 52% at -16% 4%,   var(--aura-2), transparent 60%),
+    radial-gradient(108% 48% at 46% 106%, var(--aura-3), transparent 62%),
+    var(--aura-base);
+  overflow:hidden;
+}
+
+/* ‏הקשת. קו אחד, לא צורה מלאה · היא נותנת עומק בלי להתחרות
+   ‏בשום דבר שכתוב עליה. */
+.aura::before{
+  content:'';position:absolute;
+  width:124vw;height:124vw;max-width:580px;max-height:580px;
+  top:-26%;inset-inline-end:-34%;
+  border-radius:50%;
+  border:1px solid var(--aura-line);
+}
+.aura::after{
+  content:'';position:absolute;
+  width:86vw;height:86vw;max-width:400px;max-height:400px;
+  bottom:-16%;inset-inline-start:-28%;
+  border-radius:50%;
+  border:1px solid var(--aura-line);
+  opacity:.7;
 }
 
 /* כסף. הכלל היחיד שחל על כל מספר באפליקציה.
@@ -574,9 +658,12 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   width:7px;height:7px;border-radius:50%;flex:none;
   background:currentColor;
 }
-.pulse.green{color:var(--green);background:var(--green-soft)}
-.pulse.amber{color:var(--amber);background:var(--amber-soft)}
-.pulse.red  {color:var(--red);  background:var(--red-soft)}
+/* ‏נייר מתחת לגוון. הגוונים הרכים שקופים, וכשהם יושבים ישר
+   ‏על האווירה הם מתערבבים בה ומכהים · נתפס ב-axe: "בשליטה"
+   ‏ירד ל-4.48 על רקע שיצא #dee0e6 במקום על לבן. */
+.pulse.green{color:var(--green);background:linear-gradient(var(--green-soft),var(--green-soft)),var(--paper)}
+.pulse.amber{color:var(--amber);background:linear-gradient(var(--amber-soft),var(--amber-soft)),var(--paper)}
+.pulse.red  {color:var(--red);  background:linear-gradient(var(--red-soft),var(--red-soft)),var(--paper)}
 
 /* ‏רצועת "מה יש לי בסך הכל". שורה על הנייר ולא כרטיס מורם · ענן
    ‏התובנה הוא המשטח המורם היחיד של המסך הזה. */
@@ -631,10 +718,12 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
    ‏והזוג הזה על "מאיפה זה יצא" · שתי השאלות שהמשתמש שואל
    ‏בשנייה הראשונה, ושעד היום היו קבורות בפרוזה מתחת למספר.
 
-   ‏ההוצאות אינן אדומות. הן המשטח הרגיל, בדיוק כמו ההכנסות ·
-   ‏הוצאה אינה חריגה, והיא נצבעת רק כשהיא עברה את התכנון. זאת
-   ‏הסיבה שהעיצוב של שאר האפליקציות משקר כאן: הוא צובע באדום
-   ‏את עצם העובדה שחיים עולים כסף. */
+   ‏ירוק נכנס, אדום יצא · לפי בקשת שוהם, ובניגוד להמלצה שלי.
+   ‏ההסתייגות נשארת כתובה כאן כי היא עניינית: אדום קבוע על
+   ‏הוצאות צובע את עצם העובדה שחיים עולים כסף, ולא את החריגה.
+   ‏מה שנשאר מהרעיון המקורי הוא שהחריגה עדיין מורגשת · הרקע
+   ‏האדום הוא תמיד בהיר, והמספר עצמו נצבע רק כשעברו את התכנון.
+   ‏כך "יצא" ו"חרגתי" אינם נראים אותו דבר. */
 .flow{
   display:grid;grid-template-columns:1fr 1fr;gap:10px;
   margin:2px 0 16px;
@@ -644,7 +733,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   background:var(--wash);min-width:0;
 }
 .flow .cell.in{background:var(--green-soft)}
-.flow .cell.out.over{background:var(--red-soft)}
+.flow .cell.out{background:var(--red-soft)}
 .flow .k{
   display:block;font-size:12.5px;font-weight:600;
   color:var(--ink-2);letter-spacing:0;
@@ -655,6 +744,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   margin-top:3px;color:var(--ink);
 }
 .flow .cell.in .v{color:var(--green)}
+/* ‏המספר נצבע רק בחריגה · הרקע כבר אדום תמיד, ואם גם המספר
+   ‏היה, לא היה נשאר שום הבדל בין חודש רגיל לחודש שחרג. */
+.flow .cell.out .v{color:var(--ink)}
 .flow .cell.out.over .v{color:var(--red)}
 .flow .s{
   display:block;font-size:12px;color:var(--ink-3);
@@ -662,6 +754,16 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 
 /* ──────────────────────────────── שורות הקטגוריות ── */
+
+/* ‏כותרת קבוצה · הוצאות והכנסות באותו מסך, כל אחת עם הכותרת
+   ‏שלה, כדי שלא ייראו כרשימה אחת מעורבבת. */
+.grp-h{
+  font-size:13px;font-weight:var(--w-h1);color:var(--ink-3);
+  margin:22px 0 7px;
+}
+.rows:first-of-type + .grp-h{margin-top:26px}
+/* ‏בהכנסה אין פס · אין תקרה לחרוג ממנה. */
+.row-in{padding-bottom:12px}
 
 .rows{border-top:1px solid var(--rule)}
 
@@ -677,6 +779,38 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:flex;align-items:baseline;gap:9px;
   margin-bottom:8px;
 }
+/* ‏השם והמספר הם שני כפתורים · שני יעדים שונים באותה שורה.
+   ‏השם תופס את כל מה שנשאר כדי שאזור הנגיעה שלו יהיה אמיתי. */
+.row-go{
+  display:flex;align-items:baseline;gap:9px;
+  flex:1;min-width:0;text-align:right;
+  padding:3px 0;margin:-3px 0;
+}
+.row-val{
+  padding:3px 6px;margin:-3px -6px;
+  border-radius:8px;
+}
+
+/* ‏העריכה במקום · תווית ושדה, באותו גובה של השורה כדי ששום
+   ‏דבר לא יקפוץ כשהיא נפתחת ונסגרת. */
+.row-edit{
+  display:inline-flex;align-items:center;gap:7px;flex:none;
+}
+.row-edit-k{font-size:12px;color:var(--ink-3);white-space:nowrap}
+.row-inp{
+  width:92px;
+  /* ‏16 ולא פחות · מתחת לזה ספארי מזום את הדף בכל נגיעה. */
+  font-size:16px;font-weight:700;
+  font-variant-numeric:tabular-nums;
+  direction:ltr;text-align:left;
+  padding:7px 9px;min-height:40px;
+  background:var(--paper);
+  border:1px solid var(--violet);
+  border-radius:9px;
+  color:var(--ink);
+}
+.row-inp:focus{outline:2px solid var(--violet);outline-offset:1px}
+
 .row-ico{
   flex:none;font-size:15px;line-height:1;
   width:22px;text-align:center;
@@ -732,6 +866,22 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .goal-of .money{font-size:13px;font-weight:600}
 
+/* ‏שורת הפעולות מתחת לקטגוריות · הוספה וסידור, זה לצד זה. */
+.rows-foot{display:flex;gap:6px;align-items:center}
+.rows-foot .cat-add{width:auto;flex:none}
+.rows-foot #homeSort{margin-inline-start:auto;color:var(--ink-3)}
+.rows-foot #homeSort[aria-pressed="true"]{color:var(--violet)}
+
+/* ‏חיצי הסידור · 44 פיקסל לכל אחד, כמו כל יעד נגיעה. */
+.row-sort{display:inline-flex;gap:2px;flex:none}
+.row-arrow{
+  width:44px;height:44px;margin:-10px 0;
+  display:grid;place-items:center;
+  border-radius:10px;color:var(--violet);
+}
+.row-arrow svg{width:20px;height:20px}
+.row-arrow:disabled{color:var(--rule-2)}
+
 .cat-add{
   display:flex;align-items:center;gap:8px;
   width:100%;padding:15px 0;
@@ -773,10 +923,13 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   border-radius:20px;
   margin-bottom:28px;
 }
+/* ‏נייר ומסגרת כמו הבועה עצמה · משנעשתה לבנה, זנב בגוון
+   ‏הישן נראה כמו שתי בועות בשני צבעים. נתפס ב-ruletest. */
 .insight.cloud::before,
 .insight.cloud::after{
   content:'';position:absolute;
-  background:var(--wash);
+  background:var(--paper);
+  border:1px solid var(--rule);
   border-radius:50%;
 }
 .insight.cloud::before{width:12px;height:12px;bottom:-15px;inset-inline-start:24px}
@@ -1075,7 +1228,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .set-group{margin-top:26px}
 .set-group > h2{
   font-size:13px;font-weight:700;color:var(--ink-3);
-  margin-bottom:6px;
+  margin-bottom:8px;margin-inline-start:4px;
 }
 .set-row{
   display:flex;align-items:center;gap:12px;
@@ -1083,6 +1236,25 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   padding:14px 0;border-bottom:1px solid var(--rule);
   font-size:16px;
 }
+
+/* ‏הקבוצה היא כרטיס לבן על האווירה המגוונת · העומק נוצר
+   ‏מהפרש המשטחים ולא מצל. זה גם מה שהרקע הכחול שבהשראה עושה:
+   ‏הכרטיס אינו מוגבה בצל, הוא פשוט בהיר מהרקע שמאחוריו.
+
+   ‏בלי צל גם אין בעיה עם הכותרת: היא יושבת מחוץ לכרטיס, ואילו
+   ‏הצל היה על .set-group הוא היה נמרח גם מתחת לטקסט שלה. */
+.set-group > .set-row{
+  background:var(--paper);
+  padding-inline:15px;
+  border-inline:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+/* ‏השנייה ולא הראשונה · הראשון בקבוצה הוא ה-h2. */
+.set-group > .set-row:nth-child(2){
+  border-top:1px solid var(--rule);
+  border-radius:16px 16px 0 0;
+}
+.set-group > .set-row:last-child{border-radius:0 0 16px 16px}
 /* ‏שורה שהיא קישור יורשת את הסגול של <a>, ואז שבע שורות ניווט
    צועקות ביחד. הסגול שמור לערך החי, למצב הפעיל ולפעולה הראשית,
    והחץ ממילא כבר אומר שהשורה מובילה למקום. */
@@ -1314,6 +1486,32 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ‏פס אחד לכל קטגוריה, זה כל הגרף. עוגה של שמונה פרוסות אינה
    אומרת יותר, היא רק לוקחת חצי מסך. */
+
+/* ─────────── המשטחים על האווירה ───────────
+   ‏עד היום הקרקע הייתה לבנה ומשטח מורם היה --wash. עכשיו
+   ‏הקרקע מגוונת, ולכן ההיגיון מתהפך: משטח מורם הוא לבן, וקו
+   ‏שיער מגדיר לו קצה. --wash נשאר למה שהוא טוב בו · ריחוף,
+   ‏שבבים, ריבועי אייקונים. */
+.card,
+.insight,
+.first .steps,
+.imp-sum,
+.cta,
+.eg,
+.calc-res{
+  background:var(--paper);
+  border:1px solid var(--rule);
+}
+/* ‏הזוג של נכנס ויצא · לבן מתחת לגוון, אחרת הגוון מתערבב
+   ‏באווירה והכרטיס הירוק נקרא אפרפר. נתפס בצילום. */
+.flow .cell{background:var(--paper)}
+.flow .cell.in{
+  background:linear-gradient(var(--green-soft),var(--green-soft)),var(--paper);
+}
+.flow .cell.out{
+  background:linear-gradient(var(--red-soft),var(--red-soft)),var(--paper);
+}
+
 /* ─────────────────────────────────────── גרף הקו ── */
 
 /* ‏ירוק בעלייה, אדום בירידה · המוסכמה של גרף מנייתי. האדום כאן

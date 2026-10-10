@@ -72,6 +72,10 @@
 </head>
 <body>
 
+<!-- ‏שכבת האור שמאחורי הכול. אין בה תוכן ואין בה אינטראקציה,
+     ‏ולכן היא מוסתרת מקוראי מסך. -->
+<div class="aura" aria-hidden="true"></div>
+
 <!-- ═══════════════════════════════════════════ טעינה ══ -->
 <div id="boot" class="gate" aria-busy="true">
   <div class="gate-brand">
@@ -362,8 +366,26 @@
       <button class="btn-quiet" id="firstImport" type="button">ייבוא מקובץ</button>
     </section>
 
-    <h2 class="sr-only">הקטגוריות של החודש</h2>
+    <!-- ‏התקציב יושב כאן, במסך שנפתח עשרים פעם בחודש · לא
+         ‏במסך נפרד שצריך לעבור אליו וללחוץ בו "שמירה". -->
+    <h2 class="grp-h">ההוצאות</h2>
     <div class="rows" id="homeRows"></div>
+
+    <h2 class="grp-h" id="homeInH">ההכנסות</h2>
+    <div class="rows" id="homeInRows"></div>
+
+    <div class="rows-foot">
+      <button class="cat-add" id="homeCatAdd" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+        הוספת קטגוריה
+      </button>
+      <!-- ‏גרירה באצבע אינה אמינה ואינה נגישה · חיצים הם הדרך
+           ‏שעובדת בכל מכשיר וגם עם קורא מסך. -->
+      <button class="cat-add" id="homeSort" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="homeSortWord">סידור</span>
+      </button>
+    </div>
 
     <div id="homeInsight"></div>
   </main>
@@ -396,7 +418,6 @@
       <span class="v money" id="budgetTotal">0</span>
     </div>
     <p class="setup-hint" id="budgetHint"></p>
-    <button class="btn" id="budgetSave" type="button" style="margin-top:8px">שמירת התקציב</button>
     <p class="err hidden" id="budgetErr" role="alert"></p>
   </main>
 
@@ -1030,6 +1051,15 @@
   <div class="grab" aria-hidden="true"></div>
   <h2 id="catTitle">קטגוריה חדשה</h2>
   <p class="sub" id="catSub">רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.</p>
+  <!-- ‏הוצאה או הכנסה. עד היום כל קטגוריה שנוספה הייתה הוצאה
+       ‏בקוד קשיח, ולא הייתה שום דרך להוסיף מקור הכנסה. -->
+  <div class="field">
+    <span class="lbl" id="catKindLbl">סוג</span>
+    <div class="seg" id="catKind" role="group" aria-labelledby="catKindLbl">
+      <button type="button" id="catOut" aria-pressed="true">הוצאה</button>
+      <button type="button" id="catIn" aria-pressed="false">הכנסה</button>
+    </div>
+  </div>
   <div class="field">
     <label for="catName">השם</label>
     <input class="inp" id="catName" type="text" maxlength="30" autocomplete="off" placeholder="חיות מחמד">

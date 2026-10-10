@@ -21,21 +21,31 @@ The system already exists. Find the rule before adding one.
 
 | token | use |
 |---|---|
-| `--paper` | the ground. Nothing is raised on it by default |
-| `--wash` | the one raised surface allowed per screen |
-| `--ink` `--ink-2` `--ink-3` | three text levels. All pass 4.5:1 on white |
-| `--violet` | text on white. `--violet-fill` for fills |
-| `--amber` | over budget, destructive. **There is no red in this app** |
+| `--aura-base` | the ground. Tinted, not white — that is what lifts a card |
+| `--paper` | a raised surface: a white card on the tinted ground |
+| `--wash` | hover, chips, icon squares. No longer "the raised surface" |
+| `--ink` `--ink-2` `--ink-3` | three text levels |
+| `--violet` | text. `--violet-fill` for fills |
+| `--amber` | heads-up, destructive |
+| `--red` | it already happened. Restrained, never an alarm |
+| `--green-soft` `--red-soft` | balanced as a pair: same chroma, same luminance |
 | `--gold` | the streak, nothing else |
 
 Five standing rules, from the top of the stylesheet:
 
 1. One number is the hero of a screen. Everything else supports it.
-2. No red. Over budget is amber and phrased as a question.
-3. Money is Sora, words are Heebo. Sora is subset to digits so `₪`
-   falls back to Heebo on its own — never wrap it by hand.
-4. One raised surface per screen, maximum.
-5. Motion answers a tap. Nothing animates on its own.
+2. Amber is "it is coming", red is "it already happened". Red is
+   deep and restrained, never the red of an alarm, and an overspend
+   is still phrased as a question and never as a scolding.
+3. One typeface: Heebo, loaded as a variable font over `wght@300..900`
+   so every weight in the code is a real instance. Weights come from
+   the `--w-*` tokens. Heebo's digits are exactly equal width, which
+   is why there is no second font for money.
+4. The ground is tinted and a raised surface is white. At most one
+   raised block per screen still holds; what changed is which colour
+   means "raised".
+5. Motion answers a tap. Nothing animates on its own — the ambient
+   layer is static.
 
 ## 2. The floor, which is already met
 
@@ -58,7 +68,10 @@ Do not regress these. The suites in the scratchpad check them.
 - `dir="rtl"` on `<html>`. Use logical properties: `margin-inline-start`,
   not `margin-left`.
 - Exception: `.money` is `direction: ltr; unicode-bidi: isolate`, because
-  a figure reads left to right in every language.
+  a figure reads left to right in every language. It also needs
+  `text-align: right`: an LTR run inside a block box sticks to the left
+  edge, and without this the biggest number on the screen sat in the
+  opposite corner from its own heading.
 - In a dialog the primary action goes on the **left**, which is the
   mirror of OK-on-the-right.
 - Never a hyphen in visible Hebrew. Use a middle dot, a comma, or a word.
@@ -95,7 +108,12 @@ The app earns the consultation; it does not ask for it. Rules:
 
 - [ ] Uses existing tokens and classes; no new hex, no duplicate class.
 - [ ] 390px and 320px, no horizontal scroll; 44px targets; 16px inputs.
-- [ ] Contrast checked, not assumed, against white.
+- [ ] Contrast measured, not assumed, and **against the tinted ground,
+      not white**. The ground is no longer white, and a soft tint laid
+      straight on it composites darker than it does on paper — put
+      `var(--paper)` under every translucent tint. `auratest` screenshots
+      the ambient layer, scans every pixel, finds the darkest one and
+      checks each colour token against it.
 - [ ] Hover inside the pointer query, `:active` after it.
 - [ ] RTL correct, logical properties, no hyphen in Hebrew.
 - [ ] At most one raised surface, at most one invitation, none on a

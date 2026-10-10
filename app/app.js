@@ -272,6 +272,9 @@ const plannedIn  = () => inCats().reduce((s, c) => s + planned(c.id), 0);
 const real = t => !t.is_transfer;
 const spentIn = id => S.txs.reduce((s, t) =>
   s + (real(t) && t.direction === 'out' && t.category_id === id ? t.amount_agorot : 0), 0);
+/* ‏ההקבלה של spentIn בצד ההכנסה · כמה נכנס בקטגוריה אחת. */
+const gotIn = id => S.txs.reduce((s, t) =>
+  s + (real(t) && t.direction === 'in' && t.category_id === id ? t.amount_agorot : 0), 0);
 const spentAll = () => S.txs.reduce((s, t) => s + (real(t) && t.direction === 'out' ? t.amount_agorot : 0), 0);
 const gotAll   = () => S.txs.reduce((s, t) => s + (real(t) && t.direction === 'in'  ? t.amount_agorot : 0), 0);
 const movedAll = () => S.txs.reduce((s, t) => s + (t.is_transfer ? t.amount_agorot : 0), 0);
@@ -962,6 +965,7 @@ function renderHome() {
   renderPulse(current, dim, now);
   renderWorth();
   renderRows(current, dim, now);
+  renderInRows();
   renderInsight();
 }
 
@@ -1003,6 +1007,241 @@ function renderFlow() {
   $('flowOut').setAttribute('aria-label',
     'יצא החודש ' + fmt(spent) + (over ? ', מעל התכנון' : ''));
 }
+
+/* ───────────────────────────────── סידור ── */
+
+/* ‏עמודת sort קיימת בבסיס הנתונים מהיום הראשון, ומעולם לא
+   ‏הייתה דרך לשנות אותה · כל קטגוריה שנוספה קיבלה 90 וצנחה
+   ‏לסוף לפי אלפבית.
+
+   ‏חיצים ולא גרירה: גרירה באצבע על רשימה שגם נגללת היא מקור
+   ‏קבוע לתסכול, והיא אינה נגישה כלל למי שמנווט במקלדת. */
+let sorting = false;
+
+function setSorting(on) {
+  sorting = on;
+  $('homeSort').setAttribute('aria-pressed', String(on));
+  $('homeSortWord').textContent = on ? 'סיום' : 'סידור';
+  renderHome();
+}
+$('homeSort').addEventListener('click', () => setSorting(!sorting));
+
+/* ‏הסדר נשמר כרצף 1,2,3 ולא כפערים · כך אין מצב שבו שתי
+   ‏קטגוריות חולקות ערך והסדר ביניהן נקבע באקראי. */
+async function moveCat(c, dir) {
+  const list = c.kind === 'income' ? inCats() : outCats();
+  const i = list.findIndex(x => x.id === c.id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= list.length) return;
+  list.splice(j, 0, list.splice(i, 1)[0]);
+  list.forEach((x, k) => { x.sort = k + 1; });
+  renderHome();
+  try {
+    const rows = list.map(x => ({ id: x.id, sort: x.sort }));
+    for (const r of rows) {
+      const { error } = await sb.from('categories').update({ sort: r.sort }).eq('id', r.id);
+      if (error) throw error;
+    }
+  } catch (err) { toast(human(err)); }
+}
+
+/* ‏שני החיצים, לשורה אחת. */
+function sortArrows(c, first, last) {
+  const box = el('span', 'row-sort');
+  const mk = (dir, label, d, off) => {
+    const b = el('button', 'row-arrow');
+    b.type = 'button';
+    b.setAttribute('aria-label', label + ' ' + c.label);
+    b.disabled = off;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'currentColor');
+    path.setAttribute('stroke-width', '2.2');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.append(path);
+    b.append(svg);
+    b.addEventListener('click', () => moveCat(c, dir));
+    return b;
+  };
+  box.append(mk(-1, 'העלאת', 'M7 14l5-5 5 5', first));
+  box.append(mk(1,  'הורדת', 'M7 10l5 5 5-5', last));
+  return box;
+}
+
+/* ───────────────────────────── ההכנסות בבית ── */
+
+/* ‏אותה שורה בדיוק, בלי פס ובלי "נשארו" · בהכנסה אין תקרה
+   ‏לחרוג ממנה. מה שמעניין הוא כמה נכנס מול כמה ציפיתם. */
+function renderInRows() {
+  const box = $('homeInRows');
+  box.textContent = '';
+  const cats = inCats();
+  const any = cats.some(c => planned(c.id) > 0 || gotIn(c.id) > 0);
+  $('homeInH').classList.toggle('hidden', !any);
+  box.classList.toggle('hidden', !any);
+  if (!any) return;
+
+  const frag = document.createDocumentFragment();
+  for (const c of cats) {
+    const p = planned(c.id), g = gotIn(c.id);
+    if (!p && !g) continue;
+    const row = el('div', 'row row-in');
+    const top = el('div', 'row-top');
+
+    const go = el('button', 'row-go');
+    go.type = 'button';
+    go.setAttribute('aria-label', `${c.label}. נכנס ${fmt(g)}` +
+      (p ? `, מתוך ${fmt(p)} שתוכננו` : '') + '. לתנועות');
+    go.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
+    const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
+    go.append(ic, el('span', 'row-nm', c.label));
+
+    const val = el('button', 'row-val plain');
+    val.type = 'button';
+    val.setAttribute('aria-label',
+      (p ? `תכנון ${c.label} ${fmt(p)}` : `${c.label} ללא תכנון`) + '. לשינוי');
+    val.append(moneyEl(g, 'money'));
+    val.append(document.createTextNode(' נכנס'));
+    val.addEventListener('click', () => openPlan(c, val));
+    const shown = cats.filter(x => planned(x.id) > 0 || gotIn(x.id) > 0);
+    const i = shown.findIndex(x => x.id === c.id);
+    top.append(go, sorting ? sortArrows(c, i === 0, i === shown.length - 1) : val);
+    row.append(top);
+    frag.append(row);
+  }
+  box.append(frag);
+}
+
+/* ────────────────────────── עריכת תכנון במקום ── */
+
+/* ‏התקציב היה מסך נפרד עם כפתור "שמירת התקציב", ועד שלא לחצו
+   ‏עליו שום דבר לא זז. עכשיו המספר בשורה הוא הכפתור: לחיצה
+   ‏הופכת אותו לשדה, הקלדה מעדכנת את כל המסך מיד, והשמירה
+   ‏יוצאת לשרת בשקט אחרי שהאצבע עוצרת.
+
+   ‏מה שנערך הוא התכנון, ומה שמוצג כרגיל הוא מה שנשאר · שני
+   ‏מספרים שונים. לכן השדה נפתח עם התכנון ולידו המילה "תכנון",
+   ‏ולא עם המספר שהיה שם רגע קודם. */
+
+let planTimer = null;
+let planOpen = null;
+
+const PLAN_WAIT = 700;
+
+/* ‏החודש נלכד ברגע ההקלדה ולא ברגע השמירה. בלי זה, החלפת
+   ‏חודש בתוך שבע מאות האלפיות של ההמתנה הייתה כותבת את המספר
+   ‏לחודש שאליו עברו · נתפס בבדיקה, כשחזרה מאפריל לאוקטובר
+   ‏החזירה 1 שקל במקום 11,600. */
+async function savePlan(catId, agorot, forMonth) {
+  const m = forMonth || monthKey(S.month);
+  const sameMonth = m === monthKey(S.month);
+  const prev = sameMonth ? S.budgets.get(catId) : undefined;
+  if (sameMonth) S.budgets.set(catId, agorot);
+  try {
+    const { error } = await sb.from('budgets').upsert({
+      household_id: S.hh, month: m,
+      category_id: catId, planned_agorot: agorot
+    }, { onConflict: 'household_id,month,category_id' });
+    if (error) throw error;
+  } catch (err) {
+    /* ‏מחזירים את המצב הקודם · מסך שמראה מספר שלא נשמר הוא
+       ‏גרוע יותר ממסך שאומר שהשמירה נכשלה. */
+    if (sameMonth) {
+      if (prev === undefined) S.budgets.delete(catId); else S.budgets.set(catId, prev);
+      renderHome();
+    }
+    toast(human(err));
+  }
+}
+
+function closePlan() {
+  if (!planOpen) return;
+  const { wrap, cat } = planOpen;
+  planOpen = null;
+  if (planTimer) { clearTimeout(planTimer); planTimer = null; }
+  if (wrap.isConnected) renderHome();
+  return cat;
+}
+
+function openPlan(c, valNode) {
+  closePlan();
+  const wrap = el('span', 'row-edit');
+  const lbl = el('span', 'row-edit-k', 'תכנון');
+  const inp = el('input', 'row-inp');
+  inp.type = 'text';
+  inp.inputMode = 'decimal';
+  inp.autocomplete = 'off';
+  inp.enterKeyHint = 'done';
+  inp.setAttribute('aria-label', 'התכנון של ' + c.label + ', בשקלים');
+  const p0 = planned(c.id);
+  const m0 = monthKey(S.month);
+  inp.value = p0 ? String(Math.round(p0 / 100)) : '';
+  inp.placeholder = '0';
+  wrap.append(lbl, inp);
+  valNode.replaceWith(wrap);
+  planOpen = { wrap, cat: c, inp };
+  inp.focus();
+  inp.select();
+
+  /* ‏כל הקלדה מציירת מחדש את כל מה שתלוי במספר · הפס, המספר
+     ‏הגדול, הזוג של נכנס ויצא, והמחוון. הכתיבה לשרת מחכה. */
+  inp.addEventListener('input', () => {
+    const ag = toAgorot(inp.value) || 0;
+    S.budgets.set(c.id, ag);
+    liveRedraw();
+    if (planTimer) clearTimeout(planTimer);
+    planTimer = setTimeout(() => { planTimer = null; savePlan(c.id, ag, m0); }, PLAN_WAIT);
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { e.preventDefault(); S.budgets.set(c.id, p0); inp.blur(); }
+  });
+  inp.addEventListener('blur', () => {
+    const ag = toAgorot(inp.value) || 0;
+    if (planTimer) { clearTimeout(planTimer); planTimer = null; }
+    if (ag !== p0) savePlan(c.id, ag, m0);
+    closePlan();
+  });
+}
+
+/* ‏ציור חי בזמן הקלדה · הכול חוץ מהשורות עצמן, כי ציור מחדש
+   ‏של השורה שבה השדה פתוח היה הורג את הפוקוס באמצע ההקלדה. */
+function liveRedraw() {
+  const now = new Date();
+  const current = inCurrentPeriod();
+  const dim = daysInPeriod(S.month);
+  const left = leftToSpend();
+  const over = left < 0;
+  const a = $('heroA');
+  setMoney(a, left);
+  a.classList.toggle('over', over);
+  const hq = $('heroQ');
+  hq.textContent = over ? 'כמה חרגתי' : 'כמה יש לי';
+  hq.append(el('span', 'qm', '?'));
+  renderFlow();
+  renderPulse(current, dim, now);
+  for (const { c, box } of liveBars) {
+    const p = planned(c.id), sp = spentIn(c.id);
+    const ov = p > 0 && sp > p;
+    const pct = ov ? Math.max(4, Math.round((sp - p) / sp * 100))
+              : p > 0 ? Math.min(100, Math.round(sp / p * 100))
+              : (sp > 0 ? 100 : 0);
+    box.classList.toggle('over', ov);
+    const fill = box.querySelector('i');
+    if (fill) {
+      fill.style.width = pct + '%';
+      fill.classList.toggle('over', ov);
+      fill.classList.toggle('none', !p);
+    }
+  }
+}
+
+let liveBars = [];
 
 /* ───────────────────────────────── מחוון המצב ── */
 
@@ -1056,7 +1295,7 @@ function renderWorth() {
     strip.classList.add('blank');
     v.textContent = '';
     v.classList.remove('money');
-    parts.textContent = 'להוסיף חיסכון, קרן השתלמות או דירה';
+    parts.textContent = 'להוסיף חיסכון או נכס';
     strip.setAttribute('aria-label', 'מה יש לי בסך הכל. טרם הוזן. לחיצה מוסיפה חיסכון או נכס');
     show(strip);
     return;
@@ -1084,6 +1323,7 @@ function renderWorth() {
 function renderRows(current, dim, now) {
   const box = $('homeRows');
   box.textContent = '';
+  liveBars = [];
 
   const rows = outCats()
     .map(c => ({ c, p: planned(c.id), s: spentIn(c.id) }))
@@ -1102,18 +1342,24 @@ function renderRows(current, dim, now) {
   }
 
   const frag = document.createDocumentFragment();
-  for (const { c, p, s } of rows) {
+  for (const [idx, { c, p, s }] of rows.entries()) {
     const over = p > 0 && s > p;
-    const row = el('button', 'row');
-    row.type = 'button';
-    row.setAttribute('aria-label',
-      p > 0 ? `${c.label}. יצא ${fmt(s)} מתוך ${fmt(p)} שתוכננו. ` +
-              (over ? `חריגה של ${fmt(s - p)}` : `נשארו ${fmt(p - s)}`)
-            : `${c.label}. יצא ${fmt(s)}, לא תוכנן`);
+    /* ‏השורה אינה כפתור אלא מיכל לשני כפתורים · כפתור בתוך
+       ‏כפתור אינו HTML תקין, ושני היעדים כאן שונים: השם מוביל
+       ‏לתנועות, והמספר נפתח לעריכת התכנון במקום. */
+    const row = el('div', 'row');
 
     const top = el('div', 'row-top');
+    const go = el('button', 'row-go');
+    go.type = 'button';
+    go.setAttribute('aria-label',
+      p > 0 ? `${c.label}. יצא ${fmt(s)} מתוך ${fmt(p)} שתוכננו. ` +
+              (over ? `חריגה של ${fmt(s - p)}` : `נשארו ${fmt(p - s)}`) + '. לתנועות'
+            : `${c.label}. יצא ${fmt(s)}, לא תוכנן. לתנועות`);
+    go.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
     const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
     const nm = el('span', 'row-nm', c.label);
+    go.append(ic, nm);
 
     /* ‏עובדה אחת לשורה. השורה הזאת החזיקה פעם ארבע צורות של אותו
        ‏מספר · "430 מתוך 2,500", פס, "17%" ו"נשארו 2,070" · ונמתחה
@@ -1121,7 +1367,12 @@ function renderRows(current, dim, now) {
        ‏מה שנשאר הוא המספר היחיד שאדם באמת שואל עליו כשהוא עומד
        ‏בסופר: כמה עוד מותר לי כאן. מה שיצא נמצא במסך התקציב,
        ‏ולחיצה על השורה פותחת את התנועות עצמן. */
-    const val = el('span', 'row-val' + (over ? ' over' : '') + (!p ? ' plain' : ''));
+    /* ‏המספר הוא כפתור · לחיצה הופכת אותו לשדה במקום, בלי
+       ‏לעזוב את המסך ובלי כפתור שמירה. */
+    const val = el('button', 'row-val' + (over ? ' over' : '') + (!p ? ' plain' : ''));
+    val.type = 'button';
+    val.setAttribute('aria-label',
+      (p > 0 ? `תכנון ${c.label} ${fmt(p)}` : `${c.label} ללא תכנון`) + '. לשינוי');
     if (over) {
       val.append(document.createTextNode('חריגה של '));
       val.append(moneyEl(s - p, 'money'));
@@ -1132,7 +1383,8 @@ function renderRows(current, dim, now) {
       val.append(moneyEl(s, 'money'));
       val.append(document.createTextNode(' יצא'));
     }
-    top.append(ic, nm, val);
+    val.addEventListener('click', () => openPlan(c, val));
+    top.append(go, sorting ? sortArrows(c, idx === 0, idx === rows.length - 1) : val);
 
     const bar = el('div', 'bar' + (over ? ' over' : ''));
     bar.setAttribute('aria-hidden', 'true');
@@ -1147,6 +1399,7 @@ function renderRows(current, dim, now) {
     if (over) fill.classList.add('over');
     else if (!p) fill.classList.add('none');
     bar.append(fill);
+    liveBars.push({ c, box: bar });
 
     /* ‏הסימן של היום בתוך התקופה. בלעדיו "ארבעים אחוז מהתקציב"
        הוא לא מידע: ארבעים אחוז ביום העשירי הוא בעיה, וביום
@@ -1160,7 +1413,6 @@ function renderRows(current, dim, now) {
     /* ‏"כמה נשאר לי בקטגוריה" ו"כמה מזה כבר הלך" · שני המספרים
        ‏שהפס מראה בעין אבל לא במילים. בלי תכנון אין מה לומר. */
     row.append(top, bar);
-    row.addEventListener('click', () => { S.filterCat = c.id; tab('tx'); });
     frag.append(row);
   }
   box.append(frag);
@@ -1934,6 +2186,7 @@ $('addSave').addEventListener('click', async () => {
 /* ═══════════════════════════════════════════ תקציב ══ */
 
 function renderBudget() {
+  wireBudgetLive();
   const box = $('budgetRows');
   box.textContent = '';
   setErr($('budgetErr'), '');
@@ -2037,35 +2290,53 @@ function budgetLive() {
 }
 $('budgetRows').addEventListener('input', budgetLive);
 
-$('budgetSave').addEventListener('click', async () => {
-  setErr($('budgetErr'), '');
-  const { out, inc } = budgetNumbers();
-  const all = { ...inc, ...out };
-  const m = monthKey(S.month);
-  const rows = Object.entries(all).map(([category_id, planned_agorot]) =>
-    ({ household_id: S.hh, month: m, category_id, planned_agorot }));
+/* ‏כפתור "שמירת התקציב" הוסר · כל שדה נשמר בעצמו שבע מאות
+   ‏אלפיות שנייה אחרי שהאצבע עוצרת, בדיוק כמו בשורות שבבית.
+   ‏שני המסכים נשענים על אותו savePlan ועל אותו S.budgets, ולכן
+   ‏אי אפשר שיציגו מספרים שונים. */
+/* ‏טיימר לכל קטגוריה בנפרד, ולא אחד משותף. עם טיימר יחיד כל
+   ‏הקלדה בשדה אחד ביטלה את השמירה הממתינה של שדה אחר, ומי
+   ‏שמילא שבע קטגוריות ברצף שמר רק את האחרונה · נתפס בבדיקה,
+   ‏כששבע שורות תקציב הפכו לשורה אחת בבסיס הנתונים. */
+const planPending = new Map();
 
-  const btn = $('budgetSave');
-  btn.disabled = true; btn.textContent = 'שומר...';
-  try {
-    const { error } = await sb.from('budgets')
-      .upsert(rows, { onConflict: 'household_id,month,category_id' });
-    if (error) throw error;
-    S.budgets = new Map(Object.entries(all).map(([k, v]) => [k, v]));
-    renderHome();
-    toast('התקציב נשמר.');
-  } catch (err) {
-    setErr($('budgetErr'), human(err));
-  } finally {
-    btn.disabled = false; btn.textContent = 'שמירת התקציב';
-  }
-});
+function wireBudgetLive() {
+  const box = $('budgetRows');
+  if (box.dataset.live) return;
+  box.dataset.live = '1';
+  box.addEventListener('input', e => {
+    const inp = e.target.closest('input[data-cat]');
+    if (!inp) return;
+    const id = inp.dataset.cat;
+    const ag = toAgorot(inp.value) || 0;
+    const m0 = monthKey(S.month);
+    S.budgets.set(id, ag);
+    const tot = $('budgetTotal');
+    if (tot) setMoney(tot, plannedOut());
+    const was = planPending.get(id);
+    if (was) clearTimeout(was);
+    planPending.set(id, setTimeout(() => {
+      planPending.delete(id);
+      savePlan(id, ag, m0);
+    }, PLAN_WAIT));
+  });
+}
 
 /* ───────────────────────────────────── קטגוריה חדשה ── */
 
 const ICONS = ['🏠','🛒','🚗','🏦','🎬','👶','🐾','💊','👕','✈️','📚','🎁','💡','☕','🏋️','•'];
 let newIcon = ICONS[0];
+let newKind = 'expense';       // ‏הוצאה או הכנסה, לקטגוריה חדשה
 let editCat = null;            // ‏הקטגוריה שבעריכה, או null ליצירה
+
+function setCatKind(k) {
+  newKind = k;
+  $('catOut').setAttribute('aria-pressed', String(k === 'expense'));
+  $('catIn').setAttribute('aria-pressed',  String(k === 'income'));
+  $('catName').placeholder = k === 'income' ? 'עבודה נוספת' : 'חיות מחמד';
+}
+$('catOut').addEventListener('click', () => setCatKind('expense'));
+$('catIn').addEventListener('click',  () => setCatKind('income'));
 
 /* ‏גלון אחד לשני התפקידים. רוב מה שבו זהה, ומה שנבדל הוא
    ‏הכותרת, מילת הכפתור, וכפתור ההסרה שקיים רק בעריכה. */
@@ -2073,6 +2344,11 @@ function openCat(c) {
   editCat = c || null;
   $('catName').value = c ? c.label : '';
   newIcon = c ? (c.icon || ICONS[0]) : ICONS[0];
+  /* ‏בעריכה הסוג נעול · להפוך קטגוריית הוצאה להכנסה היה מעיף
+     ‏את כל התנועות שכבר רשומות בה לצד הלא נכון של החשבון. */
+  setCatKind(c ? c.kind : 'expense');
+  $('catKind').classList.toggle('hidden', !!c);
+  $('catKind').previousElementSibling.classList.toggle('hidden', !!c);
 
   $('catTitle').textContent = c ? 'עריכת הקטגוריה' : 'קטגוריה חדשה';
   $('catSub').textContent = c
@@ -2101,6 +2377,7 @@ function openCat(c) {
 }
 
 $('catAddBtn').addEventListener('click', () => openCat(null));
+$('homeCatAdd').addEventListener('click', () => openCat(null));
 $('catCancel').addEventListener('click', closeSheet);
 
 $('catSave').addEventListener('click', async () => {
@@ -2125,7 +2402,10 @@ $('catSave').addEventListener('click', async () => {
       toast('הקטגוריה עודכנה.');
     } else {
       const { data, error } = await sb.from('categories').insert({
-        household_id: S.hh, label, icon: newIcon, kind: 'expense', sort: 90
+        household_id: S.hh, label, icon: newIcon, kind: newKind,
+        /* ‏בסוף הקבוצה שלה, ולא בערימה אחת של 90 · אחרת כל
+           ‏קטגוריה חדשה נופלת לאותו מקום ומסתדרת לפי אלפבית. */
+        sort: Math.max(90, ...S.cats.filter(x => x.kind === newKind).map(x => x.sort || 0)) + 1
       }).select().single();
       if (error) throw error;
       S.cats.push(data);
