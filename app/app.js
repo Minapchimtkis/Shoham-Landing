@@ -2298,15 +2298,20 @@ function renderTx() {
   for (const t of rows) {
     if (t.occurred_on !== day) {
       day = t.occurred_on;
-      /* ‏הסכום היומי מופיע רק כשיש מה לסכם · מיום עם תנועה אחת
-         ‏הוא בדיוק אותו מספר שכתוב בשורה שמתחתיו, כלומר אותו
-         ‏מספר פעמיים במרחק של ארבעים פיקסל. נמדד: שבע כותרות
-         ‏על תשע תנועות, ובשש מהן הסכום היה כפילות. */
-      const outRows = rows.filter(r => r.occurred_on === day
-                                    && r.direction === 'out' && !r.is_transfer);
-      const sum = outRows.reduce((s, r) => s + r.amount_agorot, 0);
+      /* ‏הסכום היומי מופיע רק כשהוא מוסיף משהו. ביום שיש בו שורה
+         ‏אחת בלבד הוא אותו מספר שכתוב בה, כלומר אותו מספר
+         ‏פעמיים במרחק ארבעים פיקסל · נמדד: שבע כותרות על תשע
+         ‏תנועות, ובשש מהן כפילות.
+
+         ‏התנאי הוא מספר השורות ביום ולא מספר ההוצאות: ביום שיש
+         ‏בו הוצאה והעברה, הסכום סופר רק את ההוצאה, ולכן הוא
+         ‏דווקא אומר איזה חלק ממה שרואים נחשב הוצאה. */
+      const dayRows = rows.filter(r => r.occurred_on === day);
+      const sum = dayRows
+        .filter(r => r.direction === 'out' && !r.is_transfer)
+        .reduce((s, r) => s + r.amount_agorot, 0);
       const h = el('h2', 'sec-h',
-        dayName(day) + (outRows.length > 1 && sum ? ' · ' + fmt(sum) : ''));
+        dayName(day) + (dayRows.length > 1 && sum ? ' · ' + fmt(sum) : ''));
       frag.append(h);
     }
     const c = byId(t.category_id);
