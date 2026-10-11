@@ -1182,7 +1182,7 @@
   </div>
   <div class="field">
     <label for="goalDate">עד מתי, אם יש תאריך</label>
-    <input class="inp" id="goalDate" type="date">
+    <input class="inp" id="goalDate" type="date" min="2020-01-01" max="2099-12-31">
     <p class="note calc-out hidden" id="goalPace"></p>
   </div>
   <p class="err hidden" id="goalErr" role="alert"></p>
@@ -1380,7 +1380,7 @@
 
   <div class="field">
     <label for="debtEnds">מתי זה נגמר, אם ידוע</label>
-    <input class="inp" id="debtEnds" type="date">
+    <input class="inp" id="debtEnds" type="date" min="2000-01-01" max="2099-12-31">
   </div>
 
   <div class="field">

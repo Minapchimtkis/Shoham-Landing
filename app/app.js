@@ -82,6 +82,18 @@ function toAgorot(raw) {
   return Math.round(n * 100);
 }
 
+/* ‏תאריך מהטופס מול האילוץ שבטבלה. השדה מסוג date כבר מגביל
+   ‏בבורר עצמו, אבל אפשר גם להקליד לתוכו, ושנה מוקלדת לא נכון
+   ‏היא הדרך הקלה ביותר להגיע לשגיאה של בסיס הנתונים · שם היא
+   ‏כבר "משהו לא עבד", ולא משפט שאומר מה לתקן. */
+function badDate(v, minYear) {
+  if (!v) return null;
+  const y = Number(String(v).slice(0, 4));
+  if (!isFinite(y) || y < minYear || y > 2099)
+    return `התאריך צריך להיות בין ${minYear} ל-2099.`;
+  return null;
+}
+
 /* ‏כסף החוצה. אגורות מוצגות רק כשהן אינן אפס, כי ".00" בסוף כל
    מספר על המסך הוא רעש בארבעה תווים. */
 function fmtNum(ag) {
@@ -226,6 +238,21 @@ function human(error) {
     return 'מסד הנתונים של האפליקציה עוד לא הוקם. יש להריץ את המיגרציה.';
   if (m.includes('failed to fetch') || m.includes('network'))
     return 'אין חיבור לרשת כרגע. הנתונים לא אבדו, רק לא נשמרו עוד.';
+  /* ‏אילוץ שנשבר בבסיס הנתונים. בלי המקרים האלה כל אחד מהם היה
+     ‏יוצא כ"משהו לא עבד", שהוא בדיוק מה שאי אפשר לתקן לפיו.
+     ‏הבדיקות שלמעלה אמורות לתפוס את כולם לפני שהם מגיעים לכאן ·
+     ‏זאת הרשת מתחת, למקרה שמשהו מחליק. */
+  if (m.includes('violates check constraint') || m.includes('check constraint')) {
+    if (m.includes('date_sane'))  return 'התאריך שנכתב רחוק מדי. כדאי לבדוק את השנה.';
+    if (m.includes('rate_bp'))    return 'הריבית נכתבת באחוזים, בין 0 ל-100.';
+    if (m.includes('name_len') || m.includes('title_len'))
+                                  return 'השם ארוך מדי. עד 60 תווים.';
+    if (m.includes('note_len'))   return 'ההערה ארוכה מדי. עד 300 תווים.';
+    if (m.includes('agorot'))     return 'הסכום צריך להיות מספר חיובי.';
+    return 'אחד השדות אינו תקין. כדאי לעבור עליהם שוב.';
+  }
+  if (m.includes('violates foreign key') || m.includes('violates not-null'))
+    return 'חסר שדה חובה. כדאי לעבור על הטופס שוב.';
   return 'משהו לא עבד. כדאי לנסות שוב.';
 }
 
@@ -3293,13 +3320,25 @@ $('debtSave').addEventListener('click', async () => {
     rate = Math.round(n * 100);
   }
 
+  /* ‏ההחזר אופציונלי, אבל מה שנכתב בו חייב להיות מספר · בלי
+     ‏הבדיקה הזאת "1,200-" היה נשמר בשקט כאפס. */
+  const monthlyRaw = $('debtMonthly').value.trim();
+  const monthly = monthlyRaw ? toAgorot(monthlyRaw) : 0;
+  if (monthly == null) {
+    setErr($('debtErr'), 'ההחזר החודשי נכתב במספרים, או נשאר ריק.');
+    $('debtMonthly').focus(); return;
+  }
+
+  const dateErr = badDate($('debtEnds').value, 2000);
+  if (dateErr) { setErr($('debtErr'), dateErr); $('debtEnds').focus(); return; }
+
   const btn = $('debtSave');
   btn.disabled = true; btn.textContent = 'שומר...';
   try {
     const row = {
       kind: debtKind, name: name.slice(0, 60),
       balance_agorot: balance,
-      monthly_agorot: toAgorot($('debtMonthly').value) || 0,
+      monthly_agorot: monthly,
       rate_bp: rate,
       ends_on: $('debtEnds').value || null,
       note: $('debtNote').value.trim().slice(0, 300) || null,
@@ -4065,6 +4104,8 @@ $('goalSave').addEventListener('click', async () => {
   if (!title) { setErr($('goalErr'), 'צריך שם למטרה.'); $('goalName').focus(); return; }
   if (!target) { setErr($('goalErr'), 'צריך סכום יעד גדול מאפס.'); $('goalTarget').focus(); return; }
   if (saved > target) { setErr($('goalErr'), 'כבר יש יותר מהיעד. אולי כדאי להעלות את היעד.'); return; }
+  const gDateErr = badDate($('goalDate').value, 2020);
+  if (gDateErr) { setErr($('goalErr'), gDateErr); $('goalDate').focus(); return; }
 
   const btn = $('goalSave');
   btn.disabled = true; btn.textContent = 'שומר...';
