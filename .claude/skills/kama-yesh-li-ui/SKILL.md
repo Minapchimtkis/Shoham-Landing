@@ -88,8 +88,10 @@ The app earns the consultation; it does not ask for it. Rules:
   `לדבר עם שוהם`. Never a loud button, never a colour that competes
   with the hero figure.
 - Never more than one invitation per screen.
-- The home, transactions, budget and add screens carry none. Those are
-  the screens someone opens every day.
+- The home, transactions and add screens carry none. Those are the
+  screens someone opens every day. There is no separate budget screen:
+  the categories, their plans and the ring strip all live on the home
+  screen, edited in place with no save button.
 - Voice: calm, specific, never salesy. "זה מה שקרה. למה זה קורה, ומה
   לעשות עם זה, זאת כבר שיחה."
 

@@ -368,26 +368,39 @@
 
     <!-- ‏התקציב יושב כאן, במסך שנפתח עשרים פעם בחודש · לא
          ‏במסך נפרד שצריך לעבור אליו וללחוץ בו "שמירה". -->
-    <h2 class="grp-h">ההוצאות</h2>
-    <!-- ‏טבעות לסריקה, רשימה לעבודה. הטבעת אומרת "כמה נשאר"
-         ‏בלי לקרוא, והרשימה שמתחתיה היא המקום שבו משנים. -->
-    <div class="rings" id="homeRings" role="list"></div>
-    <div class="rows" id="homeRows"></div>
+    <!-- ‏כל התקציב בעטיפה אחת · ביום הראשון אין מה להציג ממנו,
+         ‏וכותרת "ההוצאות" מעל ריק היא הבטחה שלא מתקיימת. -->
+    <div id="homeBudget">
+      <div id="homeOut">
+        <h2 class="grp-h">ההוצאות</h2>
+        <!-- ‏טבעות לסריקה, רשימה לעבודה. הטבעת אומרת "כמה נשאר"
+             ‏בלי לקרוא, והרשימה שמתחתיה היא המקום שבו משנים. -->
+        <div class="rings" id="homeRings" role="list"></div>
+        <div class="rows" id="homeRows"></div>
+      </div>
 
-    <h2 class="grp-h" id="homeInH">ההכנסות</h2>
-    <div class="rows" id="homeInRows"></div>
+      <div id="homeIn">
+        <h2 class="grp-h" id="homeInH">ההכנסות</h2>
+        <div class="rows" id="homeInRows"></div>
+      </div>
 
-    <div class="rows-foot">
-      <button class="cat-add" id="homeCatAdd" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
-        הוספת קטגוריה
-      </button>
-      <!-- ‏גרירה באצבע אינה אמינה ואינה נגישה · חיצים הם הדרך
-           ‏שעובדת בכל מכשיר וגם עם קורא מסך. -->
-      <button class="cat-add" id="homeSort" type="button" aria-pressed="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span id="homeSortWord">סידור</span>
-      </button>
+      <!-- ‏שורה אחת שאומרת אם התכנון מסתדר עם ההכנסה. היא
+           ‏הייתה במסך התקציב, וכאן, מתחת לשתי הקבוצות, היא
+           ‏נכונה בדיוק באותה מידה. -->
+      <p id="homeBal" class="rows-bal hidden"></p>
+
+      <div class="rows-foot">
+        <button class="cat-add" id="homeCatAdd" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
+          הוספת קטגוריה
+        </button>
+        <!-- ‏גרירה באצבע אינה אמינה ואינה נגישה · חיצים הם הדרך
+             ‏שעובדת בכל מכשיר וגם עם קורא מסך. -->
+        <button class="cat-add" id="homeSort" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="homeSortWord">סידור</span>
+        </button>
+      </div>
     </div>
 
     <div id="homeInsight"></div>
@@ -403,25 +416,6 @@
     </div>
     <div class="chips" id="txFilters" style="margin:12px 0 4px"></div>
     <div id="txList"></div>
-  </main>
-
-  <!-- ──────────────────────────────────────── תקציב ── -->
-  <main class="screen hidden" id="scBudget">
-    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">התקציב</h1>
-    <p class="note" id="budgetNote" style="margin-bottom:18px"></p>
-    <form id="budgetForm" novalidate>
-      <div id="budgetRows"></div>
-      <button class="cat-add" id="catAddBtn" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>
-        הוספת קטגוריה
-      </button>
-    </form>
-    <div class="setup-left" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--rule)">
-      <span class="k">סך התכנון להוצאות</span>
-      <span class="v money" id="budgetTotal">0</span>
-    </div>
-    <p class="setup-hint" id="budgetHint"></p>
-    <p class="err hidden" id="budgetErr" role="alert"></p>
   </main>
 
   <!-- ─────────────────────────────────────── הגדרות ── -->
@@ -969,10 +963,6 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
       </span>
       <span class="sr-only">הוספת תנועה</span>
-    </button>
-    <button type="button" data-tab="budget">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5V11m5 8.5V5.5m5 14V9m5 10.5v-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
-      תקציב
     </button>
     <button type="button" data-tab="set">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor"/></svg>

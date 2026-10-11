@@ -509,75 +509,6 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .sent p{margin-top:12px;color:var(--ink-2);font-size:16px;line-height:1.6}
 .sent .mail{font-weight:700;color:var(--ink);word-break:break-all}
 
-/* ════════════════════════════════════ שורות מספרים ══ */
-
-/* ‏הצורה הזאת נבנתה בשביל אשף ההקמה, והאשף ירד · המספרים נכנסים
-   ‏עכשיו מבפנים, במסך התקציב, והוא זה שמשתמש בה. */
-
-.setup-group{margin-bottom:28px}
-.setup-group > h2{
-  font-size:14px;font-weight:700;color:var(--ink-3);
-  margin-bottom:4px;
-}
-
-/* ‏שורת מספר, לא כרטיס. התווית מימין, השדה משמאל, קו שיער
-   ביניהן. זה מראה של דף חשבון, והוא מה שגורם לרשימת הקטגוריות
-   להיראות כמו רשימה קצרה ולא כמו טופס. */
-.num-row{
-  display:flex;align-items:center;gap:12px;
-  padding:13px 0;border-bottom:1px solid var(--rule);
-}
-.num-row:last-child{border-bottom:none}
-.num-row .ico{
-  flex:none;width:34px;height:34px;border-radius:9px;
-  background:var(--wash);display:grid;place-items:center;
-  font-size:16px;line-height:1;
-}
-.num-row .nm{flex:1;font-size:16px;font-weight:500;min-width:0}
-.num-row .nm small{display:block;font-size:13px;font-weight:400;color:var(--ink-3)}
-.num-row .amt{
-  flex:none;width:118px;position:relative;
-}
-.num-row .amt input{
-  /* ‏הספרות נצמדות לצד שבו נמצאת התווית, ולא לקצה הרחוק ממנה.
-     כך גם נוצר טור מיושר של מספרים לאורך הטופס. */
-  width:100%;text-align:right;direction:ltr;
-  font-family:var(--font);
-  font-weight:var(--w-amount);font-size:18px;
-  padding:9px 10px;
-  background:var(--paper);
-  border:1px solid var(--rule-2);border-radius:10px;
-  transition:border-color .14s var(--ease),box-shadow .14s var(--ease);
-}
-.num-row .amt input:focus{
-  outline:none;border-color:var(--violet);
-  box-shadow:0 0 0 3px var(--violet-soft);
-}
-
-/* ‏קטגוריה שהם הוסיפו · השם שלה הוא כפתור, והעיפרון לצידו הוא
-   ‏כל ההבדל בינה לבין קטגוריה של המערכת. הכפתור תופס את מקום
-   ‏התווית בדיוק, ולכן טור המספרים נשאר מיושר לאורך הטופס. */
-.nm-edit{
-  display:flex;align-items:center;flex-wrap:wrap;gap:7px;
-  text-align:start;min-height:44px;
-}
-.nm-edit .pen{flex:none;width:16px;height:16px;color:var(--ink-3)}
-.nm-edit small{flex-basis:100%}
-
-/* ‏הקורא החי · כל מספר שנכנס מזיז את הסיכום שמתחתיו, ואז מילוי
-   ‏הטופס מפסיק להיות טופס והופך למשחק עם מספר אחד. */
-.setup-left{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:12px;margin-bottom:11px;
-}
-.setup-left .k{font-size:14px;color:var(--ink-2);font-weight:500}
-.setup-left .v{font-size:25px;color:var(--violet)}
-.setup-left .v.over{color:var(--amber)}
-.setup-hint{
-  font-size:13px;color:var(--ink-3);
-  margin-bottom:11px;line-height:1.5;
-}
-
 /* ═════════════════════════════════════════ מעטפת האפליקציה ══ */
 
 .screen{
@@ -844,6 +775,14 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   padding:3px 6px;margin:-3px -6px;
   border-radius:8px;
 }
+/* ‏העיפרון · 44 פיקסל של נגיעה בלי להזיז את השורה, ולכן
+   ‏השוליים השליליים מבטלים בדיוק את הריפוד. */
+.row-pen{
+  flex:none;width:44px;height:44px;margin:-14px -11px -14px -2px;
+  display:grid;place-items:center;align-self:center;
+  border-radius:10px;color:var(--ink-3);
+}
+.row-pen svg{width:16px;height:16px}
 
 /* ‏העריכה במקום · תווית ושדה, באותו גובה של השורה כדי ששום
    ‏דבר לא יקפוץ כשהיא נפתחת ונסגרת. */
@@ -919,6 +858,15 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:flex;align-items:baseline;gap:3px;
 }
 .goal-of .money{font-size:13px;font-weight:600}
+
+/* ‏מה שהיה "‏הרמז" במסך התקציב · שורה שקטה שאומרת אם
+   ‏התכנון מסתדר עם ההכנסה, ושותקת כשהוא מסתדר בדיוק. */
+.rows-bal{
+  margin:10px 2px 0;font-size:13px;font-weight:var(--w-ui-soft);
+  color:var(--ink-3);line-height:1.5;
+}
+.rows-bal.warn{color:var(--amber)}
+.rows-bal .money{font-weight:var(--w-ui)}
 
 /* ‏שורת הפעולות מתחת לקטגוריות · הוספה וסידור, זה לצד זה. */
 .rows-foot{display:flex;gap:6px;align-items:center}
@@ -1170,7 +1118,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   backdrop-filter:blur(16px) saturate(1.6);
   -webkit-backdrop-filter:blur(16px) saturate(1.6);
   border-top:1px solid var(--rule);
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(4,1fr);
   align-items:stretch;z-index:40;
 }
 .nav button{
@@ -1382,7 +1330,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   .month-pick:hover,.streak:hover{background:var(--wash)}
   .insight .acts button:hover{background:var(--wash-2)}
   .gate-forgot button:hover{color:var(--ink-2)}
-  .nm-edit:hover .pen{color:var(--violet)}
+  .row-pen:hover{color:var(--violet)}
 }
 
 /* ‏לחיצה. אחרי חוקי הריחוף ולא לפניהם: לשניהם אותה ספציפיות,
@@ -1392,8 +1340,8 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .nav .add:active span{transform:translate(-50%,-50%) scale(.93)}
 .row:active,.tx:active,.set-row:not(.ro):active{background:var(--wash-2)}
 .worth-strip:active{opacity:.65}
+.row-pen:active{opacity:.6}
 .month-pick:active,.streak:active{background:var(--wash-2)}
-.nm-edit:active{opacity:.6}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
