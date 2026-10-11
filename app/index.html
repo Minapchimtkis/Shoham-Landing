@@ -995,6 +995,10 @@
   <div class="field" id="catField">
     <span class="lbl" id="catLbl">קטגוריה</span>
     <div class="chips" id="txCats" role="group" aria-labelledby="catLbl"></div>
+    <!-- ‏בועת הידע של הקטגוריה שנבחרה. היא נפתחת כאן ולא במסך
+         ‏נפרד, כי זה הרגע היחיד שבו המחשבה כבר על הסעיף הזה.
+         ‏aria-live כדי שקורא מסך ישמע אותה כשהיא מתחלפת. -->
+    <div class="cat-tip hidden" id="catTip" aria-live="polite"></div>
   </div>
 
   <div class="field">

@@ -709,6 +709,9 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   width:76px;padding:4px 2px;
   border-radius:14px;
 }
+/* ‏הטבעת היא כפתור רישום · היא צריכה להיראות כזה גם לפני
+   ‏שנוגעים בה, ולהגיב כשנוגעים. */
+.ring{transition:transform .12s var(--ease)}
 .ring-art{position:relative;display:block;width:72px;height:72px}
 .ring-svg{display:block;width:72px;height:72px}
 .ring-track{stroke:var(--wash-2)}
@@ -892,6 +895,19 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .cat-add svg{width:17px;height:17px}
 
 /* ────────────────────────────── המשטח המורם היחיד ── */
+
+/* ‏בועת הידע בתוך גלון ההוספה · אותה שפה של כרטיס התובנה,
+   ‏במידה קטנה יותר, כי היא יושבת בתוך טופס ולא על מסך. */
+.cat-tip{
+  margin-top:12px;padding:12px 14px;
+  background:linear-gradient(var(--wash),var(--wash)),var(--paper);
+  border-radius:14px;
+}
+.cat-tip-k{
+  display:block;font-size:12px;font-weight:var(--w-ui);
+  color:var(--violet);margin-bottom:5px;
+}
+.cat-tip p{font-size:13.5px;color:var(--ink-2);line-height:1.65}
 
 .insight{
   margin-top:24px;padding:17px 18px;
@@ -1341,6 +1357,7 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 .row:active,.tx:active,.set-row:not(.ro):active{background:var(--wash-2)}
 .worth-strip:active{opacity:.65}
 .row-pen:active{opacity:.6}
+.ring:active{transform:scale(.94)}
 .month-pick:active,.streak:active{background:var(--wash-2)}
 
 @media (prefers-reduced-motion:reduce){
