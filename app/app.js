@@ -2012,17 +2012,41 @@ async function renderInsight() {
        קבוע שיש. בלי ההחרגה הזאת שכר הדירה נתפס כ"פי 31 מהרגיל"
        בכל חודש מחדש, כי החציון נגרר אחרי המון הוצאות קטנות. */
     const steady = new Set(recurring(both).map(r => r.key));
+
+    /* ‏וההחרגה השנייה, שבלעדיה הראשונה עובדת רק מהחודש השני:
+       ‏recurring דורש שני חודשים כדי לזהות הוצאה קבועה, ולכן
+       ‏בחודש הראשון שכר הדירה תמיד נופל לכאן. נמדד על משק בית
+       ‏בן חודש אחד עם תשע תנועות: החציון היה 380 והשכירות
+       ‏5,800, כלומר "פי 15 מהרגיל אצלכם" · בזמן שכל קטגוריה
+       ‏עמדה בתכנון שלה.
+
+       ‏הוצאה שיושבת בתוך התכנון של הקטגוריה שלה אינה חריגה,
+       ‏וזה נכון מהיום הראשון: המשתמש אמר מראש שזה מה שהוא
+       ‏מצפה להוציא שם, והוא צדק. */
+    const inPlan = t => {
+      const p = planned(t.category_id);
+      return p > 0 && spentIn(t.category_id) <= p;
+    };
+
     const oneOff = both.filter(t => !steady.has(normDesc(t.description)));
     const pool = oneOff.map(t => t.amount_agorot).sort((a, b) => a - b);
     if (pool.length >= 6) {
       const med = pool[Math.floor(pool.length / 2)];
       const big = S.txs
-        .filter(t => t.direction === 'out' && !t.is_transfer && !steady.has(normDesc(t.description)))
+        .filter(t => t.direction === 'out' && !t.is_transfer
+                     && !steady.has(normDesc(t.description)) && !inPlan(t))
         .sort((a, b) => b.amount_agorot - a.amount_agorot)[0];
       if (big && med > 0 && big.amount_agorot >= med * 4 && big.amount_agorot >= 25000) {
         const c = byId(big.category_id);
-        card(`${fmt(big.amount_agorot)} ב${c ? c.label : 'תנועה אחת'}, פי ${Math.round(big.amount_agorot / med)} מהרגיל אצלכם`,
-          `${big.description || 'התנועה הזאת'} גדולה בהרבה מכל השאר החודש. אם היא מתוכננת, הכול בסדר. אם לא, זה הדבר שכדאי להסתכל עליו לפני כל השאר.`,
+        /* ‏הטענה נאמרת לפי הראיות שיש. חודש אחד אינו "הרגיל
+           ‏אצלכם" · הוא רק החודש הזה, וכך גם כתוב. */
+        /* ‏"‏מכל השאר החודש" התנגש עם הקטגוריה ששמה "כל השאר":
+           ‏"₪3,000 בכל השאר, פי 25 מכל השאר החודש". "מהרגיל
+           ‏החודש" אומר את אותו דבר ואינו מתנגש בשום שם. */
+        const hasHistory = prevRows.length > 0;
+        card(`${fmt(big.amount_agorot)} ב${c ? c.label : 'תנועה אחת'}, פי ${Math.round(big.amount_agorot / med)} ` +
+             (hasHistory ? 'מהרגיל אצלכם' : 'מהרגיל החודש'),
+          `${big.description || 'התנועה הזאת'} גדולה בהרבה מכל התנועות האחרות החודש. אם היא מתוכננת, הכול בסדר. אם לא, זה הדבר שכדאי להסתכל עליו לפני כל השאר.`,
           [['לתנועות', () => { S.filterCat = big.category_id; tab('tx'); }]]);
         return;
       }
@@ -2274,9 +2298,15 @@ function renderTx() {
   for (const t of rows) {
     if (t.occurred_on !== day) {
       day = t.occurred_on;
-      const sum = rows.filter(r => r.occurred_on === day && r.direction === 'out' && !r.is_transfer)
-                      .reduce((s, r) => s + r.amount_agorot, 0);
-      const h = el('h2', 'sec-h', dayName(day) + (sum ? ' · ' + fmt(sum) : ''));
+      /* ‏הסכום היומי מופיע רק כשיש מה לסכם · מיום עם תנועה אחת
+         ‏הוא בדיוק אותו מספר שכתוב בשורה שמתחתיו, כלומר אותו
+         ‏מספר פעמיים במרחק של ארבעים פיקסל. נמדד: שבע כותרות
+         ‏על תשע תנועות, ובשש מהן הסכום היה כפילות. */
+      const outRows = rows.filter(r => r.occurred_on === day
+                                    && r.direction === 'out' && !r.is_transfer);
+      const sum = outRows.reduce((s, r) => s + r.amount_agorot, 0);
+      const h = el('h2', 'sec-h',
+        dayName(day) + (outRows.length > 1 && sum ? ' · ' + fmt(sum) : ''));
       frag.append(h);
     }
     const c = byId(t.category_id);
@@ -3825,21 +3855,34 @@ async function renderYear() {
   const kept = totalIn - totalOut;
 
   /* ── המספר של השנה ── */
+  /* ‏מי שרושם רק הוצאות · וזה רוב האנשים בחודשים הראשונים ·
+     ‏קיבל כאן "חסרו השנה" על כל שקל שהוציא, כי אפס פחות ההוצאות
+     ‏הוא תמיד שלילי. לא חסר לו כלום, הוא פשוט לא רשם הכנסות,
+     ‏וזה הבדל גדול בין דיווח לבין אשמה. */
+  const noIncome = totalIn === 0 && totalOut > 0;
   const head = el('div', 'sum-block');
   const big = el('div', 'sum-big');
-  const v = el('span', 'v money' + (kept < 0 ? ' over' : ''));
-  setMoney(v, kept, true);
-  big.append(v, el('span', 'k', kept >= 0 ? 'נשארו אצלכם השנה' : 'חסרו השנה'));
+  const v = el('span', 'v money' + (!noIncome && kept < 0 ? ' over' : ''));
+  setMoney(v, noIncome ? totalOut : kept, !noIncome);
+  big.append(v, el('span', 'k', noIncome ? 'יצאו השנה'
+                              : kept >= 0 ? 'נשארו אצלכם השנה' : 'חסרו השנה'));
   head.append(big);
 
-  const l = el('p', 'note');
-  l.append(document.createTextNode('נכנסו ' + fmt(totalIn) + ' · יצאו ' + fmt(totalOut)));
-  head.append(l);
+  if (noIncome) {
+    head.append(el('p', 'note',
+      'לא נרשמו הכנסות השנה, ולכן זה מה שיצא ולא המאזן.'));
+  } else {
+    const l = el('p', 'note');
+    l.append(document.createTextNode('נכנסו ' + fmt(totalIn) + ' · יצאו ' + fmt(totalOut)));
+    head.append(l);
+  }
   if (totalMoved) head.append(el('p', 'note', 'ועוד ' + fmt(totalMoved) + ' בהעברות, שאינן הוצאה.'));
 
+  /* ‏ממוצע על פני חודש אחד אינו ממוצע, הוא אותו מספר שכבר
+     ‏כתוב שתי שורות מעליו. מהחודש השני הוא מתחיל להגיד משהו. */
   const months = new Set(rows.map(t => t.occurred_on.slice(0, 7))).size;
-  if (months) head.append(el('p', 'note',
-    `ממוצע של ${fmt(Math.round(totalOut / months))} לחודש, על פני ${months} ${months === 1 ? 'חודש' : 'חודשים'} עם רישום.`));
+  if (months >= 2) head.append(el('p', 'note',
+    `ממוצע של ${fmt(Math.round(totalOut / months))} לחודש, על פני ${months} חודשים עם רישום.`));
   box.append(head);
 
   /* ── שנים עשר חודשים, הגרף היחיד שבאמת עוזר ── */
