@@ -1214,7 +1214,14 @@ function renderRings(rows, current, dim, now) {
 /* ───────────────────────────── ההכנסות בבית ── */
 
 /* ‏אותה שורה בדיוק, בלי פס ובלי "נשארו" · בהכנסה אין תקרה
-   ‏לחרוג ממנה. מה שמעניין הוא כמה נכנס מול כמה ציפיתם. */
+   ‏לחרוג ממנה. מה שמעניין הוא כמה נכנס מול כמה ציפיתם, ולכן
+   ‏המספר בשורה הוא הפער ולא הסכום: "18,000 עוד לא נכנסו"
+   ‏עונה על השאלה שבאמת שואלים באמצע החודש · האם המשכורת
+   ‏כבר נחתה · ו"0 נכנס" לא ענה עליה בכלל.
+
+   ‏שלושה מצבים, כמו בהוצאות: חסר, בדיוק, ומעל. מעל אינו
+   ‏חריגה ולכן אינו נצבע באדום · בהכנסה זה דווקא בשורה
+   ‏הטובה. */
 function renderInRows() {
   const box = $('homeInRows');
   box.textContent = '';
@@ -1239,12 +1246,20 @@ function renderInRows() {
     const ic = el('span', 'row-ico', c.icon || '•'); ic.setAttribute('aria-hidden', 'true');
     go.append(ic, el('span', 'row-nm', c.label));
 
-    const val = el('button', 'row-val plain');
+    const val = el('button', 'row-val' + (p ? '' : ' plain'));
     val.type = 'button';
     val.setAttribute('aria-label',
       (p ? `תכנון ${c.label} ${fmt(p)}` : `${c.label} ללא תכנון`) + '. לשינוי');
-    val.append(moneyEl(g, 'money'));
-    val.append(document.createTextNode(' נכנס'));
+    if (p > g) {
+      val.append(moneyEl(p - g, 'money'));
+      val.append(document.createTextNode(' עוד לא נכנסו'));
+    } else if (p > 0 && g > p) {
+      val.append(moneyEl(g - p, 'money'));
+      val.append(document.createTextNode(' מעל הצפי'));
+    } else {
+      val.append(moneyEl(g, 'money'));
+      val.append(document.createTextNode(' נכנס'));
+    }
     val.addEventListener('click', () => openPlan(c, val));
     const shown = S.wantIncome ? cats
                 : cats.filter(x => planned(x.id) > 0 || gotIn(x.id) > 0);
