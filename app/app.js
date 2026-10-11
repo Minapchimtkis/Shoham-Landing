@@ -1252,16 +1252,19 @@ function renderRings(rows, current, dim, now) {
 function renderInRows() {
   const box = $('homeInRows');
   box.textContent = '';
+  /* ‏כל קטגוריות ההכנסה, גם הריקות · בדיוק כמו בהוצאות. הסינון
+     ‏שהיה כאן הסתיר קטגוריה שאין בה עדיין כלום, וזאת אותה
+     ‏קטגוריה שצריך לפתוח כדי לתכנן אותה בפעם הראשונה. מי
+     ‏שהוסיף "שכר דירה" ראה אותה עד לרענון הבא ואז היא נעלמה,
+     ‏בלי דרך להחזיר אותה חוץ מלהוסיף תנועה. */
   const cats = inCats();
-  const any = S.wantIncome || cats.some(c => planned(c.id) > 0 || gotIn(c.id) > 0);
-  $('homeInH').classList.toggle('hidden', !any);
-  box.classList.toggle('hidden', !any);
-  if (!any) return;
+  $('homeInH').classList.toggle('hidden', !cats.length);
+  box.classList.toggle('hidden', !cats.length);
+  if (!cats.length) return;
 
   const frag = document.createDocumentFragment();
   for (const c of cats) {
     const p = planned(c.id), g = gotIn(c.id);
-    if (!p && !g && !S.wantIncome) continue;
     const row = el('div', 'row row-in');
     const top = el('div', 'row-top');
 
@@ -1288,13 +1291,11 @@ function renderInRows() {
       val.append(document.createTextNode(' נכנס'));
     }
     val.addEventListener('click', () => openPlan(c, val));
-    const shown = S.wantIncome ? cats
-                : cats.filter(x => planned(x.id) > 0 || gotIn(x.id) > 0);
-    const i = shown.findIndex(x => x.id === c.id);
+    const i = cats.findIndex(x => x.id === c.id);
     const pen = catPen(c);
     top.append(go);
     if (pen && !sorting) top.append(pen);
-    top.append(sorting ? sortArrows(c, i === 0, i === shown.length - 1) : val);
+    top.append(sorting ? sortArrows(c, i === 0, i === cats.length - 1) : val);
     row.append(top);
     frag.append(row);
   }
@@ -2426,42 +2427,45 @@ $('addSave').addEventListener('click', async () => {
 
 /* ───────────────────────────────────── קטגוריה חדשה ── */
 
-const ICONS = ['🏠','🛒','🚗','🏦','🎬','👶','🐾','💊','👕','✈️','📚','🎁','💡','☕','🏋️','•'];
-let newIcon = ICONS[0];
+/* ‏שתי רשימות ולא אחת · כל שש עשרה הצורות כאן היו של הוצאה,
+   ‏ומי שהוסיף "שכר דירה" בחר מתוך עגלת קניות וכדור. גרוע מזה:
+   ‏ברירת המחדל הייתה 🏠, שבאפליקציה הזאת היא דיור, כלומר
+   ‏קטגוריית הוצאה. */
+const ICONS = {
+  expense: ['🏠','🛒','🚗','🏦','🎬','👶','🐾','💊',
+            '👕','✈️','📚','🎁','💡','☕','🏋️','•'],
+  /* ‏💼 ראשון, כי הוא הסמל של "משכורת" שכבר קיימת · מי
+     ‏שמוסיף הכנסה שנייה מתחיל מהצורה שהוא כבר מכיר. */
+  income:  ['💼','💻','🏡','🧾','🎓','📈','🏛️','🤝',
+            '💵','🏆','📦','🏪','🐷','🏦','🎁','•']
+};
+const iconsFor = k => ICONS[k === 'income' ? 'income' : 'expense'];
+let newIcon = ICONS.expense[0];
 let newKind = 'expense';       // ‏הוצאה או הכנסה, לקטגוריה חדשה
 let editCat = null;            // ‏הקטגוריה שבעריכה, או null ליצירה
 
-function setCatKind(k) {
+function setCatKind(k, keepIcon) {
   newKind = k;
   $('catOut').setAttribute('aria-pressed', String(k === 'expense'));
   $('catIn').setAttribute('aria-pressed',  String(k === 'income'));
   $('catName').placeholder = k === 'income' ? 'עבודה נוספת' : 'חיות מחמד';
+  /* ‏החלפת הסוג מחליפה את הרשימה, ולכן גם את הבחירה · אחרת
+     ‏היה נשאר מסומן סמל שכבר אינו על המסך. בעריכה הסמל של
+     ‏הקטגוריה עצמה נשמר. */
+  if (!keepIcon) newIcon = iconsFor(k)[0];
+  renderIcons();
 }
-$('catOut').addEventListener('click', () => setCatKind('expense'));
-$('catIn').addEventListener('click',  () => setCatKind('income'));
 
-/* ‏גלון אחד לשני התפקידים. רוב מה שבו זהה, ומה שנבדל הוא
-   ‏הכותרת, מילת הכפתור, וכפתור ההסרה שקיים רק בעריכה. */
-function openCat(c) {
-  editCat = c || null;
-  $('catName').value = c ? c.label : '';
-  newIcon = c ? (c.icon || ICONS[0]) : ICONS[0];
-  /* ‏בעריכה הסוג נעול · להפוך קטגוריית הוצאה להכנסה היה מעיף
-     ‏את כל התנועות שכבר רשומות בה לצד הלא נכון של החשבון. */
-  setCatKind(c ? c.kind : 'expense');
-  $('catKind').classList.toggle('hidden', !!c);
-  $('catKind').previousElementSibling.classList.toggle('hidden', !!c);
-
-  $('catTitle').textContent = c ? 'עריכת הקטגוריה' : 'קטגוריה חדשה';
-  $('catSub').textContent = c
-    ? 'השם והסמל. התנועות שכבר רשומות בה נשארות איתה.'
-    : 'רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.';
-  $('catSave').textContent = c ? 'שמירה' : 'הוספה';
-  $('catDelete').classList.toggle('hidden', !c);
-
+/* ‏רשת הסמלים, לפי הסוג שנבחר כרגע. קטגוריה ותיקה יכולה
+   ‏להחזיק סמל שאינו ברשימה שלה · הוא נוסף בראש כדי שיישאר
+   ‏אפשר לראות אותו ולבחור בו. */
+function renderIcons() {
   const box = $('catIcons');
+  if (!box) return;
   box.textContent = '';
-  for (const ic of ICONS) {
+  const list = iconsFor(newKind);
+  const all = list.includes(newIcon) ? list : [newIcon, ...list];
+  for (const ic of all) {
     const b = el('button', 'chip chip-quiet', ic);
     b.type = 'button';
     b.setAttribute('aria-pressed', String(ic === newIcon));
@@ -2473,6 +2477,31 @@ function openCat(c) {
     });
     box.append(b);
   }
+}
+$('catOut').addEventListener('click', () => setCatKind('expense'));
+$('catIn').addEventListener('click',  () => setCatKind('income'));
+
+/* ‏גלון אחד לשני התפקידים. רוב מה שבו זהה, ומה שנבדל הוא
+   ‏הכותרת, מילת הכפתור, וכפתור ההסרה שקיים רק בעריכה. */
+function openCat(c) {
+  editCat = c || null;
+  $('catName').value = c ? c.label : '';
+  const kind = c ? c.kind : 'expense';
+  newIcon = c ? (c.icon || iconsFor(kind)[0]) : iconsFor(kind)[0];
+  /* ‏בעריכה הסוג נעול · להפוך קטגוריית הוצאה להכנסה היה מעיף
+     ‏את כל התנועות שכבר רשומות בה לצד הלא נכון של החשבון. */
+  setCatKind(kind, true);
+  $('catKind').classList.toggle('hidden', !!c);
+  $('catKind').previousElementSibling.classList.toggle('hidden', !!c);
+
+  $('catTitle').textContent = c ? 'עריכת הקטגוריה' : 'קטגוריה חדשה';
+  $('catSub').textContent = c
+    ? 'השם והסמל. התנועות שכבר רשומות בה נשארות איתה.'
+    : 'רק אם באמת חסרה לכם אחת. רשימה ארוכה היא הדרך הבטוחה לכך שאיש לא ימלא אותה.';
+  $('catSave').textContent = c ? 'שמירה' : 'הוספה';
+  $('catDelete').classList.toggle('hidden', !c);
+
+  renderIcons();
   setErr($('catErr'), '');
   disarmCat();
   openSheet($('catSheet'));
