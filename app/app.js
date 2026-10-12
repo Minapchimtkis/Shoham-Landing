@@ -1950,6 +1950,27 @@ async function renderInsight() {
     }
   }
 
+  /* ‏ההוצאות הקבועות שעוד לא נרשמו, לפני כל שאר הכרטיסים ·
+     ‏זאת הפעולה שחוסכת הכי הרבה הקלדה.
+
+     ‏בלי חלון של ימים בתחילת החודש: כל עוד שכר הדירה לא נרשם,
+     ‏המספר הגדול שגוי בגובה שכר הדירה, וזה נכון ב-20 בחודש
+     ‏בדיוק כמו ב-2 בו. מי שלא רוצה אותן לוחץ "לא עכשיו", וזה
+     ‏משתיק אותן עד החודש הבא. */
+  if (current && !recSeen()) {
+    const pend = await pendingRecurring();
+    if (pend.length >= 2) {
+      const sum = pend.reduce((s, r) => s + r.amount, 0);
+      card(`${pend.length} הוצאות קבועות עוד לא נרשמו החודש`,
+        `יחד ${fmt(sum)}. הן חוזרות אצלכם כל חודש באותו סכום, ואפשר לרשום את כולן בלחיצה אחת במקום אחת אחת.`,
+        [['לראות ולרשום', () => openRecurring()],
+         ['לא עכשיו', () => { markRecSeen(); renderInsight(); }]],
+        { kick: 'חוסך הקלדה' });
+      return;
+    }
+  }
+
+
   /* ‏החריגה שכבר קרתה · הזמנה, לא חקירה. היא יורדת ברגע שענו
      ‏עליה או שבחרו לא עכשיו, ואינה חוזרת באותו חודש. */
   if (S.askCat && !haveReflection('overspend', S.askCat.id)) {
@@ -2837,8 +2858,22 @@ function recurring(rows) {
     // ‏סכום שמשתנה בחצי אינו מנוי, הוא מקום שקונים בו הרבה
     const steady = amounts.every(a => Math.abs(a - mid) <= mid * 0.2);
     if (!steady) continue;
+    /* ‏היום בחודש והקטגוריה · שניהם דרושים כדי שאפשר יהיה
+       ‏להציע את ההוצאה הזאת לחודש הנוכחי ולא רק לדווח עליה.
+       ‏היום הוא החציון, והקטגוריה היא הנפוצה ביותר · מי ששינה
+       ‏קטגוריה פעם אחת מתוך שלוש לא מזיז את ההצעה. */
+    const days = list.map(t => Number(t.occurred_on.slice(8, 10)))
+                     .filter(d => d >= 1 && d <= 31).sort((a, b) => a - b);
+    const tally = new Map();
+    for (const t of list) if (t.category_id)
+      tally.set(t.category_id, (tally.get(t.category_id) || 0) + 1);
+    let catId = null, best = 0;
+    for (const [id, n] of tally) if (n > best) { best = n; catId = id; }
+
     out.push({ key: k, label: list[list.length - 1].description || k,
-               amount: mid, months: months.size, total: list.reduce((s, t) => s + t.amount_agorot, 0) });
+               amount: mid, months: months.size, total: list.reduce((s, t) => s + t.amount_agorot, 0),
+               day: days.length ? days[Math.floor(days.length / 2)] : 1,
+               catId });
   }
   return out.sort((a, b) => b.amount - a.amount);
 }
@@ -3580,6 +3615,114 @@ async function learnMerchant(desc, catId, isMove) {
     if (was) S.mrules.set(k, was); else S.mrules.delete(k);
   }
 }
+
+
+/* ─────────── הקבועות שעוד לא נרשמו החודש ── */
+
+/* ‏רוב ההוצאה של משק בית היא חמישה עד עשרה פריטים קבועים:
+   ‏שכירות, ארנונה, סלולר, ביטוח, מנויים. הם ידועים מראש,
+   ‏והמשתמש מקליד אותם מחדש כל חודש · וזה בדיוק סוג העבודה
+   ‏שגורם לאנשים לנטוש אפליקציית תקציב בשבוע השלישי.
+
+   ‏הרשימה נבנית ממה שכבר חזר לפחות בשני חודשים באותו סכום,
+   ‏פחות מה שכבר נרשם החודש. ההשוואה היא לפי אותו מפתח שבו
+   ‏מזוהה חוזרות, ולכן "שכר דירה" שכבר נרשם לא יוצע שוב. */
+async function pendingRecurring() {
+  const hist = await loadHistory(4);
+  /* ‏החודש הנוכחי מוחרג מההיסטוריה · אחרת הוצאה שנרשמה
+     ‏החודש נספרת כחודש נוסף ומחזקת את עצמה. */
+  const { from: c0, to: c1 } = periodRange(S.month);
+  const past = hist.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
+  const here = new Set(S.txs
+    .filter(t => t.direction === 'out' && !t.is_transfer)
+    .map(t => normDesc(t.description)));
+  return recurring(past)
+    .filter(r => !here.has(r.key))
+    .filter(r => r.catId && byId(r.catId) && !byId(r.catId).archived)
+    .slice(0, 8);
+}
+
+/* ‏הגיליון עצמו. כל שורה נבחרת בנפרד, כי "לאשר הכול" בלי
+   ‏יכולת להוריד שורה אחת הוא כפתור שאנשים לא לוחצים עליו. */
+let recRows = [];
+
+const markRecSeen = () => LS.set('rec.' + monthKey(S.month), 1);
+const recSeen = () => !!LS.get('rec.' + monthKey(S.month), 0);
+
+async function openRecurring() {
+  recRows = (await pendingRecurring()).map(r => ({ ...r, take: true }));
+  const box = $('recList');
+  box.textContent = '';
+  if (!recRows.length) {
+    box.append(el('p', 'note', 'הכול כבר רשום החודש.'));
+  } else {
+    for (const r of recRows) {
+      const row = el('label', 'rec-row');
+      const cb = el('input');
+      cb.type = 'checkbox';
+      cb.checked = true;
+      cb.addEventListener('change', () => { r.take = cb.checked; recSum(); });
+      const mid = el('span', 'rec-mid');
+      mid.append(el('span', 'rec-nm', r.label.slice(0, 30)));
+      const c = byId(r.catId);
+      mid.append(el('span', 'rec-sub',
+        `${(c && c.icon) || '\u2022'} ${(c && c.label) || ''} · בדרך כלל ב-${r.day} בחודש`));
+      const v = el('span', 'rec-amt money');
+      setMoney(v, r.amount);
+      row.append(cb, mid, v);
+      box.append(row);
+    }
+  }
+  recSum();
+  setErr($('recErr'), '');
+  openSheet($('recSheet'));
+}
+
+function recSum() {
+  const on = recRows.filter(r => r.take);
+  const sum = on.reduce((s, r) => s + r.amount, 0);
+  $('recSub').textContent = on.length
+    ? `${on.length} ${on.length === 1 ? 'הוצאה' : 'הוצאות'}, יחד ${fmt(sum)}. אפשר לשנות כל אחת אחר כך.`
+    : 'לא נבחר כלום.';
+  $('recSave').textContent = on.length ? `הוספת ${on.length}` : 'הוספה';
+  $('recSave').disabled = !on.length;
+}
+
+$('recCancel').addEventListener('click', () => { markRecSeen(); closeSheet(); });
+
+$('recSave').addEventListener('click', async () => {
+  const on = recRows.filter(r => r.take);
+  if (!on.length) return;
+  const btn = $('recSave');
+  btn.disabled = true; btn.textContent = 'מוסיף...';
+  /* ‏היום נלקח מההרגל, אבל הוא חייב להישאר בתוך החודש שמוצג
+     ‏ותקף בו · בפברואר אין 31. */
+  const dim = daysInPeriod(S.month);
+  const { from } = periodRange(S.month);
+  const base = new Date(from + 'T12:00:00');
+  try {
+    const rows = on.map(r => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + Math.min(Math.max(r.day, 1), dim) - 1);
+      return {
+        household_id: S.hh, occurred_on: isoDate(d),
+        amount_agorot: r.amount, direction: 'out',
+        category_id: r.catId, description: r.label.slice(0, 80),
+        source: 'recurring', created_by: S.user.id
+      };
+    });
+    const { error } = await sb.from('transactions').insert(rows);
+    if (error) throw error;
+    markRecSeen();
+    closeSheet();
+    toast(on.length === 1 ? 'נוספה.' : on.length + ' נוספו.');
+    await loadAll();
+  } catch (err) {
+    setErr($('recErr'), human(err));
+  } finally {
+    btn.disabled = false; recSum();
+  }
+});
 
 
 /* ═══════════════════════════════════════════ מחשבונים ══ */

@@ -1073,6 +1073,22 @@
   <button class="btn btn-danger hidden" id="catDelete" type="button" style="margin-top:10px">הסרת הקטגוריה</button>
 </div>
 
+<!-- ‏ההוצאות הקבועות של החודש. רוב ההוצאה של משק בית היא
+     ‏חמישה עד עשרה פריטים ידועים מראש, והקלדה שלהם מחדש בכל
+     ‏חודש היא העבודה שגורמת לאנשים לנטוש. כאן הם מוצעים
+     ‏ביחד, וכל אחד נבחר בנפרד. -->
+<div class="sheet hidden" id="recSheet" role="dialog" aria-modal="true" aria-labelledby="recTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="recTitle">מה שחוזר כל חודש</h2>
+  <p class="sub" id="recSub"></p>
+  <div id="recList"></div>
+  <p class="err hidden" id="recErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="recCancel" type="button">לא עכשיו</button>
+    <button class="btn" id="recSave" type="button">הוספה</button>
+  </div>
+</div>
+
 <!-- ‏השאלה. לא נזיפה: הקטגוריה חרגה, וזה הזמן לשאול למה ולא
      להדליק נורה אדומה. -->
 <div class="sheet hidden" id="askSheet" role="dialog" aria-modal="true" aria-labelledby="askTitle">

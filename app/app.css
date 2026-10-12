@@ -864,6 +864,17 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ‏מה שהיה "‏הרמז" במסך התקציב · שורה שקטה שאומרת אם
    ‏התכנון מסתדר עם ההכנסה, ושותקת כשהוא מסתדר בדיוק. */
+.rec-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--rule);
+  min-height:44px;
+}
+.rec-row:last-of-type{border-bottom:none}
+.rec-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.rec-nm{font-size:15px;font-weight:var(--w-ui-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-sub{font-size:12.5px;color:var(--ink-3)}
+.rec-amt{flex:none;font-size:16px;font-weight:var(--w-amount)}
+
 .rows-bal{
   margin:10px 2px 0;font-size:13px;font-weight:var(--w-ui-soft);
   color:var(--ink-3);line-height:1.5;
