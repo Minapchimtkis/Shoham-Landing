@@ -5003,6 +5003,8 @@ function renderSet() {
   $('setSave').classList.toggle('hidden', !isGuest());
   renderLockRow();
   renderShareRow();
+  renderInstallRow();
+  renderRemindRow();
   setAssetsLine();
 }
 
@@ -5057,7 +5059,11 @@ $('setExport').addEventListener('click', async () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `כמה-יש-לי-${isoDate(new Date())}.csv`;
+  /* ‏השם באותיות לטיניות במכוון, וזה נמדד: תו שאינו ASCII
+     ‏בתוך download גורם לכרום לזנוח את כל השם · גם את
+     ‏הסיומת · ולשמור את הקובץ בשם "download" בלי סיומת.
+     ‏ובלי סיומת המכשיר אינו יודע במה לפתוח אותו. */
+  a.download = `kama-yesh-li-${isoDate(new Date())}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
   toast(`${(data || []).length} תנועות ירדו אליכם.`);
@@ -5088,6 +5094,354 @@ $('setWipe').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════ הפעלה ══ */
+
+/* ════════════════════ התקנה ותזכורת ══ */
+
+/* ‏שני הדברים כאן עונים לאותה שאלה: מה מחזיר את המשתמש
+   ‏כשהאפליקציה סגורה. מה שיושב על מסך הבית נפתח, ומה שיושב
+   ‏בלשונית שלישית מאחורי שבע אחרות · לא.
+
+   ‏מה שאין כאן, במכוון: התראות דחיפה. הן דורשות מפתחות
+   ‏VAPID, טבלת מנויים ושרת ששולח · ובאייפון הן עובדות
+   ‏בכלל רק באפליקציה מותקנת. לכן הדבר הראשון הוא ההתקנה,
+   ‏והתזכורת נשענת על היומן · שהוא הדבר היחיד שכבר מותקן
+   ‏אצל כולם ויודע להשמיע קול ביום רביעי בשמונה בערב. */
+
+/* ‏מותקנת? שלוש בדיקות, כי אף אחת מהן אינה נכונה בכל מקום:
+   ‏display-mode הוא התקן ועובד בכרום, navigator.standalone הוא
+   ‏מה שספארי באייפון עונה בו, והדגל בזיכרון הוא מה שנשאר
+   ‏אחרי appinstalled גם בלשונית שממשיכה לרוץ בדפדפן. */
+function installed() {
+  try {
+    if (matchMedia('(display-mode: standalone)').matches) return true;
+    if (matchMedia('(display-mode: fullscreen)').matches) return true;
+    if (matchMedia('(display-mode: minimal-ui)').matches) return true;
+  } catch {}
+  if (navigator.standalone === true) return true;
+  return !!LS.get('installed', 0);
+}
+
+/* ‏ההזמנה שהדפדפן מושיט לנו. הוא מושיט אותה פעם אחת בלבד,
+   ‏ואם לא שומרים אותה היא אבודה לכל אורך הביקור. */
+let bip = null;
+
+addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  bip = e;
+  renderInstallRow();
+});
+
+addEventListener('appinstalled', () => {
+  bip = null;
+  LS.set('installed', 1);
+  renderInstallRow();
+  closeSheet();
+  toast('נוסף למסך הבית.');
+});
+
+/* ‏איזה מסלול התקנה עומד לרשות המשתמש עכשיו.
+
+   ‏זיהוי לפי יכולת ולא לפי שם: אם הדפדפן הושיט לנו הזמנה,
+   ‏זה המסלול, בלי קשר למה שכתוב ב-user agent. אייפון נשאר
+   ‏זיהוי לפי מערכת הפעלה, כי שם אין הזמנה לעולם והצעדים הם
+   ‏הדבר היחיד שיש. iPadOS מציג את עצמו כ-Mac, ולכן גם
+   ‏maxTouchPoints · מק אמיתי אינו עונה במגע. */
+function instPath() {
+  const ua = navigator.userAgent || '';
+  const ios = /iPad|iPhone|iPod/.test(ua)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) return 'ios';
+  if (bip) return 'prompt';
+  if (/Android/.test(ua)) return 'android';
+  return 'desktop';
+}
+
+/* ‏הצעדים. כל שלב הוא מה שלוחצים, במילים שכתובות שם
+   ‏בדפדפן עצמו. באייפון אני לא אומר איפה כפתור השיתוף
+   ‏יושב, כי בספארי הוא למטה ובכרום לאייפון הוא למעלה
+   ‏בתוך תפריט · הסמל זהה בשתיהן, והוא מה שמחפשים. */
+const INST_STEPS = {
+  ios: [
+    ['פתחו את ', 'תפריט השיתוף', ' של הדפדפן · הריבוע שיוצא ממנו חץ כלפי מעלה.'],
+    ['גלולו ברשימה ובחרו ', 'הוסף למסך הבית', '.'],
+    ['אשרו ב', 'הוסף', '. האייקון יופיע על מסך הבית כמו כל אפליקציה אחרת.']
+  ],
+  android: [
+    ['פתחו את ', 'תפריט הדפדפן', ' · שלוש הנקודות בפינה.'],
+    ['בחרו ', 'התקנת אפליקציה', ' או ', 'הוספה למסך הבית', '.'],
+    ['אשרו, והאייקון יופיע בין האפליקציות שלכם.']
+  ],
+  desktop: [
+    ['חפשו את ', 'סמל ההתקנה', ' בשורת הכתובת, או את ', 'תפריט הדפדפן', '.'],
+    ['בחרו ', 'התקנה', ' או ', 'Install', '.'],
+    ['האפליקציה תיפתח בחלון של עצמה, בלי לשוניות ובלי שורת כתובת.']
+  ]
+};
+
+/* ‏פסקה מעורבת: איבר אי-זוגי הוא טקסט רגיל וזוגי הוא מודגש.
+   ‏בלי innerHTML · הטקסט כאן שלנו, אבל הרגל של להרכיב סימני
+   ‏עיצוב ממחרוזות הוא הרגל שמחזיק עד שמגיעה מחרוזת מבחוץ. */
+function mixed(node, parts) {
+  node.textContent = '';
+  /* ‏עטיפה אחת לכל המשפט: הפריט הוא קופסה גמישה, וכל
+     ‏ילד שהוא אלמנט הופך שם לפריט גמיש בפני עצמו.
+     ‏בלי העטיפה כל מודגש נתלש ממקומו במשפט. */
+  const w = el('span');
+  parts.forEach((t, i) => {
+    if (i % 2) w.append(el('b', null, t));
+    else w.append(document.createTextNode(t));
+  });
+  node.append(w);
+}
+
+function openInstall() {
+  const path = instPath();
+  $('instSub').textContent = path === 'ios'
+    ? 'באייפון זה שלוש לחיצות, ומכאן האפליקציה נפתחת ממסך הבית גם בלי רשת.'
+    : path === 'prompt'
+      ? 'לחיצה אחת. מכאן האפליקציה נפתחת ממסך הבית גם בלי רשת.'
+      : 'מכאן האפליקציה נפתחת ממסך הבית גם בלי רשת, בלי לחפש אותה בלשוניות.';
+
+  const ol = $('instSteps');
+  ol.textContent = '';
+  /* ‏במסלול שבו הדפדפן עושה את העבודה אין מה להסביר ·
+     ‏שלושה צעדים ליד כפתור שעושה הכל הם רעש. */
+  if (path !== 'prompt') {
+    for (const parts of INST_STEPS[path]) {
+      const li = el('li');
+      mixed(li, parts);
+      ol.append(li);
+    }
+  }
+  ol.classList.toggle('hidden', path === 'prompt');
+  $('instGo').classList.toggle('hidden', path !== 'prompt');
+  openSheet($('instSheet'));
+}
+
+$('instLater').addEventListener('click', closeSheet);
+
+$('instGo').addEventListener('click', async () => {
+  const p = bip;
+  if (!p) { closeSheet(); return; }
+  /* ‏ההזמנה נשרפת בשימוש · מנקים אותה לפני ההמתנה, אחרת
+     ‏לחיצה שנייה מהירה מנסה להשתמש בה שוב וזורקת שגיאה. */
+  bip = null;
+  try { await p.prompt(); } catch {}
+  closeSheet();
+  renderInstallRow();
+});
+
+function renderInstallRow() {
+  const row = $('setInstall');
+  if (!row) return;
+  row.classList.toggle('hidden', installed());
+}
+
+$('setInstall').addEventListener('click', () => openInstall());
+
+/* ‏ההזמנה מעצמה, פעם אחת בחייהם. לא ביום הראשון ולא לפני
+   ‏שיש משהו בפנים: התקנה של אפליקציה ריקה היא בקשה לפני
+   ‏שניתן משהו, והתשובה לה היא לא. שני ימים שונים וחמש
+   ‏תנועות הם הרגע שבו יש מה לשמור. */
+function maybeInstall() {
+  if (installed()) return;
+  if (openEl) return;
+  if (LS.get('instAsk', 0)) return;
+  if (isGuest()) return;
+  if (S.txs.length < 5) return;
+  if (LS.get('streak', { n: 0 }).n < 2) return;
+  LS.set('instAsk', 1);
+  setTimeout(() => { if (!openEl) openInstall(); }, 1200);
+}
+
+/* ────────────────────── התזכורת השבועית ── */
+
+/* ‏למה יומן ולא התראה.
+
+   ‏לדפדפן אין דרך להשמיע קול בזמן עתיד בלי שרת שידחוף
+   ‏אותו. setTimeout מת עם סגירת הלשונית, ו-Notification Triggers
+   ‏לא הגיעה לאף דפדפן יציב. נשארות שתי דרכים: התראות
+   ‏דחיפה, שדורשות מפתחות ושרת ששולח במועד, או היומן
+   ‏שכבר עושה בדיוק את זה, בכל מכשיר, בלי הרשמה ובלי הרשאה.
+
+   ‏ויתרון שלישי שהכריע: התזכורת שיושבת ביומן שלהם היא
+   ‏שלהם. הם רואים אותה, מזיזים אותה ומוחקים אותה בלי לבקש
+   ‏מאיתנו דבר, ואנחנו לא מחזיקים רשימת מנויים ולא נוגעים
+   ‏ביומן שלהם. */
+
+const REM_DAYS = [
+  { v: 0, label: 'ראשון',  ics: 'SU' },
+  { v: 1, label: 'שני',    ics: 'MO' },
+  { v: 2, label: 'שלישי', ics: 'TU' },
+  { v: 3, label: 'רביעי', ics: 'WE' },
+  { v: 4, label: 'חמישי', ics: 'TH' },
+  { v: 5, label: 'שישי',   ics: 'FR' },
+  { v: 6, label: 'שבת',    ics: 'SA' }
+];
+
+/* ‏ארבע שעות ולא בורר של שעון. בורר עושה את הבחירה
+   ‏למשימה, וארבע שעות עושות אותה ללחיצה. מי שרוצה
+   ‏שעה אחרת מזיז את האירוע ביומן שלו בשתי אצבעות. */
+const REM_HOURS = [
+  { v: 9,  label: '9:00' },
+  { v: 13, label: '13:00' },
+  { v: 18, label: '18:00' },
+  { v: 20, label: '20:00' }
+];
+
+const remCfg = () => LS.get('remind', { day: null, hour: 20 });
+
+/* ‏השורה מדווחת על מה שקרה בפועל, ולא על מה שנבחר
+   ‏בגיליון. בחירת יום וסגירה בלי להוריד את הקובץ אינה
+   ‏תזכורת, ושורה שתאמר אחרת מבטיחה משהו שלא קיים. */
+function renderRemindRow() {
+  const c = remCfg();
+  const d = REM_DAYS.find(x => x.v === c.day);
+  const h = REM_HOURS.find(x => x.v === c.hour);
+  $('remNow').textContent = (d && c.added)
+    ? `יום ${d.label}, ${h ? h.label : c.hour + ':00'}`
+    : 'לא נוספה';
+}
+
+function renderRemindSheet() {
+  const c = remCfg();
+  const chips = (box, list, key) => {
+    box.textContent = '';
+    for (const o of list) {
+      const b = el('button', 'chip', o.label);
+      b.type = 'button';
+      const on = c[key] === o.v;
+      b.setAttribute('aria-pressed', String(on));
+      if (on) b.classList.add('on');
+      b.addEventListener('click', () => {
+        LS.set('remind', { ...remCfg(), [key]: o.v });
+        renderRemindSheet();
+      });
+      box.append(b);
+    }
+  };
+  chips($('remDays'), REM_DAYS, 'day');
+  chips($('remHours'), REM_HOURS, 'hour');
+  /* ‏בלי יום אין מה לייצר. כפתור שמוריד קובץ שגוי
+     ‏גרוע מכפתור שאינו פעיל. */
+  $('remGo').disabled = c.day === null;
+  /* ‏מי שכבר הוסיף אחת · הכפתור אומר מה הוא עושה באמת. */
+  $('remGo').textContent = c.added ? 'להוסיף תזכורת נוספת' : 'להוסיף ליומן';
+  $('remDup').classList.toggle('hidden', !c.added);
+}
+
+/* ‏קיפול שורות לפי iCalendar: 75 אוקטטים, והמשך שמתחיל
+   ‏ברווח. עברית היא שני אוקטטים לאות, ולכן ספירת
+   ‏תווים הייתה משאירה שורות ארוכות מהמותר, וקיפול
+   ‏לפי אוקטטים בלי זהירות היה שובר אות באמצע. */
+function icsFold(line) {
+  const enc = new TextEncoder();
+  const out = [];
+  let cur = '', bytes = 0;
+  for (const ch of line) {
+    const n = enc.encode(ch).length;
+    if (bytes + n > 73 && cur) { out.push(cur); cur = ' '; bytes = 1; }
+    cur += ch; bytes += n;
+  }
+  if (cur) out.push(cur);
+  return out.join('\r\n');
+}
+
+/* ‏הבריחה של התוכן. פסיק, נקודה-פסיק ולוכסן הפוך הם תווי
+   ‏תחביר בתוך שדות, ושורה חדשה היא \\n. */
+const icsEsc = v => String(v)
+  .replace(/\\/g, '\\\\')
+  .replace(/;/g, '\\;')
+  .replace(/,/g, '\\,')
+  .replace(/\n/g, '\\n');
+
+/* ‏המועד הראשון: היום הנבחר הקרוב, ואם השעה בו כבר
+   ‏עברה · השבוע הבא. אירוע שמתחיל בעבר נכנס ליומן
+   ‏ומיד נראה כמי שפספסו אותו. */
+function remFirst(day, hour, now = new Date()) {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, 0, 0, 0);
+  let ahead = (day - d.getDay() + 7) % 7;
+  if (ahead === 0 && d <= now) ahead = 7;
+  d.setDate(d.getDate() + ahead);
+  return d;
+}
+
+/* ‏זמן צף במכוון: בלי Z ובלי TZID. כך היומן מעיר
+   ‏בשמונה בערב מקומי · גם אחרי מעבר לשעון חורף
+   ‏וגם בחו״ל, בלי להטמיע בקובץ גוש VTIMEZONE שלם שעוד צריך
+   ‏להיות נכון בעוד עשר שנים. */
+const icsLocal = d => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+
+const icsUtc = d => `${d.getUTCFullYear()}${pad2(d.getUTCMonth() + 1)}${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}${pad2(d.getUTCSeconds())}Z`;
+
+const REM_TITLE = 'דקה עם התקציב';
+
+function remIcs(day, hour) {
+  const d = REM_DAYS.find(x => x.v === day);
+  if (!d) return null;
+  const start = remFirst(day, hour);
+  const uid = `kyl-weekly-${day}-${hour}-${Date.now()}@shohamfinance.co.il`;
+  const link = location.origin.startsWith('http')
+    ? location.origin + '/app/'
+    : 'https://shohamfinance.co.il/app/';
+
+  const body = 'לפתוח את "כמה יש לי", להשלים מה שחסר ולהסתכל על המספר.\n' + link;
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//shohamfinance.co.il//kama-yesh-li//HE',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + icsUtc(new Date()),
+    'DTSTART:' + icsLocal(start),
+    'DURATION:PT10M',
+    'RRULE:FREQ=WEEKLY;BYDAY=' + d.ics,
+    'SUMMARY:' + icsEsc(REM_TITLE),
+    'DESCRIPTION:' + icsEsc(body),
+    'URL:' + link,
+    'TRANSP:TRANSPARENT',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'TRIGGER:PT0S',
+    'DESCRIPTION:' + icsEsc(REM_TITLE),
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ];
+  return lines.map(icsFold).join('\r\n') + '\r\n';
+}
+
+$('setRemind').addEventListener('click', () => {
+  renderRemindSheet();
+  openSheet($('remSheet'));
+});
+
+$('remGo').addEventListener('click', () => {
+  const c = remCfg();
+  const ics = remIcs(c.day, c.hour);
+  if (!ics) { toast('בחרו יום.'); return; }
+
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kama-yesh-li-reminder.ics';
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+  LS.set('remind', { ...c, added: Date.now() });
+  closeSheet();
+  renderRemindRow();
+  /* ‏הקובץ יורד, ומה שקורה אחרי כן תלוי במכשיר · באייפון
+     ‏היומן נפתח ומבקש אישור, באנדרואיד צריך לפתוח את
+     ‏הקובץ. ההודעה אומרת מה לחפש במקום להצהיר מה נעשה. */
+  toast('הקובץ ירד. פתיחה שלו תוסיף את התזכורת ליומן.');
+});
 
 /* ‏מודול הייבוא מקבל את מה שהוא צריך במקום לייבא מכאן: ייבוא
    הדדי בין שני קבצים הוא מעגל, והוא נשבר בדיוק בסדר שבו קשה
@@ -5236,6 +5590,7 @@ async function enter(user) {
   renderStreak(touchStreak());
   renderInsight();
   maybeAsk();
+  maybeInstall();
 }
 
 /* ═══════════════════════════════════════ נעילה בקוד ══ */

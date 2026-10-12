@@ -1344,6 +1344,37 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 }
 .sheet-row .btn{flex:1}
 
+/* ‏צעדי ההתקנה. מספרים גדולים ומנוקדים, כי קוראים אותם מול
+   ‏מסך אחר · אוחזים את הטלפון ומחפשים את הכפתור שנאמר כאן. */
+.inst-steps{
+  list-style:none;margin:18px 0 0;padding:0;
+  display:flex;flex-direction:column;gap:14px;
+  /* ‏מונה משלנו ולא list-item: הפריט הוא flex ולא
+     ‏list-item, והמונה המובנה של הדפדפן פשוט לא מתקדם. */
+  counter-reset:inst;
+}
+.inst-steps li{
+  display:flex;align-items:flex-start;gap:12px;
+  counter-increment:inst;
+}
+/* ‏כל המשפט בפריט גמיש אחד. בלי העטיפה הזאת כל
+   ‏<b> הופך לפריט גמיש משל עצמו, והמשפט התפרק
+   ‏לקופסאות שנסדרו בנפרד · בעברית זה יוצא שטות ממש. */
+.inst-steps li > span{
+  flex:1;min-width:0;
+  font-size:15.5px;line-height:1.5;color:var(--ink-2);
+}
+.inst-steps li::before{
+  content:counter(inst);
+  flex:none;width:26px;height:26px;border-radius:50%;
+  background:var(--wash-2);color:var(--ink);
+  font-size:13.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums;
+}
+/* ‏השם של מה שלוחצים · מודגש, כי זה הדבר שהעין מחפשת. */
+.inst-steps b{color:var(--ink);font-weight:650}
+
 /* ═══════════════════════════════════════════ הגדרות ══ */
 
 .set-group{margin-top:26px}

@@ -602,6 +602,20 @@
         <span class="v" id="setName"></span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      <!-- ‏ההתקנה. מוסתרת למי שכבר מותקן אצלו. -->
+      <button class="set-row hidden" id="setInstall" type="button">
+        <span class="k">הוספה למסך הבית<small>נפתחת כמו אפליקציה, גם בלי רשת</small></span>
+        <span class="v"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <!-- ‏התזכורת השבועית. היא יושבת ביומן של המשתמש ולא אצלנו,
+           ‏כי זה הדבר היחיד שמגיע אליו כשהאפליקציה סגורה בלי
+           ‏שרת שישלח, בלי הרשאה, ובלי תלות בדפדפן שבו נרשם. -->
+      <button class="set-row" id="setRemind" type="button">
+        <span class="k">תזכורת שבועית<small id="remNow"></small></span>
+        <span class="v"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <!-- ‏התקציב המשותף. שורה אחת שמשנה את עצמה: למי שלבד היא
            ‏ההזמנה, ולמי שכבר בשניים היא מי נמצא כאן. -->
       <button class="set-row" id="setShare" type="button">
@@ -1125,6 +1139,59 @@
     <button class="btn" id="catSave" type="button">הוספה</button>
   </div>
   <button class="btn btn-danger hidden" id="catDelete" type="button" style="margin-top:10px">הסרת הקטגוריה</button>
+</div>
+
+<!-- ‏ההתקנה למסך הבית. היא נראית כמו עוד תכונה והיא התשתית:
+     ‏באייפון, התראות דחיפה עובדות רק באפליקציה מותקנת, ובלשונית
+     ‏רגילה אי אפשר אפילו לבקש הרשאה. וגם בלי התראות, מה שיושב
+     ‏על מסך הבית נפתח, ומה שלא · לא. -->
+<div class="sheet hidden" id="instSheet" role="dialog" aria-modal="true" aria-labelledby="instTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="instTitle">להוסיף למסך הבית</h2>
+  <p class="sub" id="instSub"></p>
+  <ol class="inst-steps" id="instSteps"></ol>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="instLater" type="button">לא עכשיו</button>
+    <button class="btn hidden" id="instGo" type="button">התקנה</button>
+  </div>
+</div>
+
+<!-- ‏התזכורת השבועית. יום, שעה, ואירוע חוזר שנכנס ליומן של
+     ‏המשתמש. היומן הוא שמזכיר · לא אנחנו · ולכן זה עובד גם
+     ‏כשהאפליקציה סגורה, בלי שרת ובלי הרשאת התראות. -->
+<div class="sheet hidden" id="remSheet" role="dialog" aria-modal="true" aria-labelledby="remTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="remTitle">תזכורת שבועית</h2>
+  <p class="sub">
+    דקה בשבוע משנה את כל התמונה. בחרו מתי, והתזכורת תיכנס
+    ליומן של המכשיר ותחזור כל שבוע בעצמה.
+  </p>
+
+  <div class="field">
+    <span class="lbl" id="remDayLbl">באיזה יום</span>
+    <div class="chips" id="remDays" role="group" aria-labelledby="remDayLbl"></div>
+  </div>
+
+  <div class="field">
+    <span class="lbl" id="remHourLbl">באיזו שעה</span>
+    <div class="chips" id="remHours" role="group" aria-labelledby="remHourLbl"></div>
+  </div>
+
+  <!-- ‏מי שכבר הוסיף אחת צריך לדעת שקובץ שני אינו
+       ‏מחליף את הראשון · הוא מתווסף לידו. -->
+  <p class="note hidden" id="remDup" style="margin-top:14px">
+    כבר הוספתם תזכורת. קובץ חדש מוסיף אירוע נוסף ואינו
+    מחליף את הקודם, ולכן כדאי למחוק את הישן מהיומן.
+  </p>
+
+  <div class="sheet-row">
+    <button class="btn" id="remGo" type="button">להוסיף ליומן</button>
+  </div>
+
+  <p class="note" style="margin-top:14px">
+    האירוע נשמר ביומן שלכם בלבד, ואפשר למחוק אותו משם בכל רגע.
+    האפליקציה אינה שולחת לכם התראות ואינה רואה את היומן שלכם.
+  </p>
 </div>
 
 <!-- ‏התקציב המשותף. מסך אחד שעושה שלושה דברים לפי המצב:
