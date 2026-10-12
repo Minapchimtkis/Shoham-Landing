@@ -271,6 +271,8 @@ const S = {
   cats: [],                 // כל הקטגוריות הגלויות
   budgets: new Map(),       // category_id → agorot
   mrules: new Map(),        // ‏בית עסק → {catId, move} · מה שהייבוא למד
+  recPending: [],           // ‏קבועות שעוד לא נרשמו החודש
+  steadyKeys: new Set(),    // ‏מה שחוזר כל חודש · לפי מפתח התיאור
   txs: [],                  // תנועות החודש הנבחר
   prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
   reflections: [],
@@ -837,6 +839,24 @@ async function loadAll() {
     S.mrules.set(r.merchant, { catId: r.category_id, move: !!r.is_move });
   S.prevTxs = null;
 
+  /* ‏שתי רשימות שנגזרות מההיסטוריה, ונחשבות פעם אחת לטעינה ·
+     ‏קודם renderInsight חישבה אותן בכל ציור של הבית, וגם
+     ‏התחזית צריכה אותן והיא חייבת להיות סינכרונית. */
+  try {
+    const hist = await loadHistory(4);
+    const { from: c0, to: c1 } = periodRange(S.month);
+    const past = hist.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
+    const rec = recurring(past);
+    S.steadyKeys = new Set(rec.map(r => r.key));
+    const here = new Set(S.txs
+      .filter(t => t.direction === 'out' && !t.is_transfer)
+      .map(t => normDesc(t.description)));
+    S.recPending = rec
+      .filter(r => !here.has(r.key))
+      .filter(r => r.catId && byId(r.catId) && !byId(r.catId).archived)
+      .slice(0, 8);
+  } catch { S.steadyKeys = new Set(); S.recPending = []; }
+
   renderHome();
   snapNetWorth();
 }
@@ -1023,6 +1043,7 @@ function renderHome() {
 
   renderFlow();
   renderPulse(current, dim, now);
+  renderForecast(now);
   renderWorth();
   renderRows(current, dim, now);
   renderInRows();
@@ -1516,6 +1537,7 @@ function liveRedraw() {
   renderFlow();
   renderBal();
   renderPulse(current, dim, now);
+  renderForecast(now);
   /* ‏הטבעות נבנות מחדש במלואן · אין בהן פוקוס שאפשר להרוג,
      ‏והן שש תמונות קטנות. השורות, לעומת זאת, מחזיקות את השדה
      ‏הפתוח, ולכן מהן מתעדכן רק הפס. */
@@ -1550,6 +1572,86 @@ let liveBars = [];
    ‏מקדים את היום בחודש ביותר מ-12 אחוז. בעשירי בחודש הוצאתם
    ‏חצי מהתכנון · זה לא חריגה, אבל זה הזמן שבו עוד אפשר להחליט,
    ‏ואחרי שכבר חרגתם כבר אין מה להחליט. */
+/* ───────────────── האם אגמור את החודש ── */
+
+/* ‏המסך עונה על "כמה יש לי". השאלה שבאמת מדירה שינה היא מה
+   ‏יקרה עד הסוף, והיא נענית מהמספרים של המשתמש עצמו.
+
+   ‏העיקר כאן הוא מה שלא נכנס לקצב היומי: שכר דירה שנרשם ב-2
+   ‏בחודש אינו "קצב". בלי ההפרדה הזאת 5,800 חלקי יומיים כפול
+   ‏שלושים הם תחזית של 87 אלף שקל, והמספר הזה היה הורס כל
+   ‏אמון במסך. לכן הקבועות יוצאות מהקצב ונוספות בחזרה כסכום
+   ‏ידוע, יחד עם אלה שעוד לא נרשמו.
+
+   ‏זאת תחזית ולא הבטחה, והיא נאמרת כך במילים. */
+function forecast(now) {
+  const plan = plannedOut();
+  if (!plan || !inCurrentPeriod()) return null;
+  const dim = daysInPeriod(S.month);
+  const day = dayOfPeriod(S.month, now);
+  const left = dim - day;
+  /* ‏ארבעה ימים אינם קצב, והם מכפילים כל רעש פי שבעה. ובסוף
+     ‏החודש כבר אין מה לחזות · המספר שעל המסך הוא התשובה. */
+  if (day < 5 || left < 3) return null;
+
+  const out = S.txs.filter(t => t.direction === 'out' && !t.is_transfer);
+  if (out.length < 4) return null;
+
+  const spent = out.reduce((s, t) => s + t.amount_agorot, 0);
+  const steady = out
+    .filter(t => S.steadyKeys.has(normDesc(t.description)))
+    .reduce((s, t) => s + t.amount_agorot, 0);
+  const variable = Math.max(0, spent - steady);
+  const coming = pendingRecurring().reduce((s, r) => s + r.amount, 0);
+
+  const rate = variable / day;
+  /* ‏מעוגל לשקלים שלמים. "6,833.33" בתחזית הוא דיוק שאינו
+     ‏קיים · שתי הספרות האחרונות מבטיחות דבר שהחישוב הזה לא
+     ‏יכול להבטיח, והן גם מה שגורם למספר להיראות כמו תקלה. */
+  const projected = Math.round((spent + rate * left + coming) / 100) * 100;
+  return { projected, plan, diff: projected - plan, left, coming, rate: Math.round(rate) };
+}
+
+function renderForecast(now) {
+  const box = $('homeCast');
+  box.textContent = '';
+  const f = forecast(now);
+  if (!f) { hide(box); return; }
+  show(box);
+  box.classList.toggle('over', f.diff > 0);
+
+  const line = el('p', 'cast-main');
+  line.append(document.createTextNode('לפי הקצב הזה החודש ייגמר על '));
+  line.append(moneyEl(f.projected, 'money'));
+  box.append(line);
+
+  const sub = el('p', 'cast-sub');
+  if (f.diff > 0) {
+    sub.append(moneyEl(f.diff, 'money'));
+    sub.append(document.createTextNode(' מעל התכנון. עוד ' + f.left +
+      (f.left === 1 ? ' יום' : ' ימים') + ' להחליט מה משנים.'));
+  } else {
+    sub.append(document.createTextNode('בתוך התכנון, עם '));
+    sub.append(moneyEl(-f.diff, 'money'));
+    sub.append(document.createTextNode(' מרווח.'));
+  }
+  box.append(sub);
+
+  /* ‏מה שנכנס לתחזית ולא נראה על המסך · בלי השורה הזאת
+     ‏המספר מרגיש כמו קסם, ואי אפשר לבדוק אותו. */
+  if (f.coming > 0) {
+    const note = el('p', 'cast-note');
+    note.append(document.createTextNode('כולל '));
+    note.append(moneyEl(f.coming, 'money'));
+    note.append(document.createTextNode(' של קבועות שעוד לא נרשמו.'));
+    box.append(note);
+  }
+  box.setAttribute('aria-label',
+    `תחזית לסוף החודש ${fmt(f.projected)}, ` +
+    (f.diff > 0 ? `${fmt(f.diff)} מעל התכנון` : `בתוך התכנון`));
+}
+
+
 function renderPulse(current, dim, now) {
   const el_ = $('homePulse');
   const plan = plannedOut();
@@ -1958,7 +2060,7 @@ async function renderInsight() {
      ‏בדיוק כמו ב-2 בו. מי שלא רוצה אותן לוחץ "לא עכשיו", וזה
      ‏משתיק אותן עד החודש הבא. */
   if (current && !recSeen()) {
-    const pend = await pendingRecurring();
+    const pend = pendingRecurring();
     if (pend.length >= 2) {
       const sum = pend.reduce((s, r) => s + r.amount, 0);
       card(`${pend.length} הוצאות קבועות עוד לא נרשמו החודש`,
@@ -3627,19 +3729,14 @@ async function learnMerchant(desc, catId, isMove) {
    ‏הרשימה נבנית ממה שכבר חזר לפחות בשני חודשים באותו סכום,
    ‏פחות מה שכבר נרשם החודש. ההשוואה היא לפי אותו מפתח שבו
    ‏מזוהה חוזרות, ולכן "שכר דירה" שכבר נרשם לא יוצע שוב. */
-async function pendingRecurring() {
-  const hist = await loadHistory(4);
-  /* ‏החודש הנוכחי מוחרג מההיסטוריה · אחרת הוצאה שנרשמה
-     ‏החודש נספרת כחודש נוסף ומחזקת את עצמה. */
-  const { from: c0, to: c1 } = periodRange(S.month);
-  const past = hist.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
+/* ‏הרשימה עצמה נבנית ב-loadAll, פעם אחת לטעינה. כאן היא רק
+   ‏מסוננת שוב מול מה שנרשם מאז · מי שהוסיף "שכר דירה" ביד
+   ‏אחרי הטעינה לא אמור לראות אותו מוצע. */
+function pendingRecurring() {
   const here = new Set(S.txs
     .filter(t => t.direction === 'out' && !t.is_transfer)
     .map(t => normDesc(t.description)));
-  return recurring(past)
-    .filter(r => !here.has(r.key))
-    .filter(r => r.catId && byId(r.catId) && !byId(r.catId).archived)
-    .slice(0, 8);
+  return S.recPending.filter(r => !here.has(r.key));
 }
 
 /* ‏הגיליון עצמו. כל שורה נבחרת בנפרד, כי "לאשר הכול" בלי
@@ -3650,7 +3747,7 @@ const markRecSeen = () => LS.set('rec.' + monthKey(S.month), 1);
 const recSeen = () => !!LS.get('rec.' + monthKey(S.month), 0);
 
 async function openRecurring() {
-  recRows = (await pendingRecurring()).map(r => ({ ...r, take: true }));
+  recRows = pendingRecurring().map(r => ({ ...r, take: true }));
   const box = $('recList');
   box.textContent = '';
   if (!recRows.length) {

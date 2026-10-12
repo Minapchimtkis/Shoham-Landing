@@ -864,6 +864,23 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ‏מה שהיה "‏הרמז" במסך התקציב · שורה שקטה שאומרת אם
    ‏התכנון מסתדר עם ההכנסה, ושותקת כשהוא מסתדר בדיוק. */
+/* ‏התחזית · שקטה כשהיא בתוך התכנון, ובענבר כשלא. לא אדום:
+   ‏זה עוד לא קרה, וענבר הוא "זה מגיע" בשפה של האפליקציה. */
+.cast{
+  margin-top:16px;padding:13px 15px;
+  background:linear-gradient(var(--wash),var(--wash)),var(--paper);
+  border-radius:14px;
+}
+.cast.over{
+  background:linear-gradient(var(--amber-soft),var(--amber-soft)),var(--paper);
+}
+.cast-main{font-size:15px;font-weight:var(--w-ui-soft);line-height:1.5}
+.cast-main .money{font-weight:var(--w-amount);font-size:16px}
+.cast-sub{margin-top:4px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.cast.over .cast-sub{color:var(--amber)}
+.cast-sub .money{font-weight:var(--w-ui)}
+.cast-note{margin-top:5px;font-size:12.5px;color:var(--ink-3)}
+
 .rec-row{
   display:flex;align-items:center;gap:12px;
   padding:12px 0;border-bottom:1px solid var(--rule);
