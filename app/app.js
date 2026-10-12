@@ -3708,7 +3708,10 @@ $('recSave').addEventListener('click', async () => {
         household_id: S.hh, occurred_on: isoDate(d),
         amount_agorot: r.amount, direction: 'out',
         category_id: r.catId, description: r.label.slice(0, 80),
-        source: 'recurring', created_by: S.user.id
+        /* ‏העמודה מוגבלת ל-manual או import, ולא לשלישי · נבדק
+           ‏מול PostgreSQL אמיתי, שדחה 'recurring'. וזה גם התיאור
+           ‏הנכון: המשתמש ראה כל שורה ואישר אותה. */
+        source: 'manual', created_by: S.user.id
       };
     });
     const { error } = await sb.from('transactions').insert(rows);
