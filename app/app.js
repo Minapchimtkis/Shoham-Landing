@@ -22,6 +22,9 @@
    ‏אין SRI · אין דרך לומר "רק הקובץ הזה ולא אחר". ראה app/vendor. */
 import { createClient } from '../vendor/supabase.js';
 import { mountImport } from './import.js';
+/* ‏parse.js כבר נטענת סטטית מתוך import.js · השם הזה אינו
+   ‏מוסיף בקשה, והוא מה שמחשב את המפתח של בית עסק. */
+import { merchantKey } from './parse.js';
 
 /* ‏אותו פרויקט ואותו מפתח פרסום כמו בשאר הדפים. אין כאן סוד:
    המפתח הזה נועד לרוץ בדפדפן, והוא לבדו אינו מאפשר דבר. מה שמגן
@@ -267,6 +270,7 @@ const S = {
   month: monthOf(new Date()),
   cats: [],                 // כל הקטגוריות הגלויות
   budgets: new Map(),       // category_id → agorot
+  mrules: new Map(),        // ‏בית עסק → {catId, move} · מה שהייבוא למד
   txs: [],                  // תנועות החודש הנבחר
   prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
   reflections: [],
@@ -782,7 +786,7 @@ async function loadAll() {
   /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
      ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
      ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
-  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt] = await Promise.all([
+  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt, mru] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
@@ -800,7 +804,8 @@ async function loadAll() {
     sb.from('assets').select('*').eq('archived', false)
       .order('created_at', { ascending: true }),
     sb.from('debts').select('*').eq('archived', false)
-      .order('balance_agorot', { ascending: false })
+      .order('balance_agorot', { ascending: false }),
+    sb.from('merchant_rules').select('merchant,category_id,is_move')
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
@@ -824,6 +829,12 @@ async function loadAll() {
   /* ‏העמודה הזאת נוספה אחרי שהיו כבר משקי בית. אם המיגרציה עוד
      לא רצה, הראשון בחודש הוא מה שהיה תמיד. */
   S.cycle = (!hh.error && hh.data && hh.data[0] && hh.data[0].cycle_start) || 1;
+  /* ‏מה שהייבוא למד. טבלה חדשה, ולכן באותה סובלנות כמו
+     ‏השאר: עד שהמיגרציה תרוץ, הייבוא פשוט ממשיך לנחש כמו
+     ‏קודם במקום שהאפליקציה תיפול. */
+  S.mrules = new Map();
+  if (!mru.error) for (const r of (mru.data || []))
+    S.mrules.set(r.merchant, { catId: r.category_id, move: !!r.is_move });
   S.prevTxs = null;
 
   renderHome();
@@ -3525,6 +3536,52 @@ $('debtDelete').addEventListener('click', async () => {
   renderHome();
 });
 
+/* ─────────────────── מה שהייבוא למד ── */
+
+/* ‏טבלת המילים שבפרסר מזהה כמאה וחמישים בתי עסק ישראליים,
+   ‏והיא לא זוכרת כלום. מי שתיקן "ארומה" ממזון לאוכל בחוץ
+   ‏קיבל את אותה טעות בחודש הבא ובזה שאחריו.
+
+   ‏כאן נשמר כל תיקון, ובייבוא הבא הוא מנצח את טבלת המילים.
+   ‏השמירה שקטה במכוון: היא קורית תוך כדי שהמשתמש מתקן, והוא
+   ‏לא צריך לדעת שמשהו נלמד. */
+function ruleFor(desc) {
+  const k = merchantKey(desc);
+  if (!k) return null;
+  const r = S.mrules.get(k);
+  if (!r) return null;
+  if (r.move) return { move: true, catId: null };
+  /* ‏קטגוריה שהוסרה בינתיים · הכלל מצביע לשום מקום, ועדיף
+     ‏לנחש מחדש מאשר להחזיר שם שכבר אינו ברשימות. */
+  const c = byId(r.catId);
+  if (!c || c.archived) return null;
+  return { move: false, catId: r.catId };
+}
+
+async function learnMerchant(desc, catId, isMove) {
+  const k = merchantKey(desc);
+  if (!k || !S.hh) return;
+  if (!isMove && !catId) return;
+  const was = S.mrules.get(k);
+  /* ‏אותו כלל בדיוק · אין מה לכתוב, וזה המקרה הנפוץ ביותר,
+     ‏כי רוב השורות בייבוא נשארות כפי שהן. */
+  if (was && !!was.move === !!isMove && was.catId === (isMove ? null : catId)) return;
+  S.mrules.set(k, { catId: isMove ? null : catId, move: !!isMove });
+  try {
+    const { error } = await sb.from('merchant_rules').upsert({
+      household_id: S.hh, merchant: k,
+      category_id: isMove ? null : catId, is_move: !!isMove,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'household_id,merchant' });
+    if (error) throw error;
+  } catch {
+    /* ‏למידה היא בונוס ולא פעולה שהמשתמש ביקש · כישלון שלה
+       ‏אינו ראוי להודעה, והתנועה עצמה ממילא כבר נשמרה. */
+    if (was) S.mrules.set(k, was); else S.mrules.delete(k);
+  }
+}
+
+
 /* ═══════════════════════════════════════════ מחשבונים ══ */
 
 /* ‏שני מחשבונים, ולא ארבעה. שניים מהארבעה שתוכננו כבר קיימים
@@ -4420,6 +4477,7 @@ const IMP = mountImport({
   sb, S, $, el, show, hide, toast, openSheet, closeSheet,
   fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,
   goTab: tab,
+  ruleFor, learnMerchant,
   monthName, monthKeyOf: monthKey,
   setMonth: m => { S.month = m; S.lastLeft = null; $('monthLabel').textContent = periodLabel(m); },
   reload: async () => { try { await loadAll(); } catch (err) { toast(human(err)); } }

@@ -198,6 +198,17 @@ export function mountImport(A) {
     impFile = file;
     impRows = res.rows;
 
+    /* ‏מה שנלמד מתיקונים קודמים גובר על טבלת המילים. מוחל פעם
+       ‏אחת, כאן, ולא בכל ציור · renderReview נקראת שוב בכל
+       ‏לחיצה על "סמן הכול", ויישום חוזר היה מוחק תיקון שהמשתמש
+       ‏כבר עשה בשורה. */
+    if (A.ruleFor) for (const r of impRows) {
+      const learned = A.ruleFor(r.description);
+      if (!learned) continue;
+      if (learned.move) { r.move = true; r.learnedId = null; }
+      else { r.move = false; r.learnedId = learned.catId; }
+    }
+
     /* ‏כפילויות נבדקות מול התנועות שכבר קיימות בטווח התאריכים
        של הקובץ, ולא מול החודש הנוכחי בלבד: דף של שלושה חודשים
        חופף לשלושה חודשים של רישום ידני. */
@@ -259,6 +270,8 @@ export function mountImport(A) {
         sel.append(o);
       }
       if (r.move) sel.value = MOVE;
+      else if (r.catId) sel.value = r.catId;          // ‏מה שכבר נבחר בשורה
+      else if (r.learnedId && cats.some(c => c.id === r.learnedId)) sel.value = r.learnedId;
       else {
         const hit = cats.find(c => c.key === r.cat) ||
                     cats.find(c => c.key === (r.direction === 'in' ? 'other_in' : 'other'));
@@ -270,6 +283,10 @@ export function mountImport(A) {
         r.move = sel.value === MOVE;
         row.classList.toggle('moved', r.move);
         updateSum();
+        /* ‏זה הרגע שבו האפליקציה לומדת. המשתמש תיקן שורה, ובייבוא
+           ‏הבא אותו בית עסק כבר ייפול למקום הנכון · בלי שהוא
+           ‏צריך לדעת שמשהו נשמר. */
+        if (A.learnMerchant) A.learnMerchant(r.description, r.catId, r.move);
       };
       sel.addEventListener('change', syncMove);
       sub.append(sel);
