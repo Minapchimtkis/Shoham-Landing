@@ -210,6 +210,13 @@
       <span>או</span>
     </div>
     <button class="btn btn-ghost" id="authGuest" type="button">להתחיל בלי חשבון</button>
+    <!-- ‏מי שקיבל קוד מבן הזוג. חייב להיות כאן ולא אחרי ההרשמה:
+         ‏הוא משנה מה קורה ברגע ההרשמה עצמו · מי שנרשם רגיל
+         ‏מקבל משק בית משלו, ואז אי אפשר להצטרף לאחר. -->
+    <p class="gate-switch" id="joinLink">
+      <span>קיבלתם קוד הזמנה?</span>
+      <button type="button" id="authJoin">הצטרפות לתקציב משותף</button>
+    </p>
     <p class="note guest-note" id="guestNote">
       נכנסים ישר פנימה. הנתונים נשמרים בחשבון, אבל לחשבון הזה אין
       עדיין כתובת, והדרך היחידה אליו היא הדפדפן הזה. אימייל פותר
@@ -242,6 +249,37 @@
 
   <!-- ‏בקשת איפוס. מסך נפרד ולא שדה שמופיע בתוך הטופס, כי אדם
        ‏שהגיע לכאן כבר לא זוכר כלום ולא צריך לראות שני שדות. -->
+  <!-- ‏ההצטרפות. קוד, ואז אותם אימייל וסיסמה · ההבדל היחיד
+       ‏הוא שבסוף נכנסים לתקציב קיים במקום לפתוח חדש. -->
+  <div id="gateJoin" class="sent hidden">
+    <h2>הצטרפות לתקציב משותף</h2>
+    <p>מי שהזמין אתכם רואה קוד בן שש אותיות במסך "עוד". אחרי הקוד נפתח חשבון משלכם, ושניכם רואים את אותו תקציב.</p>
+    <form id="joinForm" class="gate-form" novalidate>
+      <div class="field">
+        <label for="joinCode">הקוד</label>
+        <input class="inp" id="joinCode" type="text" inputmode="latin"
+               autocomplete="off" maxlength="6" dir="ltr"
+               style="text-align:center;letter-spacing:4px;font-weight:800"
+               placeholder="ABC123">
+      </div>
+      <div class="field">
+        <label for="joinEmail">אימייל</label>
+        <input class="inp" type="email" id="joinEmail" name="email"
+               autocomplete="email" inputmode="email" dir="ltr"
+               placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="joinPass">סיסמה</label>
+        <input class="inp" type="password" id="joinPass" name="password"
+               autocomplete="new-password" minlength="10"
+               placeholder="לפחות 10 תווים">
+      </div>
+      <button class="btn" id="joinBtn" type="submit">הצטרפות</button>
+      <p class="err hidden" id="joinErr" role="alert"></p>
+    </form>
+    <button class="btn btn-ghost" id="joinBack" type="button" style="margin-top:12px">חזרה</button>
+  </div>
+
   <div id="gateForgot" class="sent hidden">
     <h2>קורה לכולם</h2>
     <p>תכתבו את האימייל שלכם ונשלח קישור לבחירת סיסמה חדשה.</p>
@@ -557,6 +595,13 @@
       <button class="set-row" id="setNameBtn" type="button">
         <span class="k">השם שלי</span>
         <span class="v" id="setName"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <!-- ‏התקציב המשותף. שורה אחת שמשנה את עצמה: למי שלבד היא
+           ‏ההזמנה, ולמי שכבר בשניים היא מי נמצא כאן. -->
+      <button class="set-row" id="setShare" type="button">
+        <span class="k">תקציב משותף<small id="setShareSub"></small></span>
+        <span class="v" id="setShareV"></span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -1075,6 +1120,39 @@
     <button class="btn" id="catSave" type="button">הוספה</button>
   </div>
   <button class="btn btn-danger hidden" id="catDelete" type="button" style="margin-top:10px">הסרת הקטגוריה</button>
+</div>
+
+<!-- ‏התקציב המשותף. מסך אחד שעושה שלושה דברים לפי המצב:
+     ‏מזמין, מראה את מי שכבר כאן, ונותן לכל אחד לבחור צבע. -->
+<div class="sheet hidden" id="shareSheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="shareTitle">תקציב משותף</h2>
+  <p class="sub" id="shareSub"></p>
+
+  <!-- ‏הקוד, למי שמזמין -->
+  <div id="shareInvite" class="hidden">
+    <div class="code" id="shareCode" dir="ltr"></div>
+    <p class="note" id="shareCodeNote">הקוד תקף שבועיים. מי שמקבל אותו נכנס לאפליקציה, לוחץ "הצטרפות לתקציב משותף" ומקליד אותו.</p>
+    <div class="sheet-row">
+      <button class="btn btn-ghost" id="shareCopy" type="button">העתקה</button>
+      <button class="btn btn-ghost" id="shareNew" type="button">קוד חדש</button>
+    </div>
+  </div>
+
+  <!-- ‏מי נמצא כאן -->
+  <div id="shareWho" class="hidden"></div>
+
+  <!-- ‏הצבע שלי -->
+  <div id="shareColors" class="hidden">
+    <span class="lbl" id="shareColorLbl">הצבע שלי</span>
+    <div class="chips" id="shareColorList" role="group" aria-labelledby="shareColorLbl"></div>
+  </div>
+
+  <p class="err hidden" id="shareErr" role="alert"></p>
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="shareClose" type="button">סגירה</button>
+    <button class="btn" id="shareGo" type="button">הזמנת בן או בת זוג</button>
+  </div>
 </div>
 
 <!-- ‏ההוצאות הקבועות של החודש. רוב ההוצאה של משק בית היא

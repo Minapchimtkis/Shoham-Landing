@@ -271,6 +271,8 @@ const S = {
   cats: [],                 // כל הקטגוריות הגלויות
   budgets: new Map(),       // category_id → agorot
   mrules: new Map(),        // ‏בית עסק → {catId, move} · מה שהייבוא למד
+  members: [],              // ‏חברי משק הבית · user_id, role, color, name
+  hhKind: 'solo',           // ‏אישי או משותף
   recPending: [],           // ‏קבועות שעוד לא נרשמו החודש
   steadyKeys: new Set(),    // ‏מה שחוזר כל חודש · לפי מפתח התיאור
   txs: [],                  // תנועות החודש הנבחר
@@ -439,6 +441,83 @@ function authMode(mode) {
 }
 
 $('authToggle').addEventListener('click', () => authMode(S.mode === 'signup' ? 'login' : 'signup'));
+
+/* ‏השגיאות של join_household חוזרות באנגלית מהפונקציה, והן
+   ‏המקרים שמשתמש באמת פוגש · כל אחת מהן צריכה לומר מה
+   ‏לעשות עכשיו. */
+function joinProblem(err) {
+  const m = String(err?.message || err || '').toLowerCase();
+  if (m.includes('not found'))        return 'הקוד לא נמצא. כדאי לבדוק אותו מול מי שהזמין אתכם.';
+  if (m.includes('already used'))     return 'הקוד הזה כבר נוצל. מי שהזמין אתכם יכול להפיק קוד חדש.';
+  if (m.includes('expired'))          return 'הקוד פג. מי שהזמין אתכם יכול להפיק קוד חדש.';
+  if (m.includes('already in a household'))
+    return 'כבר יש לכם תקציב משלכם, ואי אפשר להצטרף לשני. אפשר לפתוח חשבון חדש עם אימייל אחר.';
+  if (m.includes('is full'))          return 'התקציב הזה כבר מנוהל בידי שניים.';
+  if (m.includes('function') && m.includes('does not exist'))
+    return 'ההצטרפות עוד לא הוקמה בפרויקט. יש להריץ את המיגרציה.';
+  return human(err);
+}
+
+/* ‏ההרשמה של מי שהוזמן. זהה לרגילה בכל דבר חוץ מאחד: הקוד
+   ‏נשמר לפני, ו-enter משתמשת בו במקום לפתוח משק בית חדש. */
+$('joinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setErr($('joinErr'), '');
+  const code  = $('joinCode').value.trim().toUpperCase();
+  const email = $('joinEmail').value.trim();
+  const pass  = $('joinPass').value;
+
+  if (code.length !== 6) {
+    setErr($('joinErr'), 'הקוד הוא שש תווים · אותיות וספרות. כדאי לבדוק שוב.');
+    $('joinCode').focus(); return;
+  }
+  if (!email || !email.includes('@')) {
+    setErr($('joinErr'), 'צריך כתובת אימייל תקינה.');
+    $('joinEmail').focus(); return;
+  }
+  const bad = passProblem(pass, email);
+  if (bad) { setErr($('joinErr'), bad); $('joinPass').focus(); return; }
+
+  const btn = $('joinBtn');
+  btn.disabled = true; btn.textContent = 'מצטרף...';
+  pendingJoin.set(code);
+  try {
+    /* ‏מי שכבר מחובר אינו נרשם שוב. זה קורה בדיוק במקרה
+       ‏הנפוץ ביותר: הקלדת קוד שגוי פעם אחת. החשבון כבר נוצר
+       ‏והמשתמש מחובר, ורק ההצטרפות נכשלה · בלי הבדיקה הזאת
+       ‏הניסיון השני היה חוזר עם "כבר יש חשבון" ונועל אותו
+       ‏בחוץ עם קוד תקין ביד. */
+    const { data: cur } = await sb.auth.getSession();
+    if (cur && cur.session) { await enter(cur.session.user); return; }
+
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass,
+      options: { emailRedirectTo: window.location.origin + '/app/' }
+    });
+    if (error) throw error;
+    if (data.session) { await enter(data.session.user); return; }
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      /* ‏יש לו כבר חשבון · מנסים להיכנס איתו ואז להצטרף,
+         ‏במקום לשלוח אותו למסך אחר עם קוד ביד. */
+      const { data: si, error: se } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (!se && si && si.user) { await enter(si.user); return; }
+      authMode('login');
+      gateScreen('main');
+      setErr($('authErr'), 'כבר יש חשבון עם האימייל הזה. היכנסו איתו וההצטרפות תושלם.');
+      return;
+    }
+    $('sentHead').textContent = 'שלחנו לכם מייל';
+    $('sentMail').textContent = email;
+    $('sentWhy').textContent =
+      'ולחצו על הקישור כדי לאשר את החשבון. ההצטרפות תושלם כשתחזרו.';
+    gateScreen('sent');
+  } catch (err) {
+    pendingJoin.clear();
+    setErr($('joinErr'), human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'הצטרפות';
+  }
+});
 
 $('authForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -648,10 +727,37 @@ $('sentBack').addEventListener('click', () => {
 /* ‏ארבעה מסכים בתוך השער, ואחד מהם גלוי בכל רגע. */
 function gateScreen(which) {
   for (const [k, id] of [['main','gateMain'], ['sent','gateSent'],
-                         ['forgot','gateForgot'], ['new','gateNew']]) {
+                         ['forgot','gateForgot'], ['new','gateNew'],
+                         ['join','gateJoin']]) {
     $(id).classList.toggle('hidden', k !== which);
   }
 }
+
+/* ‏הקוד נשמר עד שההרשמה מסתיימת. אישור מייל מוציא את המשתמש
+   ‏מהדף וחוזר אליו, ובלי השמירה הזאת הקוד היה הולך לאיבוד
+   ‏בדיוק באמצע. */
+const pendingJoin = {
+  get:   () => { try { return localStorage.getItem('kyl.join') || ''; } catch { return ''; } },
+  set:   c  => { try { localStorage.setItem('kyl.join', c); } catch {} },
+  clear: () => { try { localStorage.removeItem('kyl.join'); } catch {} }
+};
+
+$('authJoin').addEventListener('click', () => {
+  setErr($('joinErr'), '');
+  $('joinEmail').value = $('authEmail').value.trim();
+  gateScreen('join');
+  $('joinCode').focus();
+});
+$('joinBack').addEventListener('click', () => { pendingJoin.clear(); gateScreen('main'); });
+
+/* ‏הקוד מוקלד באותיות גדולות תמיד · הוא מוקרא בקול, ואנשים
+   ‏מקלידים אותו איך שבא להם. */
+$('joinCode').addEventListener('input', () => {
+  const el_ = $('joinCode');
+  const at = el_.selectionStart;
+  el_.value = el_.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  try { el_.setSelectionRange(at, at); } catch {}
+});
 
 $('authForgot').addEventListener('click', () => {
   $('forgotEmail').value = $('authEmail').value.trim();
@@ -788,7 +894,7 @@ async function loadAll() {
   /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
      ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
      ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
-  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt, mru] = await Promise.all([
+  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt, mru, mem, pros] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
@@ -807,7 +913,9 @@ async function loadAll() {
       .order('created_at', { ascending: true }),
     sb.from('debts').select('*').eq('archived', false)
       .order('balance_agorot', { ascending: false }),
-    sb.from('merchant_rules').select('merchant,category_id,is_move')
+    sb.from('merchant_rules').select('merchant,category_id,is_move'),
+    sb.from('household_members').select('user_id,role,color'),
+    sb.from('profiles').select('user_id,display_name')
   ]);
 
   for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
@@ -831,6 +939,23 @@ async function loadAll() {
   /* ‏העמודה הזאת נוספה אחרי שהיו כבר משקי בית. אם המיגרציה עוד
      לא רצה, הראשון בחודש הוא מה שהיה תמיד. */
   S.cycle = (!hh.error && hh.data && hh.data[0] && hh.data[0].cycle_start) || 1;
+  S.hhKind = (!hh.error && hh.data && hh.data[0] && hh.data[0].kind) || 'solo';
+  /* ‏חברי משק הבית. טבלה ותיקה אבל עמודת הצבע חדשה, והשם של
+     ‏השני נקרא רק מאז המיגרציה · לכן באותה סובלנות: עד שהיא
+     ‏תרוץ, האפליקציה מתנהגת כאילו יש אדם אחד. */
+  {
+    const names = new Map(((!pros.error && pros.data) || [])
+      .map(r => [r.user_id, r.display_name]));
+    S.members = ((!mem.error && mem.data) || []).map(m => ({
+      id: m.user_id, role: m.role, color: m.color || null,
+      name: names.get(m.user_id) || null
+    }));
+    /* ‏הבעלים ראשון תמיד · סדר יציב הוא מה שמאפשר לתת צבע
+       ‏ברירת מחדל שונה לכל אחד בלי לשמור אותו. */
+    S.members.sort((a, b) =>
+      (a.role === 'owner' ? 0 : 1) - (b.role === 'owner' ? 0 : 1) ||
+      String(a.id).localeCompare(String(b.id)));
+  }
   /* ‏מה שהייבוא למד. טבלה חדשה, ולכן באותה סובלנות כמו
      ‏השאר: עד שהמיגרציה תרוץ, הייבוא פשוט ממשיך לנחש כמו
      ‏קודם במקום שהאפליקציה תיפול. */
@@ -3719,6 +3844,187 @@ async function learnMerchant(desc, catId, isMove) {
 }
 
 
+/* ───────────────── שניים על תקציב אחד ── */
+
+/* ‏ארבעה צבעים, ולא שישה. באפליקציה הזאת לכל צבע כבר יש
+   ‏משמעות · סגול הוא הפעולה, ענבר הוא "שים לב", אדום הוא
+   ‏חריגה, ירוק הוא בשליטה וזהב הוא הרצף · וצבע של אדם
+   ‏שמתנגש באחת מהן נקרא כמשמעות ולא כזהות.
+
+   ‏נמדד מול המשטח המגוון: ענבר יצא אפס מעלות מהמשמעות שלו,
+   ‏ו-coral שמונה מעלות ממנו וגם 4.44 בלבד, מתחת לסף. שניהם
+   ‏נפסלו. הארבעה שנשארו רחוקים לפחות ארבעים מעלות זה מזה.
+
+   ‏אין כאן מגדר ואין שדה מגדר בשום מקום · כל אחד בוחר
+   ‏לעצמו, וזה מה שעובד לכל שילוב של שני אנשים. */
+const MEMBER_COLORS = ['indigo', 'rose', 'teal', 'plum'];
+const COLOR_NAME = { indigo: 'כחול', rose: 'ורוד', teal: 'טורקיז', plum: 'סגול עמוק' };
+
+const isShared = () => S.hhKind === 'shared' || S.members.length > 1;
+
+/* ‏הצבע של אדם. מי שלא בחר מקבל לפי מקומו ברשימה, וסדר
+   ‏הרשימה יציב · הבעלים ראשון. */
+function colorOf(userId) {
+  const i = S.members.findIndex(m => m.id === userId);
+  if (i < 0) return MEMBER_COLORS[0];
+  return S.members[i].color || MEMBER_COLORS[i % MEMBER_COLORS.length];
+}
+
+/* ‏השם שמוצג. מי שלא הזין שם מקבל "אני" אם זה הוא, ואת
+   ‏התפקיד אם זה השני · "משתמש לא ידוע" הוא גרוע מכלום. */
+function nameOf(userId) {
+  const m = S.members.find(x => x.id === userId);
+  if (m && m.name) return m.name;
+  if (userId && S.user && userId === S.user.id) return 'אני';
+  return m && m.role === 'owner' ? 'בן הזוג' : 'בן הזוג';
+}
+
+/* ─────────────── מסך התקציב המשותף ── */
+
+let myCode = null;
+
+function renderShareRow() {
+  const sub = $('setShareSub'), v = $('setShareV');
+  if (S.members.length > 1) {
+    const other = S.members.find(m => !S.user || m.id !== S.user.id);
+    sub.textContent = 'מנוהל בידי שניים';
+    v.textContent = other ? nameOf(other.id) : 'שניים';
+  } else {
+    sub.textContent = 'לנהל את אותו תקציב בשניים';
+    v.textContent = 'להזמין';
+  }
+}
+
+async function openShare() {
+  setErr($('shareErr'), '');
+  const two = S.members.length > 1;
+  $('shareSub').textContent = two
+    ? 'שניכם רואים את אותם מספרים, וכל תנועה רשומה על מי שהוסיף אותה.'
+    : 'אפשר לנהל את אותו תקציב בשניים. כל אחד נכנס עם החשבון שלו, ושניכם רואים את אותה תמונה.';
+
+  /* ‏מי נמצא כאן */
+  const who = $('shareWho');
+  who.textContent = '';
+  who.classList.toggle('hidden', !two);
+  if (two) for (const m of S.members) {
+    const row = el('div', 'who-row');
+    const dot = el('span', 'who-dot c-' + colorOf(m.id));
+    dot.setAttribute('aria-hidden', 'true');
+    row.append(dot, el('span', 'who-nm', nameOf(m.id)));
+    if (S.user && m.id === S.user.id) row.append(el('span', 'who-me', 'אני'));
+    who.append(row);
+  }
+
+  /* ‏הצבע שלי */
+  $('shareColors').classList.toggle('hidden', !two);
+  if (two) renderColorPicker();
+
+  /* ‏ההזמנה · רק כשעוד אין שני */
+  $('shareInvite').classList.add('hidden');
+  $('shareGo').classList.toggle('hidden', two);
+  $('shareGo').textContent = 'הזמנת בן או בת זוג';
+  $('shareGo').disabled = false;
+  myCode = null;
+
+  if (!two) {
+    /* ‏קוד שכבר הופק ועוד לא נוצל חוזר כמות שהוא · אין טעם
+       ‏להחליף קוד שהמשתמש כבר הקריא למישהו. */
+    try {
+      const { data } = await sb.from('household_invites')
+        .select('code,expires_at,used_by').limit(5);
+      const live = (data || []).find(r => !r.used_by && new Date(r.expires_at) > new Date());
+      if (live) showCode(live.code);
+    } catch {}
+  }
+  openSheet($('shareSheet'));
+}
+
+function showCode(code) {
+  myCode = code;
+  $('shareCode').textContent = code;
+  $('shareInvite').classList.remove('hidden');
+  $('shareGo').classList.add('hidden');
+}
+
+function renderColorPicker() {
+  const box = $('shareColorList');
+  box.textContent = '';
+  const mine = S.user ? colorOf(S.user.id) : MEMBER_COLORS[0];
+  const taken = S.members
+    .filter(m => !S.user || m.id !== S.user.id)
+    .map(m => colorOf(m.id));
+  for (const c of MEMBER_COLORS) {
+    const b = el('button', 'chip chip-quiet c-chip c-' + c);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(c === mine));
+    b.setAttribute('aria-label', COLOR_NAME[c] + (taken.includes(c) ? ', תפוס' : ''));
+    b.append(el('span', 'c-swatch'));
+    b.append(document.createTextNode(COLOR_NAME[c]));
+    /* ‏הצבע של השני אינו נבחר · שני אנשים באותו צבע הופכים
+       ‏את כל ההפרדה לחסרת משמעות. */
+    b.disabled = taken.includes(c) && c !== mine;
+    b.addEventListener('click', () => setMyColor(c));
+    box.append(b);
+  }
+}
+
+async function setMyColor(c) {
+  if (!S.user) return;
+  const me = S.members.find(m => m.id === S.user.id);
+  const was = me ? me.color : null;
+  if (me) me.color = c;
+  renderColorPicker();
+  renderHome();
+  try {
+    const { error } = await sb.from('household_members')
+      .update({ color: c }).eq('user_id', S.user.id);
+    if (error) throw error;
+  } catch (err) {
+    if (me) me.color = was;
+    renderColorPicker();
+    setErr($('shareErr'), human(err));
+  }
+}
+
+$('setShare').addEventListener('click', () => openShare());
+$('shareClose').addEventListener('click', closeSheet);
+
+$('shareGo').addEventListener('click', async () => {
+  const btn = $('shareGo');
+  btn.disabled = true; btn.textContent = 'מפיק קוד...';
+  setErr($('shareErr'), '');
+  try {
+    const { data, error } = await sb.rpc('make_invite');
+    if (error) throw error;
+    S.hhKind = 'shared';
+    showCode(data);
+  } catch (err) {
+    setErr($('shareErr'), String(err?.message || '').includes('does not exist')
+      ? 'התקציב המשותף עוד לא הוקם בפרויקט. יש להריץ את המיגרציה.'
+      : human(err));
+  } finally {
+    btn.disabled = false; btn.textContent = 'הזמנת בן או בת זוג';
+  }
+});
+
+$('shareNew').addEventListener('click', () => { $('shareGo').click(); });
+
+$('shareCopy').addEventListener('click', async () => {
+  if (!myCode) return;
+  try {
+    await navigator.clipboard.writeText(myCode);
+    toast('הקוד הועתק.');
+  } catch {
+    /* ‏העתקה נחסמת בהקשרים מסוימים · אז לפחות מסמנים אותו
+       ‏כדי שאפשר יהיה להעתיק ביד. */
+    const r = document.createRange();
+    r.selectNodeContents($('shareCode'));
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(r);
+    toast('הקוד מסומן · אפשר להעתיק.');
+  }
+});
+
 /* ─────────── הקבועות שעוד לא נרשמו החודש ── */
 
 /* ‏רוב ההוצאה של משק בית היא חמישה עד עשרה פריטים קבועים:
@@ -4613,6 +4919,7 @@ function renderSet() {
   $('cycleNow').textContent = cycleLabel(S.cycle || 1);
   $('setSave').classList.toggle('hidden', !isGuest());
   renderLockRow();
+  renderShareRow();
   setAssetsLine();
 }
 
@@ -4787,6 +5094,27 @@ async function enter(user) {
     gateScreen('main');
     setErr($('authErr'), human(err));
     return;
+  }
+
+  /* ‏מי שהגיע עם קוד הזמנה מצטרף לתקציב קיים, ו-setup_household
+     ‏לא רצה בכלל · אחרת היה נפתח לו משק בית משלו, והפונקציה
+     ‏הייתה נופלת על "already in a household" והוא היה נתקע עם
+     ‏תקציב ריק ובלי דרך חזרה. */
+  if (!S.hh && pendingJoin.get()) {
+    const code = pendingJoin.get();
+    try {
+      const { data, error } = await sb.rpc('join_household', { p_code: code });
+      if (error) throw error;
+      pendingJoin.clear();
+      S.hh = data;
+    } catch (err) {
+      pendingJoin.clear();
+      stage('gate');
+      gateScreen('join');
+      $('joinCode').value = code;
+      setErr($('joinErr'), joinProblem(err));
+      return;
+    }
   }
 
   /* ‏אין אשף. משק הבית נפתח ריק ברגע הראשון, והמספרים נכנסים
