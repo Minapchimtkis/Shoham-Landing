@@ -1167,6 +1167,7 @@ function renderHome() {
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
   renderFlow();
+  renderSplit();
   renderPulse(current, dim, now);
   renderForecast(now);
   renderWorth();
@@ -1697,6 +1698,77 @@ let liveBars = [];
    ‏מקדים את היום בחודש ביותר מ-12 אחוז. בעשירי בחודש הוצאתם
    ‏חצי מהתכנון · זה לא חריגה, אבל זה הזמן שבו עוד אפשר להחליט,
    ‏ואחרי שכבר חרגתם כבר אין מה להחליט. */
+/* ────────────── מי הכניס ומי הוציא ── */
+
+/* ‏אותה תמונה, מפורקת לשניים. היא מתחת לסכום המשותף ולא
+   ‏במקומו · התקציב הוא אחד, והפירוק הוא המידע הנוסף.
+
+   ‏פסים ולא קו לאורך החודש: שני אנשים כפול נכנס ויצא הם
+   ‏ארבעה קווים על רוחב טלפון, ואת זה אי אפשר לקרוא. הפס
+   ‏נמדד מול הגדול מבין השניים, כך שההשוואה היא ביניהם ולא
+   ‏מול מספר שרירותי.
+
+   ‏אין כאן שיפוט. מי שמכניס פחות אינו "מאחור" · זה תיאור
+   ‏של מה שקרה, ובדיוק כמו שאר המסך. */
+function renderSplit() {
+  const box = $('homeSplit');
+  box.textContent = '';
+  if (!isShared() || S.members.length < 2) { hide(box); return; }
+
+  const real = t => !t.is_transfer;
+  const by = id => ({
+    in:  S.txs.filter(t => real(t) && t.direction === 'in'  && t.created_by === id)
+              .reduce((s, t) => s + t.amount_agorot, 0),
+    out: S.txs.filter(t => real(t) && t.direction === 'out' && t.created_by === id)
+              .reduce((s, t) => s + t.amount_agorot, 0)
+  });
+  const rows = S.members.map(m => ({ m, ...by(m.id) }));
+
+  /* ‏תנועות בלי בעלים · ישנות, או כאלה שנוצרו לפני שהתקציב
+     ‏הפך למשותף. הן נספרות בסכום הכולל ולא מיוחסות לאיש,
+     ‏וזאת האמת. */
+  const owned = rows.reduce((s, r) => s + r.in + r.out, 0);
+  const all = S.txs.filter(real).reduce((s, t) => s + t.amount_agorot, 0);
+  const orphan = all - owned;
+
+  if (!owned) { hide(box); return; }
+  show(box);
+
+  const maxV = Math.max(1, ...rows.map(r => Math.max(r.in, r.out)));
+  const head = el('h2', 'grp-h', 'מי הכניס ומי הוציא');
+  box.append(head);
+
+  for (const r of rows) {
+    const blk = el('div', 'split-p');
+    const nm = el('div', 'split-nm');
+    const dot = el('span', 'who-dot c-' + colorOf(r.m.id));
+    dot.setAttribute('aria-hidden', 'true');
+    nm.append(dot, el('span', null, nameOf(r.m.id)));
+    blk.append(nm);
+
+    for (const [k, v, cls] of [['נכנס', r.in, 'in'], ['יצא', r.out, 'out']]) {
+      const row = el('div', 'split-row');
+      row.append(el('span', 'split-k', k));
+      const track = el('div', 'split-track');
+      const fill = el('i', 'c-' + colorOf(r.m.id) + ' ' + cls);
+      fill.style.width = Math.round(v / maxV * 100) + '%';
+      track.append(fill);
+      row.append(track);
+      const vv = el('span', 'split-v money');
+      setMoney(vv, v);
+      row.append(vv);
+      row.setAttribute('aria-label', `${nameOf(r.m.id)}, ${k} ${fmt(v)}`);
+      blk.append(row);
+    }
+    box.append(blk);
+  }
+
+  if (orphan > 0) {
+    box.append(el('p', 'split-note',
+      `${fmt(orphan)} נרשמו לפני שהתקציב הפך למשותף, ולכן אינם מיוחסים לאף אחד.`));
+  }
+}
+
 /* ───────────────── האם אגמור את החודש ── */
 
 /* ‏המסך עונה על "כמה יש לי". השאלה שבאמת מדירה שינה היא מה
@@ -2553,6 +2625,7 @@ function renderTx() {
   /* ‏נבנה בשבר מסמך ומוכנס פעם אחת. שלוש מאות הכנסות נפרדות
      לתוך המסמך החי מבטלות את הפריסה שלוש מאות פעמים. */
   const frag = document.createDocumentFragment();
+  const two = isShared() && S.members.length > 1;
   let day = null;
   for (const t of rows) {
     if (t.occurred_on !== day) {
@@ -2579,11 +2652,20 @@ function renderTx() {
 
     const ic = el('span', 'tx-ico', t.is_transfer ? '⇄' : ((c && c.icon) || '•'));
     ic.setAttribute('aria-hidden', 'true');
+    /* ‏מי רשם · רק כשהתקציב מנוהל בשניים. באדם אחד זאת נקודה
+       ‏שאומרת "אני", והיא רעש. */
+    if (two && t.created_by) ic.classList.add('by', 'c-' + colorOf(t.created_by));
     const mid = el('div', 'tx-mid');
     mid.append(el('div', 't', t.description || (c ? c.label : 'תנועה')));
     const sub = el('div', 's');
     sub.textContent = t.is_transfer ? 'העברה, לא נספרת כהוצאה'
                     : (t.description && c ? c.label : (t.source === 'import' ? 'מיובא' : ''));
+    /* ‏וגם בשם ולא רק בצבע · צבע לבדו אינו נגיש, ומי שרואה
+       ‏את המסך בשמש גם לא תמיד מבחין בו. */
+    if (two && t.created_by) {
+      if (sub.textContent) sub.append(document.createTextNode(' · '));
+      sub.append(el('span', 'tx-by', nameOf(t.created_by)));
+    }
     if (t.installment_no && t.installment_total) {
       const tag = el('span', 'tag', `תשלום ${t.installment_no} מתוך ${t.installment_total}`);
       sub.append(tag);
@@ -2594,7 +2676,8 @@ function renderTx() {
     if (t.direction === 'in' && !t.is_transfer) amt.prepend(document.createTextNode('+'));
 
     row.setAttribute('aria-label',
-      `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}`);
+      `${t.description || (c ? c.label : 'תנועה')}, ${t.direction === 'in' ? 'הכנסה' : 'הוצאה'} ${fmt(t.amount_agorot)}, ${dayName(t.occurred_on)}` +
+      (two && t.created_by ? `, רשם ${nameOf(t.created_by)}` : ''));
     row.append(ic, mid, amt);
     row.addEventListener('click', () => openTx(t));
     frag.append(row);
