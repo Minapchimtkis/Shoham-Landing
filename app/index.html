@@ -68,7 +68,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
 
+<!-- ‏לחיצת היד אל Supabase מתחילה עכשיו, ולא אחרי ש-app.js
+     ‏ירד, נותח והחזיר את החיבור. DNS, TCP ו-TLS הם שלוש
+     ‏נסיעות לשרת לפני שנשלחה בקשה אחת, ובטלפון הן עולות
+     ‏יותר מכל השאילתות שאחריהן גיחד. crossorigin הכרחי ·
+     ‏בלעדיו החיבור שנפתח אינו זה שבו ישתמשו השאילתות. -->
+<link rel="preconnect" href="https://vplqocqmlquajwwnyeby.supabase.co" crossorigin>
+
 <link rel="stylesheet" href="app.css">
+
+<!-- ‏גרף המודולים בשטוח ולא במדרגות. תגית הסקריפט יושבת
+     ‏בתחתית המסמך, ובלעדיהן הדפדפן מגלה את app.js רק
+     ‏אחרי שקרא 86 ק"ב של HTML, ואת שלושת הקבצים שהוא מייבא
+     ‏רק אחרי שהוא ירד ונותח · שלוש קומות של המתנה. כאן כולם
+     ‏יורדים יחד, במקביל לגיליון הסגנונות. -->
+<link rel="modulepreload" href="app.js">
+<link rel="modulepreload" href="import.js">
+<link rel="modulepreload" href="parse.js">
+<link rel="modulepreload" href="../vendor/supabase.js">
 </head>
 <body>
 

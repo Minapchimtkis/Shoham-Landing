@@ -878,14 +878,32 @@ $('setOut').addEventListener('click', async () => {
 
 /* ═══════════════════════════════════════ טעינת נתונים ══ */
 
+/* ‏שתי השאילתות שצריכות לרוץ לפני כל השאר, בגל אחד.
+   ‏קודם הן רצו בטור · אחת המתינה לשנייה בלי להזדקק לה,
+   ‏וזה עלה נסיעה שלמה לשרת בכל פתיחה.
+
+   ‏שתיהן עם כוכבית ולא עם רשימת עמודות: עמודות נוספו
+   ‏כאן לאורך הדרך (צבע, סוג, יום תחילת מחזור), ושאילתה
+   ‏שמבקשת עמודה שעוד לא קיימת נופלת כולה. השורות
+   ‏האלה הן שתיים ואחת, ולא נושאות בית חולים. */
 async function findHousehold() {
-  const { data, error } = await sb.from('household_members')
-    .select('household_id').limit(1);
-  if (error) throw error;
-  return data && data.length ? data[0].household_id : null;
+  const [mem, hh] = await Promise.all([
+    sb.from('household_members').select('*'),
+    sb.from('households').select('*').limit(1)
+  ]);
+  if (mem.error) throw mem.error;
+  const members = mem.data || [];
+  return {
+    hh: members.length ? members[0].household_id : null,
+    members,
+    hhRow: (!hh.error && hh.data && hh.data[0]) || null
+  };
 }
 
-async function loadAll() {
+/* ‏pre הוא מה ש-enter כבר קרא בגל הראשון. בלעדיו הפונקציה
+   ‏קוראת את הכל בעצמה, וכך היא נשארת נכונה גם כשקוראים
+   ‏לה אחרי שינוי חודש או אחרי עריכה. */
+async function loadAll(pre) {
   /* ‏התקציב נשמר תחת החודש הקלנדרי. התנועות נקראות לפי החלון
      שהמשתמש בחר. זאת כל ההפרדה. */
   const m0 = monthKey(S.month);
@@ -894,14 +912,28 @@ async function loadAll() {
   /* ‏גם הקטגוריות שהוסרו נקראות · הן אינן מוצגות בשום רשימה,
      ‏אבל תנועה ישנה מצביעה עליהן ובלעדיהן היא הייתה מאבדת את
      ‏השם שלה. הסינון עצמו יושב ב-outCats ו-inCats. */
-  const [cats, buds, txs, refl, prof, hh, anyB, anyT, ast, dbt, mru, mem, pros] = await Promise.all([
+  /* ‏ההיסטוריה נכנסת לאותו גל ולא אחריו. היא אינה תלויה
+     ‏באף אחת מהאחרות, וכשהיא חיכתה להן היא עלתה נסיעה
+     ‏שלמה לשרת בכל פתיחה. */
+  const hN = 4;
+  const hFrom = periodRange(addMonths(S.month, -(hN - 1))).from;
+  const hTo = p1;
+
+  /* ‏מה שכבר ביד אינו נשאל שוב. שאילתה שכבר נענתה
+     ‏היא עדיין נסיעה שלמה לשרת גם כשהיא מקבילה לאחרות. */
+  const have = v => Promise.resolve({ data: v, error: null });
+
+  const [cats, buds, txs, refl, pros, hh, anyB, anyT, ast, dbt, mru, mem, hist] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
       .order('occurred_on', { ascending: false }).order('created_at', { ascending: false }),
     sb.from('reflections').select('*').eq('month', m0),
-    sb.from('profiles').select('display_name').limit(1),
-    sb.from('households').select('cycle_start').limit(1),
+    /* ‏פרופיל אחד במקום שניים: קודם רצה כאן שאילתה
+       ‏לשם שלי ועוד אחת לשמות של כולם, והשנייה
+       ‏מכילה את הראשונה. */
+    sb.from('profiles').select('user_id,display_name'),
+    pre && pre.hhRow ? have([pre.hhRow]) : sb.from('households').select('*').limit(1),
     /* ‏"היה כאן אי פעם משהו" · בלי זה חודש חדש וריק אצל מי
        ‏שמשתמש חצי שנה היה נראה לו כמו היום הראשון. */
     sb.from('budgets').select('category_id').limit(1),
@@ -914,11 +946,13 @@ async function loadAll() {
     sb.from('debts').select('*').eq('archived', false)
       .order('balance_agorot', { ascending: false }),
     sb.from('merchant_rules').select('merchant,category_id,is_move'),
-    sb.from('household_members').select('user_id,role,color'),
-    sb.from('profiles').select('user_id,display_name')
+    pre && pre.members ? have(pre.members) : sb.from('household_members').select('*'),
+    sb.from('transactions')
+      .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
+      .gte('occurred_on', hFrom).lte('occurred_on', hTo)
   ]);
 
-  for (const r of [cats, buds, txs, prof]) if (r.error) throw r.error;
+  for (const r of [cats, buds, txs, pros]) if (r.error) throw r.error;
 
   S.ever = !!(((anyB.data || []).length) || ((anyT.data || []).length));
   /* ‏טבלת הנכסים נוספה אחרי שכבר היו משקי בית. אם המיגרציה שלה
@@ -935,7 +969,12 @@ async function loadAll() {
   /* ‏טבלת ההשתקפויות היא שכבת הנשמה, ולא שכבת הכסף. אם המיגרציה
      שלה עוד לא רצה, האפליקציה עובדת בלעדיה במקום ליפול. */
   S.reflections = refl.error ? [] : (refl.data || []);
-  S.profile = (prof.data && prof.data[0]) || null;
+  /* ‏הפרופיל שלי מתוך הרשימה. לפני המדיניות שמראה
+     ‏לשניים את השמות זה בין כה היה רק אני. */
+  /* ‏התאמה לפי מזהה ולא "הראשון ברשימה": בתקציב
+     ‏משותף הרשימה מחזיקה גם את השני, ונפילה לראשון
+     ‏הייתה מציגה לאדם את השם של בן הזוג שלו כשמו שלו. */
+  S.profile = (pros.data || []).find(r => r.user_id === (S.user && S.user.id)) || null;
   /* ‏העמודה הזאת נוספה אחרי שהיו כבר משקי בית. אם המיגרציה עוד
      לא רצה, הראשון בחודש הוא מה שהיה תמיד. */
   S.cycle = (!hh.error && hh.data && hh.data[0] && hh.data[0].cycle_start) || 1;
@@ -967,10 +1006,15 @@ async function loadAll() {
   /* ‏שתי רשימות שנגזרות מההיסטוריה, ונחשבות פעם אחת לטעינה ·
      ‏קודם renderInsight חישבה אותן בכל ציור של הבית, וגם
      ‏התחזית צריכה אותן והיא חייבת להיות סינכרונית. */
+  /* ‏ההיסטוריה כבר חזרה בגל שלמעלה · מניחים אותה
+     ‏במטמון ש-loadHistory קוראת ממנו, והיא לא תיסע שוב. */
+  S.hist = { n: hN, anchor: m0,
+             rows: hist.error ? [] : (hist.data || [])
+               .map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) })) };
+
   try {
-    const hist = await loadHistory(4);
     const { from: c0, to: c1 } = periodRange(S.month);
-    const past = hist.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
+    const past = S.hist.rows.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
     const rec = recurring(past);
     S.steadyKeys = new Set(rec.map(r => r.key));
     const here = new Set(S.txs
@@ -1016,16 +1060,44 @@ async function snapNetWorth() {
 
 /* ‏החודש שלפני, ורק בשביל ההשוואה. נטען אחרי הציור הראשון כדי
    שהמסך לא יחכה לשאילתה שהוא לא צריך בשביל המספר הגדול. */
+/* ‏השאילתה שכבר באוויר, כדי שהקורא השני ימתין לה
+   ‏במקום לשלוח אותה שוב. */
+let prevWait = null;
+
+/* ‏החודש שעבר. הוא יושב כולו בתוך ארבעת החודשים
+   ‏ש-loadAll כבר הביאה, ולכן במקרה הרגיל אין כאן נסיעה
+   ‏לשרת בכלל. קודם זו הייתה שאילתה שלישית בטור, שיצאה
+   ‏אחרי שהמסך כבר עמד, והכרטיס הראשון בבית המתין לה.
+
+   ‏הנפילה נשמרת: אם ההיסטוריה אינה ביד או שהיא של
+   ‏חודש אחר, שואלים כמו קודם. */
 async function loadPrev() {
   if (S.prevTxs) return S.prevTxs;
   const p = addMonths(S.month, -1);
   const { from: a, to: b } = periodRange(p);
-  const { data, error } = await sb.from('transactions')
-    .select('amount_agorot,direction,category_id,occurred_on')
-    .gte('occurred_on', a).lte('occurred_on', b);
-  S.prevTxs = error ? [] : (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
-  return S.prevTxs;
+
+  if (S.hist && S.hist.n >= 2 && S.hist.anchor === monthKey(S.month)) {
+    S.prevTxs = S.hist.rows
+      .filter(t => t.occurred_on >= a && t.occurred_on <= b)
+      .map(t => ({ ...t }));
+    return S.prevTxs;
+  }
+
+  /* ‏שמירה על ההבטחה עצמה ולא רק על התשובה. שלושה
+     ‏מקומות קוראים לכאן באותו ציור, ו-S.prevTxs נכתב רק
+     ‏כשהתשובה חוזרת · עד אז כולם ראו null וכולם שלחו
+     ‏את אותה שאילתה. שלוש נסיעות לשרת עבור אותה תשובה. */
+  if (prevWait) return prevWait;
+  prevWait = (async () => {
+    const { data, error } = await sb.from('transactions')
+      .select('amount_agorot,direction,category_id,occurred_on')
+      .gte('occurred_on', a).lte('occurred_on', b);
+    S.prevTxs = error ? [] : (data || []).map(t => ({ ...t, amount_agorot: Number(t.amount_agorot) }));
+    return S.prevTxs;
+  })();
+  try { return await prevWait; } finally { prevWait = null; }
 }
+
 
 /* ───────────────────────────────────── היום הראשון ── */
 
@@ -5522,8 +5594,11 @@ for (const b of document.querySelectorAll('.nav button[data-tab]')) {
 
 async function enter(user) {
   S.user = user;
+  /* ‏מה שכבר נקרא כאן עובר ל-loadAll במקום שייקרא שוב. */
+  let pre = null;
   try {
-    S.hh = await findHousehold();
+    pre = await findHousehold();
+    S.hh = pre.hh;
   } catch (err) {
     /* ‏אם הטבלאות עוד לא קיימות, זה המקום היחיד שבו זה מתגלה,
        ולכן זה המקום שבו צריך להגיד את זה בבירור. */
@@ -5572,13 +5647,16 @@ async function enter(user) {
   }
 
   try {
-    /* ‏יום תחילת המחזור נקרא לפני הכל: הוא קובע איזו תקופה היא
-       "עכשיו", ובלעדיו הטעינה הראשונה הייתה מביאה את החלון
-       הלא נכון ומתקנת את עצמה אחר כך על המסך. */
-    const { data: h } = await sb.from('households').select('cycle_start').limit(1);
-    S.cycle = (h && h[0] && h[0].cycle_start) || 1;
+    /* ‏יום תחילת המחזור נדרש לפני הכל: הוא קובע איזו תקופה
+       היא "עכשיו", ובלעדיו הטעינה הראשונה מביאה את החלון
+       הלא נכון ומתקנת את עצמה אחר כך על המסך. הוא כבר
+       ביד, מהגל הראשון. */
+    /* ‏מי שעבר בהצטרפות או בפתיחת משק בית קיבל בינתיים
+       ‏משק בית חדש, ומה שנקרא לפני כן הוא של מצב שכבר אינו. */
+    if (!pre || pre.hh !== S.hh) pre = null;
+    S.cycle = (pre && pre.hhRow && pre.hhRow.cycle_start) || 1;
     S.month = currentAnchor();
-    await loadAll();
+    await loadAll(pre);
   } catch (err) {
     stage('gate');
     setErr($('authErr'), human(err));
