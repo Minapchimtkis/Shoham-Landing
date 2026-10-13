@@ -274,7 +274,7 @@ const S = {
   members: [],              // ‏חברי משק הבית · user_id, role, color, name
   hhKind: 'solo',           // ‏אישי או משותף
   recPending: [],           // ‏קבועות שעוד לא נרשמו החודש
-  steadyKeys: new Set(),    // ‏מה שחוזר כל חודש · לפי מפתח התיאור
+  steady: new Map(),        // ‏מפתח התיאור ← הסכום שחוזר בו כל חודש
   txs: [],                  // תנועות החודש הנבחר
   prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
   reflections: [],
@@ -1016,7 +1016,7 @@ async function loadAll(pre) {
     const { from: c0, to: c1 } = periodRange(S.month);
     const past = S.hist.rows.filter(t => t.occurred_on < c0 || t.occurred_on > c1);
     const rec = recurring(past);
-    S.steadyKeys = new Set(rec.map(r => r.key));
+    S.steady = new Map(rec.map(r => [r.key, r.amount]));
     const here = new Set(S.txs
       .filter(t => t.direction === 'out' && !t.is_transfer)
       .map(t => normDesc(t.description)));
@@ -1024,7 +1024,7 @@ async function loadAll(pre) {
       .filter(r => !here.has(r.key))
       .filter(r => r.catId && byId(r.catId) && !byId(r.catId).archived)
       .slice(0, 8);
-  } catch { S.steadyKeys = new Set(); S.recPending = []; }
+  } catch { S.steady = new Map(); S.recPending = []; }
 
   renderHome();
   snapNetWorth();
@@ -1867,9 +1867,26 @@ function forecast(now) {
   if (out.length < 4) return null;
 
   const spent = out.reduce((s, t) => s + t.amount_agorot, 0);
-  const steady = out
-    .filter(t => S.steadyKeys.has(normDesc(t.description)))
-    .reduce((s, t) => s + t.amount_agorot, 0);
+
+  /* ‏הוצאה קבועה חוזרת פעם אחת בחודש בסכום מוכר, ורק הסכום
+     ‏הזה יורד מהקצב. כל מה שמעבר לו הוא הוצאה משתנה כמו כל
+     ‏אחרת, גם אם הוא באותו בית עסק.
+
+     ‏קודם ירדה כאן כל תנועה ששמה מוכר, וזה מחק את רוב ההוצאה
+     ‏של מי שקונה באותו סופר פעמיים בחודש · כלומר כולם.
+     ‏עשר קניות בשופרסל של 500 הופכו לחמשת אלפים "קבועים",
+     ‏הקצב ירד לאפס, והתחזית הבטיחה מרווח פי תשעה מהאמיתי. */
+  const perKey = new Map();
+  for (const t of out) {
+    const k = normDesc(t.description);
+    if (!S.steady.has(k)) continue;
+    perKey.set(k, (perKey.get(k) || 0) + t.amount_agorot);
+  }
+  let steady = 0;
+  /* ‏לכל יותר מה שיצא בפועל: מי ששילם החודש חצי שכר דירה
+     ‏אינו אמור להיות מזוכה על החצי שעוד לא שילם. */
+  for (const [k, sum] of perKey) steady += Math.min(sum, S.steady.get(k));
+
   const variable = Math.max(0, spent - steady);
   const coming = pendingRecurring().reduce((s, r) => s + r.amount, 0);
 
