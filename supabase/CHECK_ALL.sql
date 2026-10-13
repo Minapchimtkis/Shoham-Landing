@@ -5,7 +5,7 @@
 -- להריץ אותה בכל רגע ובכל מספר פעמים.
 --
 -- להדביק בעורך ה-SQL של סופהבייס וללחוץ Run. כל שורה שחוזרת
--- עם ✗ היא דבר שהאפליקציה מחפשת ולא מוצאת, ולידה כתוב איזו
+-- עם X היא דבר שהאפליקציה מחפשת ולא מוצאת, ולידה כתוב איזו
 -- מיגרציה מביאה אותו.
 
 with c(n, what, fix, ok) as (values
@@ -56,7 +56,7 @@ with c(n, what, fix, ok) as (values
     (select count(*)=1 from pg_policies
       where schemaname='public' and tablename='household_members' and policyname='hm_color')),
 
--- ── האבטחה. לא תכונה · אם אחת מאלה ✗, הנתונים חשופים ──
+-- ── האבטחה. לא תכונה · אם אחת מאלה X, הנתונים חשופים ──
  (15,'אין טבלה בלי אבטחת שורות', 'בדיקת אבטחה · לא מיגרציה',
     (select count(*) filter (where not rowsecurity) = 0
        from pg_tables where schemaname='public' and tablename in
@@ -73,7 +73,7 @@ with c(n, what, fix, ok) as (values
          and exists(select 1 from pg_roles where rolname='authenticated')), false)))
 )
 select n as "#",
-       case when ok then '✓' else '✗' end as "מצב",
+       case when ok then 'V' else 'X' end as "מצב",
        what as "מה",
        case when ok then '' else fix end as "מה מביא את זה"
 from c order by n;
