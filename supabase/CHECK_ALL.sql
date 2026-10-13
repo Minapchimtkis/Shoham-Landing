@@ -1,16 +1,16 @@
--- ‏מה כבר רץ ומה עוד לא.
+-- מה כבר רץ ומה עוד לא.
 -- ═══════════════════════════════════════════════════════════════
 --
--- ‏לקרוא בלבד. אינה כותבת, אינה משנה ואינה מוחקת כלום, ואפשר
--- ‏להריץ אותה בכל רגע ובכל מספר פעמים.
+-- לקרוא בלבד. אינה כותבת, אינה משנה ואינה מוחקת כלום, ואפשר
+-- להריץ אותה בכל רגע ובכל מספר פעמים.
 --
--- ‏להדביק בעורך ה-SQL של סופהבייס וללחוץ Run. כל שורה שחוזרת
--- ‏עם ✗ היא דבר שהאפליקציה מחפשת ולא מוצאת, ולידה כתוב איזו
--- ‏מיגרציה מביאה אותו.
+-- להדביק בעורך ה-SQL של סופהבייס וללחוץ Run. כל שורה שחוזרת
+-- עם ✗ היא דבר שהאפליקציה מחפשת ולא מוצאת, ולידה כתוב איזו
+-- מיגרציה מביאה אותו.
 
 with c(n, what, fix, ok) as (values
 
--- ── ‏הטבלאות ──
+-- ── הטבלאות ──
  (1,'כל טבלאות הליבה', '20261007120000_app_core',
     (select count(*)=9 from pg_tables where schemaname='public' and tablename in
      ('households','household_members','profiles','categories','budgets',
@@ -26,7 +26,7 @@ with c(n, what, fix, ok) as (values
  (6,'הזמנות לתקציב משותף', '20261020120000_shared_household',
     (select count(*)=1 from pg_tables where schemaname='public' and tablename='household_invites')),
 
--- ── ‏העמודות שנוספו בדרך ──
+-- ── העמודות שנוספו בדרך ──
  (7,'יום תחילת המחזור', '20261011120000_app_cycle',
     (select count(*)=1 from information_schema.columns
       where table_schema='public' and table_name='households' and column_name='cycle_start')),
@@ -37,7 +37,7 @@ with c(n, what, fix, ok) as (values
     (select count(*)=1 from information_schema.columns
       where table_schema='public' and table_name='household_members' and column_name='color')),
 
--- ── ‏הפונקציות ──
+-- ── הפונקציות ──
  (10,'פתיחת משק בית', '20261007120000_app_core',
     (select count(*)=1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
       where n.nspname='public' and p.proname='setup_household')),
@@ -48,7 +48,7 @@ with c(n, what, fix, ok) as (values
     (select count(*)=1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
       where n.nspname='public' and p.proname='join_household')),
 
--- ── ‏מדיניות הקריאה של השם השני ──
+-- ── מדיניות הקריאה של השם השני ──
  (13,'כל אחד רואה את שם השני', '20261020120000_shared_household',
     (select count(*)=1 from pg_policies
       where schemaname='public' and tablename='profiles' and policyname='pr_read_house')),
@@ -56,7 +56,7 @@ with c(n, what, fix, ok) as (values
     (select count(*)=1 from pg_policies
       where schemaname='public' and tablename='household_members' and policyname='hm_color')),
 
--- ── ‏האבטחה. לא תכונה · אם אחת מאלה ✗, הנתונים חשופים ──
+-- ── האבטחה. לא תכונה · אם אחת מאלה ✗, הנתונים חשופים ──
  (15,'אין טבלה בלי אבטחת שורות', 'בדיקת אבטחה · לא מיגרציה',
     (select count(*) filter (where not rowsecurity) = 0
        from pg_tables where schemaname='public' and tablename in
