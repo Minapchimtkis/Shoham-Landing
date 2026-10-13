@@ -1248,6 +1248,33 @@
      ‏חמישה עד עשרה פריטים ידועים מראש, והקלדה שלהם מחדש בכל
      ‏חודש היא העבודה שגורמת לאנשים לנטוש. כאן הם מוצעים
      ‏ביחד, וכל אחד נבחר בנפרד. -->
+<!-- תכנון לחודש חדש. התקציב נשמר לפי חודש ואינו עובר
+     מעצמו, ולכן באחד בחודש מי שסיים חודש מוצלח נפתח
+     לו מסך בלי טבעות, בלי תחזית ובלי מחוון. כאן מעבירים את
+     החודש שעבר בלחיצה אחת, ורואים מראש מה ייכנס. -->
+<div class="sheet hidden" id="planSheet" role="dialog" aria-modal="true" aria-labelledby="planTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <h2 id="planTitle">התכנון של החודש</h2>
+  <p class="sub" id="planSub"></p>
+
+  <div class="field">
+    <span class="lbl" id="planHowLbl">מאיפה לקחת את המספרים</span>
+    <div class="chips" id="planChips" role="group" aria-labelledby="planHowLbl"></div>
+  </div>
+
+  <div id="planList"></div>
+  <p class="err hidden" id="planErr" role="alert"></p>
+
+  <div class="sheet-row">
+    <button class="btn btn-ghost" id="planCancel" type="button">לא עכשיו</button>
+    <button class="btn" id="planSave" type="button">לקבוע</button>
+  </div>
+
+  <p class="note" style="margin-top:14px">
+    כל סכום ניתן לשינוי אחר כך, ישר בשורות שבבית.
+  </p>
+</div>
+
 <div class="sheet hidden" id="recSheet" role="dialog" aria-modal="true" aria-labelledby="recTitle">
   <div class="grab" aria-hidden="true"></div>
   <h2 id="recTitle">מה שחוזר כל חודש</h2>

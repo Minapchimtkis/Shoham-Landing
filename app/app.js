@@ -277,6 +277,7 @@ const S = {
   steady: new Map(),        // ‏מפתח התיאור ← הסכום שחוזר בו כל חודש
   txs: [],                  // תנועות החודש הנבחר
   prevTxs: null,            // החודש שלפניו, לצורך ההשוואה בלבד
+  prevPlan: null,           // ‏התכנון של החודש שעבר · רק כשנדרש
   reflections: [],
   tab: 'home',
   cycle: 1,
@@ -1064,6 +1065,26 @@ async function snapNetWorth() {
    ‏במקום לשלוח אותה שוב. */
 let prevWait = null;
 
+/* ‏התכנון של החודש שעבר. נטען רק כשאין תכנון לחודש הזה,
+   ‏כלומר רק למי שצריך אותו, ולכן הוא אינו יושב בגל הטעינה
+   ‏של כולם. שמירה על ההבטחה ולא רק על התוצאה, כמו ב-loadPrev. */
+let prevPlanWait = null;
+
+async function loadPrevPlan() {
+  const m = monthKey(addMonths(S.month, -1));
+  if (S.prevPlan && S.prevPlan.month === m) return S.prevPlan.map;
+  if (prevPlanWait) return prevPlanWait;
+  prevPlanWait = (async () => {
+    const { data, error } = await sb.from('budgets')
+      .select('category_id,planned_agorot').eq('month', m);
+    const map = new Map(error ? []
+      : (data || []).map(b => [b.category_id, Number(b.planned_agorot)]));
+    S.prevPlan = { month: m, map };
+    return map;
+  })();
+  try { return await prevPlanWait; } finally { prevPlanWait = null; }
+}
+
 /* ‏החודש שעבר. הוא יושב כולו בתוך ארבעת החודשים
    ‏ש-loadAll כבר הביאה, ולכן במקרה הרגיל אין כאן נסיעה
    ‏לשרת בכלל. קודם זו הייתה שאילתה שלישית בטור, שיצאה
@@ -1188,12 +1209,27 @@ function renderHome() {
      שהיא עצמה שאלה. */
   /* ‏סימן השאלה בתגית משלו, כדי שיהיה אפשר להרחיק אותו מהמילה
      ‏שלפניו · textContent לבדו היה מוחק את התגית שבדף בכל ציור. */
+  /* ‏"חרגתי" נאמר רק כשיש תכנון לחרוג ממנו. באחד בחודש,
+     ‏לפני שנקבע תכנון חדש ולפני שהמשכורת נכנסה, leftToSpend
+     ‏נופל למסלול "מה שנכנס פחות מה שיצא" והוא שלילי ·
+     ‏ואז מי שסיים חודש מושלם נפתח לו "כמה חרגתי". זו האשמה
+     ‏במקום עובדה, ובדיוק השד שהאפליקציה נבנתה כדי להילחם בו.
+     ‏המספר עצמו נשאר אדום כשהוא שלילי · זו עדיין עובדה. */
+  const overPlan = plannedOut() > 0 && left < 0;
+  /* ‏הסימן חייב להיות במקום אחד בדיוק. fmtNum מחזיר תמיד
+     ‏ערך מוחלט, ועד עכשיו המילה "חרגתי" היא שנשאה אותו.
+     ‏כשאין תכנון הכותרת חוזרת להיות "כמה יש לי", ואז מינוס
+     ‏של 2,400 היה נקרא כפלוס 2,400. הסימן עובר אל המספר. */
+  const shortfall = !overPlan && left < 0;
   const hq = $('heroQ');
-  hq.textContent = over ? 'כמה חרגתי' : 'כמה יש לי';
+  hq.textContent = overPlan ? 'כמה חרגתי' : 'כמה יש לי';
   hq.append(el('span', 'qm', '?'));
   const a = $('heroA');
-  setMoney(a, left);
-  a.setAttribute('aria-label', (over ? 'חרגתם ב' : 'נשאר לכם ') + fmt(left));
+  setMoney(a, left, shortfall);
+  a.setAttribute('aria-label',
+    overPlan   ? 'חרגתם ב' + fmt(left)
+    : shortfall ? 'יצא יותר ממה שנכנס ב' + fmt(left)
+                : 'נשאר לכם ' + fmt(left));
   a.classList.toggle('over', over);
 
   if (S.lastLeft !== null && S.lastLeft !== left) {
@@ -2325,6 +2361,26 @@ async function renderInsight() {
 
   const now = new Date();
   const current = inCurrentPeriod();
+
+  /* ‏לפני כל השאר: חודש בלי תכנון.
+
+     ‏התקציב נשמר לפי חודש ואינו עובר מעצמו, ולכן באחד בחודש
+     ‏הטבעות, התחזית, המחוון ושורת המאזן כולם מתכבים יחד.
+     ‏זה הדבר החשוב ביותר שאפשר לומר במצב הזה, ולכן הוא ראשון. */
+  if (current && !plannedOut() && !plannedIn()) {
+    const prevPlan = await loadPrevPlan();
+    const prevRows = await loadPrev();
+    const prevSpent = prevSpentByCat(prevRows);
+    const havePrev = [...prevPlan.values()].some(v => v > 0) || prevSpent.size > 0;
+    if (havePrev) {
+      const nm = monthName(addMonths(S.month, -1));
+      card('החודש עוד בלי תכנון',
+        `התכנון נשמר לכל חודש בנפרד, ובלעדיו הטבעות והתחזית שקטות. ` +
+        `אפשר להעביר את ${nm} כמו שהוא, או לפי מה שבאמת יצא בו.`,
+        [['לראות ולקבוע', () => openPlanCarry()]]);
+      return;
+    }
+  }
 
   /* ‏שאלת סוף החודש. בחמשת הימים הראשונים של התקופה, ורק אם
      היה בקודמת משהו להסתכל עליו. */
@@ -5183,6 +5239,128 @@ $('setWipe').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════ הפעלה ══ */
+
+/* ══════════════ התכנון של החודש החדש ══ */
+
+/* ‏התקציב נשמר תחת חודש קלנדרי, ואינו עובר מעצמו. לכן
+   ‏באחד בחודש כל מה שנשען על התכנון מתכבה בבת אחת · הטבעות,
+   ‏התחזית, המחוון ושורת המאזן · למשתמש שלא עשה שום דבר רע.
+   ‏הוא סיים חודש טוב וקיבל על זה מסך כבוי.
+
+   ‏שתי הדרכים להתחיל חודש: כמו שתוכנן, או כמו שיצא בפועל.
+   ‏השנייה חשובה לא פחות: מי שתכנן 1,500 למזון והוציא 2,400
+   ‏שלושה חודשים ברצף אינו חלש אופי · התכנון שלו פשוט לא נכון.
+
+   ‏אין כאן המלצה בין השתיים. שתיהן עובדות מהחודש שעבר, והרשימה
+   ‏מראה מראש בדיוק מה ייכנס, כדי שאף מספר לא יופיע בלי שראו אותו. */
+
+let planHow = 'plan';          // 'plan' ‏כמו שתוכנן, 'actual' ‏כמו שיצא
+
+/* ‏מה יצא בפועל בחודש שעבר, לפי קטגוריה. */
+function prevSpentByCat(prevRows) {
+  const m = new Map();
+  for (const t of prevRows) {
+    if (t.direction !== 'out' || t.is_transfer || !t.category_id) continue;
+    m.set(t.category_id, (m.get(t.category_id) || 0) + t.amount_agorot);
+  }
+  return m;
+}
+
+/* ‏מה ייכנס בפועל, לפי הבחירה. רק קטגוריות שיש להן מספר
+   ‏בצד שנבחר, ורק קטגוריות שעדיין קיימות ולא הוסרו. */
+function planRows(prevPlan, prevSpent) {
+  const out = [];
+  for (const c of outCats()) {
+    const p = prevPlan.get(c.id) || 0;
+    const a = prevSpent.get(c.id) || 0;
+    const v = planHow === 'plan' ? p : a;
+    if (v > 0) out.push({ c, plan: p, actual: a, value: v });
+  }
+  return out.sort((x, y) => y.value - x.value);
+}
+
+function renderPlanSheet(prevPlan, prevSpent) {
+  const chips = $('planChips');
+  chips.textContent = '';
+  const opts = [['plan', 'כמו שתכננתי'], ['actual', 'כמו שיצא בפועל']];
+  for (const [v, label] of opts) {
+    const b = el('button', 'chip', label);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(planHow === v));
+    if (planHow === v) b.classList.add('on');
+    b.addEventListener('click', () => { planHow = v; renderPlanSheet(prevPlan, prevSpent); });
+    chips.append(b);
+  }
+
+  const rows = planRows(prevPlan, prevSpent);
+  const list = $('planList');
+  list.textContent = '';
+  for (const r of rows) {
+    const row = el('div', 'rec-row');
+    const mid = el('div', 'rec-mid');
+    mid.append(el('div', 'rec-nm', (r.c.icon ? r.c.icon + ' ' : '') + r.c.label));
+    /* ‏שני המספרים תמיד זה לצד זה · הבחירה היא בין שניים,
+       ‏ומי שרואה רק את זה שבחר אינו יודע ממה ויתר. */
+    mid.append(el('div', 'rec-sub',
+      `תכנון ${fmt(r.plan)} · יצא ${fmt(r.actual)}`));
+    row.append(mid);
+    const amt = el('div', 'rec-amt money');
+    setMoney(amt, r.value);
+    row.append(amt);
+    list.append(row);
+  }
+
+  const sum = rows.reduce((s, r) => s + r.value, 0);
+  /* ‏רק ההוצאות. סכימה של כל שורות התקציב היתה מוסיפה
+     ‏גם את המשכורת, והשורה אמרה "תכננתם 30,000" למי שתכנן
+     ‏12,000 הוצאות לצד 18,000 הכנסה. הרשימה עצמה היתה נכונה,
+     ‏ולכן השורה סתרה את מה שמתחתיה. */
+  const outIds = new Set(outCats().map(c => c.id));
+  const planTotal = [...prevPlan].reduce((a, [id, v]) => a + (outIds.has(id) ? v : 0), 0);
+  const spentTotal = [...prevSpent].reduce((a, [id, v]) => a + (outIds.has(id) ? v : 0), 0);
+  $('planSub').textContent = rows.length
+    ? `ב${monthName(addMonths(S.month, -1))} תכננתם ${fmt(planTotal)} להוצאות ויצאו ${fmt(spentTotal)}. ` +
+      `זה מה שייכנס לחודש הזה:`
+    : 'אין מספרים להעביר מהחודש שעבר.';
+  $('planSave').disabled = !rows.length;
+  $('planSave').textContent = rows.length
+    ? `לקבוע ${fmt(sum)}` : 'לקבוע';
+}
+
+async function openPlanCarry() {
+  setErr($('planErr'), '');
+  const [prevPlan, prevRows] = await Promise.all([loadPrevPlan(), loadPrev()]);
+  const prevSpent = prevSpentByCat(prevRows);
+  /* ‏ברירת המחדל היא התכנון, ואם לא היה תכנון · מה שיצא. */
+  planHow = prevPlan.size ? 'plan' : 'actual';
+  renderPlanSheet(prevPlan, prevSpent);
+  openSheet($('planSheet'));
+  $('planSave').onclick = async () => {
+    const rows = planRows(prevPlan, prevSpent);
+    if (!rows.length) return;
+    $('planSave').disabled = true;
+    try {
+      /* ‏הכל בבת אחת. שמירה חלקית משאירה תקציב שחציו מהחודש
+         ‏שעבר וחציו ריק, וזה גרוע משני המצבים. */
+      const m = monthKey(S.month);
+      const { error } = await sb.from('budgets').upsert(
+        rows.map(r => ({ household_id: S.hh, month: m,
+                         category_id: r.c.id, planned_agorot: r.value })),
+        { onConflict: 'household_id,month,category_id' });
+      if (error) throw error;
+      for (const r of rows) S.budgets.set(r.c.id, r.value);
+    } catch (err) {
+      $('planSave').disabled = false;
+      setErr($('planErr'), human(err));
+      return;
+    }
+    closeSheet();
+    renderHome();
+    toast('התכנון של החודש נקבע.');
+  };
+}
+
+$('planCancel').addEventListener('click', closeSheet);
 
 /* ════════════════════ התקנה ותזכורת ══ */
 
