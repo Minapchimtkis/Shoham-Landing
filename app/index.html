@@ -1058,22 +1058,40 @@
 
   <!-- ──────────────────────────────────── ניווט ── -->
   <nav class="nav" aria-label="ניווט ראשי">
+    <!-- שני סמלים לכל לשונית: קו כשלא נבחרה, מלא כשכן. זה
+         הסימן של סרגל iOS והדבר שהעין קוראת לפני הצבע. -->
     <button type="button" data-tab="home" aria-current="page">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.6L12 4l8 6.6V20h-5v-5.4H9V20H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="ico" aria-hidden="true">
+        <svg class="out" viewBox="0 0 24 24"><path d="M3.9 10.3 12 4l8.1 6.3V19a1.6 1.6 0 0 1-1.6 1.6h-3.7V15H9.2v5.6H5.5A1.6 1.6 0 0 1 3.9 19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg class="fill" viewBox="0 0 24 24"><path d="M3.9 10.3 12 4l8.1 6.3V19a1.6 1.6 0 0 1-1.6 1.6h-3.7V15H9.2v5.6H5.5A1.6 1.6 0 0 1 3.9 19z" fill="currentColor"/></svg>
+      </span>
       בית
     </button>
+
     <button type="button" data-tab="tx">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5h15M4.5 12h15M4.5 16.5h9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      <span class="ico" aria-hidden="true">
+        <svg class="out" viewBox="0 0 24 24"><rect x="3.6" y="4.4" width="16.8" height="15.2" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7.2 9.2h9.6M7.2 12.6h9.6M7.2 16h5.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="fill" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M6.2 4.4h11.6a2.6 2.6 0 0 1 2.6 2.6v10a2.6 2.6 0 0 1-2.6 2.6H6.2A2.6 2.6 0 0 1 3.6 17V7a2.6 2.6 0 0 1 2.6-2.6Zm1 4a.9.9 0 0 0 0 1.8h9.6a.9.9 0 0 0 0-1.8Zm0 3.4a.9.9 0 0 0 0 1.8h9.6a.9.9 0 0 0 0-1.8Zm0 3.4a.9.9 0 0 0 0 1.8h5.6a.9.9 0 0 0 0-1.8Z" fill="currentColor"/></svg>
+      </span>
       תנועות
     </button>
+
+    <!-- הוספה. בתוך השורה ולא מרחפת מעליה · כפתור עגול 56
+         פיקסל שיושב מעל הסרגל הוא שפת אנדרואיד, ובאייפון
+         הוא נראה כמו אלמנט זר. ריבוע מעוגל בגודל סמל, בצבע
+         המותג, שומר על הבולטות בלי לשבור את השורה. -->
     <button type="button" class="add" id="addBtn" aria-haspopup="dialog">
-      <span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="6" fill="currentColor"/><path d="M12 7.6v8.8M7.6 12h8.8" fill="none" stroke="var(--paper)" stroke-width="2.2" stroke-linecap="round"/></svg>
       </span>
-      <span class="sr-only">הוספת תנועה</span>
+      הוספה
     </button>
+
     <button type="button" data-tab="profile">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4.8 20c0-3.6 3.2-5.8 7.2-5.8s7.2 2.2 7.2 5.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      <span class="ico" aria-hidden="true">
+        <svg class="out" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.2 19.6c0-3.4 3-5.4 6.8-5.4s6.8 2 6.8 5.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="fill" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.9" fill="currentColor"/><path d="M4.6 20.2c0-3.8 3.3-5.9 7.4-5.9s7.4 2.1 7.4 5.9z" fill="currentColor"/></svg>
+      </span>
       פרופיל
     </button>
   </nav>
