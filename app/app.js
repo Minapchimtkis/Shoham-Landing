@@ -2619,6 +2619,22 @@ async function renderInsight() {
     return;
   }
 
+  /* ‏הריבית לבדה, פעם בחודש.
+
+     ‏זה המספר שאף אחד אינו מחשב לעצמו. החוב עצמו גלוי,
+     ‏ההחזר החודשי גלוי, והחלק שלא מקטין את החוב אינו גלוי בשום
+     ‏מקום. עובדה בלבד · בלי "כדאי", בלי דירוג בין חובות, ובלי
+     ‏להגיד מה לעשות. מה לעשות עם זה הוא כבר שיחה עם אדם. */
+  const interest = interestAll();
+  if (interest >= 5000 && sparse('debt-interest', 30)) {
+    const year = interest * 12;
+    card(`הריבית לבדה היא ${fmt(interest)} בחודש`,
+      `זה מה שהחובות עולים בלי שהיתרה קטנה, לפי הריביות שרשמתם. ` +
+      `על פני שנה זה ${fmt(year)}.`,
+      [['לחובות', () => tab('debts')]]);
+    return;
+  }
+
   /* 2. ‏תכנון להחזרים בלי חוב רשום. הזמנה, ופעם אחת. */
   const repayCat = outCats().find(c => c.key === 'debt');
   const repayPlan = repayCat ? planned(repayCat.id) : 0;
@@ -3785,6 +3801,21 @@ const monthlyAll = () => S.debts.reduce((t, d) => t + d.monthly_agorot, 0);
 /* ‏ריבית נשמרת בנקודות בסיס. 525 הם 5.25 אחוז. */
 const rateText = bp => bp == null ? '' : (bp / 100).toFixed(2).replace(/\.?0+$/, '') + '%';
 
+/* ‏כמה הריבית לבדה עולה בחודש.
+
+   ‏אחוז הוא מופשט. "11.9%" אינו אומר שום דבר על כמה
+   ‏זה עולה, והמספר הזה ישב עד היום רק בתוך מחשבון שצריך
+   ‏לפתוח ולמלא. זה חילוק, לא המלצה: היתרה שרשמו כפול
+   ‏הריבית שרשמו, לחודש אחד. */
+/* ‏מעוגל לשקלים שלמים. "198.33" מבטיח דיוק שאינו קיים:
+   ‏היתרה זזה כל יום, והבנק מחשב לפי יתרה יומית ולא לפי
+   ‏צילום אחד. שתי הספרות האחרונות הן רעש שנראה כמו דיוק. */
+const monthlyInterest = d =>
+  (d.rate_bp == null || !d.balance_agorot) ? 0
+  : Math.round(d.balance_agorot * d.rate_bp / 120000 / 100) * 100;
+
+const interestAll = () => S.debts.reduce((t, d) => t + monthlyInterest(d), 0);
+
 function monthsLeft(iso) {
   if (!iso) return null;
   const m = Math.round((new Date(iso + 'T12:00:00') - new Date()) / (30.4 * DAY));
@@ -3838,8 +3869,26 @@ function renderDebts() {
   const v2 = el('span', 'v money sm'); setMoney(v2, monthlyAll());
   r2.append(v2);
   head.append(r1, r2);
+
+  /* ‏הריבית לבדה. היא אינה חלק מ"יוצא כל חודש" · היא החלק
+     ‏שלו שאינו מקטין את החוב, והיא המספר היחיד כאן שאף
+     ‏אחד אינו מחשב לעצמו. מוצגת רק כשרשמו ריבית בפועל. */
+  const interest = interestAll();
+  if (interest > 0) {
+    const r3 = el('div', 'owe-row');
+    /* ‏לא "מתוך זה". הריבית אינה תת-קבוצה של מה שיוצא כל
+       ‏חודש: מינוס שאין לו החזר חודשי צובר ריבית שאינה
+       ‏יוצאת בשום תשלום · היא פשוט מווספת ליתרה. כותרת
+       ‏שאומרת "מתוך זה" הייתה טוענת טענה שאינה נכונה. */
+    r3.append(el('span', 'k', 'הריבית בחודש'));
+    const v3 = el('span', 'v money sm'); setMoney(v3, interest);
+    r3.append(v3);
+    head.append(r3);
+  }
+
   head.setAttribute('aria-label',
-    `סך החובות ${fmt(owedAll())}, ומתוכם ${fmt(monthlyAll())} יוצאים כל חודש`);
+    `סך החובות ${fmt(owedAll())}, ומתוכם ${fmt(monthlyAll())} יוצאים כל חודש` +
+    (interest > 0 ? `. הריבית על כל החובות היא ${fmt(interest)} בחודש` : ''));
   box.append(head);
 
   /* ── החובות עצמם, מהגדול לקטן ──
@@ -3856,7 +3905,13 @@ function renderDebts() {
     /* ‏שם שכבר אומר את הסוג · "מינוס" מתחת ל"מינוס" הוא רעש. */
     const bits = [];
     if (d.name.trim() !== k.label) bits.push(k.label);
-    if (d.rate_bp != null) bits.push(rateText(d.rate_bp));
+    /* ‏האחוז ומה שהוא עולה, באותה שורה. אחד הוא המקור
+       ‏והשני הוא המשמעות, ובלי השני הראשון הוא רק מספר. */
+    if (d.rate_bp != null) {
+      const mi = monthlyInterest(d);
+      bits.push(mi ? `ריבית ${rateText(d.rate_bp)} · ${fmt(mi)} בחודש`
+                   : `ריבית ${rateText(d.rate_bp)}`);
+    }
     if (d.ends_on) {
       const m = monthsLeft(d.ends_on);
       bits.push(m > 0 ? `עוד ${m} ${m === 1 ? 'חודש' : 'חודשים'}` : 'התאריך עבר');
