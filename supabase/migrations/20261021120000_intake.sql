@@ -95,15 +95,48 @@ create index if not exists intake_status_idx  on public.intake_submissions (stat
 create index if not exists intake_phone_idx   on public.intake_submissions (public.norm_phone(phone));
 
 -- ── who may touch it ──────────────────────────────────────────────────
+-- "Signed in" is not a permission in this project. The budget app is open
+-- to the world by design, so anyone who signs up there is authenticated in
+-- this same Supabase project and holds the publishable key printed in the
+-- page source. 20261015120000_lock_business_tables.sql settled the rule for
+-- every business table: an explicit staff list, checked by is_staff(). This
+-- table is somebody's financial life and answers, so it follows that rule
+-- and stops rather than guessing if the list is not there.
+do $$
+begin
+  if to_regclass('public.staff') is null
+     or to_regprocedure('public.is_staff()') is null then
+    raise exception using message =
+      'is_staff() or the staff table is missing. Run ' ||
+      '20261015120000_lock_business_tables.sql first, then this file.';
+  end if;
+  if not exists (select 1 from public.staff) then
+    raise exception using message =
+      'The staff list is empty, so this would lock you out of your own ' ||
+      'dashboard. Add yourself first: insert into public.staff(user_id) ' ||
+      'select id from auth.users where lower(email)=lower(''your email'');';
+  end if;
+end $$;
+
 alter table public.intake_submissions enable row level security;
 
-drop policy if exists intake_read   on public.intake_submissions;
-drop policy if exists intake_update on public.intake_submissions;
-drop policy if exists intake_delete on public.intake_submissions;
+-- Every policy, including any written outside this repo, then only
+-- staff-gated ones.
+do $$
+declare p text;
+begin
+  for p in select policyname from pg_policies
+            where schemaname = 'public' and tablename = 'intake_submissions' loop
+    execute format('drop policy %I on public.intake_submissions', p);
+  end loop;
+end $$;
 
-create policy intake_read   on public.intake_submissions for select to authenticated using (true);
-create policy intake_update on public.intake_submissions for update to authenticated using (true) with check (true);
-create policy intake_delete on public.intake_submissions for delete to authenticated using (true);
+create policy intake_staff_read on public.intake_submissions
+  for select to authenticated using (public.is_staff());
+create policy intake_staff_update on public.intake_submissions
+  for update to authenticated using (public.is_staff()) with check (public.is_staff());
+create policy intake_staff_delete on public.intake_submissions
+  for delete to authenticated using (public.is_staff());
 
 -- Anonymous visitors reach the table through intake_submit() and nowhere
 -- else. There is no policy for them, so RLS denies everything by default,
