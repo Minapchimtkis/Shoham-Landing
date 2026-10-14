@@ -363,6 +363,12 @@
       <span class="dot" aria-hidden="true"></span>
       <span id="streakText"></span>
     </button>
+    <!-- שלוש הקווים. בקצה השמאלי, כמו בכל אפליקציה שאנשים
+         מכירים, ובכל מסך · הגדרות שצריך לחפש אינן הגדרות. -->
+    <button class="menu-btn" id="menuBtn" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="sr-only">הגדרות</span>
+    </button>
   </header>
 
   <!-- ───────────────────────────────────────── בית ── -->
@@ -484,25 +490,11 @@
 
   <!-- ─────────────────────────────────────── הגדרות ── -->
   <main class="screen hidden" id="scSet">
-    <h1 class="hero" style="padding-bottom:12px;font-size:27px;font-weight:900;letter-spacing:-0.025em">עוד</h1>
-
-    <div class="set-group">
-      <h2>הכסף שלי</h2>
-      <button class="set-row" id="setAssets" type="button">
-        <span class="k">
-          החסכונות והנכסים שלי
-          <small id="assetsNow">כמה יש לי מעבר לעובר ושב</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="set-row" id="setDebts" type="button">
-        <span class="k">
-          החובות שלי
-          <small id="debtsNow">הלוואות, מינוס, אשראי, משכנתא</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
+    <button class="back" id="setBack" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      חזרה
+    </button>
+    <h1 class="pg-title">הגדרות</h1>
 
     <div class="set-group">
       <h2>כלים</h2>
@@ -510,31 +502,6 @@
         <span class="k">
           מחשבונים
           <small>ריבית דריבית, וכמה זמן ייקח לסגור חוב</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <div class="set-group">
-      <h2>התמונה</h2>
-      <button class="set-row" id="setYear" type="button">
-        <span class="k">
-          סיכום השנה
-          <small>איפה אתם עומדים, שנים עשר חודשים במבט אחד</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="set-row" id="setSum" type="button">
-        <span class="k">
-          סיכום החודש
-          <small>לאן הכסף הלך, ומה השתנה מהחודש שעבר</small>
-        </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="set-row" id="setGoals" type="button">
-        <span class="k">
-          מטרות חיסכון
-          <small>כמה צריך, עד מתי, וכמה כבר יש</small>
         </span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -692,6 +659,62 @@
       פיננסים בפיקוח אוניברסיטת אריאל. הכלי הזה אינו ייעוץ השקעות
       ואינו המלצה. הוא מראה לכם את הכסף שלכם.
     </p>
+  </main>
+
+  <!-- ──────────────────────────────── הפרופיל ──
+       הכסף שאינו של החודש הזה: מה שיש, מה שחייבים, לאן
+       הולכים ומה קרה לאורך הזמן. ההגדרות אינן כאן · הן
+       בשלוש הקווים למעלה, כמו בכל אפליקציה שאנשים מכירים. -->
+  <main class="screen hidden" id="scProfile">
+    <h1 class="pg-title">הכסף שלי</h1>
+
+    <!-- מי אני. שם ואימייל, ובתקציב משותף גם מי עוד כאן. -->
+    <div class="who-card" id="profWho"></div>
+
+    <div class="set-group">
+      <h2>הכסף שלי</h2>
+      <button class="set-row" id="setAssets" type="button">
+        <span class="k">
+          החסכונות והנכסים שלי
+          <small id="assetsNow">כמה יש לי מעבר לעובר ושב</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setDebts" type="button">
+        <span class="k">
+          החובות שלי
+          <small id="debtsNow">הלוואות, מינוס, אשראי, משכנתא</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+
+    <div class="set-group">
+      <h2>התמונה</h2>
+      <button class="set-row" id="setYear" type="button">
+        <span class="k">
+          סיכום השנה
+          <small>איפה אתם עומדים, שנים עשר חודשים במבט אחד</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setSum" type="button">
+        <span class="k">
+          סיכום החודש
+          <small>לאן הכסף הלך, ומה השתנה מהחודש שעבר</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="set-row" id="setGoals" type="button">
+        <span class="k">
+          מטרות חיסכון
+          <small>כמה צריך, עד מתי, וכמה כבר יש</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
   </main>
 
   <!-- ──────────────────────────── חסכונות ונכסים ── -->
@@ -1049,9 +1072,9 @@
       </span>
       <span class="sr-only">הוספת תנועה</span>
     </button>
-    <button type="button" data-tab="set">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor"/></svg>
-      עוד
+    <button type="button" data-tab="profile">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4.8 20c0-3.6 3.2-5.8 7.2-5.8s7.2 2.2 7.2 5.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      פרופיל
     </button>
   </nav>
 </div>

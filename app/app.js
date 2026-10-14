@@ -387,12 +387,22 @@ function stage(name) {
 /* ‏ייבוא ומסמכים אינם לשוניות בניווט אלא מסכים שנפתחים מתוך
    ההגדרות. הם מסמנים את ההגדרות כמקום שממנו הגיעו, ומסתירים
    את בורר החודש, שאין לו שם משמעות. */
-const SUB = { import: 'set', docs: 'set', sum: 'set', goals: 'set', year: 'set',
-              assets: 'set', privacy: 'set', debts: 'set', tools: 'set' };
+/* ‏לאיזו לשונית שייך כל מסך משנה, כדי שהסימון למטה לא ייעלם
+   ‏כשנכנסים פנימה. הכסף שייך לפרופיל; הכלים והקבצים שייכים
+   ‏להגדרות. להגדרות עצמן אין לשונית · הערך 'set' אינו תואם
+   ‏לאף כפתור בניווט, ולכן שום דבר לא מסומן כשנמצאים בהן. */
+const SUB = { assets: 'profile', debts: 'profile', goals: 'profile',
+              year: 'profile', sum: 'profile',
+              import: 'set', docs: 'set', tools: 'set', privacy: 'set',
+              set: 'set' };
+
+/* ‏לאן חוזר כפתור החזרה של ההגדרות. הן נפתחות מכל מסך,
+   ‏וחזרה קבועה לבית היתה זורקת מי שפתח אותן מהתנועות. */
+let backFrom = 'home';
 
 function tab(name) {
   S.tab = name;
-  const map = { home: 'scHome', tx: 'scTx', set: 'scSet',
+  const map = { home: 'scHome', tx: 'scTx', set: 'scSet', profile: 'scProfile',
                 import: 'scImport', docs: 'scDocs', sum: 'scSum', goals: 'scGoals',
                 year: 'scYear', assets: 'scAssets', privacy: 'scPrivacy',
                 debts: 'scDebts', tools: 'scTools' };
@@ -403,13 +413,17 @@ function tab(name) {
     b.dataset.tab === current ? b.setAttribute('aria-current', 'page')
                               : b.removeAttribute('aria-current');
   }
-  document.querySelector('.topbar').classList.toggle('hidden', !!SUB[name]);
+  const topbar = document.querySelector('.topbar');
+  topbar.classList.toggle('hidden', !!SUB[name]);
+  /* ‏בוחר החודש רק במסכים שהחודש משנה בהם משהו. */
+  topbar.classList.toggle('no-month', name === 'profile');
 
   /* ‏חזרה לבית מציירת מחדש · בלי זה, אחרי שהתובנות דילגו על ציור
      ‏שנעשה ממסך אחר, הבית היה מראה כרטיס ישן. */
   if (name === 'home') renderHome();
   if (name === 'tx') renderTx();
   if (name === 'set') renderSet();
+  if (name === 'profile') renderProfile();
   if (name === 'import') IMP.openImport();
   if (name === 'docs') IMP.openDocs();
   if (name === 'sum') renderSum();
@@ -5195,6 +5209,42 @@ $('goalDelete').addEventListener('click', async () => {
 
 /* ‏הכול כאן ולא ב-enter · המסך הזה נצבע בכל כניסה אליו, וכך הוא
    ‏מראה תמיד את המצב העדכני ולא את זה שהיה ברגע הכניסה. */
+/* ‏הפרופיל. מי אני, ואז הכסף שאינו של החודש הזה. */
+function renderProfile() {
+  const box = $('profWho');
+  box.textContent = '';
+
+  const me = el('div', 'who-row');
+  const dot = el('span', 'who-dot' + (isShared() ? ' c-' + colorOf(S.user && S.user.id) : ''));
+  dot.setAttribute('aria-hidden', 'true');
+  me.append(dot);
+  const mid = el('div', 'who-mid');
+  mid.append(el('div', 'who-nm', (S.profile && S.profile.display_name) || 'החשבון שלי'));
+  const sub = el('div', 'who-sub');
+  sub.textContent = (S.user && S.user.email) || (isGuest() ? 'אורח, בלי אימייל' : '');
+  sub.setAttribute('dir', 'ltr');
+  mid.append(sub);
+  me.append(mid);
+  box.append(me);
+
+  /* ‏בתקציב משותף גם השני. הפרופיל הוא של משק הבית
+     ‏ולא של אדם אחד, והכסף שמתחת משותף לשניהם. */
+  if (isShared()) for (const m of S.members) {
+    if (S.user && m.id === S.user.id) continue;
+    const row = el('div', 'who-row');
+    const d2 = el('span', 'who-dot c-' + colorOf(m.id));
+    d2.setAttribute('aria-hidden', 'true');
+    row.append(d2);
+    const m2 = el('div', 'who-mid');
+    m2.append(el('div', 'who-nm', nameOf(m.id)));
+    m2.append(el('div', 'who-sub', 'מנהלים את אותו תקציב'));
+    row.append(m2);
+    box.append(row);
+  }
+
+  setAssetsLine();
+}
+
 function renderSet() {
   /* ‏לאורח אין כתובת, ושדה ריק נראה כמו תקלה. */
   $('setEmail').textContent = S.user?.email || (isGuest() ? 'אורח, בלי אימייל' : '');
@@ -5205,8 +5255,15 @@ function renderSet() {
   renderShareRow();
   renderInstallRow();
   renderRemindRow();
-  setAssetsLine();
 }
+
+/* ‏שלוש הקווים. נגישות מכל מסך, וחוזרות למקום שממנו
+   ‏נפתחו. חזרה קבועה לבית היתה זורקת מי שפתח מהתנועות. */
+$('menuBtn').addEventListener('click', () => {
+  backFrom = (S.tab === 'set' || SUB[S.tab] === 'set') ? backFrom : (S.tab || 'home');
+  tab('set');
+});
+$('setBack').addEventListener('click', () => tab(backFrom || 'home'));
 
 $('setNameBtn').addEventListener('click', () => {
   $('nameInput').value = S.profile?.display_name || '';

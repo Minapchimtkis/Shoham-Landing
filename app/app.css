@@ -511,6 +511,24 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
 
 /* ═════════════════════════════════════════ מעטפת האפליקציה ══ */
 
+/* ‏הניווט הקבוע יושב על התחתית, ולכן שישים הפיקסלים
+   ‏האחרונים אינם באמת נראים. בלי השורה הזאת כל גלילה
+   ‏אוטומטית אל אלמנט · פוקוס, עריכה, קפיצה אל שורה · מניחה
+   ‏אותו מתחת לניווט, והלחיצה הבאה עליו פשוט אינה מגיעה.
+
+   ‏נמדד: הוספת כפתור אחד לסרגל העליון הזיזה את מצב הגלילה
+   ‏ב-28 פיקסל, וזה הספיק כדי להפיל שורת קטגוריה מתחת לניווט. */
+html{
+  scroll-padding-bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom));
+}
+
+/* ‏הסרגל העליון אינו עוגן גלילה. הדפדפן בוחר לבד אלמנט
+   ‏שישמור את מקומו כשתוכן מעליו משתנה, וכשהוספה כאן
+   ‏כפתור הוא נבחר במקום מה שנבחר קודם · ומצב הגלילה זז ב-28
+   ‏פיקסל, מספיק כדי להפיל שורה מתחת לניווט. כרומה של מסך
+   ‏אינה המקום שלפיו מייצבים את התוכן. */
+.topbar{overflow-anchor:none}
+
 .screen{
   padding:0 var(--pad);
   padding-bottom:calc(var(--nav-h) + 26px + env(safe-area-inset-bottom));
@@ -521,6 +539,37 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   gap:12px;
   padding:max(14px,env(safe-area-inset-top)) 0 10px;
 }
+
+/* ‏שלוש הקווים. בקצה השמאלי של הסרגל, ובאותו משקל של
+   ‏בוחר החודש · שני הקצוות צריכים להיראות שווים במשקל. */
+.menu-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:none;
+  width:44px;height:44px;
+  margin-inline-end:-10px;
+  border-radius:var(--r-pill);
+  color:var(--ink-2);
+}
+.menu-btn svg{width:23px;height:23px}
+
+/* ‏בפרופיל אין חודש. ההון העצמי, החובות והמטרות אינם
+   ‏שייכים לאוקטובר, ובוחר חודש שאינו משנה כלום הוא הבטחה
+   ‏שלא נשמרת. ההמבורגר נשאר בקצה השמאלי גם כשהוא לבדו. */
+.topbar.no-month .month-pick{display:none}
+.menu-btn{margin-inline-start:auto}
+
+/* ‏כרטיס הזהות בראש הפרופיל. משטח מורם אחד, והוא היחיד
+   ‏במסך · שורות ההגדרות שמתחתיו הן קבוצות ולא כרטיסים. */
+.who-card{
+  background:var(--paper);
+  border-radius:16px;
+  padding:14px 16px;
+  margin-bottom:6px;
+}
+.who-card .who-row{padding:8px 0}
+.who-card .who-row + .who-row{border-top:1px solid var(--rule)}
+.who-card .who-nm{font-size:16px;font-weight:var(--w-ui)}
+.who-card .who-sub{font-size:13px;color:var(--ink-3)}
 
 .month-pick{
   display:inline-flex;align-items:center;gap:6px;
@@ -947,6 +996,10 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   background:var(--c,var(--violet-fill));
 }
 .who-nm{flex:1;font-size:15px;font-weight:var(--w-ui-soft)}
+/* ‏שתי שורות במקום אחת · שם מעל אימייל, בראש הפרופיל. */
+.who-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.who-mid .who-nm{flex:none}
+.who-sub{font-size:13px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .who-me{font-size:12px;color:var(--ink-3)}
 
 .c-chip{display:inline-flex;align-items:center;gap:7px}
@@ -1240,6 +1293,13 @@ p a,.note a,.credit a{text-decoration:underline;text-underline-offset:2px}
   display:grid;grid-template-columns:repeat(4,1fr);
   align-items:stretch;z-index:40;
 }
+/* ‏הסמלים אינם מטרות לחיצה. כולם aria-hidden והכפתור הוא
+   ‏שמקבל את הלחיצה. בלי זה הצורה המצוירת עצמה נבדקת
+   ‏ב-elementFromPoint, וסמל שצורתו מגיעה גבוה יותר בתיבה תופס
+   ‏לחיצות שלא מיועדות לו · החלפת שלוש נקודות בדמות אדם
+   ‏חשפה את זה מיד. */
+.nav svg{pointer-events:none}
+
 .nav button{
   display:flex;flex-direction:column;align-items:center;
   justify-content:center;gap:3px;
