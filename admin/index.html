@@ -187,7 +187,10 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 @media(max-width:340px){.fu-row{grid-template-columns:minmax(0,1fr)}.fu-clear{width:100%}}
 
 /* ===== תוצאות שאלון ===== */
-.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:16px}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:16px}
+/* ‏ארבע לשוניות בשורה אחת נדחסות מתחת ל-44 פיקסל ברוחב טלפון,
+   ‏ושתי שורות של שתיים קריאות יותר מכיתוב שנחתך. */
+@media (min-width:560px){.tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .tab{min-height:43px;padding:0 6px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#b8c0d0;font-size:11.5px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .tab.on{color:#dacaff;border-color:rgba(139,92,246,.36);background:rgba(139,92,246,.1)}
 .tab .count{min-width:20px;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.06);font-size:9px}
@@ -199,6 +202,70 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .qr-kind.deep{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
 .qr-score{justify-self:center;font-size:17px;font-weight:900}
 .s-hi{color:var(--green)}.s-mid{color:var(--blue)}.s-low{color:var(--amber)}.s-min{color:var(--red)}
+/* ═══ ‏שאלוני ההיכרות ═══ */
+/* ‏אזור נפרד בדשבורד · הוא אינו נטען ואינו מצויר עד שלוחצים על
+   ‏הלשונית שלו, כדי שהוא לא יעמוד מול העין בזמן עבודה על לידים. */
+.ik-row{display:grid;grid-template-columns:minmax(0,1fr) 62px 86px;align-items:center;gap:8px;padding:13px 12px;border-bottom:1px solid rgba(255,255,255,.055);cursor:pointer;text-align:start;width:100%;background:none;border-inline:0;border-top:0;color:inherit}
+.ik-row:last-child{border-bottom:0}
+@media (hover:hover) and (pointer:fine){.ik-row:hover{background:rgba(255,255,255,.018)}}
+.ik-name{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ik-sub{margin-top:4px;color:var(--muted2);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ik-kind{justify-self:center;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:#b8c0d0;font-size:9px;font-weight:900;padding:5px 9px;white-space:nowrap}
+.ik-kind.couple{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
+.ik-pill{justify-self:center}
+
+/* ‏גיליון התשובות. שלב, ואז שורה לכל שאלה · אותו סדר בדיוק
+   ‏שבו נשאלו, כדי שאפשר יהיה לקרוא אותו כמו שיחה. */
+.ik-stage{border-top:1px solid var(--line);padding:14px}
+.ik-stage:first-child{border-top:0}
+.ik-stage h4{margin:0 0 10px;font-size:11px;font-weight:900;letter-spacing:.4px;color:#dacaff}
+.ik-qa{padding:9px 0;border-top:1px solid rgba(255,255,255,.045)}
+.ik-qa:first-of-type{border-top:0}
+.ik-q{font-size:11px;line-height:1.55;color:var(--muted)}
+.ik-who{font-size:10px;font-weight:900;color:#dacaff}
+.ik-a{margin-top:3px;font-size:13.5px;line-height:1.6;color:#eef0f5;white-space:pre-wrap;overflow-wrap:anywhere}
+.ik-a.none{color:var(--muted2);font-style:italic}
+
+.ik-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line)}
+.ik-meta div{background:#0d1120;padding:11px 13px}
+.ik-meta span{display:block;color:var(--muted2);font-size:9px;font-weight:800;margin-bottom:4px}
+.ik-meta b{font-size:12.5px;font-weight:800;overflow-wrap:anywhere}
+
+.ik-acts{display:flex;flex-wrap:wrap;gap:8px;padding:14px}
+.ik-acts .btn{flex:1 1 auto;min-width:120px}
+
+/* ‏הדפסה · הדפדפן מייצר PDF עברי תקין בלי שום ספרייה, ועם טקסט
+   ‏שאפשר לסמן ולחפש בו. ספריות PDF בדפדפן דורשות הטמעת גופן
+   ‏עברי, ובלעדיה העברית יוצאת ריבועים. */
+@media print{
+  @page{margin:14mm}
+  body{background:#fff!important;color:#000!important}
+  body::before{display:none!important}
+  .topbar,.tabs,.ik-acts,.back-btn,.detail-menu,.kebab-menu,.toast,
+  #dashboardView,#loginView,.alerts,.stats,.metrics,.toolbar{display:none!important}
+  .detail-screen,.app-shell{max-width:none;margin:0;padding:0}
+  .detail-section{border:1px solid #bbb;border-radius:0;margin-bottom:10px;break-inside:avoid}
+  .detail-section-head{border-bottom:1px solid #bbb}
+  .detail-section-head strong,.detail-section-head span{color:#000!important}
+  /* ‏שורת הכותרת היא רשת של שלוש עמודות עם כפתור חזרה · בהדפסה
+     ‏הכפתור נעלם, העמודה האמצעית מצטמצמת והשם נשבר לשתי שורות. */
+  .detail-topbar{display:block!important;margin-bottom:12px}
+  .detail-title{text-align:start!important}
+  .detail-title b{font-size:20px}
+  .detail-title small{margin-top:2px}
+  /* ‏כפתורי הפעולה אינם שייכים לדף מודפס, וגם לא המסגרת שלהם. */
+  #ikActsSection{display:none!important}
+  /* ‏תיבת הערה ריקה היא חצי עמוד לבן · מסומנת לפני ההדפסה. */
+  #ikNotesSection.print-empty{display:none!important}
+  .ik-stage{border-top:1px solid #ddd;break-inside:avoid}
+  .ik-meta{background:#ddd}
+  .ik-meta div{background:#fff}
+  .ik-meta span,.ik-q{color:#555!important}
+  .ik-meta b,.ik-a{color:#000!important}
+  .ik-who,.ik-stage h4{color:#000!important}
+  .notes,.status-select{border:1px solid #bbb!important;color:#000!important;background:#fff!important}
+}
+
 .fn-wrap{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.018);padding:15px;margin-bottom:18px}
 .fn-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
 .fn-head strong{font-size:12px}.fn-head span{color:var(--muted2);font-size:9px}
@@ -361,6 +428,7 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
   <button id="tabLeads" class="tab on">לידים <span class="count" id="tabLeadsCount">0</span></button>
   <button id="tabQuiz" class="tab">שאלון <span class="count" id="tabQuizCount">0</span></button>
   <button id="tabPage" class="tab">דף הנחיתה <span class="count" id="tabPageCount">0</span></button>
+  <button id="tabIntake" class="tab">שאלוני היכרות <span class="count" id="tabIntakeCount">0</span></button>
 </div>
 
 <div id="leadsPane">
@@ -466,6 +534,43 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
     <div id="pgSources"></div>
   </div>
 </div>
+
+<!-- ‏שאלוני ההיכרות. אזור נפרד לגמרי · הוא נטען רק כשנכנסים
+     ‏אליו, ושום דבר ממנו אינו מופיע במסך הלידים. -->
+<div id="intakePane" class="hidden">
+  <section class="stats">
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>סה״כ</div><b id="ikTotal">0</b><small>שאלונים</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>חדשים</div><b id="ikNew">0</b><small>לא נפתחו</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>יחידים</div><b id="ikSingle">0</b><small>שאלון אישי</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>זוגות</div><b id="ikCouple">0</b><small>שאלון זוגי</small></div>
+  </section>
+
+  <section class="toolbar">
+    <div class="search-wrap"><span class="search-icon">⌕</span><input id="ikSearch" class="search" placeholder="חיפוש לפי שם, טלפון או תשובה…"></div>
+    <div class="filter-wrap">
+      <button id="ikFilterBtn" class="filter-icon-btn" title="סינון"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <div id="ikFilterMenu" class="filter-menu">
+        <button data-ikstatus="all" class="active">כל הסטטוסים</button>
+        <button data-ikstatus="new">חדש</button>
+        <button data-ikstatus="meeting_set">נקבעה פגישה</button>
+        <button data-ikstatus="met">הפגישה התקיימה</button>
+        <button data-ikstatus="in_progress">בטיפול</button>
+        <div class="menu-sep"></div><div class="menu-title">סוג</div>
+        <button data-ikkind="all" class="active">הכל</button>
+        <button data-ikkind="individual">יחידים</button>
+        <button data-ikkind="couple">זוגות</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="list-shell">
+    <div class="list-head" style="grid-template-columns:minmax(0,1fr) 62px 86px">
+      <span>מי מילא</span><span style="justify-self:center">סוג</span><span style="justify-self:center">סטטוס</span>
+    </div>
+    <div id="ikEmpty" class="empty hidden">אין עדיין שאלוני היכרות</div>
+    <div id="ikList"></div>
+  </div>
+</div>
 </section>
 
 <section id="detailView" class="detail-screen hidden">
@@ -542,6 +647,66 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 
 </div>
 </section>
+
+<!-- ‏גיליון שאלון אחד. מסך נפרד, בדיוק כמו מסך הליד · כך אפשר
+     ‏לקרוא אותו לפני פגישה בלי שום דבר אחר על המסך. -->
+<section id="ikDetail" class="detail-screen hidden">
+  <header class="detail-topbar">
+    <button id="ikBack" class="back-btn" type="button" aria-label="חזרה"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <div class="detail-title"><b id="ikWho">—</b><small id="ikWhen">—</small></div>
+    <span></span>
+  </header>
+
+  <section class="detail-section">
+    <div class="detail-section-head"><strong>מי ומתי</strong><span>פרטי המילוי</span></div>
+    <div class="ik-meta">
+      <div><span>סוג השאלון</span><b id="ikMetaKind">—</b></div>
+      <div><span>טלפון</span><b id="ikMetaPhone">—</b></div>
+      <div><span>אימייל</span><b id="ikMetaEmail">—</b></div>
+      <div><span>ליד מקושר</span><b id="ikMetaLead">—</b></div>
+      <div><span>התחיל למלא</span><b id="ikMetaStart">—</b></div>
+      <div><span>סיים ושלח</span><b id="ikMetaEnd">—</b></div>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <div class="detail-section-head"><strong>התשובות</strong><span id="ikCountNote">—</span></div>
+    <div id="ikAnswers"></div>
+  </section>
+
+  <section class="detail-section">
+    <div class="detail-section-head"><strong>סטטוס</strong><span>ניהול הטיפול</span></div>
+    <div class="status-wrap">
+      <label class="detail-label" for="ikStatus">סטטוס נוכחי</label>
+      <select id="ikStatus" class="status-select">
+        <option value="new">חדש</option>
+        <option value="meeting_set">נקבעה פגישה</option>
+        <option value="met">הפגישה התקיימה</option>
+        <option value="in_progress">בטיפול</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="detail-section" id="ikNotesSection">
+    <div class="detail-section-head"><strong>הערות פנימיות</strong><span>לא מוצג ללקוח</span></div>
+    <div class="notes-wrap"><label class="detail-label" for="ikNotes">הערה</label><textarea id="ikNotes" class="notes" maxlength="5000"></textarea></div>
+  </section>
+
+  <section class="detail-section">
+    <div class="detail-section-head"><strong>הסכמה</strong><span>תיעוד הטופס</span></div>
+    <div class="consent-wrap"><div class="consent-line"><div class="consent-check">✓</div><div><div id="ikConsentText" class="consent-text">—</div><div id="ikConsentMeta" class="consent-meta">—</div></div></div></div>
+  </section>
+
+  <section class="detail-section" id="ikActsSection">
+    <div class="detail-section-head"><strong>פעולות</strong><span>הדפסה, העתקה ומחיקה</span></div>
+    <div class="ik-acts">
+      <button id="ikPrint" class="btn" type="button">הדפסה או שמירה כ-PDF</button>
+      <button id="ikCopy" class="btn" type="button">העתקת סיכום</button>
+      <button id="ikDelete" class="btn btn-danger" type="button">מחיקת השאלון</button>
+    </div>
+  </section>
+</section>
+
 </main>
 
 <div id="deleteConfirmBackdrop" class="confirm-backdrop hidden">
@@ -610,11 +775,11 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage()]);markTabsLoaded();startRealtime();
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage(),loadIntake()]);markTabsLoaded();startRealtime();
   // Leads are the live part and realtime already pushes new ones; the rest
   // changes slowly and does not need a round trip every minute.
   if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000);
-  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage();markTabsLoaded()},300000)}
+  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage();loadIntake();markTabsLoaded()},300000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}if(slowTimer){clearInterval(slowTimer);slowTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -1080,7 +1245,7 @@ function render(){
 }
 
 function openLead(id){activeLeadId=id;openedIds.add(id);renderDetail(id);hide($('dashboardView'));show($('detailView'));window.scrollTo({top:0,behavior:'instant'})}
-function back(){activeLeadId=null;hide($('detailView'));show($('dashboardView'));window.scrollTo({top:0,behavior:'instant'})}
+function back(){activeLeadId=null;hide($('detailView'));hide($('ikDetail'));show($('dashboardView'));window.scrollTo({top:0,behavior:'instant'})}
 function renderDetail(id){
   const l=leads.find(x=>x.id===id);if(!l)return;const p=parts(l.created_at);
   $('detailReceived').textContent=p.full;$('detailName').textContent=l.name||'—';$('detailPhoneText').textContent=l.phone||'—';$('detailInfoName').textContent=l.name||'—';$('detailInfoPhone').textContent=l.phone||'—';$('detailDate').textContent=p.date;$('detailTime').textContent=p.time;$('detailLang').textContent=l.page_lang==='en'?'English':'עברית';$('detailMessage').textContent=l.message||'ללא הודעה';$('detailStatus').value=l.status||'new';$('detailNotes').value=l.admin_notes||'';
@@ -1354,11 +1519,26 @@ $('detailStatus').addEventListener('change',()=>{$('detailStatusPill').className
 $('copyPhoneBtn').addEventListener('click',async()=>{const l=leads.find(x=>x.id===activeLeadId);if(!l)return;try{await navigator.clipboard.writeText(l.phone||'');toast('הטלפון הועתק')}catch{toast(l.phone||'')}});
 
 function openDelete(ids){pendingDeleteIds=[...ids];$('deleteConfirmText').textContent=ids.length===1?`למחוק את הליד של ${leads.find(l=>l.id===ids[0])?.name||'הלקוח'}? הפעולה בלתי הפיכה.`:`למחוק ${ids.length} לידים? הפעולה בלתי הפיכה.`;show($('deleteConfirmBackdrop'));document.body.classList.add('locked')}
-function closeDelete(){hide($('deleteConfirmBackdrop'));document.body.classList.remove('locked');pendingDeleteIds=[]}
+function closeDelete(){hide($('deleteConfirmBackdrop'));document.body.classList.remove('locked');pendingDeleteIds=[];ikPendingDelete=null}
 $('deleteLeadBtn').addEventListener('click',()=>activeLeadId!=null&&openDelete(partyOf(activeLeadId).map(l=>l.id)));
 $('bulkDeleteBtn').addEventListener('click',()=>selectedIds.size&&openDelete([...new Set([...selectedIds].flatMap(id=>partyOf(id).map(l=>l.id)))]));
 $('cancelDeleteBtn').addEventListener('click',closeDelete);
-$('confirmDeleteBtn').addEventListener('click',async()=>{if(!pendingDeleteIds.length)return;const ids=[...pendingDeleteIds];const btn=$('confirmDeleteBtn');btn.disabled=true;const{error}=await supabase.from('leads').delete().in('id',ids);btn.disabled=false;if(error){toast('מחיקת הלידים נכשלה','bad');return}const wasActive=activeLeadId!=null&&ids.includes(activeLeadId);ids.forEach(id=>selectedIds.delete(id));closeDelete();if(wasActive)back();toast(ids.length===1?'הליד נמחק':`${ids.length} לידים נמחקו`);await loadLeads()});
+$('confirmDeleteBtn').addEventListener('click',async()=>{
+  /* ‏אותו גלון משמש את שתי המחיקות · מי שממתין קובע מה נמחק,
+     ‏ושאלון קודם כי הוא זה שנפתח אחרון. */
+  if(ikPendingDelete){
+    const id=ikPendingDelete;const btn=$('confirmDeleteBtn');btn.disabled=true;
+    const{error}=await supabase.from('intake_submissions').delete().eq('id',id);
+    btn.disabled=false;
+    if(error){toast('מחיקת השאלון נכשלה','bad');return}
+    closeDelete();
+    ikAnswers.delete(id);
+    intakes=intakes.filter(x=>x.id!==id);
+    if(activeIk===id)ikBack();
+    renderIntake();toast('השאלון נמחק');
+    return;
+  }
+  if(!pendingDeleteIds.length)return;const ids=[...pendingDeleteIds];const btn=$('confirmDeleteBtn');btn.disabled=true;const{error}=await supabase.from('leads').delete().in('id',ids);btn.disabled=false;if(error){toast('מחיקת הלידים נכשלה','bad');return}const wasActive=activeLeadId!=null&&ids.includes(activeLeadId);ids.forEach(id=>selectedIds.delete(id));closeDelete();if(wasActive)back();toast(ids.length===1?'הליד נמחק':`${ids.length} לידים נמחקו`);await loadLeads()});
 
 $('selectAll').addEventListener('change',()=>{const ids=filtered().map(l=>l.id);$('selectAll').checked?ids.forEach(id=>selectedIds.add(id)):ids.forEach(id=>selectedIds.delete(id));render()});
 $('clearSelection').addEventListener('click',()=>{selectedIds.clear();render()});
@@ -1392,21 +1572,311 @@ $('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true
 // The three tabs are the three stages of the same journey, read in order:
 // who came to the page, who answered the questionnaire, who is now a lead.
 // Leads is first because that is the one he opens the dashboard to work in.
-const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane'};
-const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage'};
+/* ═════════════════════════ ‏שאלוני ההיכרות ═════════════════════════ */
+/* ‏אזור נפרד בדשבורד. הוא נטען רק כשנכנסים אליו, ואין לו שום
+   ‏נוכחות במסך הלידים · בדיוק כדי שלא יעמוד מול העין. */
+
+const IK_STATUS={
+  new:{label:'חדש',cls:'status-new'},
+  meeting_set:{label:'נקבעה פגישה',cls:'status-contacted'},
+  met:{label:'הפגישה התקיימה',cls:'status-closed'},
+  in_progress:{label:'בטיפול',cls:'status-contacted'}
+};
+const IK_KIND={individual:'יחיד',couple:'זוג'};
+
+let intakes=[];
+let activeIk=null;
+let ikStatusFilter='all';
+let ikKindFilter='all';
+let ikNotesTimer=null;
+let ikTableOk=true;
+
+/* ‏התשובות עצמן נמשכות רק כשפותחים גיליון. הרשימה אינה צריכה
+   ‏אותן, והן החלק הכבד · שאלון מלא הוא עשרות אלפי תווים. */
+const IK_LIST_COLS='id,kind,name,phone,email,partner_a,partner_b,status,notes,lead_id,consent,consent_text,consent_at,started_at,created_at,updated_at';
+const ikAnswers=new Map();
+
+async function loadIntake(){
+  if(!currentUser||!ikTableOk)return;
+  const{data,error}=await fetchAll(()=>supabase.from('intake_submissions').select(IK_LIST_COLS).order('created_at',{ascending:false}));
+  if(error){
+    /* ‏המיגרציה עוד לא הורצה · האזור פשוט נשאר ריק במקום להציף
+       ‏שגיאה בכל רענון. */
+    if(schemaMissing(error)){ikTableOk=false;renderIntake();return}
+    console.error(error);return;
+  }
+  intakes=data||[];
+  renderIntake();
+  if(activeIk)renderIkDetail(activeIk);
+}
+
+async function loadIkAnswers(id){
+  if(ikAnswers.has(id))return true;
+  const{data,error}=await supabase.from('intake_submissions').select('answers').eq('id',id).maybeSingle();
+  if(error){console.error(error);return false}
+  ikAnswers.set(id,Array.isArray(data?.answers)?data.answers:[]);
+  return true;
+}
+
+/* ‏החיפוש נוגע גם בתשובות שכבר נמשכו, כך שאחרי פתיחת גיליון
+   ‏אפשר למצוא אותו לפי משפט שנכתב בו. */
+function ikHaystack(r){
+  const base=[r.name,r.phone,r.email,r.partner_a,r.partner_b,r.notes].filter(Boolean).join(' ');
+  const ans=ikAnswers.get(r.id);
+  if(!ans)return base;
+  return base+' '+ans.map(st=>(st.items||[]).map(i=>i.a).join(' ')).join(' ');
+}
+
+function ikVisible(){
+  const q=($('ikSearch').value||'').trim().toLowerCase();
+  return intakes.filter(r=>{
+    if(ikStatusFilter!=='all'&&(r.status||'new')!==ikStatusFilter)return false;
+    if(ikKindFilter!=='all'&&r.kind!==ikKindFilter)return false;
+    if(q&&!ikHaystack(r).toLowerCase().includes(q))return false;
+    return true;
+  });
+}
+
+function renderIntake(){
+  $('tabIntakeCount').textContent=intakes.length;
+  $('ikTotal').textContent=intakes.length;
+  $('ikNew').textContent=intakes.filter(r=>(r.status||'new')==='new').length;
+  $('ikSingle').textContent=intakes.filter(r=>r.kind==='individual').length;
+  $('ikCouple').textContent=intakes.filter(r=>r.kind==='couple').length;
+
+  const box=$('ikList');box.replaceChildren();
+  const rows=ikVisible();
+  if(!rows.length){
+    $('ikEmpty').textContent=ikTableOk
+      ? (intakes.length?'אין שאלון שמתאים לסינון':'אין עדיין שאלוני היכרות')
+      : 'האזור הזה יתמלא אחרי הרצת המיגרציה בסופהבייס';
+    show($('ikEmpty'));return;
+  }
+  hide($('ikEmpty'));
+
+  for(const r of rows){
+    const row=document.createElement('button');
+    row.type='button';row.className='ik-row';
+
+    const who=document.createElement('div');
+    const nm=document.createElement('div');nm.className='ik-name';
+    nm.textContent=r.name||'ללא שם';
+    const sub=document.createElement('div');sub.className='ik-sub';
+    sub.textContent=[parts(r.created_at).full,r.phone].filter(Boolean).join(' · ');
+    who.append(nm,sub);
+
+    const kind=document.createElement('span');
+    kind.className='ik-kind'+(r.kind==='couple'?' couple':'');
+    kind.textContent=IK_KIND[r.kind]||'—';
+
+    const pill=document.createElement('span');
+    const st=IK_STATUS[r.status||'new']||IK_STATUS.new;
+    pill.className='status-pill ik-pill '+st.cls;
+    pill.textContent=st.label;
+
+    row.append(who,kind,pill);
+    row.addEventListener('click',()=>openIk(r.id));
+    box.appendChild(row);
+  }
+}
+
+async function openIk(id){
+  activeIk=id;
+  hide($('dashboardView'));hide($('detailView'));show($('ikDetail'));
+  window.scrollTo({top:0,behavior:'instant'});
+  renderIkDetail(id);
+  if(await loadIkAnswers(id)&&activeIk===id)renderIkDetail(id);
+}
+
+function ikBack(){
+  activeIk=null;hide($('ikDetail'));show($('dashboardView'));
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function renderIkDetail(id){
+  const r=intakes.find(x=>x.id===id);if(!r)return;
+
+  $('ikWho').textContent=r.name||'ללא שם';
+  $('ikWhen').textContent=parts(r.created_at).full;
+  $('ikMetaKind').textContent=r.kind==='couple'
+    ? ('זוג'+(r.partner_a||r.partner_b?' · '+[r.partner_a,r.partner_b].filter(Boolean).join(' ו'):''))
+    : 'יחיד';
+  $('ikMetaPhone').textContent=r.phone||'—';
+  $('ikMetaEmail').textContent=r.email||'—';
+
+  /* ‏הליד עצמו עשוי להיות לא טעון או מחוק · אומרים מה שידוע
+     ‏ולא ממציאים שם. */
+  const lead=r.lead_id!=null?leads.find(l=>l.id===r.lead_id):null;
+  $('ikMetaLead').textContent=r.lead_id==null?'לא מקושר':(lead?lead.name||'ליד ללא שם':'ליד שנמחק');
+
+  $('ikMetaStart').textContent=r.started_at?parts(r.started_at).full:'לא נרשם';
+  $('ikMetaEnd').textContent=parts(r.created_at).full;
+
+  $('ikStatus').value=r.status||'new';
+  if(document.activeElement!==$('ikNotes'))$('ikNotes').value=r.notes||'';
+
+  $('ikConsentText').textContent=r.consent_text||(r.consent?'אושרה שמירת התשובות':'ללא הסכמה מתועדת');
+  $('ikConsentMeta').textContent=r.consent_at?('אושר ב-'+parts(r.consent_at).full):'—';
+
+  const host=$('ikAnswers');host.replaceChildren();
+  const stages=ikAnswers.get(id);
+  if(!stages){
+    const p=document.createElement('div');p.className='ik-stage';
+    p.textContent='טוען את התשובות…';host.appendChild(p);
+    $('ikCountNote').textContent='—';
+    return;
+  }
+
+  let answered=0,total=0;
+  for(const st of stages){
+    const block=document.createElement('div');block.className='ik-stage';
+    const h=document.createElement('h4');h.textContent=st.stage||'';block.appendChild(h);
+    for(const it of (st.items||[])){
+      total++;
+      const qa=document.createElement('div');qa.className='ik-qa';
+      const q=document.createElement('div');q.className='ik-q';
+      if(it.who){
+        const w=document.createElement('span');w.className='ik-who';
+        w.textContent=it.who+' · ';q.appendChild(w);
+      }
+      q.appendChild(document.createTextNode(it.q||''));
+      const a=document.createElement('div');
+      const txt=(it.a==null?'':String(it.a)).trim();
+      if(txt)answered++;
+      a.className='ik-a'+(txt?'':' none');
+      a.textContent=txt||'לא נענה';
+      qa.append(q,a);block.appendChild(qa);
+    }
+    host.appendChild(block);
+  }
+  $('ikCountNote').textContent=answered+' מתוך '+total+' שאלות';
+}
+
+/* ‏סיכום להדבקה · טקסט פשוט, כי זה מה שנדבק נכון בכל מקום,
+   ‏מהערות של יומן ועד הודעה. */
+function ikSummary(r,stages){
+  const out=[];
+  out.push('שאלון היכרות · '+(r.kind==='couple'?'זוג':'יחיד'));
+  out.push('מי: '+(r.name||'ללא שם')+(r.phone?' · '+r.phone:''));
+  out.push('נשלח: '+parts(r.created_at).full);
+  out.push('');
+  for(const st of stages||[]){
+    out.push('── '+(st.stage||''));
+    for(const it of (st.items||[])){
+      const a=(it.a==null?'':String(it.a)).trim();
+      out.push((it.who?'['+it.who+'] ':'')+(it.q||''));
+      out.push('  '+(a||'לא נענה'));
+    }
+    out.push('');
+  }
+  if(r.notes)out.push('הערות פנימיות: '+r.notes);
+  return out.join('\n');
+}
+
+$('ikBack').addEventListener('click',ikBack);
+$('ikSearch').addEventListener('input',renderIntake);
+
+/* ‏אותה מחלקה בדיוק שתפריטי הסינון האחרים משתמשים בה · 'show'
+   ‏ולא 'open', אחרת הכפתור נראה חי והתפריט נשאר מוסתר. */
+$('ikFilterBtn').addEventListener('click',e=>{e.stopPropagation();$('ikFilterMenu').classList.toggle('show')});
+$('ikFilterMenu').addEventListener('click',e=>{
+  e.stopPropagation();
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.ikstatus){
+    ikStatusFilter=b.dataset.ikstatus;
+    $('ikFilterMenu').querySelectorAll('[data-ikstatus]').forEach(x=>x.classList.toggle('active',x===b));
+  }
+  if(b.dataset.ikkind){
+    ikKindFilter=b.dataset.ikkind;
+    $('ikFilterMenu').querySelectorAll('[data-ikkind]').forEach(x=>x.classList.toggle('active',x===b));
+  }
+  $('ikFilterBtn').classList.toggle('active',ikStatusFilter!=='all'||ikKindFilter!=='all');
+  renderIntake();
+});
+document.addEventListener('click',()=>$('ikFilterMenu').classList.remove('show'));
+
+$('ikStatus').addEventListener('change',async()=>{
+  if(!activeIk)return;
+  const value=$('ikStatus').value;
+  const{error}=await supabase.from('intake_submissions').update({status:value}).eq('id',activeIk);
+  if(error){toast('עדכון הסטטוס נכשל','bad');return}
+  const r=intakes.find(x=>x.id===activeIk);if(r)r.status=value;
+  renderIntake();toast('הסטטוס עודכן');
+});
+
+/* ‏ההערה נשמרת אחרי שתיקה של שנייה · שמירה בכל הקשה היתה
+   ‏שולחת עשרות בקשות למשפט אחד. */
+$('ikNotes').addEventListener('input',()=>{
+  if(!activeIk)return;
+  clearTimeout(ikNotesTimer);
+  const id=activeIk,value=$('ikNotes').value;
+  ikNotesTimer=setTimeout(async()=>{
+    const{error}=await supabase.from('intake_submissions').update({notes:value}).eq('id',id);
+    if(error){toast('שמירת ההערה נכשלה','bad');return}
+    const r=intakes.find(x=>x.id===id);if(r)r.notes=value;
+  },1000);
+});
+
+/* ‏נתלה על האירוע של הדפדפן ולא רק על הכפתור, כדי שגם הדפסה
+   ‏מהתפריט או ב-Ctrl+P תצא נקייה. */
+window.addEventListener('beforeprint',()=>{
+  const sec=$('ikNotesSection');
+  if(sec)sec.classList.toggle('print-empty',!($('ikNotes').value||'').trim());
+});
+
+$('ikPrint').addEventListener('click',()=>{
+  if(!activeIk)return;
+  if(!ikAnswers.has(activeIk)){toast('התשובות עוד נטענות','bad');return}
+  window.print();
+});
+
+$('ikCopy').addEventListener('click',async()=>{
+  if(!activeIk)return;
+  const r=intakes.find(x=>x.id===activeIk);if(!r)return;
+  const stages=ikAnswers.get(activeIk);
+  if(!stages){toast('התשובות עוד נטענות','bad');return}
+  const text=ikSummary(r,stages);
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('הסיכום הועתק');
+  }catch(e){
+    /* ‏הדפדפן חוסם העתקה בלי מחווה מובהקת, או שאין הרשאה ·
+       ‏בחירה של הטקסט נותנת לו להעתיק ידנית במקום להיכשל בשקט. */
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand('copy')}catch(e2){}
+    document.body.removeChild(ta);
+    toast(ok?'הסיכום הועתק':'ההעתקה נחסמה · אפשר להדפיס במקום',ok?'ok':'bad');
+  }
+});
+
+let ikPendingDelete=null;
+$('ikDelete').addEventListener('click',()=>{
+  if(!activeIk)return;
+  const r=intakes.find(x=>x.id===activeIk);if(!r)return;
+  ikPendingDelete=activeIk;
+  $('deleteConfirmText').textContent='השאלון של '+(r.name||'ללא שם')+' יימחק לצמיתות, על כל התשובות שבו. הפעולה בלתי הפיכה.';
+  show($('deleteConfirmBackdrop'));document.body.classList.add('locked');
+});
+
+const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane',intake:'intakePane'};
+const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage',intake:'tabIntake'};
 // Realtime carries new leads and nothing else, so the panels behind the two
 // slower tabs are only refetched on login, on the refresh button, and once
 // every five minutes. Opening a tab is a request to see what is in it now,
 // not what it held when the timer last ran. The floor keeps flipping between
 // tabs from costing a query per tap.
-const tabLoaded={quiz:0,page:0};
+const tabLoaded={quiz:0,page:0,intake:0};
 function freshenTab(which){
   if(!(which in tabLoaded))return;
   if(Date.now()-tabLoaded[which]<30000)return;
   tabLoaded[which]=Date.now();
-  if(which==='quiz'){loadQuiz();loadFunnel()}else{loadPage()}
+  if(which==='quiz'){loadQuiz();loadFunnel()}
+  else if(which==='intake'){loadIntake()}
+  else{loadPage()}
 }
-function markTabsLoaded(){const n=Date.now();tabLoaded.quiz=n;tabLoaded.page=n}
+function markTabsLoaded(){const n=Date.now();tabLoaded.quiz=n;tabLoaded.page=n;tabLoaded.intake=n}
 
 function setTab(which){
   if(!PANES[which])which='leads';

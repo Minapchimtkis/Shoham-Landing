@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- ‏מדיניות אבטחת תוכן. הדף הזה אוסף את התמונה הכלכלית של אדם,
+     ‏ולכן הוא לא טוען סקריפט משום מקום חוץ מעצמו ולא שולח נתונים
+     ‏לשום יעד חוץ מ-Supabase. הגופן מגוגל הוא הדבר החיצוני היחיד,
+     ‏והוא גיליון סגנונות · לא קוד. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src https://vplqocqmlquajwwnyeby.supabase.co;
+  base-uri 'none';
+  form-action 'none';
+  object-src 'none';
+  frame-src 'none'">
+
+<title>שאלון היכרות | שוהם אבו</title>
+<meta name="description" content="שאלון היכרות כלכלי לקראת פגישת המיפוי.">
+
+<!-- ‏השאלון נשלח ללקוח לפני פגישה · הוא אינו דף שיווקי ואין סיבה
+     ‏שאדם זר ימצא אותו בחיפוש וימלא אותו. -->
+<meta name="robots" content="noindex,nofollow,noarchive">
+
+<link rel="icon" href="assets/favicon.ico?v=4dc83ac7" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="assets/icon-192.png?v=47886d2c" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=47886d2c">
+<meta name="theme-color" content="#0a0015">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
+
+<style>
+/* ‏אותם אסימונים בדיוק של quiz.html ושל דף הנחיתה. השאלון הזה
+   ‏הוא עוד חדר באותו בית, לא בית שני. */
+:root {
+  --font: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --p1: #0a0015;
+  --p2: #12003a;
+  --p3: #3b0764;
+  --p4: #7c3aed;
+  --p5: #a855f7;
+  --p6: #d8b4fe;
+  --white: #ffffff;
+  --gold: #f0c040;
+  --ok: #2fd98b;
+  --err: #ff6974;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+button, input, select, textarea { font-family: inherit; }
+
+html {
+  background: var(--p1);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+button, [role="button"], .btn, .opt, .chip, .scale b {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+a, input, textarea, label, summary { touch-action: manipulation; }
+
+body {
+  font-family: var(--font);
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #23094a 0%, var(--p1) 55%) var(--p1);
+  color: var(--white);
+  direction: rtl;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 40% at 50% 20%, rgba(124,58,237,0.22), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(109,40,217,0.14), transparent 65%);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 34px 22px 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.head { text-align: center; margin-bottom: 26px; }
+.brand {
+  font-size: 13px; font-weight: 700; letter-spacing: 3px;
+  color: var(--p6); text-shadow: 0 0 18px rgba(168,85,247,0.5);
+}
+
+/* ── ‏ההתקדמות ── */
+.progress {
+  height: 4px; background: rgba(168,85,247,0.16);
+  border-radius: 99px; overflow: hidden;
+  margin: 22px 0 10px; opacity: 0; transition: opacity 0.3s;
+}
+.progress.on { opacity: 1; }
+.progress-fill {
+  height: 100%; width: 0%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--p4), var(--p5));
+  transition: width 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+.progress-note {
+  font-size: 12px; font-weight: 600; letter-spacing: 1px;
+  color: rgba(255,255,255,0.4); text-align: center;
+  margin-bottom: 26px; min-height: 17px;
+}
+
+/* ── ‏מסכים ── */
+.screen { display: none; }
+.screen.on { display: block; animation: rise 0.42s cubic-bezier(0.22,1,0.36,1); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.on { animation: none; }
+  .progress-fill { transition: none; }
+}
+
+h1 {
+  font-size: clamp(26px, 5.6vw, 37px);
+  font-weight: 800; line-height: 1.24;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+}
+h1 .accent {
+  background: linear-gradient(135deg, var(--p5), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lede {
+  font-size: 16px; font-weight: 300; line-height: 1.75;
+  color: rgba(255,255,255,0.72); margin-bottom: 30px;
+}
+
+/* ── ‏שני הכרטיסים ── */
+.picks { display: flex; flex-direction: column; gap: 14px; }
+
+.pick {
+  width: 100%; text-align: start; cursor: pointer;
+  background: linear-gradient(158deg, rgba(255,255,255,0.06), rgba(255,255,255,0.018));
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 18px; padding: 24px 22px;
+  color: inherit;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  box-shadow: 0 22px 50px -26px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pick:hover { border-color: rgba(168,85,247,0.62); transform: translateY(-2px); }
+}
+.pick:active { transform: translateY(0); }
+
+.pick-ico { width: 30px; height: 30px; color: var(--p5); margin-bottom: 13px; display: block; }
+.pick h2 { font-size: 21px; font-weight: 800; margin-bottom: 7px; }
+.pick p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.64); }
+.pick-go {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-top: 16px; font-size: 14.5px; font-weight: 700; color: var(--p6);
+}
+.pick-go svg { width: 15px; height: 15px; }
+
+/* ── ‏שאלה ── */
+.step-count {
+  font-size: 12px; font-weight: 700; letter-spacing: 2px;
+  color: var(--p6); margin-bottom: 10px;
+}
+.stage-title { font-size: clamp(22px, 4.8vw, 28px); font-weight: 800; line-height: 1.35; margin-bottom: 6px; }
+.stage-sub { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.56); margin-bottom: 26px; }
+
+.q { margin-bottom: 30px; }
+.q:last-of-type { margin-bottom: 8px; }
+
+.q-text {
+  font-size: 17.5px; font-weight: 700; line-height: 1.5;
+  margin-bottom: 6px;
+}
+.q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
+.q-opt-note { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.38); margin-inline-start: 7px; }
+
+.who-tag {
+  display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 1px;
+  color: var(--p6); background: rgba(168,85,247,0.14);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 99px; padding: 4px 11px; margin-bottom: 10px;
+}
+
+/* ── ‏אפשרויות ── */
+.opts { display: flex; flex-direction: column; gap: 10px; }
+
+.opt {
+  width: 100%; text-align: start; position: relative;
+  font-size: 15.5px; font-weight: 500; line-height: 1.55;
+  color: rgba(255,255,255,0.86);
+  background: linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
+  border: 1px solid rgba(168,85,247,0.24);
+  border-radius: 14px; padding: 15px 18px;
+  min-height: 48px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+@media (hover: hover) and (pointer: fine) {
+  .opt:hover { border-color: rgba(168,85,247,0.56); background: rgba(168,85,247,0.1); }
+}
+.opt[aria-pressed="true"] {
+  border-color: var(--p5);
+  background: rgba(124,58,237,0.26);
+  color: #fff;
+  font-weight: 700;
+}
+.opt[aria-pressed="true"]::after {
+  content: ''; position: absolute; inset-inline-start: 17px; top: 50%;
+  width: 6px; height: 11px; margin-top: -8px;
+  border: solid var(--p6); border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.opt[aria-pressed="true"] { padding-inline-start: 38px; }
+.opt[disabled] { opacity: 0.38; cursor: not-allowed; }
+
+/* ── ‏סולם ── */
+.scale { display: flex; gap: 8px; }
+.scale button {
+  flex: 1; min-height: 54px; border-radius: 13px;
+  font-size: 17px; font-weight: 800; color: rgba(255,255,255,0.72);
+  background: linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
+  border: 1px solid rgba(168,85,247,0.24);
+  cursor: pointer; transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .scale button:hover { border-color: rgba(168,85,247,0.56); }
+}
+.scale button[aria-pressed="true"] {
+  border-color: var(--p5); background: rgba(124,58,237,0.32); color: #fff;
+}
+.scale-ends {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 9px;
+}
+
+/* ── ‏שדות ── */
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; font-size: 13.5px; font-weight: 700;
+  color: rgba(255,255,255,0.74); margin-bottom: 7px;
+}
+.field input, .field textarea, textarea.free {
+  width: 100%;
+  background: rgba(168,85,247,0.06);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 12px;
+  padding: 15px 17px;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--white);
+  outline: none;
+  direction: rtl;
+  text-align: right;
+  transition: border-color 0.25s, background 0.25s;
+}
+textarea.free { min-height: 108px; resize: vertical; }
+.field input::placeholder, textarea.free::placeholder { color: rgba(255,255,255,0.3); }
+.field input:focus, .field textarea:focus, textarea.free:focus {
+  border-color: rgba(168,85,247,0.75); background: rgba(168,85,247,0.1);
+}
+.field input[aria-invalid="true"], textarea.free[aria-invalid="true"] {
+  border-color: rgba(255,105,116,0.65);
+}
+.field-err { font-size: 12.5px; color: var(--err); margin-top: 6px; min-height: 16px; }
+
+.counter { font-size: 12px; color: rgba(255,255,255,0.32); margin-top: 6px; text-align: start; }
+
+/* ── ‏מתג "יחד או בנפרד" ── */
+.seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+  padding: 5px; margin-bottom: 26px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(168,85,247,0.2);
+  border-radius: 15px;
+}
+.seg button {
+  min-height: 46px; border: none; border-radius: 11px; cursor: pointer;
+  font-size: 14.5px; font-weight: 700; color: rgba(255,255,255,0.6);
+  background: transparent; transition: background 0.2s, color 0.2s;
+}
+.seg button[aria-pressed="true"] { background: rgba(124,58,237,0.42); color: #fff; }
+
+/* ── ‏כפתורים ── */
+.nav-row { display: flex; gap: 11px; align-items: center; margin-top: 30px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 26px; border: none; border-radius: 99px;
+  font-family: var(--font); font-size: 16px; font-weight: 700;
+  cursor: pointer; text-decoration: none; min-height: 52px;
+  transition: transform 0.22s, box-shadow 0.22s, background 0.22s, opacity 0.22s;
+}
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, var(--p4), var(--p5));
+  color: #fff;
+  box-shadow: 0 12px 34px -12px rgba(124,58,237,0.85);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
+}
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: grayscale(0.5); }
+
+.btn-ghost {
+  flex: none; padding: 16px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(168,85,247,0.26);
+  color: rgba(255,255,255,0.72);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover { background: rgba(255,255,255,0.09); color: #fff; }
+}
+.btn-ghost svg { width: 16px; height: 16px; }
+
+/* ── ‏הסכמה ── */
+.consent-box {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(168,85,247,0.22);
+  border-radius: 16px; padding: 19px 20px; margin-bottom: 20px;
+}
+.consent-box h3 { font-size: 15px; font-weight: 800; margin-bottom: 9px; }
+.consent-box p { font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,0.6); }
+.consent-box p + p { margin-top: 9px; }
+
+.consent { display: flex; align-items: flex-start; gap: 11px; margin: 4px 0 20px; cursor: pointer; }
+.consent input {
+  appearance: none; -webkit-appearance: none; flex-shrink: 0;
+  width: 21px; height: 21px; margin-top: 1px;
+  border-radius: 6px; border: 1px solid rgba(168,85,247,0.5);
+  background: rgba(168,85,247,0.08); cursor: pointer; position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+.consent input:checked { background: var(--p4); border-color: var(--p5); }
+.consent input:checked::after {
+  content: ''; position: absolute; left: 7px; top: 3px;
+  width: 5px; height: 11px; border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.consent span { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.74); }
+
+/* ── ‏סקירה לפני שליחה ── */
+.review-stage { margin-bottom: 22px; }
+.review-stage h3 {
+  font-size: 13px; font-weight: 800; letter-spacing: 1.5px;
+  color: var(--p6); margin-bottom: 11px;
+}
+.review-row {
+  border-top: 1px solid rgba(168,85,247,0.16);
+  padding: 12px 0;
+}
+.review-q { font-size: 13.5px; color: rgba(255,255,255,0.5); line-height: 1.5; margin-bottom: 4px; }
+.review-a { font-size: 15px; line-height: 1.65; color: rgba(255,255,255,0.92); white-space: pre-wrap; }
+.review-a.empty { color: rgba(255,255,255,0.3); font-style: italic; }
+.review-who { font-size: 11.5px; font-weight: 800; color: var(--p6); }
+
+.edit-link {
+  background: none; border: none; cursor: pointer; padding: 4px 0;
+  font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--p6);
+}
+
+/* ── ‏סיום ── */
+.done-ico {
+  width: 62px; height: 62px; margin: 0 auto 22px;
+  border-radius: 50%; display: grid; place-items: center;
+  background: rgba(47,217,139,0.12); border: 1px solid rgba(47,217,139,0.4);
+}
+.done-ico svg { width: 30px; height: 30px; color: var(--ok); }
+.done { text-align: center; }
+.done p { font-size: 16px; line-height: 1.85; color: rgba(255,255,255,0.74); margin-bottom: 26px; }
+
+/* ── ‏הודעות ── */
+.note {
+  border-radius: 13px; padding: 13px 16px; font-size: 13.5px; line-height: 1.65;
+  margin-bottom: 18px;
+}
+.note-err { background: rgba(255,105,116,0.1); border: 1px solid rgba(255,105,116,0.32); color: #ffc4c8; }
+.note-info { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: var(--p6); }
+.note .btn-inline {
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: var(--font); font-size: 13.5px; font-weight: 800;
+  color: inherit; text-decoration: underline; text-underline-offset: 3px;
+}
+
+.foot {
+  margin-top: auto; padding-top: 34px; text-align: center;
+  font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.3);
+}
+.foot a { color: rgba(255,255,255,0.46); text-underline-offset: 3px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+:focus-visible { outline: 2px solid var(--p5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="head">
+    <a class="brand" href="/">שוהם אבו · ליווי וייעוץ פיננסי</a>
+  </header>
+
+  <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="התקדמות בשאלון">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-note" id="progressNote"></div>
+
+  <!-- ─────────────────────────────── ‏בחירת שאלון ── -->
+  <section class="screen on" id="scPick">
+    <h1>בואו נבין יחד את <span class="accent">מערכת היחסים</span> שלכם עם הכסף</h1>
+    <p class="lede">כדי לבנות תוכנית כלכלית שמתאימה לחיים שלכם, חשוב לי להכיר לא רק את המספרים, אלא גם את המטרות, ההרגלים והדברים שחשובים לכם באמת.</p>
+
+    <div class="picks">
+      <button class="pick" type="button" id="pickIndividual">
+        <svg class="pick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.6 3.1-5.7 7-5.7s7 2.1 7 5.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <h2>שאלון ליחידים</h2>
+        <p>ארבעה שלבים קצרים על המטרות שלך, היחס שלך לכסף וההרגלים שמשפיעים על ההתנהלות. בערך שבע דקות.</p>
+        <span class="pick-go">מתחילים
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+
+      <button class="pick" type="button" id="pickCouple">
+        <svg class="pick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.4" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16.4" cy="9.4" r="2.7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.6 20c0-3.3 2.6-5.2 5.8-5.2 1.5 0 2.9.4 4 1.2M13.4 20c0-2.8 1.5-4.4 3.9-4.4 2.3 0 3.9 1.6 3.9 4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <h2>שאלון לזוגות</h2>
+        <p>ארבעה שלבים על היחס של כל אחד לכסף, על ההתנהלות המשותפת ועל העתיד שאתם רוצים לבנות. בערך עשר דקות.</p>
+        <span class="pick-go">מתחילים
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <div id="draftNote"></div>
+  </section>
+
+  <!-- ─────────────────────────────── ‏מי ממלא ── -->
+  <section class="screen" id="scWho">
+    <div class="step-count" id="whoCount"></div>
+    <h2 class="stage-title">כמה פרטים קצרים</h2>
+    <p class="stage-sub" id="whoSub"></p>
+    <div id="whoFields"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" type="button" id="whoBack" aria-label="חזרה">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-primary" type="button" id="whoNext">הבא</button>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── ‏שלב שאלות ── -->
+  <section class="screen" id="scStage">
+    <div class="step-count" id="stageCount"></div>
+    <h2 class="stage-title" id="stageTitle"></h2>
+    <p class="stage-sub" id="stageSub"></p>
+    <div id="stageSeg"></div>
+    <div id="stageBody"></div>
+    <div id="stageErr"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" type="button" id="stageBack" aria-label="חזרה לשלב הקודם">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-primary" type="button" id="stageNext">הבא</button>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── ‏סקירה ושליחה ── -->
+  <section class="screen" id="scReview">
+    <div class="step-count" id="reviewCount"></div>
+    <h2 class="stage-title">לפני ששולחים</h2>
+    <p class="stage-sub">זאת התמונה שתגיע אליי. אפשר לחזור ולשנות כל תשובה.</p>
+
+    <div id="reviewBody"></div>
+
+    <div class="consent-box">
+      <h3>מה קורה עם מה שכתבתם</h3>
+      <p>התשובות נשמרות אצלי לצורך פגישת ההיכרות והליווי, ומשמשות אותי בלבד. אני לא מעביר אותן לאף גורם אחר ולא משתמש בהן לפרסום.</p>
+      <p>אפשר לבקש ממני בכל רגע לראות מה נשמר או למחוק הכול, ואני עושה את זה.</p>
+    </div>
+
+    <label class="consent">
+      <input type="checkbox" id="consentBox">
+      <span id="consentText"></span>
+    </label>
+
+    <div id="sendErr"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" type="button" id="reviewBack" aria-label="חזרה לעריכה">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-primary" type="button" id="sendBtn" disabled>שליחת השאלון</button>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── ‏סיום ── -->
+  <section class="screen" id="scDone">
+    <div class="done">
+      <div class="done-ico">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.6l4.6 4.6L19 7.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1>תודה ששיתפתם אותי</h1>
+      <p>התשובות יעזרו לנו להגיע לפגישה מוכנים יותר, להבין מה חשוב לכם ולבנות יחד תוכנית כלכלית שמתאימה לחיים שלכם. אין כאן תשובות נכונות או שגויות · המטרה היא להבין את נקודת הפתיחה שלכם.</p>
+      <a class="btn btn-primary" href="/" style="max-width:280px;margin:0 auto">חזרה לאתר</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    שוהם אבו · ליווי וייעוץ פיננסי<br>
+    <a href="/">shohamfinance.co.il</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ‏אותו פרויקט ואותו מפתח ציבורי שהדשבורד והשאלון הקצר משתמשים
+   ‏בהם. אין כאן שום דבר סודי: כל כתיבה עוברת דרך intake_submit,
+   ‏והיא הדבר היחיד שיש לו הישג יד אל הטבלה. */
+var SUPABASE_URL = 'https://vplqocqmlquajwwnyeby.supabase.co';
+var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
+
+var $ = function (id) { return document.getElementById(id); };
+
+function uuid() {
+  try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+/* ═══════════════════════════════════ ‏השאלות ══ */
+/* ‏הכול נתונים. המסכים נבנים מהמבנה הזה ואין שום שאלה כתובה
+   ‏ביד ב-HTML · שינוי ניסוח הוא שינוי שורה אחת כאן. */
+
+var FEELING = ['ביטחון ושליטה', 'לחץ ודאגה', 'תסכול', 'חוסר ודאות', 'רצון להתקדם'];
+var CHILDHOOD = ['דיברו על כסף בפתיחות', 'כסף היה מקור למתח', 'הייתה תחושת מחסור',
+                 'לא דיברו על כסף', 'למדתי להתנהל עצמאית', 'מעדיף לא לשתף'];
+
+var INDIVIDUAL = {
+  kind: 'individual',
+  title: 'שאלון ליחידים',
+  stages: [
+    {
+      title: 'היכרות ומטרות',
+      sub: 'נתחיל במה שהביא אותך לכאן ובמה שאתה רוצה שישתנה.',
+      questions: [
+        { id: 'i1', type: 'text', required: true,
+          q: 'מה גרם לך לפנות לייעוץ פיננסי דווקא עכשיו?',
+          ph: 'מה קרה לאחרונה, או מה כבר מזמן מטריד' },
+        { id: 'i2', type: 'multi', max: 3, required: true,
+          q: 'מהן שלוש המטרות הכלכליות החשובות לך ביותר?',
+          options: ['יציאה ממינוס או מחובות', 'בניית חיסכון', 'רכישת דירה',
+                    'השקעות ובניית הון', 'שיפור רמת החיים',
+                    'הקמת עסק או פיתוח קריירה', 'הפחתת לחץ כלכלי'] },
+        { id: 'i3', type: 'text',
+          q: 'אם בעוד חצי שנה הליווי יצליח, מה היית רוצה שייראה אחרת בחיים שלך?',
+          ph: 'אפשר במשפט אחד' }
+      ]
+    },
+    {
+      title: 'היחס שלך לכסף',
+      sub: 'אין כאן תשובות נכונות. מה שנכון זה מה שבאמת קורה אצלך.',
+      questions: [
+        { id: 'i4', type: 'single', required: true, options: FEELING,
+          q: 'איזו תחושה עולה בך כשאתה חושב על המצב הכלכלי שלך?' },
+        { id: 'i5', type: 'single', required: true,
+          q: 'מה בדרך כלל קורה כשנכנסת המשכורת?',
+          options: ['חוסך תחילה', 'משלם התחייבויות ואז בודק מה נשאר',
+                    'מוציא ומנסה לחסוך בסוף', 'מרגיש צורך ליהנות מהכסף',
+                    'אין שיטה קבועה'] },
+        { id: 'i6', type: 'scale', required: true,
+          q: 'עד כמה אתה מרגיש שאתה שולט בהוצאות שלך?',
+          low: 'כמעט בכלל לא', high: 'שליטה מלאה' },
+        { id: 'i7', type: 'single', required: true, options: CHILDHOOD,
+          q: 'איך התנהלו אצלכם בבית עם כסף כשהיית צעיר?' },
+        { id: 'i8', type: 'single', required: true,
+          q: 'מה הכי קשה לך בהתנהלות הכלכלית?',
+          options: ['התמדה בחיסכון', 'קניות לא מתוכננות', 'מעקב אחר הוצאות',
+                    'חובות', 'דחיית סיפוקים', 'תעדוף מטרות', 'חוסר ודאות',
+                    'אין קושי משמעותי'] }
+      ]
+    },
+    {
+      title: 'הרגלים וקבלת החלטות',
+      sub: 'החלק הזה עוזר לי להבין איפה הכסף באמת נגמר.',
+      questions: [
+        { id: 'i9', type: 'single', required: true,
+          q: 'מה בדרך כלל משפיע על קנייה שלא תכננת?',
+          options: ['צורך אמיתי', 'פינוק', 'לחץ או יום קשה', 'מבצע',
+                    'השפעת הסביבה', 'קנייה ספונטנית', 'זה קורה לעיתים רחוקות'] },
+        { id: 'i10', type: 'single', required: true,
+          q: 'האם אתה נמנע לפעמים מלבדוק את חשבון הבנק או פירוט האשראי?',
+          options: ['בודק בקביעות', 'דוחה לפעמים', 'נמנע כי זה מלחיץ',
+                    'לא יודע בדיוק כמה אני מוציא'] },
+        { id: 'i11', type: 'scale', required: true,
+          q: 'עד כמה ההוצאות שלך משקפות את הדברים שבאמת חשובים לך?',
+          low: 'כמעט בכלל לא', high: 'במידה רבה' },
+        { id: 'i12', type: 'single', required: true,
+          q: 'האם אתה מרגיש לפעמים לחץ לשמור על רמת חיים מסוימת בגלל הסביבה?',
+          options: ['במידה רבה', 'לפעמים', 'לעיתים רחוקות', 'לא ממש'] },
+        { id: 'i13', type: 'text',
+          q: 'מה לדעתך עומד בינך לבין המטרות הכלכליות שלך?',
+          ph: 'מה שחוסם, בעיניך' }
+      ]
+    },
+    {
+      title: 'תוכנית להמשך',
+      sub: 'אחרון, ומכאן נבנה את הפגישה.',
+      questions: [
+        { id: 'i14', type: 'single', required: true,
+          q: 'איזה סוג ליווי יעזור לך ביותר?',
+          options: ['מסגרת ברורה', 'מעקב שוטף', 'הבנת הרגלים',
+                    'הגדלת חיסכון והכנסה', 'הפחתת לחץ', 'קבלת החלטות'] },
+        { id: 'i15', type: 'scale', required: true,
+          q: 'עד כמה אתה מוכן לבצע שינויים בהרגלים כדי להתקדם?',
+          low: 'מעדיף שלא', high: 'מוכן לגמרי' },
+        { id: 'i16', type: 'text',
+          q: 'האם יש משהו נוסף שחשוב לי לדעת לפני הפגישה?',
+          ph: 'כל דבר שלא נשאל כאן' }
+      ]
+    }
+  ]
+};
+
+var COUPLE = {
+  kind: 'couple',
+  title: 'שאלון לזוגות',
+  stages: [
+    {
+      title: 'היחס האישי של כל אחד לכסף',
+      sub: 'אפשר לענות יחד, ואפשר שכל אחד יענה בנפרד. בשני המקרים זה בסדר גמור.',
+      perPartner: true,
+      questions: [
+        { id: 'c1', type: 'single', required: true,
+          q: 'מה הכי חשוב לך לשנות במצב הכלכלי שלכם?',
+          options: ['יציאה ממינוס או חובות', 'חיסכון', 'רכישת דירה', 'השקעות',
+                    'איכות חיים', 'הפחתת מתחים', 'ביטחון כלכלי'] },
+        { id: 'c2', type: 'single', required: true, options: FEELING,
+          q: 'איזו תחושה עולה בך כשאתה חושב על המצב הכלכלי שלכם?' },
+        { id: 'c3', type: 'single', required: true, options: CHILDHOOD,
+          q: 'איך התנהלו אצלך בבית עם כסף כשהיית צעיר?' },
+        { id: 'c4', type: 'single', required: true,
+          q: 'מה כסף מסמל עבורך יותר מכול?',
+          options: ['ביטחון', 'חופש', 'הנאה', 'הצלחה', 'אחריות למשפחה'] },
+        { id: 'c5', type: 'text',
+          q: 'מה הכי קשה לך אישית בהתנהלות הכלכלית?',
+          ph: 'מה שקשה לך, לא לכם' }
+      ]
+    },
+    {
+      title: 'התנהלות משותפת',
+      sub: 'איך הכסף מתנהל ביניכם בפועל.',
+      questions: [
+        { id: 'c6', type: 'single', required: true,
+          q: 'איך מתקבלות החלטות על הוצאות גדולות?',
+          options: ['יחד', 'אחד מוביל', 'כל אחד מחליט בנפרד',
+                    'בהתאם להוצאה', 'יש קושי להסכים'] },
+        { id: 'c7', type: 'scale', required: true,
+          q: 'עד כמה אתם מתואמים בסדרי העדיפויות הכלכליים?',
+          low: 'כמעט בכלל לא', high: 'מתואמים מאוד' },
+        { id: 'c8', type: 'text',
+          q: 'כשאחד רוצה לחסוך והשני רוצה להוציא, מה קורה בדרך כלל?',
+          ph: 'מה קורה בפועל, גם אם זה לא נעים' },
+        { id: 'c9', type: 'scale', required: true,
+          q: 'עד כמה נוח לכם לדבר על כסף בלי להרגיש ביקורת או האשמה?',
+          low: 'לא נוח בכלל', high: 'נוח מאוד' },
+        { id: 'c10', type: 'multi', required: true,
+          q: 'האם יש נושאים כלכליים שאתם נמנעים מלדבר עליהם?',
+          options: ['הוצאות אישיות', 'חובות', 'עזרה למשפחה', 'רכישות גדולות',
+                    'פערי שכר', 'השקעות', 'אין נושאים כאלה',
+                    'מעדיפים לדבר בפגישה'] },
+        { id: 'c11', type: 'text',
+          q: 'מה כל אחד מכם מרגיש שהוא צריך יותר מבן או בת הזוג בנושא הכסף?',
+          ph: 'אפשר לכתוב על שניכם כאן' }
+      ]
+    },
+    {
+      title: 'הרגלים ולחצים',
+      sub: 'מה מושך את הכסף החוצה, ומה קורה כשחורגים.',
+      questions: [
+        { id: 'c12', type: 'multi', required: true,
+          q: 'מה בדרך כלל משפיע על ההוצאות שלכם?',
+          options: ['חוסר זמן', 'בילויים', 'ילדים ומשפחה', 'לחץ בעבודה',
+                    'רשתות חברתיות', 'קניות ספונטניות', 'הוצאות קבועות',
+                    'חוסר בהירות'] },
+        { id: 'c13', type: 'text', required: true,
+          q: 'האם אתם מרגישים שאתם חיים בהתאם ליכולת הכלכלית שלכם?',
+          ph: 'כן, לא, או תלוי בחודש' },
+        { id: 'c14', type: 'scale', required: true,
+          q: 'עד כמה אתם מסכימים על מהי הוצאה חשובה ומה אפשר לצמצם?',
+          low: 'כמעט אף פעם', high: 'כמעט תמיד' },
+        { id: 'c15', type: 'text',
+          q: 'כשיש חריגה מהתקציב, איך אתם מגיבים?',
+          ph: 'מדברים, מתעלמים, מתווכחים' },
+        { id: 'c16', type: 'text',
+          q: 'איזו הוצאה הייתם רוצים לבחון מחדש, בלי לוותר על איכות החיים?',
+          ph: 'משהו שמרגיש גדול מדי ביחס למה שהוא נותן' }
+      ]
+    },
+    {
+      title: 'עתיד משותף',
+      sub: 'לאן אתם רוצים להגיע, ואיך תדעו שהגעתם.',
+      questions: [
+        { id: 'c17', type: 'multi', max: 3, required: true,
+          q: 'מהם שלושת היעדים הכלכליים המשותפים שלכם?',
+          options: ['קרן חירום', 'סגירת חובות', 'דירה', 'חיסכון לילדים',
+                    'השקעות', 'חופשות', 'הגדלת הכנסה',
+                    'צמצום שעות עבודה בעתיד'] },
+        { id: 'c18', type: 'single', required: true,
+          q: 'איך הייתם רוצים לנהל את הכסף?',
+          options: ['תקציב משותף', 'חשבון משותף לצד חשבונות אישיים',
+                    'חשבונות נפרדים עם חלוקת הוצאות', 'עדיין לא החלטנו'] },
+        { id: 'c19', type: 'text',
+          q: 'מה כל אחד מכם לא רוצה לאבד בדרך לשיפור המצב הכלכלי?',
+          ph: 'משהו שחשוב לשמור עליו' },
+        { id: 'c20', type: 'text',
+          q: 'בעוד שנה, איך תדעו שהתהליך הצליח?',
+          ph: 'מה יהיה שונה' },
+        { id: 'c21', type: 'text',
+          q: 'מה חשוב לכם שאדע על ההתנהלות שלכם כזוג לפני שנתחיל?',
+          ph: 'כל דבר שלא נשאל כאן' }
+      ]
+    }
+  ]
+};
+
+/* ═══════════════════════════════════ ‏המצב ══ */
+
+var S = {
+  form: null,        /* INDIVIDUAL או COUPLE */
+  step: 0,           /* 0 = מי ממלא, 1..n = שלבים, n+1 = סקירה */
+  who: {},           /* ‏שם, טלפון, אימייל, שמות בני הזוג */
+  answers: {},       /* ‏מזהה שאלה אל תשובה. בזוגות בנפרד: {a:…, b:…} */
+  split: false,      /* ‏בזוגות · כל אחד עונה בנפרד */
+  startedAt: null,
+  submitToken: null,
+  sending: false
+};
+
+/* ‏קישור אישי. הדשבורד יכול לתת ללקוח כתובת עם ?t=…, וכך התשובות
+   ‏מגיעות מקושרות אליו בלי שיקליד שום דבר נוסף. */
+var LINK_TOKEN = (function () {
+  try {
+    var t = new URLSearchParams(location.search).get('t');
+    return /^[0-9a-f-]{36}$/i.test(t || '') ? t : null;
+  } catch (e) { return null; }
+})();
+
+var CONSENT_TEXT = 'אני מאשר ששוהם אבו ישמור את התשובות שלי לצורך פגישת ההיכרות והליווי.';
+
+/* ═══════════════════════════════════ ‏טיוטה ══ */
+/* ‏הטיוטה יושבת בדפדפן של מי שממלא ולא אצלי. אדם שמתחיל למלא
+   ‏ולא מסיים לא השאיר אצלי שום דבר, וזה גם מה שמבטיח שמי
+   ‏שמתחרט פשוט סוגר את הדף והכול נעלם. */
+var DRAFT_KEY = 'shoham_intake_draft';
+
+function saveDraft() {
+  if (!S.form) return;
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      kind: S.form.kind, step: S.step, who: S.who, answers: S.answers,
+      split: S.split, startedAt: S.startedAt, submitToken: S.submitToken,
+      at: Date.now()
+    }));
+  } catch (e) { /* ‏מצב פרטי · הטיוטה פשוט לא תישמר */ }
+}
+
+function readDraft() {
+  try {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    var d = JSON.parse(raw);
+    /* ‏טיוטה בת יותר משבועיים כבר לא רלוונטית לפגישה שנקבעה. */
+    if (!d || !d.kind || !d.at || Date.now() - d.at > 14 * 864e5) return null;
+    return d;
+  } catch (e) { return null; }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+}
+
+/* ═══════════════════════════════════ ‏עזרי בנייה ══ */
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+function show(id) {
+  var ids = ['scPick', 'scWho', 'scStage', 'scReview', 'scDone'];
+  for (var i = 0; i < ids.length; i++) $(ids[i]).classList.toggle('on', ids[i] === id);
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function note(host, cls, text) {
+  clear(host);
+  if (!text) return;
+  host.appendChild(el('div', 'note ' + cls, text));
+}
+
+/* ‏מי עונה · בזוגות שנענה בנפרד כל שאלה מופיעה פעמיים. */
+function partners() {
+  return S.split ? [
+    { key: 'a', name: S.who.partnerA || 'בן/בת זוג א׳' },
+    { key: 'b', name: S.who.partnerB || 'בן/בת זוג ב׳' }
+  ] : [{ key: null, name: null }];
+}
+
+function getAns(q, whoKey) {
+  var v = S.answers[q.id];
+  if (whoKey) return (v && typeof v === 'object' && !Array.isArray(v)) ? v[whoKey] : undefined;
+  return v;
+}
+
+function setAns(q, whoKey, value) {
+  if (whoKey) {
+    var cur = S.answers[q.id];
+    if (!cur || typeof cur !== 'object' || Array.isArray(cur)) cur = {};
+    cur[whoKey] = value;
+    S.answers[q.id] = cur;
+  } else {
+    S.answers[q.id] = value;
+  }
+  saveDraft();
+}
+
+function isAnswered(v, type) {
+  if (v == null) return false;
+  if (type === 'multi') return Array.isArray(v) && v.length > 0;
+  if (type === 'text') return String(v).trim().length > 0;
+  return String(v).length > 0;
+}
+
+/* ═══════════════════════════════════ ‏התקדמות ══ */
+
+function totalSteps() { return S.form ? S.form.stages.length + 2 : 0; }
+
+function paintProgress() {
+  var on = !!S.form && S.step >= 0;
+  $('progress').classList.toggle('on', on);
+  if (!on) { $('progressNote').textContent = ''; return; }
+  var pct = Math.round((S.step / (totalSteps() - 1)) * 100);
+  $('progressFill').style.width = pct + '%';
+  $('progress').setAttribute('aria-valuenow', String(pct));
+  $('progressNote').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
+}
+
+/* ═══════════════════════════════════ ‏מסך מי ממלא ══ */
+
+var WHO_FIELDS = {
+  individual: [
+    { k: 'name',  label: 'שם מלא', ph: 'איך לפנות אליך', required: true, cap: 80 },
+    { k: 'phone', label: 'טלפון', ph: '050-000-0000', required: true, type: 'tel', cap: 40 },
+    { k: 'email', label: 'אימייל', ph: 'לא חובה', type: 'email', cap: 120 }
+  ],
+  couple: [
+    { k: 'partnerA', label: 'שם בן או בת זוג א׳', ph: 'השם הראשון', required: true, cap: 80 },
+    { k: 'partnerB', label: 'שם בן או בת זוג ב׳', ph: 'השם השני', required: true, cap: 80 },
+    { k: 'phone',    label: 'טלפון ליצירת קשר', ph: '050-000-0000', required: true, type: 'tel', cap: 40 },
+    { k: 'email',    label: 'אימייל', ph: 'לא חובה', type: 'email', cap: 120 }
+  ]
+};
+
+function renderWho() {
+  var host = $('whoFields');
+  clear(host);
+  $('whoCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
+  $('whoSub').textContent = S.form.kind === 'couple'
+    ? 'השמות עוזרים לי לדעת מי ענה מה, והטלפון כדי לחזור אליכם.'
+    : 'רק כדי שאדע מי ממלא ואיך לחזור אליך.';
+
+  var fields = WHO_FIELDS[S.form.kind];
+  fields.forEach(function (f) {
+    var wrap = el('div', 'field');
+    var id = 'who_' + f.k;
+    var lab = el('label', null, f.label + (f.required ? '' : ' · לא חובה'));
+    lab.setAttribute('for', id);
+    var inp = document.createElement('input');
+    inp.id = id;
+    inp.type = f.type || 'text';
+    inp.placeholder = f.ph;
+    inp.maxLength = f.cap;
+    inp.value = S.who[f.k] || '';
+    if (f.k === 'phone') inp.setAttribute('inputmode', 'tel');
+    if (f.k === 'name' || f.k === 'partnerA' || f.k === 'partnerB') inp.autocomplete = 'name';
+    if (f.k === 'email') inp.autocomplete = 'email';
+    if (f.k === 'phone') inp.autocomplete = 'tel';
+    var err = el('div', 'field-err');
+    err.id = id + '_err';
+    inp.addEventListener('input', function () {
+      S.who[f.k] = inp.value;
+      inp.removeAttribute('aria-invalid');
+      err.textContent = '';
+      saveDraft();
+    });
+    wrap.appendChild(lab); wrap.appendChild(inp); wrap.appendChild(err);
+    host.appendChild(wrap);
+  });
+}
+
+/* ‏תשעה ספרות אחרי שמסירים כל מה שאינו ספרה · אותה בדיקה בדיוק
+   ‏שהשרת עושה, כדי שלא יישלח משהו שייענה בסירוב. */
+function phoneOk(p) {
+  return String(p || '').replace(/\D/g, '').length >= 9;
+}
+
+function emailOk(e) {
+  var v = String(e || '').trim();
+  return v === '' || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+}
+
+function validateWho() {
+  var fields = WHO_FIELDS[S.form.kind];
+  var firstBad = null;
+  fields.forEach(function (f) {
+    var inp = $('who_' + f.k), err = $('who_' + f.k + '_err');
+    if (!inp) return;
+    var v = (inp.value || '').trim();
+    var msg = '';
+    if (f.required && !v) msg = 'צריך למלא את השדה הזה';
+    else if (f.k === 'phone' && v && !phoneOk(v)) msg = 'מספר טלפון לא תקין';
+    else if (f.k === 'email' && !emailOk(v)) msg = 'כתובת אימייל לא תקינה';
+    err.textContent = msg;
+    if (msg) {
+      inp.setAttribute('aria-invalid', 'true');
+      if (!firstBad) firstBad = inp;
+    } else {
+      inp.removeAttribute('aria-invalid');
+    }
+  });
+  if (firstBad) { firstBad.focus(); firstBad.scrollIntoView({ block: 'center' }); return false; }
+  return true;
+}
+
+/* ═══════════════════════════════════ ‏מסך שלב ══ */
+
+function renderStage() {
+  var stage = S.form.stages[S.step - 1];
+  $('stageCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
+  $('stageTitle').textContent = stage.title;
+  $('stageSub').textContent = stage.sub || '';
+  note($('stageErr'), '', '');
+
+  /* ‏המתג "יחד או בנפרד" · רק בשלב שמסומן כאישי בשאלון הזוגות. */
+  var seg = $('stageSeg');
+  clear(seg);
+  if (stage.perPartner) {
+    var box = el('div', 'seg');
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', 'איך למלא את השלב הזה');
+    [['יחד', false], ['כל אחד בנפרד', true]].forEach(function (pair) {
+      var b = el('button', null, pair[0]);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(S.split === pair[1]));
+      b.addEventListener('click', function () {
+        if (S.split === pair[1]) return;
+        S.split = pair[1];
+        /* ‏המעבר בין המצבים לא שומר תשובות · הצורה שלהן שונה,
+           ‏ולנחש איזו משתי התשובות "האמיתית" היה גרוע מלשאול שוב. */
+        stage.questions.forEach(function (q) { delete S.answers[q.id]; });
+        saveDraft();
+        renderStage();
+      });
+      box.appendChild(b);
+    });
+    seg.appendChild(box);
+  }
+
+  var host = $('stageBody');
+  clear(host);
+  var perPartner = !!stage.perPartner && S.split;
+
+  stage.questions.forEach(function (q) {
+    (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
+      host.appendChild(buildQuestion(q, p));
+    });
+  });
+}
+
+function buildQuestion(q, who) {
+  var wrap = el('div', 'q');
+  var fieldId = 'q_' + q.id + (who.key ? '_' + who.key : '');
+
+  if (who.name) wrap.appendChild(el('span', 'who-tag', who.name));
+
+  var qt = el('div', 'q-text');
+  qt.id = fieldId + '_label';
+  qt.appendChild(document.createTextNode(q.q));
+  if (!q.required) qt.appendChild(el('span', 'q-opt-note', '· לא חובה'));
+  wrap.appendChild(qt);
+
+  if (q.type === 'multi') {
+    wrap.appendChild(el('div', 'q-hint',
+      q.max ? ('אפשר לבחור עד ' + q.max) : 'אפשר לבחור יותר מאחת'));
+  }
+
+  if (q.type === 'single' || q.type === 'multi') {
+    wrap.appendChild(buildOptions(q, who, fieldId));
+  } else if (q.type === 'scale') {
+    wrap.appendChild(buildScale(q, who, fieldId));
+  } else {
+    wrap.appendChild(buildText(q, who, fieldId));
+  }
+
+  var err = el('div', 'field-err');
+  err.id = fieldId + '_err';
+  wrap.appendChild(err);
+  return wrap;
+}
+
+function buildOptions(q, who, fieldId) {
+  var box = el('div', 'opts');
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-labelledby', fieldId + '_label');
+
+  q.options.forEach(function (opt) {
+    var b = el('button', 'opt', opt);
+    b.type = 'button';
+    var cur = getAns(q, who.key);
+    var on = q.type === 'multi'
+      ? (Array.isArray(cur) && cur.indexOf(opt) > -1)
+      : cur === opt;
+    b.setAttribute('aria-pressed', String(on));
+
+    b.addEventListener('click', function () {
+      if (q.type === 'single') {
+        setAns(q, who.key, opt);
+      } else {
+        var list = getAns(q, who.key);
+        list = Array.isArray(list) ? list.slice() : [];
+        var at = list.indexOf(opt);
+        if (at > -1) list.splice(at, 1);
+        else {
+          /* ‏התקרה היא בקשה, לא מלכודת · מי שבחר שלוש וכעת רוצה
+             ‏רביעית מקבל הסבר ולא כפתור מת. */
+          if (q.max && list.length >= q.max) {
+            $(fieldId + '_err').textContent = 'אפשר לבחור עד ' + q.max + '. הסירו אחת כדי להחליף.';
+            return;
+          }
+          list.push(opt);
+        }
+        setAns(q, who.key, list);
+      }
+      $(fieldId + '_err').textContent = '';
+      repaintGroup(q, who, box, fieldId);
+    });
+
+    box.appendChild(b);
+  });
+  return box;
+}
+
+function repaintGroup(q, who, box, fieldId) {
+  var cur = getAns(q, who.key);
+  var kids = box.children;
+  for (var i = 0; i < kids.length; i++) {
+    var opt = q.options[i];
+    var on = q.type === 'multi'
+      ? (Array.isArray(cur) && cur.indexOf(opt) > -1)
+      : cur === opt;
+    kids[i].setAttribute('aria-pressed', String(on));
+  }
+}
+
+function buildScale(q, who, fieldId) {
+  var box = el('div');
+  var row = el('div', 'scale');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-labelledby', fieldId + '_label');
+
+  for (var n = 1; n <= 5; n++) {
+    (function (n) {
+      var b = el('button', null, String(n));
+      b.type = 'button';
+      b.setAttribute('aria-label', n + ' מתוך 5');
+      b.setAttribute('aria-pressed', String(getAns(q, who.key) === n));
+      b.addEventListener('click', function () {
+        setAns(q, who.key, n);
+        $(fieldId + '_err').textContent = '';
+        var kids = row.children;
+        for (var i = 0; i < kids.length; i++) {
+          kids[i].setAttribute('aria-pressed', String(i + 1 === n));
+        }
+      });
+      row.appendChild(b);
+    })(n);
+  }
+  box.appendChild(row);
+
+  var ends = el('div', 'scale-ends');
+  ends.appendChild(el('span', null, q.low || '1'));
+  ends.appendChild(el('span', null, q.high || '5'));
+  box.appendChild(ends);
+  return box;
+}
+
+function buildText(q, who, fieldId) {
+  var box = el('div');
+  var ta = document.createElement('textarea');
+  ta.className = 'free';
+  ta.id = fieldId;
+  ta.placeholder = q.ph || '';
+  ta.maxLength = 1200;
+  ta.setAttribute('aria-labelledby', fieldId + '_label');
+  var cur = getAns(q, who.key);
+  ta.value = cur == null ? '' : String(cur);
+
+  var count = el('div', 'counter');
+  function paintCount() {
+    count.textContent = ta.value.length > 900 ? (ta.value.length + ' מתוך 1200 תווים') : '';
+  }
+  paintCount();
+
+  ta.addEventListener('input', function () {
+    setAns(q, who.key, ta.value);
+    ta.removeAttribute('aria-invalid');
+    $(fieldId + '_err').textContent = '';
+    paintCount();
+  });
+
+  box.appendChild(ta);
+  box.appendChild(count);
+  return box;
+}
+
+function validateStage() {
+  var stage = S.form.stages[S.step - 1];
+  var perPartner = !!stage.perPartner && S.split;
+  var firstBad = null;
+
+  stage.questions.forEach(function (q) {
+    (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
+      var fieldId = 'q_' + q.id + (p.key ? '_' + p.key : '');
+      var err = $(fieldId + '_err');
+      if (!err) return;
+      if (!q.required) { err.textContent = ''; return; }
+      var ok = isAnswered(getAns(q, p.key), q.type);
+      err.textContent = ok ? '' : (q.type === 'text' ? 'צריך לכתוב משהו כאן' : 'צריך לבחור תשובה');
+      if (!ok && !firstBad) firstBad = err.parentNode;
+    });
+  });
+
+  if (firstBad) {
+    firstBad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    var ta = firstBad.querySelector('textarea');
+    if (ta) ta.focus({ preventScroll: true });
+    note($('stageErr'), 'note-err', 'נשארו כמה שאלות בלי תשובה. הן מסומנות למעלה.');
+    return false;
+  }
+  note($('stageErr'), '', '');
+  return true;
+}
+
+/* ═══════════════════════════════════ ‏סקירה ══ */
+
+function answerText(q, whoKey) {
+  var v = getAns(q, whoKey);
+  if (!isAnswered(v, q.type)) return null;
+  if (Array.isArray(v)) return v.join(' · ');
+  if (q.type === 'scale') return v + ' מתוך 5';
+  return String(v).trim();
+}
+
+function renderReview() {
+  $('reviewCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
+  var host = $('reviewBody');
+  clear(host);
+
+  S.form.stages.forEach(function (stage, idx) {
+    var block = el('div', 'review-stage');
+    var head = el('h3', null, stage.title);
+    block.appendChild(head);
+
+    var perPartner = !!stage.perPartner && S.split;
+    stage.questions.forEach(function (q) {
+      (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
+        var row = el('div', 'review-row');
+        var qd = el('div', 'review-q');
+        if (p.name) {
+          qd.appendChild(el('span', 'review-who', p.name + ' · '));
+        }
+        qd.appendChild(document.createTextNode(q.q));
+        row.appendChild(qd);
+        var txt = answerText(q, p.key);
+        row.appendChild(el('div', 'review-a' + (txt ? '' : ' empty'), txt || 'לא נענה'));
+        block.appendChild(row);
+      });
+    });
+
+    var edit = el('button', 'edit-link', 'חזרה לעריכת השלב הזה');
+    edit.type = 'button';
+    edit.addEventListener('click', function () { goto(idx + 1); });
+    block.appendChild(edit);
+    host.appendChild(block);
+  });
+
+  $('consentText').textContent = CONSENT_TEXT;
+  $('sendBtn').disabled = !$('consentBox').checked;
+}
+
+/* ═══════════════════════════════════ ‏ניווט ══ */
+
+function goto(step) {
+  S.step = step;
+  saveDraft();
+  paintProgress();
+  if (step === 0) { renderWho(); show('scWho'); }
+  else if (step <= S.form.stages.length) { renderStage(); show('scStage'); }
+  else { renderReview(); show('scReview'); }
+}
+
+function startForm(form, resume) {
+  S.form = form;
+  if (!resume) {
+    S.who = {}; S.answers = {}; S.split = false;
+    S.startedAt = new Date().toISOString();
+    S.submitToken = uuid();
+  }
+  if (!S.submitToken) S.submitToken = uuid();
+  if (!S.startedAt) S.startedAt = new Date().toISOString();
+  goto(resume ? Math.min(S.step, S.form.stages.length + 1) : 0);
+}
+
+/* ═══════════════════════════════════ ‏שליחה ══ */
+
+function buildPayload() {
+  return S.form.stages.map(function (stage) {
+    var perPartner = !!stage.perPartner && S.split;
+    var items = [];
+    stage.questions.forEach(function (q) {
+      (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
+        var txt = answerText(q, p.key);
+        var item = { q: q.q, a: txt == null ? '' : txt };
+        if (p.name) item.who = p.name;
+        items.push(item);
+      });
+    });
+    return { stage: stage.title, items: items };
+  });
+}
+
+var REASONS = {
+  no_consent: 'צריך לאשר את השמירה לפני השליחה.',
+  bad_kind: 'משהו השתבש בזיהוי סוג השאלון. רעננו את הדף ונסו שוב.',
+  bad_answers: 'התשובות ארוכות מדי לשליחה. קצרו מעט את התשובות הפתוחות ונסו שוב.',
+  not_identified: 'צריך שם וטלפון תקין. אפשר לחזור ולתקן אותם בשלב הראשון.',
+  too_many_attempts: 'נשלחו כבר כמה שאלונים מהמספר הזה בשעה האחרונה. נסו שוב בעוד שעה, או שלחו לי הודעה.'
+};
+
+function send() {
+  if (S.sending) return;
+  if (!$('consentBox').checked) return;
+
+  S.sending = true;
+  var btn = $('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'שולח…';
+  note($('sendErr'), '', '');
+
+  var body = {
+    p_kind: S.form.kind,
+    p_answers: buildPayload(),
+    p_token: LINK_TOKEN,
+    p_submit_token: S.submitToken,
+    p_name: S.form.kind === 'couple'
+      ? ((S.who.partnerA || '') + ' ו' + (S.who.partnerB || '')).trim()
+      : (S.who.name || '').trim(),
+    p_phone: (S.who.phone || '').trim(),
+    p_email: (S.who.email || '').trim() || null,
+    p_partner_a: S.who.partnerA || null,
+    p_partner_b: S.who.partnerB || null,
+    p_consent: true,
+    p_consent_text: CONSENT_TEXT,
+    p_started_at: S.startedAt
+  };
+
+  fetch(SUPABASE_URL + '/rest/v1/rpc/intake_submit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_PUBLISHABLE_KEY
+    },
+    body: JSON.stringify(body)
+  }).then(function (r) {
+    if (!r.ok) throw new Error('http ' + r.status);
+    return r.json();
+  }).then(function (res) {
+    if (res && res.ok) {
+      clearDraft();
+      $('progress').classList.remove('on');
+      $('progressNote').textContent = '';
+      show('scDone');
+      return;
+    }
+    throw { reason: (res && res.reason) || 'unknown' };
+  }).catch(function (e) {
+    S.sending = false;
+    btn.disabled = false;
+    btn.textContent = 'שליחת השאלון';
+    var msg = (e && e.reason && REASONS[e.reason]) ||
+      'השליחה לא עברה. בדקו את החיבור לרשת ונסו שוב · התשובות שלכם נשמרו כאן ולא הלכו לאיבוד.';
+    note($('sendErr'), 'note-err', msg);
+    $('sendErr').scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+}
+
+/* ═══════════════════════════════════ ‏חיווט ══ */
+
+$('pickIndividual').addEventListener('click', function () { clearDraft(); startForm(INDIVIDUAL, false); });
+$('pickCouple').addEventListener('click', function () { clearDraft(); startForm(COUPLE, false); });
+
+$('whoBack').addEventListener('click', function () {
+  S.form = null;
+  paintProgress();
+  show('scPick');
+});
+$('whoNext').addEventListener('click', function () {
+  if (validateWho()) goto(1);
+});
+
+$('stageBack').addEventListener('click', function () { goto(S.step - 1); });
+$('stageNext').addEventListener('click', function () {
+  if (validateStage()) goto(S.step + 1);
+});
+
+$('reviewBack').addEventListener('click', function () { goto(S.form.stages.length); });
+$('consentBox').addEventListener('change', function () {
+  $('sendBtn').disabled = !this.checked;
+});
+$('sendBtn').addEventListener('click', send);
+
+/* ‏המשך מהמקום שעצרו. מוצע ולא נכפה · מי שחוזר לדף כדי להתחיל
+   ‏מחדש לא צריך למחוק ידנית תשובות ישנות. */
+(function offerDraft() {
+  var d = readDraft();
+  if (!d) return;
+  var form = d.kind === 'couple' ? COUPLE : INDIVIDUAL;
+  var host = $('draftNote');
+  var box = el('div', 'note note-info');
+  box.appendChild(document.createTextNode('התחלתם למלא את ה' + form.title.replace('שאלון ', 'שאלון ') + ' ולא סיימתם. '));
+  var go = el('button', 'btn-inline', 'להמשיך מהמקום שעצרתם');
+  go.type = 'button';
+  go.addEventListener('click', function () {
+    S.who = d.who || {};
+    S.answers = d.answers || {};
+    S.split = !!d.split;
+    S.step = d.step || 0;
+    S.startedAt = d.startedAt || new Date().toISOString();
+    S.submitToken = d.submitToken || uuid();
+    startForm(form, true);
+  });
+  box.appendChild(go);
+  box.appendChild(document.createTextNode(' · '));
+  var drop = el('button', 'btn-inline', 'להתחיל מחדש');
+  drop.type = 'button';
+  drop.addEventListener('click', function () { clearDraft(); clear(host); });
+  box.appendChild(drop);
+  host.appendChild(box);
+})();
+
+paintProgress();
+})();
+</script>
+</body>
+</html>

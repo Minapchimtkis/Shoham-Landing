@@ -5,4 +5,9 @@ Allow: /
 # The dashboard is behind a login and has nothing to offer a search engine.
 Disallow: /admin/
 
+# The intake questionnaire is sent to a client before a meeting. It is not
+# marketing, and a stranger who found it in search and filled it in would
+# just be noise in the list.
+Disallow: /intake.html
+
 Sitemap: https://shohamfinance.co.il/sitemap.xml
