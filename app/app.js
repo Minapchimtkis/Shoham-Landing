@@ -4019,7 +4019,7 @@ function openDebt(d) {
 }
 
 $('setDebts').addEventListener('click', () => tab('debts'));
-$('debtsBack').addEventListener('click', () => tab('set'));
+$('debtsBack').addEventListener('click', () => tab(SUB.debts));
 $('debtAdd').addEventListener('click', () => openDebt(null));
 $('debtCancel').addEventListener('click', closeSheet);
 
@@ -4576,7 +4576,7 @@ function openTools() {
 }
 
 $('setTools').addEventListener('click', () => tab('tools'));
-$('toolsBack').addEventListener('click', () => tab('set'));
+$('toolsBack').addEventListener('click', () => tab(SUB.tools));
 $('toolGrow').addEventListener('click', () => pickTool('grow'));
 $('toolPay').addEventListener('click', () => pickTool('pay'));
 $('calcGrow').addEventListener('input', growLive);
@@ -5870,7 +5870,7 @@ $('setWa').addEventListener('click', () => {
 });
 
 $('setPrivacy').addEventListener('click', () => tab('privacy'));
-$('privacyBack').addEventListener('click', () => tab('set'));
+$('privacyBack').addEventListener('click', () => tab(SUB.privacy));
 /* ‏שתי הפעולות שבתחתית מסך הפרטיות הן בדיוק אלה שבהגדרות · אותו
    ‏קוד, ולא עותק שני שיתיישן. */
 $('privExport').addEventListener('click', () => $('setExport').click());
@@ -5880,13 +5880,13 @@ $('setDocs').addEventListener('click', () => tab('docs'));
 $('setSum').addEventListener('click', () => tab('sum'));
 $('setYear').addEventListener('click', () => tab('year'));
 $('setAssets').addEventListener('click', () => tab('assets'));
-$('assetsBack').addEventListener('click', () => tab('set'));
-$('yearBack').addEventListener('click', () => tab('set'));
+$('assetsBack').addEventListener('click', () => tab(SUB.assets));
+$('yearBack').addEventListener('click', () => tab(SUB.year));
 $('setGoals').addEventListener('click', () => tab('goals'));
-$('importBack').addEventListener('click', () => tab('set'));
-$('docsBack').addEventListener('click', () => tab('set'));
-$('sumBack').addEventListener('click', () => tab('set'));
-$('goalsBack').addEventListener('click', () => tab('set'));
+$('importBack').addEventListener('click', () => tab(SUB.import));
+$('docsBack').addEventListener('click', () => tab(SUB.docs));
+$('sumBack').addEventListener('click', () => tab(SUB.sum));
+$('goalsBack').addEventListener('click', () => tab(SUB.goals));
 
 /* ‏חיפוש בהקלדה, בלי השהיה: הכל כבר בזיכרון. */
 $('txSearch').addEventListener('input', () => renderTx());
