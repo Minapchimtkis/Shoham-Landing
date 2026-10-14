@@ -105,54 +105,68 @@ body::before {
 }
 
 .head { text-align: center; margin-bottom: 26px; }
+/* ‏מרווח אותיות נועד לרישיות לטיניות. בעברית הוא פשוט מותח
+   ‏את המילה ועושה אותה קשה לקריאה · נמדד על המסך. */
 .brand {
-  font-size: 13px; font-weight: 700; letter-spacing: 3px;
-  color: var(--p6); text-shadow: 0 0 18px rgba(168,85,247,0.5);
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover { color: var(--p6); }
 }
 
-/* ── ‏ההתקדמות ── */
-.progress {
-  height: 4px; background: rgba(168,85,247,0.16);
-  border-radius: 99px; overflow: hidden;
-  margin: 22px 0 10px; opacity: 0; transition: opacity 0.3s;
+/* ── ‏מסילת השלבים ──
+   ‏השאלון הוא רצף אמיתי של ארבעה שלבים, ולכן סימון לכל שלב
+   ‏אומר משהו: כמה היו, איפה אני, כמה נשאר. סרגל מתמלא בגרדיאנט
+   ‏היה מראה אחוז · מספר שאיש לא צריך. כאן גם שם השלב, ולכן
+   ‏התווית שהיתה מעל כל כותרת מיותרת ונמחקה. */
+.rail { margin: 20px 0 30px; opacity: 0; transition: opacity 0.25s; }
+.rail.on { opacity: 1; }
+.rail-marks { display: flex; gap: 5px; }
+.rail-marks i {
+  flex: 1; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  transition: background 0.3s;
 }
-.progress.on { opacity: 1; }
-.progress-fill {
-  height: 100%; width: 0%; border-radius: 99px;
-  background: linear-gradient(90deg, var(--p4), var(--p5));
-  transition: width 0.45s cubic-bezier(0.22,1,0.36,1);
+.rail-marks i.done { background: rgba(168,85,247,0.45); }
+.rail-marks i.now  { background: var(--p5); }
+.rail-name {
+  margin-top: 11px; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.46);
 }
-.progress-note {
-  font-size: 12px; font-weight: 600; letter-spacing: 1px;
-  color: rgba(255,255,255,0.4); text-align: center;
-  margin-bottom: 26px; min-height: 17px;
-}
+.rail-name b { color: rgba(255,255,255,0.82); font-weight: 700; }
 
 /* ── ‏מסכים ── */
 .screen { display: none; }
-.screen.on { display: block; animation: rise 0.42s cubic-bezier(0.22,1,0.36,1); }
+/* ‏הופעה בלבד. החלקה מלמטה בכל מסך היא אפקט שחוזר על עצמו
+   ‏שש פעמים ומושך תשומת לב למעבר במקום לשאלה שבו. */
+.screen.on { display: block; animation: fade 0.22s ease-out; }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
   .screen.on { animation: none; }
-  .progress-fill { transition: none; }
+  .rail, .rail-marks i { transition: none; }
 }
 
+/* ‏מילה אחת בכותרת בגרדיאנט היא הסימן המובהק ביותר לעמוד
+   ‏שנוצר אוטומטית. ההבדל בין שתי השורות עושה את אותה עבודה:
+   ‏הראשונה קטנה ושקטה, השנייה גדולה · וזה גם קורא נכון יותר,
+   ‏כי "מערכת היחסים שלכם עם הכסף" הוא הדבר, ו"בואו נבין יחד"
+   ‏הוא רק הזמנה. */
 h1 {
-  font-size: clamp(26px, 5.6vw, 37px);
-  font-weight: 800; line-height: 1.24;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+  font-size: clamp(27px, 6vw, 38px);
+  font-weight: 800; line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 16px;
 }
-h1 .accent {
-  background: linear-gradient(135deg, var(--p5), var(--gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+h1 .lead-in {
+  display: block;
+  font-size: 0.5em; font-weight: 600;
+  letter-spacing: 0;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
 }
 
 .lede {
@@ -177,70 +191,90 @@ h1 .accent {
 }
 .pick:active { transform: translateY(0); }
 
-.pick-ico { width: 30px; height: 30px; color: var(--p5); margin-bottom: 13px; display: block; }
-.pick h2 { font-size: 21px; font-weight: 800; margin-bottom: 7px; }
+.pick h2 { font-size: 23px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
 .pick p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.64); }
+/* ‏מי עונה · עובדה על השאלון, ולכן היא יושבת בשורה משלה ולא
+   ‏נבלעת בפסקה. בזוגות זאת ההנחיה החשובה ביותר בעמוד. */
+/* ‏span הוא inline, ו-margin אנכי וקו עליון עליו פשוט אינם
+   ‏פועלים · בלעדי block השורה הזאת נדבקה ל"מתחילים". */
+.pick-how {
+  display: block;
+  margin-top: 14px; padding-top: 13px;
+  border-top: 1px solid rgba(168,85,247,0.18);
+  font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,0.56);
+}
+.pick-how b { color: var(--p6); font-weight: 700; }
 .pick-go {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 7px;
   margin-top: 16px; font-size: 14.5px; font-weight: 700; color: var(--p6);
 }
 .pick-go svg { width: 15px; height: 15px; }
 
 /* ── ‏שאלה ── */
-.step-count {
-  font-size: 12px; font-weight: 700; letter-spacing: 2px;
-  color: var(--p6); margin-bottom: 10px;
-}
-.stage-title { font-size: clamp(22px, 4.8vw, 28px); font-weight: 800; line-height: 1.35; margin-bottom: 6px; }
-.stage-sub { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.56); margin-bottom: 26px; }
+/* ‏השאלה היא התוכן, וכותרת השלב היא ההקשר. קודם זה היה הפוך:
+   ‏הכותרת ב-28 והשאלה ב-17.5, כך שההקשר צעק והשאלה נלחשה.
+   ‏שם השלב עבר למסילה למעלה, וכאן נשאר רק המשפט שמכין. */
+.stage-sub { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.52); margin-bottom: 30px; }
 
-.q { margin-bottom: 30px; }
+.q { margin-bottom: 34px; }
 .q:last-of-type { margin-bottom: 8px; }
 
 .q-text {
-  font-size: 17.5px; font-weight: 700; line-height: 1.5;
-  margin-bottom: 6px;
+  font-size: clamp(18px, 4.2vw, 20px);
+  font-weight: 700; line-height: 1.45;
+  letter-spacing: -0.008em;
+  margin-bottom: 8px;
 }
 .q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
 .q-opt-note { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.38); margin-inline-start: 7px; }
 
+/* ‏מי עונה. בשאלון שבו כל אחד עונה בנפרד זה הדבר שהעין צריכה
+   ‏לתפוס ראשונה בכל שאלה, ולכן הוא שם ממשי ולא תגית קטנה. */
 .who-tag {
-  display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: 1px;
-  color: var(--p6); background: rgba(168,85,247,0.14);
-  border: 1px solid rgba(168,85,247,0.3);
-  border-radius: 99px; padding: 4px 11px; margin-bottom: 10px;
+  display: block; font-size: 13px; font-weight: 800;
+  color: var(--p6); margin-bottom: 7px;
 }
 
 /* ── ‏אפשרויות ── */
-.opts { display: flex; flex-direction: column; gap: 10px; }
+/* ‏אפשרות אינה כרטיס. קודם כל אפשרות קיבלה מסגרת, גרדיאנט
+   ‏וצל פנימי · שבע מהן על מסך אחד נראו כמו שבעה משטחים שווי
+   ‏ערך לשאלה עצמה. עכשיו הן רשימה: קו שיער מפריד, והנבחרת
+   ‏היא היחידה שמקבלת צבע. */
+.opts {
+  display: flex; flex-direction: column;
+  border-block: 1px solid rgba(255,255,255,0.09);
+}
 
 .opt {
   width: 100%; text-align: start; position: relative;
-  font-size: 15.5px; font-weight: 500; line-height: 1.55;
-  color: rgba(255,255,255,0.86);
-  background: linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
-  border: 1px solid rgba(168,85,247,0.24);
-  border-radius: 14px; padding: 15px 18px;
-  min-height: 48px; cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  font-size: 15.5px; font-weight: 500; line-height: 1.5;
+  color: rgba(255,255,255,0.8);
+  background: none; border: 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 34px 14px 14px;
+  min-height: 50px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
+.opt:first-child { border-top: 0; }
 @media (hover: hover) and (pointer: fine) {
-  .opt:hover { border-color: rgba(168,85,247,0.56); background: rgba(168,85,247,0.1); }
+  .opt:hover { background: rgba(255,255,255,0.035); color: #fff; }
+}
+.opt::before {
+  content: ''; position: absolute; inset-inline-start: 13px; top: 50%;
+  width: 15px; height: 15px; margin-top: -8px;
+  border: 1.5px solid rgba(255,255,255,0.26);
+  border-radius: 50%;
+  transition: border-color 0.15s, background 0.15s;
 }
 .opt[aria-pressed="true"] {
+  background: rgba(124,58,237,0.17);
+  color: #fff; font-weight: 700;
+}
+.opt[aria-pressed="true"]::before {
   border-color: var(--p5);
-  background: rgba(124,58,237,0.26);
-  color: #fff;
-  font-weight: 700;
+  background: var(--p5);
+  box-shadow: inset 0 0 0 3px var(--p1);
 }
-.opt[aria-pressed="true"]::after {
-  content: ''; position: absolute; inset-inline-start: 17px; top: 50%;
-  width: 6px; height: 11px; margin-top: -8px;
-  border: solid var(--p6); border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-.opt[aria-pressed="true"] { padding-inline-start: 38px; }
 .opt[disabled] { opacity: 0.38; cursor: not-allowed; }
 
 /* ── ‏סולם ── */
@@ -297,9 +331,15 @@ textarea.free { min-height: 108px; resize: vertical; }
 .counter { font-size: 12px; color: rgba(255,255,255,0.32); margin-top: 6px; text-align: start; }
 
 /* ── ‏מתג "יחד או בנפרד" ── */
+.seg-wrap { margin-bottom: 30px; }
+.seg-lede {
+  font-size: 14.5px; line-height: 1.7;
+  color: rgba(255,255,255,0.72); margin-bottom: 13px;
+}
+.seg-lede b { color: #fff; font-weight: 700; }
 .seg {
   display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
-  padding: 5px; margin-bottom: 26px;
+  padding: 5px;
   background: rgba(255,255,255,0.045);
   border: 1px solid rgba(168,85,247,0.2);
   border-radius: 15px;
@@ -344,10 +384,11 @@ textarea.free { min-height: 108px; resize: vertical; }
 .btn-ghost svg { width: 16px; height: 16px; }
 
 /* ── ‏הסכמה ── */
+/* ‏לא כרטיס. זה טקסט שצריך לקרוא לפני שמאשרים, והמסגרת סביבו
+   ‏רק גרמה לו להיראות כמו עוד רכיב שאפשר לדלג עליו. */
 .consent-box {
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 16px; padding: 19px 20px; margin-bottom: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 18px; margin-bottom: 18px;
 }
 .consent-box h3 { font-size: 15px; font-weight: 800; margin-bottom: 9px; }
 .consent-box p { font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,0.6); }
@@ -372,7 +413,7 @@ textarea.free { min-height: 108px; resize: vertical; }
 /* ── ‏סקירה לפני שליחה ── */
 .review-stage { margin-bottom: 22px; }
 .review-stage h3 {
-  font-size: 13px; font-weight: 800; letter-spacing: 1.5px;
+  font-size: 14px; font-weight: 800;
   color: var(--p6); margin-bottom: 11px;
 }
 .review-row {
@@ -433,30 +474,30 @@ textarea.free { min-height: 108px; resize: vertical; }
     <a class="brand" href="/">שוהם אבו · ליווי וייעוץ פיננסי</a>
   </header>
 
-  <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="התקדמות בשאלון">
-    <div class="progress-fill" id="progressFill"></div>
+  <div class="rail" id="rail">
+    <div class="rail-marks" id="railMarks" aria-hidden="true"></div>
+    <div class="rail-name" id="railName" role="status" aria-live="polite"></div>
   </div>
-  <div class="progress-note" id="progressNote"></div>
 
   <!-- ─────────────────────────────── ‏בחירת שאלון ── -->
   <section class="screen on" id="scPick">
-    <h1>בואו נבין יחד את <span class="accent">מערכת היחסים</span> שלכם עם הכסף</h1>
+    <h1><span class="lead-in">בואו נבין יחד</span>את מערכת היחסים שלכם עם הכסף</h1>
     <p class="lede">כדי לבנות תוכנית כלכלית שמתאימה לחיים שלכם, חשוב לי להכיר לא רק את המספרים, אלא גם את המטרות, ההרגלים והדברים שחשובים לכם באמת.</p>
 
     <div class="picks">
       <button class="pick" type="button" id="pickIndividual">
-        <svg class="pick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.6 3.1-5.7 7-5.7s7 2.1 7 5.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
         <h2>שאלון ליחידים</h2>
-        <p>ארבעה שלבים קצרים על המטרות שלך, היחס שלך לכסף וההרגלים שמשפיעים על ההתנהלות. בערך שבע דקות.</p>
+        <p>ארבעה שלבים קצרים על המטרות שלך, היחס שלך לכסף וההרגלים שמשפיעים על ההתנהלות.</p>
+        <span class="pick-how">בערך שבע דקות.</span>
         <span class="pick-go">מתחילים
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
       </button>
 
       <button class="pick" type="button" id="pickCouple">
-        <svg class="pick-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.4" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16.4" cy="9.4" r="2.7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.6 20c0-3.3 2.6-5.2 5.8-5.2 1.5 0 2.9.4 4 1.2M13.4 20c0-2.8 1.5-4.4 3.9-4.4 2.3 0 3.9 1.6 3.9 4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
         <h2>שאלון לזוגות</h2>
-        <p>ארבעה שלבים על היחס של כל אחד לכסף, על ההתנהלות המשותפת ועל העתיד שאתם רוצים לבנות. בערך עשר דקות.</p>
+        <p>ארבעה שלבים על היחס של כל אחד לכסף, על ההתנהלות המשותפת ועל העתיד שאתם רוצים לבנות.</p>
+        <span class="pick-how"><b>בשלב הראשון כל אחד מכם עונה בנפרד</b>, על אותן חמש שאלות. בערך עשר דקות לשניכם.</span>
         <span class="pick-go">מתחילים
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
@@ -468,8 +509,7 @@ textarea.free { min-height: 108px; resize: vertical; }
 
   <!-- ─────────────────────────────── ‏מי ממלא ── -->
   <section class="screen" id="scWho">
-    <div class="step-count" id="whoCount"></div>
-    <h2 class="stage-title">כמה פרטים קצרים</h2>
+    <h2 class="q-text">כמה פרטים קצרים</h2>
     <p class="stage-sub" id="whoSub"></p>
     <div id="whoFields"></div>
     <div class="nav-row">
@@ -482,8 +522,7 @@ textarea.free { min-height: 108px; resize: vertical; }
 
   <!-- ─────────────────────────────── ‏שלב שאלות ── -->
   <section class="screen" id="scStage">
-    <div class="step-count" id="stageCount"></div>
-    <h2 class="stage-title" id="stageTitle"></h2>
+    <h2 class="sr-only" id="stageTitle"></h2>
     <p class="stage-sub" id="stageSub"></p>
     <div id="stageSeg"></div>
     <div id="stageBody"></div>
@@ -498,8 +537,7 @@ textarea.free { min-height: 108px; resize: vertical; }
 
   <!-- ─────────────────────────────── ‏סקירה ושליחה ── -->
   <section class="screen" id="scReview">
-    <div class="step-count" id="reviewCount"></div>
-    <h2 class="stage-title">לפני ששולחים</h2>
+    <h2 class="q-text">לפני ששולחים</h2>
     <p class="stage-sub">זאת התמונה שתגיע אליי. אפשר לחזור ולשנות כל תשובה.</p>
 
     <div id="reviewBody"></div>
@@ -663,7 +701,9 @@ var COUPLE = {
   stages: [
     {
       title: 'היחס האישי של כל אחד לכסף',
-      sub: 'אפשר לענות יחד, ואפשר שכל אחד יענה בנפרד. בשני המקרים זה בסדר גמור.',
+      /* ‏בלי משפט פתיחה · ההסבר שמעל המתג כבר אומר את מה שצריך,
+         ‏ושני משפטים על אותו נושא זה אחרי זה החלישו זה את זה. */
+      sub: '',
       perPartner: true,
       questions: [
         { id: 'c1', type: 'single', required: true,
@@ -766,7 +806,10 @@ var S = {
   step: 0,           /* 0 = מי ממלא, 1..n = שלבים, n+1 = סקירה */
   who: {},           /* ‏שם, טלפון, אימייל, שמות בני הזוג */
   answers: {},       /* ‏מזהה שאלה אל תשובה. בזוגות בנפרד: {a:…, b:…} */
-  split: false,      /* ‏בזוגות · כל אחד עונה בנפרד */
+  split: true,       /* ‏בזוגות · כל אחד עונה בנפרד. זאת ברירת המחדל
+                        ‏בכוונה: שני אנשים שעונים יחד על "מה כסף מסמל
+                        ‏עבורך" נותנים תשובה אחת מרוככת, ואז אין מה
+                        ‏להשוות בפגישה. יחד נשאר אפשרי למי שמבקש. */
   startedAt: null,
   submitToken: null,
   sending: false
@@ -875,14 +918,33 @@ function isAnswered(v, type) {
 
 function totalSteps() { return S.form ? S.form.stages.length + 2 : 0; }
 
+/* ‏שם המסך הנוכחי. השלבים הם שמות אמיתיים, והפרטים והסקירה
+   ‏הם שני הקצוות · כך המסילה אומרת איפה אני, ולא כמה אחוז. */
+function stepName(i) {
+  if (i === 0) return 'הפרטים שלכם';
+  if (i <= S.form.stages.length) return S.form.stages[i - 1].title;
+  return 'סקירה ושליחה';
+}
+
 function paintProgress() {
   var on = !!S.form && S.step >= 0;
-  $('progress').classList.toggle('on', on);
-  if (!on) { $('progressNote').textContent = ''; return; }
-  var pct = Math.round((S.step / (totalSteps() - 1)) * 100);
-  $('progressFill').style.width = pct + '%';
-  $('progress').setAttribute('aria-valuenow', String(pct));
-  $('progressNote').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
+  $('rail').classList.toggle('on', on);
+  if (!on) { $('railMarks').textContent = ''; $('railName').textContent = ''; return; }
+
+  var n = totalSteps();
+  var marks = $('railMarks');
+  clear(marks);
+  for (var i = 0; i < n; i++) {
+    var m = el('i');
+    if (i < S.step) m.className = 'done';
+    else if (i === S.step) m.className = 'now';
+    marks.appendChild(m);
+  }
+
+  var name = $('railName');
+  clear(name);
+  name.appendChild(el('b', null, stepName(S.step)));
+  name.appendChild(document.createTextNode('  ·  ' + (S.step + 1) + ' מתוך ' + n));
 }
 
 /* ═══════════════════════════════════ ‏מסך מי ממלא ══ */
@@ -904,7 +966,6 @@ var WHO_FIELDS = {
 function renderWho() {
   var host = $('whoFields');
   clear(host);
-  $('whoCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
   $('whoSub').textContent = S.form.kind === 'couple'
     ? 'השמות עוזרים לי לדעת מי ענה מה, והטלפון כדי לחזור אליכם.'
     : 'רק כדי שאדע מי ממלא ואיך לחזור אליך.';
@@ -976,19 +1037,27 @@ function validateWho() {
 
 function renderStage() {
   var stage = S.form.stages[S.step - 1];
-  $('stageCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
   $('stageTitle').textContent = stage.title;
-  $('stageSub').textContent = stage.sub || '';
+  var sub = $('stageSub');
+  sub.textContent = stage.sub || '';
+  sub.style.display = stage.sub ? '' : 'none';
   note($('stageErr'), '', '');
 
   /* ‏המתג "יחד או בנפרד" · רק בשלב שמסומן כאישי בשאלון הזוגות. */
   var seg = $('stageSeg');
   clear(seg);
   if (stage.perPartner) {
+    var wrap = el('div', 'seg-wrap');
+    var lede = el('p', 'seg-lede');
+    lede.appendChild(el('b', null, 'בשלב הזה כל אחד מכם עונה בנפרד.'));
+    lede.appendChild(document.createTextNode(
+      ' אותן חמש שאלות, פעם אחת לכל אחד. אין כאן תשובה נכונה, ודווקא ההבדלים ביניכם הם מה שעוזר לי להבין מאיפה להתחיל.'));
+    wrap.appendChild(lede);
+
     var box = el('div', 'seg');
     box.setAttribute('role', 'group');
     box.setAttribute('aria-label', 'איך למלא את השלב הזה');
-    [['יחד', false], ['כל אחד בנפרד', true]].forEach(function (pair) {
+    [['כל אחד בנפרד', true], ['נעדיף לענות יחד', false]].forEach(function (pair) {
       var b = el('button', null, pair[0]);
       b.type = 'button';
       b.setAttribute('aria-pressed', String(S.split === pair[1]));
@@ -1003,7 +1072,8 @@ function renderStage() {
       });
       box.appendChild(b);
     });
-    seg.appendChild(box);
+    wrap.appendChild(box);
+    seg.appendChild(wrap);
   }
 
   var host = $('stageBody');
@@ -1202,7 +1272,6 @@ function answerText(q, whoKey) {
 }
 
 function renderReview() {
-  $('reviewCount').textContent = 'שלב ' + (S.step + 1) + ' מתוך ' + totalSteps();
   var host = $('reviewBody');
   clear(host);
 
@@ -1252,7 +1321,7 @@ function goto(step) {
 function startForm(form, resume) {
   S.form = form;
   if (!resume) {
-    S.who = {}; S.answers = {}; S.split = false;
+    S.who = {}; S.answers = {}; S.split = true;
     S.startedAt = new Date().toISOString();
     S.submitToken = uuid();
   }
@@ -1328,8 +1397,7 @@ function send() {
   }).then(function (res) {
     if (res && res.ok) {
       clearDraft();
-      $('progress').classList.remove('on');
-      $('progressNote').textContent = '';
+      $('rail').classList.remove('on');
       show('scDone');
       return;
     }
@@ -1384,7 +1452,7 @@ $('sendBtn').addEventListener('click', send);
   go.addEventListener('click', function () {
     S.who = d.who || {};
     S.answers = d.answers || {};
-    S.split = !!d.split;
+    S.split = d.split !== false;
     S.step = d.step || 0;
     S.startedAt = d.startedAt || new Date().toISOString();
     S.submitToken = d.submitToken || uuid();
