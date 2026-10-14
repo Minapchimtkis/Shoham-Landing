@@ -700,7 +700,8 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
   <section class="detail-section" id="ikActsSection">
     <div class="detail-section-head"><strong>פעולות</strong><span>הדפסה, העתקה ומחיקה</span></div>
     <div class="ik-acts">
-      <button id="ikPrint" class="btn" type="button">הדפסה או שמירה כ-PDF</button>
+      <button id="ikPrint" class="btn" type="button">פתיחה להדפסה</button>
+      <button id="ikSave" class="btn" type="button">שמירה כקובץ</button>
       <button id="ikCopy" class="btn" type="button">העתקת סיכום</button>
       <button id="ikDelete" class="btn btn-danger" type="button">מחיקת השאלון</button>
     </div>
@@ -1824,10 +1825,110 @@ window.addEventListener('beforeprint',()=>{
   if(sec)sec.classList.toggle('print-empty',!($('ikNotes').value||'').trim());
 });
 
+/* ‏גיליון עצמאי להדפסה ולשמירה.
+   ‏window.print() בספארי באייפון היא פקודה ריקה · הדפדפן מתעלם
+   ‏ממנה בלי שגיאה, ולכן הכפתור "עבד" ולא עשה כלום. מסמך שלם
+   ‏ונפרד פותר את זה בשני הכיוונים: במחשב הוא נפתח ומדפיס, ובאייפון
+   ‏הוא נפתח כדף קריא שאפשר לשתף ממנו להדפסה או לשמירה בקבצים.
+   ‏הוא גם אינו תלוי ב-CSS של הדשבורד, ולכן אין סיכוי שכלל הדפסה
+   ‏יסתיר ממנו חצי. */
+function ikEsc(v){
+  return String(v==null?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function ikSheetHtml(r,stages){
+  const kind=r.kind==='couple'
+    ? 'זוג'+((r.partner_a||r.partner_b)?' · '+[r.partner_a,r.partner_b].filter(Boolean).join(' ו'):'')
+    : 'יחיד';
+  const meta=[
+    ['סוג השאלון',kind],
+    ['טלפון',r.phone||'—'],
+    ['אימייל',r.email||'—'],
+    ['התחיל למלא',r.started_at?parts(r.started_at).full:'לא נרשם'],
+    ['סיים ושלח',parts(r.created_at).full],
+    ['סטטוס',(IK_STATUS[r.status||'new']||IK_STATUS.new).label]
+  ].map(x=>'<tr><th>'+ikEsc(x[0])+'</th><td>'+ikEsc(x[1])+'</td></tr>').join('');
+
+  const body=(stages||[]).map(st=>{
+    const items=(st.items||[]).map(it=>{
+      const a=(it.a==null?'':String(it.a)).trim();
+      return '<div class="qa"><div class="q">'+
+        (it.who?'<b>'+ikEsc(it.who)+' · </b>':'')+ikEsc(it.q||'')+'</div>'+
+        '<div class="a'+(a?'':' none')+'">'+ikEsc(a||'לא נענה')+'</div></div>';
+    }).join('');
+    return '<section><h2>'+ikEsc(st.stage||'')+'</h2>'+items+'</section>';
+  }).join('');
+
+  const notes=(r.notes||'').trim();
+
+  return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>'+ikEsc(r.name||'שאלון היכרות')+' · שאלון היכרות</title><style>'+
+    '@page{margin:14mm}'+
+    '*{box-sizing:border-box}'+
+    'body{margin:0;padding:22px;background:#fff;color:#000;'+
+    'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;'+
+    'font-size:14px;line-height:1.6;max-width:760px;margin-inline:auto}'+
+    'h1{font-size:22px;margin:0 0 2px}'+
+    '.sub{color:#666;font-size:12px;margin-bottom:18px}'+
+    'table{border-collapse:collapse;width:100%;margin-bottom:22px}'+
+    'th,td{border:1px solid #ccc;padding:7px 10px;text-align:start;font-size:13px}'+
+    'th{width:34%;background:#f4f4f6;font-weight:700;color:#444}'+
+    'section{margin-bottom:20px;break-inside:avoid}'+
+    'h2{font-size:14px;margin:0 0 9px;padding-bottom:5px;border-bottom:2px solid #333}'+
+    '.qa{padding:7px 0;border-bottom:1px solid #eee}'+
+    '.qa:last-child{border-bottom:0}'+
+    '.q{color:#555;font-size:12.5px}'+
+    '.a{font-size:14px;font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere}'+
+    '.a.none{font-weight:400;color:#999;font-style:italic}'+
+    '.notes{border:1px solid #ccc;padding:10px 12px;white-space:pre-wrap}'+
+    '.hint{margin-bottom:18px;padding:10px 12px;border:1px solid #c9b6ea;'+
+    'background:#f6f1fd;border-radius:8px;font-size:12.5px;color:#4a3870}'+
+    '@media print{.hint{display:none}body{padding:0}}'+
+    '</style></head><body>'+
+    '<div class="hint">באייפון: כפתור השיתוף למטה, ואז "הדפסה" או "שמירה בקבצים". '+
+    'במחשב חלון ההדפסה נפתח מעצמו.</div>'+
+    '<h1>'+ikEsc(r.name||'ללא שם')+'</h1>'+
+    '<div class="sub">שאלון היכרות · '+ikEsc(kind)+'</div>'+
+    '<table>'+meta+'</table>'+
+    body+
+    (notes?'<section><h2>הערות פנימיות</h2><div class="notes">'+ikEsc(notes)+'</div></section>':'')+
+    '</body></html>';
+}
+
+function ikSheetOrNull(){
+  if(!activeIk)return null;
+  const r=intakes.find(x=>x.id===activeIk);
+  const stages=ikAnswers.get(activeIk);
+  if(!r||!stages){toast('התשובות עוד נטענות','bad');return null}
+  return {r,stages,html:ikSheetHtml(r,stages)};
+}
+
+/* ‏שם קובץ באותיות לטיניות בלבד. כרום זורק שם הורדה שיש בו תו
+   ‏לא אנגלי ושומר "download" בלי סיומת · נמדד. */
+function ikFileName(r){
+  const d=new Date(r.created_at);
+  const p=n=>String(n).padStart(2,'0');
+  return 'intake-'+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'.html';
+}
+
 $('ikPrint').addEventListener('click',()=>{
-  if(!activeIk)return;
-  if(!ikAnswers.has(activeIk)){toast('התשובות עוד נטענות','bad');return}
-  window.print();
+  const sheet=ikSheetOrNull();if(!sheet)return;
+  const w=window.open('','_blank');
+  if(!w){toast('הדפדפן חסם את הפתיחה · אפשר לשמור כקובץ במקום','bad');return}
+  w.document.open();w.document.write(sheet.html);w.document.close();
+  /* ‏במחשב זה פותח את חלון ההדפסה. באייפון זאת פקודה ריקה,
+     ‏והדף פשוט נשאר פתוח לשיתוף · ולכן ההסבר בראשו. */
+  setTimeout(()=>{try{w.focus();w.print()}catch(e){}},350);
+});
+
+$('ikSave').addEventListener('click',()=>{
+  const sheet=ikSheetOrNull();if(!sheet)return;
+  saveBlob(new Blob(['\uFEFF'+sheet.html],{type:'text/html;charset=utf-8'}),
+           ikFileName(sheet.r));
+  toast('הקובץ נשמר');
 });
 
 $('ikCopy').addEventListener('click',async()=>{
