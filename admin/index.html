@@ -639,6 +639,16 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
     </div>
   </section>
 
+  <!-- ‏שאלון ההיכרות של הליד הזה. אם מילא, לחיצה פותחת את
+       ‏הגיליון. אם לא, שולחים לו קישור אישי בלחיצה אחת. -->
+  <section class="detail-section"><div class="detail-section-head"><strong>שאלון היכרות</strong><span>לפני פגישת המיפוי</span></div>
+    <div class="qz-wrap">
+      <div id="leadIntake"></div>
+      <button id="sendIntakeWa" class="link-btn" type="button">שליחת השאלון בוואטסאפ</button>
+      <button id="copyIntakeLink" class="link-btn" type="button">העתקת הקישור האישי</button>
+    </div>
+  </section>
+
   <section class="detail-section"><div class="detail-section-head"><strong>הערות פנימיות</strong><span>לא מוצג ללקוח</span></div><div class="notes-wrap"><label class="detail-label">הערה</label><textarea id="detailNotes" class="notes" maxlength="5000"></textarea></div></section>
   <section class="detail-section"><div class="detail-section-head"><strong>הסכמה</strong><span>תיעוד הטופס</span></div><div class="consent-wrap"><div class="consent-line"><div id="detailConsentIcon" class="consent-check">✓</div><div><div id="detailConsentText" class="consent-text">—</div><div id="detailConsentMeta" class="consent-meta">—</div></div></div></div></section>
 
@@ -1253,7 +1263,7 @@ function renderDetail(id){
   $('detailStatusPill').className=`status-pill ${statusClass(l.status||'new')}`;$('detailStatusPill').textContent=statusLabel(l.status||'new');$('detailCall').href='tel:'+String(l.phone||'').replace(/[^\d+]/g,'');
   $('detailConsentText').textContent=l.consent?'הלקוח אישר את תנאי מדיניות הפרטיות בעת שליחת הטופס.':'לא תועדה הסכמה.';$('detailConsentIcon').textContent=l.consent?'✓':'!';$('detailConsentMeta').textContent=l.consent_at?'אושר ב־'+parts(l.consent_at).full:'—';
   draftTags=[...leadTags(l)];renderTags();$('tagInput').value='';$('detailFollowUp').value=toLocalInput(l.follow_up_at);updateFuNote();
-  $('detailWait').textContent=waitText(l);$('detailSource').textContent=l.source||'ישיר';syncWa(l);renderLeadQuiz(id);renderDetailWa(id)
+  $('detailWait').textContent=waitText(l);$('detailSource').textContent=l.source||'ישיר';syncWa(l);renderLeadQuiz(id);renderLeadIntake(id);renderDetailWa(id)
 }
 
 function renderTags(){
@@ -1609,6 +1619,7 @@ async function loadIntake(){
   intakes=data||[];
   renderIntake();
   if(activeIk)renderIkDetail(activeIk);
+  if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderLeadIntake(activeLeadId);
 }
 
 async function loadIkAnswers(id){
@@ -1996,6 +2007,87 @@ for(const k in TABS)$(TABS[k]).addEventListener('click',()=>setTab(k));
 
 // The link identifies the lead, so they reach the deep questionnaire without
 // filling in the short one again.
+/* ═════════════ ‏השאלון והליד · שני הצדדים מחוברים ═════════════ */
+/* ‏הקישור האישי היה דורש שאילתת SQL כדי לשלוף טוקן. זה לא דבר
+   ‏שצריך לעשות ביד כדי לשלוח הודעה ללקוח. */
+
+function intakeUrl(lead){
+  if(!lead||!lead.quiz_token)return null;
+  const url=new URL('../intake.html',window.location.href);
+  url.searchParams.set('t',lead.quiz_token);
+  return url.href;
+}
+
+function intakeWaText(lead,url){
+  return 'היי '+first(lead)+', לקראת הפגישה שלנו הכנתי שאלון היכרות קצר.\n'+
+    'הוא עוזר לי להגיע מוכן יותר ולהבין מה חשוב לך, ולא רק את המספרים.\n'+
+    'לוקח בערך שבע דקות, ואפשר לעצור באמצע ולהמשיך אחר כך.\n'+url;
+}
+
+/* ‏כל השאלונים של האדם הזה, גם אם יש לו כמה רשומות עם אותו
+   ‏טלפון · בדיוק כמו שתוצאות השאלון הקצר מוצגות. */
+function intakesOf(id){
+  const ids=partyOf(id).map(l=>l.id);
+  return intakes.filter(r=>r.lead_id!=null&&ids.includes(r.lead_id));
+}
+
+function renderLeadIntake(id){
+  const box=$('leadIntake');box.replaceChildren();
+  const lead=leads.find(x=>x.id===id);
+  const rows=intakesOf(id);
+
+  if(!ikTableOk){
+    const p=document.createElement('div');p.className='qz-none';
+    p.textContent='אפשר יהיה לשלוח שאלון אחרי הרצת המיגרציה בסופהבייס.';
+    box.append(p);
+  } else if(!rows.length){
+    const p=document.createElement('div');p.className='qz-none';
+    p.textContent='הליד עדיין לא מילא שאלון היכרות.';
+    box.append(p);
+  } else {
+    for(const r of rows){
+      const card=document.createElement('button');
+      card.type='button';card.className='ik-row';
+      const who=document.createElement('div');
+      const nm=document.createElement('div');nm.className='ik-name';
+      nm.textContent=r.kind==='couple'?'שאלון לזוגות':'שאלון ליחידים';
+      const sub=document.createElement('div');sub.className='ik-sub';
+      sub.textContent=parts(r.created_at).full;
+      who.append(nm,sub);
+      const kind=document.createElement('span');
+      kind.className='ik-kind'+(r.kind==='couple'?' couple':'');
+      kind.textContent=IK_KIND[r.kind]||'—';
+      const pill=document.createElement('span');
+      const st=IK_STATUS[r.status||'new']||IK_STATUS.new;
+      pill.className='status-pill ik-pill '+st.cls;pill.textContent=st.label;
+      card.append(who,kind,pill);
+      card.addEventListener('click',()=>{setTab('intake');openIk(r.id)});
+      box.append(card);
+    }
+  }
+
+  /* ‏בלי טוקן אין קישור אישי, ואין טעם להציע כפתור שלא יעבוד. */
+  const ok=!!intakeUrl(lead);
+  $('sendIntakeWa').disabled=!ok;
+  $('copyIntakeLink').disabled=!ok;
+}
+
+$('sendIntakeWa').addEventListener('click',()=>{
+  const l=leads.find(x=>x.id===activeLeadId);if(!l)return;
+  const url=intakeUrl(l);
+  if(!url){toast('לליד הזה אין עדיין טוקן אישי','bad');return}
+  const p=waPhone(l.phone);
+  if(!p){toast('מספר הטלפון אינו תקין לוואטסאפ','bad');return}
+  window.open('https://wa.me/'+p+'?text='+encodeURIComponent(intakeWaText(l,url)),'_blank','noopener');
+});
+
+$('copyIntakeLink').addEventListener('click',async()=>{
+  const l=leads.find(x=>x.id===activeLeadId);if(!l)return;
+  const url=intakeUrl(l);
+  if(!url){toast('לליד הזה אין עדיין טוקן אישי','bad');return}
+  try{await navigator.clipboard.writeText(url);toast('הקישור הועתק')}catch{toast(url)}
+});
+
 $('copyQuizLink').addEventListener('click',async()=>{
   const l=leads.find(x=>x.id===activeLeadId);if(!l)return;
   if(!l.quiz_token){toast('לליד הזה אין עדיין טוקן — יש להריץ את המיגרציה','bad');return}
@@ -2176,8 +2268,31 @@ function startRealtime(){
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'leads'},payload=>{
         const row=payload?.new;if(!row||leads.some(l=>l.id===row.id))return;
         leads.unshift(row);newCount++;refreshBadge();render();notifyNewLead(row)
-      }).subscribe()
+      })
+      /* ‏שאלון שמגיע בזמן שהדשבורד פתוח · בלי זה הוא היה מופיע רק
+         ‏ברענון או אחרי חמש דקות, ושאלון מגיע בדיוק כשמחכים לו. */
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'intake_submissions'},payload=>{
+        const row=payload?.new;if(!row||intakes.some(r=>r.id===row.id))return;
+        intakes.unshift(row);renderIntake();
+        if(activeLeadId!=null&&leads.some(l=>l.id===activeLeadId))renderLeadIntake(activeLeadId);
+        notifyNewIntake(row)
+      })
+      .subscribe()
   }catch(e){console.error('realtime',e)}
+}
+
+function notifyNewIntake(row){
+  const name=row.name||'ללא שם';
+  const what=row.kind==='couple'?'שאלון זוגות':'שאלון היכרות';
+  toast(what+': '+name);
+  const t=$('toast');clearTimeout(t._timer);t._timer=setTimeout(()=>hide(t),6000);
+  beep();
+  try{
+    if(notifyPerm()==='granted'){
+      const n=new window.Notification(what+' מולא',{body:name,tag:'intake-'+row.id,lang:'he'});
+      n.onclick=()=>{window.focus();n.close()}
+    }
+  }catch{}
 }
 function stopRealtime(){
   if(!realtimeChannel)return;
