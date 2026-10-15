@@ -226,7 +226,15 @@ h1 .lead-in {
   margin-bottom: 8px;
 }
 .q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
-.q-opt-note { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.38); margin-inline-start: 7px; }
+/* ‏קודם זה היה מודבק לסוף השאלה ונקרא כחלק ממנה, ולפעמים
+   ‏נשבר לשורה חדשה באמצע משפט. */
+.q-opt-note {
+  display: block;
+  font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: 12px;
+}
+.q-hint.counted b { color: var(--p6); font-weight: 800; }
 
 /* ── ‏אפשרויות ── */
 /* ‏אפשרות אינה כרטיס. קודם כל אפשרות קיבלה מסגרת, גרדיאנט
@@ -252,13 +260,18 @@ h1 .lead-in {
 @media (hover: hover) and (pointer: fine) {
   .opt:hover { background: rgba(255,255,255,0.035); color: #fff; }
 }
+/* ‏עיגול אומר "בחר אחת", ריבוע אומר "אפשר כמה". כשכל האפשרויות
+   ‏היו עגולות, שאלה שמרשה שלוש בחירות נראתה כמו שאלה שמרשה
+   ‏אחת, והמשתמש גילה את האמת רק כשקיבל שגיאה. */
 .opt::before {
   content: ''; position: absolute; inset-inline-start: 13px; top: 50%;
-  width: 15px; height: 15px; margin-top: -8px;
+  width: 16px; height: 16px; margin-top: -8px;
   border: 1.5px solid rgba(255,255,255,0.26);
   border-radius: 50%;
   transition: border-color 0.15s, background 0.15s;
 }
+.opts.many .opt::before { border-radius: 5px; }
+
 .opt[aria-pressed="true"] {
   background: rgba(124,58,237,0.17);
   color: #fff; font-weight: 700;
@@ -267,6 +280,15 @@ h1 .lead-in {
   border-color: var(--p5);
   background: var(--p5);
   box-shadow: inset 0 0 0 3px var(--p1);
+}
+/* ‏בבחירה מרובה סימן וי ולא נקודה · הוא אומר "נבחר" ולא "זה". */
+.opts.many .opt[aria-pressed="true"]::before { box-shadow: none; }
+.opts.many .opt[aria-pressed="true"]::after {
+  content: ''; position: absolute;
+  inset-inline-start: 18px; top: 50%;
+  width: 5px; height: 9px; margin-top: -6px;
+  border: solid var(--p1); border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 .opt[disabled] { opacity: 0.38; cursor: not-allowed; }
 
@@ -311,7 +333,9 @@ h1 .lead-in {
   text-align: right;
   transition: border-color 0.25s, background 0.25s;
 }
-textarea.free { min-height: 108px; resize: vertical; }
+/* ‏תיבה ריקה גבוהה ממלאת חצי מסך בלי להגיד כלום.
+   ‏שלוש שורות מספיקות, והיא גדלה למי שכותב יותר. */
+textarea.free { min-height: 86px; resize: vertical; }
 .field input::placeholder, textarea.free::placeholder { color: rgba(255,255,255,0.3); }
 .field input:focus, .field textarea:focus, textarea.free:focus {
   border-color: rgba(168,85,247,0.75); background: rgba(168,85,247,0.1);
@@ -1135,13 +1159,18 @@ function buildQuestion(q, who) {
 
   var qt = el('div', 'q-text');
   qt.id = fieldId + '_label';
-  qt.appendChild(document.createTextNode(q.q));
-  if (!q.required) qt.appendChild(el('span', 'q-opt-note', '· לא חובה'));
+  qt.textContent = q.q;
   wrap.appendChild(qt);
 
+  if (!q.required) wrap.appendChild(el('span', 'q-opt-note', 'לא חובה'));
+
   if (q.type === 'multi') {
-    wrap.appendChild(el('div', 'q-hint',
-      q.max ? ('אפשר לבחור עד ' + q.max) : 'אפשר לבחור יותר מאחת'));
+    /* ‏מונה חי. קודם המשוב היחיד היה הודעת שגיאה כשחורגים,
+       ‏כלומר הדבר הראשון שהמשתמש שמע היה שהוא טעה. */
+    var hint = el('div', 'q-hint counted');
+    hint.id = fieldId + '_count';
+    wrap.appendChild(hint);
+    paintCount(q, who, fieldId);
   }
 
   if (q.type === 'single' || q.type === 'multi') {
@@ -1158,8 +1187,24 @@ function buildQuestion(q, who) {
   return wrap;
 }
 
+/* ‏כמה נבחרו מתוך כמה · נקרא לפני הבחירה, בזמנה ואחריה. */
+function paintCount(q, who, fieldId) {
+  var host = document.getElementById(fieldId + '_count');
+  if (!host) return;
+  var cur = getAns(q, who.key);
+  var n = Array.isArray(cur) ? cur.length : 0;
+  clear(host);
+  if (!q.max) {
+    host.textContent = n ? ('נבחרו ' + n) : 'אפשר לבחור יותר מאחת';
+    return;
+  }
+  if (!n) { host.textContent = 'אפשר לבחור עד ' + q.max; return; }
+  host.appendChild(el('b', null, n + ' מתוך ' + q.max));
+  host.appendChild(document.createTextNode(n >= q.max ? ' · אפשר להסיר ולהחליף' : ' נבחרו'));
+}
+
 function buildOptions(q, who, fieldId) {
-  var box = el('div', 'opts');
+  var box = el('div', 'opts' + (q.type === 'multi' ? ' many' : ''));
   box.setAttribute('role', 'group');
   box.setAttribute('aria-labelledby', fieldId + '_label');
 
@@ -1192,6 +1237,7 @@ function buildOptions(q, who, fieldId) {
         setAns(q, who.key, list);
       }
       $(fieldId + '_err').textContent = '';
+      paintCount(q, who, fieldId);
       repaintGroup(q, who, box, fieldId);
     });
 
