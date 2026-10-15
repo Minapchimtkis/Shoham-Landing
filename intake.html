@@ -72,7 +72,7 @@ a, input, textarea, label, summary { touch-action: manipulation; }
 
 body {
   font-family: var(--font);
-  background: radial-gradient(ellipse 120% 80% at 50% -10%, #23094a 0%, var(--p1) 55%) var(--p1);
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #2d0b5e 0%, var(--p1) 58%) var(--p1);
   color: var(--white);
   direction: rtl;
   min-height: 100vh;
@@ -88,8 +88,8 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 40% at 50% 20%, rgba(124,58,237,0.22), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(109,40,217,0.14), transparent 65%);
+    radial-gradient(ellipse 55% 40% at 50% 20%, rgba(124,58,237,0.32), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(109,40,217,0.22), transparent 65%);
 }
 
 .wrap {
@@ -109,7 +109,7 @@ body::before {
    ‏את המילה ועושה אותה קשה לקריאה · נמדד על המסך. */
 .brand {
   font-size: 13px; font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.62);
   text-decoration: none;
 }
 @media (hover: hover) and (pointer: fine) {
@@ -126,14 +126,14 @@ body::before {
 .rail-marks { display: flex; gap: 5px; }
 .rail-marks i {
   flex: 1; height: 3px; border-radius: 2px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.17);
   transition: background 0.3s;
 }
-.rail-marks i.done { background: rgba(168,85,247,0.45); }
+.rail-marks i.done { background: rgba(168,85,247,0.62); }
 .rail-marks i.now  { background: var(--p5); }
 .rail-name {
   margin-top: 11px; font-size: 13px; font-weight: 600;
-  color: rgba(255,255,255,0.46);
+  color: rgba(255,255,255,0.62);
 }
 .rail-name b { color: rgba(255,255,255,0.82); font-weight: 700; }
 
@@ -165,34 +165,39 @@ h1 .lead-in {
   display: block;
   font-size: 0.5em; font-weight: 600;
   letter-spacing: 0;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.64);
   margin-bottom: 6px;
 }
 
 .lede {
-  font-size: 16px; font-weight: 300; line-height: 1.75;
-  color: rgba(255,255,255,0.72); margin-bottom: 30px;
+  font-size: 16px; font-weight: 400; line-height: 1.75;
+  color: rgba(255,255,255,0.84); margin-bottom: 30px;
 }
 
 /* ── ‏שני הכרטיסים ── */
-.picks { display: flex; flex-direction: column; gap: 14px; }
+/* ‏עשרים ולא ארבעה עשר · המרווח הגדול ביותר בתוך
+   ‏כרטיס הוא שש עשרה, וכשהמרווח בין שני כרטיסים
+   ‏קטן ממנו הם נקראים כבלוק אחד ארוך ולא כשתי
+   ‏בחירות. עכשיו הסולם עולה: 16 בפנים, 20 ביניהם,
+   ‏ו-26 עד הרצועה שמתחת. */
+.picks { display: flex; flex-direction: column; gap: 20px; }
 
 .pick {
   width: 100%; text-align: start; cursor: pointer;
-  background: linear-gradient(158deg, rgba(255,255,255,0.06), rgba(255,255,255,0.018));
-  border: 1px solid rgba(168,85,247,0.3);
+  background: linear-gradient(158deg, rgba(124,58,237,0.30), rgba(124,58,237,0.08));
+  border: 1px solid rgba(168,85,247,0.46);
   border-radius: 18px; padding: 24px 22px;
   color: inherit;
   transition: border-color 0.25s, background 0.25s, transform 0.25s;
-  box-shadow: 0 22px 50px -26px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 22px 50px -26px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 @media (hover: hover) and (pointer: fine) {
-  .pick:hover { border-color: rgba(168,85,247,0.62); transform: translateY(-2px); }
+  .pick:hover { border-color: rgba(168,85,247,0.8); transform: translateY(-2px); }
 }
 .pick:active { transform: translateY(0); }
 
 .pick h2 { font-size: 23px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; }
-.pick p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.64); }
+.pick p { font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.8); }
 /* ‏מי עונה · עובדה על השאלון, ולכן היא יושבת בשורה משלה ולא
    ‏נבלעת בפסקה. בזוגות זאת ההנחיה החשובה ביותר בעמוד. */
 /* ‏span הוא inline, ו-margin אנכי וקו עליון עליו פשוט אינם
@@ -200,8 +205,8 @@ h1 .lead-in {
 .pick-how {
   display: block;
   margin-top: 14px; padding-top: 13px;
-  border-top: 1px solid rgba(168,85,247,0.18);
-  font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,0.56);
+  border-top: 1px solid rgba(168,85,247,0.32);
+  font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,0.74);
 }
 .pick-how b { color: var(--p6); font-weight: 700; }
 .pick-go {
@@ -214,7 +219,7 @@ h1 .lead-in {
 /* ‏השאלה היא התוכן, וכותרת השלב היא ההקשר. קודם זה היה הפוך:
    ‏הכותרת ב-28 והשאלה ב-17.5, כך שההקשר צעק והשאלה נלחשה.
    ‏שם השלב עבר למסילה למעלה, וכאן נשאר רק המשפט שמכין. */
-.stage-sub { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.52); margin-bottom: 30px; }
+.stage-sub { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.68); margin-bottom: 30px; }
 
 .q { margin-bottom: 34px; }
 .q:last-of-type { margin-bottom: 8px; }
@@ -225,13 +230,13 @@ h1 .lead-in {
   letter-spacing: -0.008em;
   margin-bottom: 8px;
 }
-.q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
+.q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.6); margin-bottom: 14px; }
 /* ‏קודם זה היה מודבק לסוף השאלה ונקרא כחלק ממנה, ולפעמים
    ‏נשבר לשורה חדשה באמצע משפט. */
 .q-opt-note {
   display: block;
   font-size: 12.5px; font-weight: 600;
-  color: rgba(255,255,255,0.38);
+  color: rgba(255,255,255,0.56);
   margin-bottom: 12px;
 }
 .q-hint.counted b { color: var(--p6); font-weight: 800; }
@@ -243,22 +248,22 @@ h1 .lead-in {
    ‏היא היחידה שמקבלת צבע. */
 .opts {
   display: flex; flex-direction: column;
-  border-block: 1px solid rgba(255,255,255,0.09);
+  border-block: 1px solid rgba(168,85,247,0.26);
 }
 
 .opt {
   width: 100%; text-align: start; position: relative;
   font-size: 15.5px; font-weight: 500; line-height: 1.5;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.88);
   background: none; border: 0;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid rgba(168,85,247,0.2);
   padding: 14px 34px 14px 14px;
   min-height: 50px; cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 .opt:first-child { border-top: 0; }
 @media (hover: hover) and (pointer: fine) {
-  .opt:hover { background: rgba(255,255,255,0.035); color: #fff; }
+  .opt:hover { background: rgba(124,58,237,0.12); color: #fff; }
 }
 /* ‏עיגול אומר "בחר אחת", ריבוע אומר "אפשר כמה". כשכל האפשרויות
    ‏היו עגולות, שאלה שמרשה שלוש בחירות נראתה כמו שאלה שמרשה
@@ -266,14 +271,14 @@ h1 .lead-in {
 .opt::before {
   content: ''; position: absolute; inset-inline-start: 13px; top: 50%;
   width: 16px; height: 16px; margin-top: -8px;
-  border: 1.5px solid rgba(255,255,255,0.26);
+  border: 1.5px solid rgba(255,255,255,0.42);
   border-radius: 50%;
   transition: border-color 0.15s, background 0.15s;
 }
 .opts.many .opt::before { border-radius: 5px; }
 
 .opt[aria-pressed="true"] {
-  background: rgba(124,58,237,0.17);
+  background: rgba(124,58,237,0.3);
   color: #fff; font-weight: 700;
 }
 .opt[aria-pressed="true"]::before {
@@ -296,32 +301,32 @@ h1 .lead-in {
 .scale { display: flex; gap: 8px; }
 .scale button {
   flex: 1; min-height: 54px; border-radius: 13px;
-  font-size: 17px; font-weight: 800; color: rgba(255,255,255,0.72);
-  background: linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
-  border: 1px solid rgba(168,85,247,0.24);
+  font-size: 17px; font-weight: 800; color: rgba(255,255,255,0.84);
+  background: linear-gradient(158deg, rgba(124,58,237,0.24), rgba(124,58,237,0.07));
+  border: 1px solid rgba(168,85,247,0.4);
   cursor: pointer; transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 @media (hover: hover) and (pointer: fine) {
-  .scale button:hover { border-color: rgba(168,85,247,0.56); }
+  .scale button:hover { border-color: rgba(168,85,247,0.74); }
 }
 .scale button[aria-pressed="true"] {
   border-color: var(--p5); background: rgba(124,58,237,0.32); color: #fff;
 }
 .scale-ends {
   display: flex; justify-content: space-between;
-  font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 9px;
+  font-size: 12px; color: rgba(255,255,255,0.58); margin-top: 9px;
 }
 
 /* ── ‏שדות ── */
 .field { margin-bottom: 14px; }
 .field label {
   display: block; font-size: 13.5px; font-weight: 700;
-  color: rgba(255,255,255,0.74); margin-bottom: 7px;
+  color: rgba(255,255,255,0.86); margin-bottom: 7px;
 }
 .field input, .field textarea, textarea.free {
   width: 100%;
-  background: rgba(168,85,247,0.06);
-  border: 1px solid rgba(168,85,247,0.3);
+  background: rgba(124,58,237,0.14);
+  border: 1px solid rgba(168,85,247,0.42);
   border-radius: 12px;
   padding: 15px 17px;
   font-family: var(--font);
@@ -336,7 +341,7 @@ h1 .lead-in {
 /* ‏תיבה ריקה גבוהה ממלאת חצי מסך בלי להגיד כלום.
    ‏שלוש שורות מספיקות, והיא גדלה למי שכותב יותר. */
 textarea.free { min-height: 86px; resize: vertical; }
-.field input::placeholder, textarea.free::placeholder { color: rgba(255,255,255,0.3); }
+.field input::placeholder, textarea.free::placeholder { color: rgba(255,255,255,0.46); }
 .field input:focus, .field textarea:focus, textarea.free:focus {
   border-color: rgba(168,85,247,0.75); background: rgba(168,85,247,0.1);
 }
@@ -345,28 +350,28 @@ textarea.free { min-height: 86px; resize: vertical; }
 }
 .field-err { font-size: 12.5px; color: var(--err); margin-top: 6px; min-height: 16px; }
 
-.counter { font-size: 12px; color: rgba(255,255,255,0.32); margin-top: 6px; text-align: start; }
+.counter { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 6px; text-align: start; }
 
 /* ── ‏מתג "יחד או בנפרד" ── */
 .seg-wrap { margin-bottom: 30px; }
 .seg-lede {
   font-size: 14.5px; line-height: 1.7;
-  color: rgba(255,255,255,0.72); margin-bottom: 13px;
+  color: rgba(255,255,255,0.84); margin-bottom: 13px;
 }
 .seg-lede b { color: #fff; font-weight: 700; }
 .seg {
   display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
   padding: 5px;
-  background: rgba(255,255,255,0.045);
-  border: 1px solid rgba(168,85,247,0.2);
+  background: rgba(124,58,237,0.14);
+  border: 1px solid rgba(168,85,247,0.34);
   border-radius: 15px;
 }
 .seg button {
   min-height: 46px; border: none; border-radius: 11px; cursor: pointer;
-  font-size: 14.5px; font-weight: 700; color: rgba(255,255,255,0.6);
+  font-size: 14.5px; font-weight: 700; color: rgba(255,255,255,0.76);
   background: transparent; transition: background 0.2s, color 0.2s;
 }
-.seg button[aria-pressed="true"] { background: rgba(124,58,237,0.42); color: #fff; }
+.seg button[aria-pressed="true"] { background: rgba(124,58,237,0.62); color: #fff; }
 
 /* ── ‏כפתורים ── */
 .nav-row { display: flex; gap: 11px; align-items: center; margin-top: 30px; }
@@ -391,12 +396,12 @@ textarea.free { min-height: 86px; resize: vertical; }
 
 .btn-ghost {
   flex: none; padding: 16px 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(168,85,247,0.26);
-  color: rgba(255,255,255,0.72);
+  background: rgba(124,58,237,0.16);
+  border: 1px solid rgba(168,85,247,0.4);
+  color: rgba(255,255,255,0.86);
 }
 @media (hover: hover) and (pointer: fine) {
-  .btn-ghost:hover { background: rgba(255,255,255,0.09); color: #fff; }
+  .btn-ghost:hover { background: rgba(124,58,237,0.28); color: #fff; }
 }
 .btn-ghost svg { width: 16px; height: 16px; }
 
@@ -404,11 +409,11 @@ textarea.free { min-height: 86px; resize: vertical; }
 /* ‏לא כרטיס. זה טקסט שצריך לקרוא לפני שמאשרים, והמסגרת סביבו
    ‏רק גרמה לו להיראות כמו עוד רכיב שאפשר לדלג עליו. */
 .consent-box {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(168,85,247,0.28);
   padding-top: 18px; margin-bottom: 18px;
 }
 .consent-box h3 { font-size: 15px; font-weight: 800; margin-bottom: 9px; }
-.consent-box p { font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,0.6); }
+.consent-box p { font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,0.76); }
 .consent-box p + p { margin-top: 9px; }
 
 .consent { display: flex; align-items: flex-start; gap: 11px; margin: 4px 0 20px; cursor: pointer; }
@@ -425,7 +430,7 @@ textarea.free { min-height: 86px; resize: vertical; }
   width: 5px; height: 11px; border: solid #fff; border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
-.consent span { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.74); }
+.consent span { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.86); }
 
 /* ── ‏סקירה לפני שליחה ── */
 .review-stage { margin-bottom: 22px; }
@@ -434,12 +439,12 @@ textarea.free { min-height: 86px; resize: vertical; }
   color: var(--p6); margin-bottom: 11px;
 }
 .review-row {
-  border-top: 1px solid rgba(168,85,247,0.16);
+  border-top: 1px solid rgba(168,85,247,0.26);
   padding: 12px 0;
 }
-.review-q { font-size: 13.5px; color: rgba(255,255,255,0.5); line-height: 1.5; margin-bottom: 4px; }
+.review-q { font-size: 13.5px; color: rgba(255,255,255,0.66); line-height: 1.5; margin-bottom: 4px; }
 .review-a { font-size: 15px; line-height: 1.65; color: rgba(255,255,255,0.92); white-space: pre-wrap; }
-.review-a.empty { color: rgba(255,255,255,0.3); font-style: italic; }
+.review-a.empty { color: rgba(255,255,255,0.46); font-style: italic; }
 .review-who { font-size: 11.5px; font-weight: 800; color: var(--p6); }
 
 /* ‏מסומן · בלי זה הוא באותו סגול ובאותו משקל כמו
@@ -460,7 +465,7 @@ textarea.free { min-height: 86px; resize: vertical; }
 }
 .done-ico svg { width: 30px; height: 30px; color: var(--ok); }
 .done { text-align: center; }
-.done p { font-size: 16px; line-height: 1.85; color: rgba(255,255,255,0.74); margin-bottom: 26px; }
+.done p { font-size: 16px; line-height: 1.85; color: rgba(255,255,255,0.84); margin-bottom: 26px; }
 
 /* ── ‏הודעות ── */
 .note {
@@ -473,8 +478,8 @@ textarea.free { min-height: 86px; resize: vertical; }
 #draftNote { margin-top: 26px; }
 #draftNote .note { margin-bottom: 0; }
 
-.note-err { background: rgba(255,105,116,0.1); border: 1px solid rgba(255,105,116,0.32); color: #ffc4c8; }
-.note-info { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: var(--p6); }
+.note-err { background: rgba(255,105,116,0.16); border: 1px solid rgba(255,105,116,0.46); color: #ffd3d6; }
+.note-info { background: rgba(124,58,237,0.18); border: 1px solid rgba(168,85,247,0.44); color: var(--p6); }
 /* ‏שתי פעולות בשורה משלהן ולא בהמשך המשפט · כשהן
    ‏ישבו בתוך הפסקה הן היו שתי מילים מסומנות בגובה
    ‏שש עשרה פיקסל, וזה דף שנפתח בטלפון. */
@@ -489,14 +494,14 @@ textarea.free { min-height: 86px; resize: vertical; }
    ‏זהה, שתי מילים מסומנות זו ליד זו נקראו כרצף אחד,
    ‏ומחיקת תשובות בטעות היא טעות שאי אפשר לבטל. */
 .note .btn-inline.minor {
-  font-weight: 600; color: rgba(255,255,255,0.62);
+  font-weight: 600; color: rgba(255,255,255,0.74);
 }
 
 .foot {
   margin-top: auto; padding-top: 34px; text-align: center;
-  font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.3);
+  font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.46);
 }
-.foot a { color: rgba(255,255,255,0.46); text-underline-offset: 3px; }
+.foot a { color: rgba(255,255,255,0.62); text-underline-offset: 3px; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
