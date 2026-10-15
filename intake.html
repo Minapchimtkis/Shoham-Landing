@@ -442,9 +442,14 @@ textarea.free { min-height: 86px; resize: vertical; }
 .review-a.empty { color: rgba(255,255,255,0.3); font-style: italic; }
 .review-who { font-size: 11.5px; font-weight: 800; color: var(--p6); }
 
+/* ‏מסומן · בלי זה הוא באותו סגול ובאותו משקל כמו
+   ‏כותרות השלבים שמעליו, ונקרא ככותרת ולא כפעולה ·
+   ‏וזו הדרך היחידה לתקן תשובה לפני שליחה. */
 .edit-link {
   background: none; border: none; cursor: pointer; padding: 4px 0;
+  display: inline-flex; align-items: center; min-height: 44px;
   font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--p6);
+  text-decoration: underline; text-underline-offset: 3px;
 }
 
 /* ── ‏סיום ── */
@@ -462,12 +467,29 @@ textarea.free { min-height: 86px; resize: vertical; }
   border-radius: 13px; padding: 13px 16px; font-size: 13.5px; line-height: 1.65;
   margin-bottom: 18px;
 }
+/* ‏ההצעה להמשיך היא קבוצה בפני עצמה, ולכן המרווח
+   ‏מעליה גדול מהמרווח שבין שני הכרטיסים · בלי זה
+   ‏היא נגעה בתחתית כרטיס הזוגות ונקראה כחלק ממנו. */
+#draftNote { margin-top: 26px; }
+#draftNote .note { margin-bottom: 0; }
+
 .note-err { background: rgba(255,105,116,0.1); border: 1px solid rgba(255,105,116,0.32); color: #ffc4c8; }
 .note-info { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: var(--p6); }
+/* ‏שתי פעולות בשורה משלהן ולא בהמשך המשפט · כשהן
+   ‏ישבו בתוך הפסקה הן היו שתי מילים מסומנות בגובה
+   ‏שש עשרה פיקסל, וזה דף שנפתח בטלפון. */
+.note-acts { display: flex; flex-wrap: wrap; gap: 0 20px; margin-top: 2px; }
 .note .btn-inline {
   background: none; border: none; cursor: pointer; padding: 0;
+  display: inline-flex; align-items: center; min-height: 44px;
   font-family: var(--font); font-size: 13.5px; font-weight: 800;
   color: inherit; text-decoration: underline; text-underline-offset: 3px;
+}
+/* ‏השנייה היא דרך היציאה ולא הפעולה · כששתיהן נראו
+   ‏זהה, שתי מילים מסומנות זו ליד זו נקראו כרצף אחד,
+   ‏ומחיקת תשובות בטעות היא טעות שאי אפשר לבטל. */
+.note .btn-inline.minor {
+  font-weight: 600; color: rgba(255,255,255,0.62);
 }
 
 .foot {
@@ -1546,7 +1568,8 @@ $('sendBtn').addEventListener('click', send);
   var form = d.kind === 'couple' ? COUPLE : INDIVIDUAL;
   var host = $('draftNote');
   var box = el('div', 'note note-info');
-  box.appendChild(document.createTextNode('התחלתם למלא את ה' + form.title.replace('שאלון ', 'שאלון ') + ' ולא סיימתם. '));
+  box.appendChild(el('div', null, 'התחלתם למלא את ה' + form.title + ' ולא סיימתם.'));
+  var acts = el('div', 'note-acts');
   var go = el('button', 'btn-inline', 'להמשיך מהמקום שעצרתם');
   go.type = 'button';
   go.addEventListener('click', function () {
@@ -1558,12 +1581,12 @@ $('sendBtn').addEventListener('click', send);
     S.submitToken = d.submitToken || uuid();
     startForm(form, true);
   });
-  box.appendChild(go);
-  box.appendChild(document.createTextNode(' · '));
-  var drop = el('button', 'btn-inline', 'להתחיל מחדש');
+  acts.appendChild(go);
+  var drop = el('button', 'btn-inline minor', 'להתחיל מחדש');
   drop.type = 'button';
   drop.addEventListener('click', function () { clearDraft(); clear(host); });
-  box.appendChild(drop);
+  acts.appendChild(drop);
+  box.appendChild(acts);
   host.appendChild(box);
 })();
 
