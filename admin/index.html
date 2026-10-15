@@ -214,6 +214,27 @@ textarea.input{min-height:110px;padding:12px;resize:vertical;line-height:1.6}
 .ik-kind.couple{color:#dacaff;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.12)}
 .ik-pill{justify-self:center}
 
+/* ‏לקראת הפגישה. מד של חמש נקודות ולא צבע · צבע על מספר אומר
+   ‏"טוב" או "רע", וזאת אבחנה. מד מראה את המספר עצמו ונותן
+   ‏להשוות בין שני סולמות במבט אחד. */
+.dg-wrap{padding:14px}
+.dg-group{margin-bottom:16px}
+.dg-group:last-child{margin-bottom:0}
+.dg-head{font-size:9px;font-weight:800;color:var(--muted2);margin-bottom:9px}
+.dg-scale{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
+.dg-scale:first-of-type{border-top:0}
+.dg-q{font-size:12.5px;line-height:1.5;color:#cdd2dc}
+.dg-meter{display:flex;gap:4px;align-items:center;flex:none}
+.dg-meter i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.12)}
+.dg-meter i.on{background:var(--purple)}
+.dg-meter b{margin-inline-start:7px;font-size:12px;font-weight:900;color:#e7eaf1;white-space:nowrap}
+.dg-picks{display:flex;flex-wrap:wrap;gap:6px}
+.dg-pick{border-radius:999px;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.12);color:#dacaff;font-size:11px;font-weight:800;padding:5px 10px}
+.dg-pick-q{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.dg-pick-row{margin-bottom:12px}
+.dg-pick-row:last-child{margin-bottom:0}
+.dg-note{font-size:11.5px;color:var(--muted2);padding-top:10px;border-top:1px solid rgba(255,255,255,.055)}
+
 /* ‏גיליון התשובות. שלב, ואז שורה לכל שאלה · אותו סדר בדיוק
    ‏שבו נשאלו, כדי שאפשר יהיה לקרוא אותו כמו שיחה. */
 .ik-stage{border-top:1px solid var(--line);padding:14px}
@@ -677,6 +698,14 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
       <div><span>התחיל למלא</span><b id="ikMetaStart">—</b></div>
       <div><span>סיים ושלח</span><b id="ikMetaEnd">—</b></div>
     </div>
+  </section>
+
+  <!-- ‏לקראת הפגישה. אין כאן ניתוח ואין ציון · רק המספרים
+       ‏והבחירות שכבר נענו, מוצפים כדי שלא צריך לקרוא עשרים
+       ‏שאלות בדרך לפגישה. -->
+  <section class="detail-section hidden" id="ikDigestSection">
+    <div class="detail-section-head"><strong>לקראת הפגישה</strong><span>מה שכבר נאמר</span></div>
+    <div id="ikDigest"></div>
   </section>
 
   <section class="detail-section">
@@ -1732,6 +1761,7 @@ function renderIkDetail(id){
 
   const host=$('ikAnswers');host.replaceChildren();
   const stages=ikAnswers.get(id);
+  renderIkDigest(stages);
   if(!stages){
     const p=document.createElement('div');p.className='ik-stage';
     p.textContent='טוען את התשובות…';host.appendChild(p);
@@ -1764,14 +1794,119 @@ function renderIkDetail(id){
   $('ikCountNote').textContent=answered+' מתוך '+total+' שאלות';
 }
 
+/* ═══════════ ‏לקראת הפגישה ═══════════ */
+/* ‏הצפה בלבד, בלי שורת פרשנות אחת. השאלונים נשמרים כזוג של
+   ‏נוסח השאלה ותשובה, בלי מזהה סוג, ולכן הסוג נגזר מצורת
+   ‏התשובה: "N מתוך 5" הוא סולם, תשובה עם מפריד היא בחירה
+   ‏מרובה, וכל השאר טקסט. זה עמיד גם אם ינוסחו שאלות מחדש.
+
+   ‏מה שבמפורש אין כאן: ציון, דירוג, צבע שאומר טוב או רע,
+   ‏וכל משפט שמסכם אדם. מד של חמש נקודות מראה את המספר שהוא
+   ‏עצמו נתן, וזה הכול. */
+
+const DG_SCALE=/^([1-5])\s+מתוך\s+5$/;
+
+function ikDigest(stages){
+  const scales=[],picks=[];
+  let answered=0,total=0;
+  for(const st of stages||[]){
+    for(const it of (st.items||[])){
+      total++;
+      const a=(it.a==null?'':String(it.a)).trim();
+      if(!a)continue;
+      answered++;
+      const m=a.match(DG_SCALE);
+      if(m){scales.push({q:it.q||'',who:it.who||null,n:Number(m[1])});continue}
+      if(a.includes(' · ')){
+        picks.push({q:it.q||'',who:it.who||null,items:a.split(' · ').filter(Boolean)});
+      }
+    }
+  }
+  return {scales,picks,answered,total,blank:total-answered};
+}
+
+function renderIkDigest(stages){
+  const sec=$('ikDigestSection'),box=$('ikDigest');
+  box.replaceChildren();
+  const d=ikDigest(stages);
+
+  /* ‏בלי סולמות ובלי בחירות אין מה להציף, ומסגרת ריקה גרועה
+     ‏מכלום · הסעיף פשוט לא מופיע. */
+  if(!d.scales.length&&!d.picks.length){sec.classList.add('hidden');return}
+  sec.classList.remove('hidden');
+
+  const wrap=document.createElement('div');wrap.className='dg-wrap';
+
+  if(d.scales.length){
+    const g=document.createElement('div');g.className='dg-group';
+    g.append(Object.assign(document.createElement('div'),
+      {className:'dg-head',textContent:'הסולמות, כפי שדורגו'}));
+    for(const sc of d.scales){
+      const row=document.createElement('div');row.className='dg-scale';
+      const q=document.createElement('div');q.className='dg-q';
+      q.textContent=(sc.who?sc.who+' · ':'')+sc.q;
+      const meter=document.createElement('div');meter.className='dg-meter';
+      for(let i=1;i<=5;i++){
+        const dot=document.createElement('i');
+        if(i<=sc.n)dot.className='on';
+        meter.append(dot);
+      }
+      const num=document.createElement('b');num.textContent=sc.n+'/5';
+      meter.append(num);
+      meter.setAttribute('role','img');
+      meter.setAttribute('aria-label',sc.n+' מתוך 5');
+      row.append(q,meter);g.append(row);
+    }
+    wrap.append(g);
+  }
+
+  if(d.picks.length){
+    const g=document.createElement('div');g.className='dg-group';
+    g.append(Object.assign(document.createElement('div'),
+      {className:'dg-head',textContent:'מה נבחר'}));
+    for(const pk of d.picks){
+      const row=document.createElement('div');row.className='dg-pick-row';
+      const q=document.createElement('div');q.className='dg-pick-q';
+      q.textContent=(pk.who?pk.who+' · ':'')+pk.q;
+      const list=document.createElement('div');list.className='dg-picks';
+      for(const item of pk.items){
+        const chip=document.createElement('span');chip.className='dg-pick';
+        chip.textContent=item;list.append(chip);
+      }
+      row.append(q,list);g.append(row);
+    }
+    wrap.append(g);
+  }
+
+  if(d.blank){
+    const n=document.createElement('div');n.className='dg-note';
+    n.textContent=d.blank===1?'שאלה אחת נותרה בלי תשובה.'
+                             :d.blank+' שאלות נותרו בלי תשובה.';
+    wrap.append(n);
+  }
+
+  box.append(wrap);
+}
+
 /* ‏סיכום להדבקה · טקסט פשוט, כי זה מה שנדבק נכון בכל מקום,
    ‏מהערות של יומן ועד הודעה. */
+function ikSummaryDigest(stages){
+  const d=ikDigest(stages),out=[];
+  for(const x of d.scales)out.push((x.who?'['+x.who+'] ':'')+x.q+'  '+x.n+'/5');
+  for(const x of d.picks)out.push((x.who?'['+x.who+'] ':'')+x.q+'  '+x.items.join(' · '));
+  if(d.blank)out.push(d.blank===1?'שאלה אחת נותרה בלי תשובה.'
+                                 :d.blank+' שאלות נותרו בלי תשובה.');
+  return out;
+}
+
 function ikSummary(r,stages){
   const out=[];
   out.push('שאלון היכרות · '+(r.kind==='couple'?'זוג':'יחיד'));
   out.push('מי: '+(r.name||'ללא שם')+(r.phone?' · '+r.phone:''));
   out.push('נשלח: '+parts(r.created_at).full);
   out.push('');
+  const d=ikSummaryDigest(stages);
+  if(d.length){out.push('── לקראת הפגישה');out.push(...d);out.push('')}
   for(const st of stages||[]){
     out.push('── '+(st.stage||''));
     for(const it of (st.items||[])){
@@ -1874,6 +2009,22 @@ function ikSheetHtml(r,stages){
 
   const notes=(r.notes||'').trim();
 
+  /* ‏אותה הצפה שעל המסך, כי דווקא על נייר לפני פגישה היא
+     ‏שווה הכי הרבה. אותו כלל: רק מה שנענה, בלי מילה שלי. */
+  const d=ikDigest(stages);
+  let digest='';
+  if(d.scales.length||d.picks.length){
+    const sc=d.scales.map(x=>
+      '<tr><th>'+ikEsc((x.who?x.who+' · ':'')+x.q)+'</th>'+
+      '<td><b>'+x.n+' / 5</b></td></tr>').join('');
+    const pk=d.picks.map(x=>
+      '<tr><th>'+ikEsc((x.who?x.who+' · ':'')+x.q)+'</th>'+
+      '<td>'+ikEsc(x.items.join(' · '))+'</td></tr>').join('');
+    digest='<section><h2>לקראת הפגישה</h2><table>'+sc+pk+'</table>'+
+      (d.blank?'<div class="blank">'+(d.blank===1?'שאלה אחת נותרה בלי תשובה.'
+        :d.blank+' שאלות נותרו בלי תשובה.')+'</div>':'')+'</section>';
+  }
+
   return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">'+
     '<meta name="viewport" content="width=device-width,initial-scale=1">'+
     '<title>'+ikEsc(r.name||'שאלון היכרות')+' · שאלון היכרות</title><style>'+
@@ -1895,6 +2046,7 @@ function ikSheetHtml(r,stages){
     '.a{font-size:14px;font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere}'+
     '.a.none{font-weight:400;color:#999;font-style:italic}'+
     '.notes{border:1px solid #ccc;padding:10px 12px;white-space:pre-wrap}'+
+    '.blank{margin-top:8px;font-size:12px;color:#777}'+
     '.hint{margin-bottom:18px;padding:10px 12px;border:1px solid #c9b6ea;'+
     'background:#f6f1fd;border-radius:8px;font-size:12.5px;color:#4a3870}'+
     '@media print{.hint{display:none}body{padding:0}}'+
@@ -1904,6 +2056,7 @@ function ikSheetHtml(r,stages){
     '<h1>'+ikEsc(r.name||'ללא שם')+'</h1>'+
     '<div class="sub">שאלון היכרות · '+ikEsc(kind)+'</div>'+
     '<table>'+meta+'</table>'+
+    digest+
     body+
     (notes?'<section><h2>הערות פנימיות</h2><div class="notes">'+ikEsc(notes)+'</div></section>':'')+
     '</body></html>';
