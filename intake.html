@@ -228,13 +228,6 @@ h1 .lead-in {
 .q-hint { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
 .q-opt-note { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.38); margin-inline-start: 7px; }
 
-/* ‏מי עונה. בשאלון שבו כל אחד עונה בנפרד זה הדבר שהעין צריכה
-   ‏לתפוס ראשונה בכל שאלה, ולכן הוא שם ממשי ולא תגית קטנה. */
-.who-tag {
-  display: block; font-size: 13px; font-weight: 800;
-  color: var(--p6); margin-bottom: 7px;
-}
-
 /* ── ‏אפשרויות ── */
 /* ‏אפשרות אינה כרטיס. קודם כל אפשרות קיבלה מסגרת, גרדיאנט
    ‏וצל פנימי · שבע מהן על מסך אחד נראו כמו שבעה משטחים שווי
@@ -806,6 +799,7 @@ var S = {
   step: 0,           /* 0 = מי ממלא, 1..n = שלבים, n+1 = סקירה */
   who: {},           /* ‏שם, טלפון, אימייל, שמות בני הזוג */
   answers: {},       /* ‏מזהה שאלה אל תשובה. בזוגות בנפרד: {a:…, b:…} */
+  steps: null,       /* ‏מפת הצעדים · נבנית מהשלבים ומהפיצול */
   split: true,       /* ‏בזוגות · כל אחד עונה בנפרד. זאת ברירת המחדל
                         ‏בכוונה: שני אנשים שעונים יחד על "מה כסף מסמל
                         ‏עבורך" נותנים תשובה אחת מרוככת, ואז אין מה
@@ -916,14 +910,49 @@ function isAnswered(v, type) {
 
 /* ═══════════════════════════════════ ‏התקדמות ══ */
 
-function totalSteps() { return S.form ? S.form.stages.length + 2 : 0; }
+/* ‏צעד אינו שלב.
+   ‏בשאלון הזוגות השלב האישי נשאל פעמיים, פעם לכל אחד, ולכן
+   ‏הוא שני צעדים ולא אחד. קודם כל עשר השאלות ישבו במסך אחד
+   ‏באורך חמישה מסכים וחצי, וכל שאלה הופיעה בו פעמיים בדיוק
+   ‏זו מתחת לזו · זה נקרא כמו תקלה ולא כמו שאלון. עכשיו יעל
+   ‏עונה על החמש שלה, ואז אורי על שלו. */
+function buildSteps() {
+  var out = [{ kind: 'who' }];
+  S.form.stages.forEach(function (st, i) {
+    if (st.perPartner && S.split) {
+      out.push({ kind: 'stage', i: i, who: 'a' });
+      out.push({ kind: 'stage', i: i, who: 'b' });
+    } else {
+      out.push({ kind: 'stage', i: i, who: null });
+    }
+  });
+  out.push({ kind: 'review' });
+  return out;
+}
+
+function steps() {
+  if (!S.steps) S.steps = buildSteps();
+  return S.steps;
+}
+
+function totalSteps() { return S.form ? steps().length : 0; }
+
+function stepAt(n) { return steps()[Math.max(0, Math.min(n, steps().length - 1))]; }
 
 /* ‏שם המסך הנוכחי. השלבים הם שמות אמיתיים, והפרטים והסקירה
    ‏הם שני הקצוות · כך המסילה אומרת איפה אני, ולא כמה אחוז. */
-function stepName(i) {
-  if (i === 0) return 'הפרטים שלכם';
-  if (i <= S.form.stages.length) return S.form.stages[i - 1].title;
-  return 'סקירה ושליחה';
+function stepName(n) {
+  var st = stepAt(n);
+  if (st.kind === 'who') return 'הפרטים שלכם';
+  if (st.kind === 'review') return 'סקירה ושליחה';
+  var title = S.form.stages[st.i].title;
+  return st.who ? ('התור של ' + partnerName(st.who)) : title;
+}
+
+function partnerName(key) {
+  if (key === 'a') return S.who.partnerA || 'בן/בת זוג א׳';
+  if (key === 'b') return S.who.partnerB || 'בן/בת זוג ב׳';
+  return '';
 }
 
 function paintProgress() {
@@ -1036,27 +1065,38 @@ function validateWho() {
 /* ═══════════════════════════════════ ‏מסך שלב ══ */
 
 function renderStage() {
-  var stage = S.form.stages[S.step - 1];
+  var st = stepAt(S.step);
+  var stage = S.form.stages[st.i];
   $('stageTitle').textContent = stage.title;
-  var sub = $('stageSub');
-  sub.textContent = stage.sub || '';
-  sub.style.display = stage.sub ? '' : 'none';
   note($('stageErr'), '', '');
 
-  /* ‏המתג "יחד או בנפרד" · רק בשלב שמסומן כאישי בשאלון הזוגות. */
+  var sub = $('stageSub');
+  var subText = stage.sub || '';
+  /* ‏במעבר השני אין צורך להסביר שוב · צריך רק לומר שהתור עבר. */
+  if (st.who === 'b') subText = 'עכשיו תנו את הטלפון ל' + partnerName('b') + '. אותן חמש שאלות, והתשובות של ' + partnerName('a') + ' כבר שמורות.';
+  sub.textContent = subText;
+  sub.style.display = subText ? '' : 'none';
+
   var seg = $('stageSeg');
   clear(seg);
-  if (stage.perPartner) {
+
+  /* ‏המתג מופיע רק בפתח החלק האישי · במעבר השני הבחירה כבר
+     ‏נעשתה, וכפתור שמשנה את המבנה באמצע רק מבלבל. */
+  if (stage.perPartner && st.who !== 'b') {
     var wrap = el('div', 'seg-wrap');
     var lede = el('p', 'seg-lede');
-    lede.appendChild(el('b', null, 'בשלב הזה כל אחד מכם עונה בנפרד.'));
-    lede.appendChild(document.createTextNode(
-      ' אותן חמש שאלות, פעם אחת לכל אחד. אין כאן תשובה נכונה, ודווקא ההבדלים ביניכם הם מה שעוזר לי להבין מאיפה להתחיל.'));
+    if (st.who === 'a') {
+      lede.appendChild(el('b', null, 'קודם ' + partnerName('a') + ', אחר כך ' + partnerName('b') + '.'));
+      lede.appendChild(document.createTextNode(
+        ' דווקא ההבדלים ביניכם הם מה שעוזר לי להבין מאיפה להתחיל.'));
+    } else {
+      lede.appendChild(document.createTextNode('אתם עונים יחד על החלק הזה.'));
+    }
     wrap.appendChild(lede);
 
     var box = el('div', 'seg');
     box.setAttribute('role', 'group');
-    box.setAttribute('aria-label', 'איך למלא את השלב הזה');
+    box.setAttribute('aria-label', 'איך למלא את החלק האישי');
     [['כל אחד בנפרד', true], ['נעדיף לענות יחד', false]].forEach(function (pair) {
       var b = el('button', null, pair[0]);
       b.type = 'button';
@@ -1067,7 +1107,9 @@ function renderStage() {
         /* ‏המעבר בין המצבים לא שומר תשובות · הצורה שלהן שונה,
            ‏ולנחש איזו משתי התשובות "האמיתית" היה גרוע מלשאול שוב. */
         stage.questions.forEach(function (q) { delete S.answers[q.id]; });
+        S.steps = buildSteps();
         saveDraft();
+        paintProgress();
         renderStage();
       });
       box.appendChild(b);
@@ -1078,12 +1120,9 @@ function renderStage() {
 
   var host = $('stageBody');
   clear(host);
-  var perPartner = !!stage.perPartner && S.split;
-
+  var who = st.who ? { key: st.who, name: partnerName(st.who) } : { key: null, name: null };
   stage.questions.forEach(function (q) {
-    (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
-      host.appendChild(buildQuestion(q, p));
-    });
+    host.appendChild(buildQuestion(q, who));
   });
 }
 
@@ -1091,7 +1130,8 @@ function buildQuestion(q, who) {
   var wrap = el('div', 'q');
   var fieldId = 'q_' + q.id + (who.key ? '_' + who.key : '');
 
-  if (who.name) wrap.appendChild(el('span', 'who-tag', who.name));
+  /* ‏אין כאן תגית שם. המסך כולו שייך לאדם אחד והמסילה אומרת
+     ‏למי, כך ששם שחוזר מעל כל אחת מחמש השאלות הוא רעש. */
 
   var qt = el('div', 'q-text');
   qt.id = fieldId + '_label';
@@ -1234,12 +1274,14 @@ function buildText(q, who, fieldId) {
 }
 
 function validateStage() {
-  var stage = S.form.stages[S.step - 1];
-  var perPartner = !!stage.perPartner && S.split;
+  var st = stepAt(S.step);
+  var stage = S.form.stages[st.i];
   var firstBad = null;
+  var only = st.who ? [{ key: st.who, name: partnerName(st.who) }]
+                    : [{ key: null, name: null }];
 
   stage.questions.forEach(function (q) {
-    (perPartner ? partners() : [{ key: null, name: null }]).forEach(function (p) {
+    only.forEach(function (p) {
       var fieldId = 'q_' + q.id + (p.key ? '_' + p.key : '');
       var err = $(fieldId + '_err');
       if (!err) return;
@@ -1298,7 +1340,7 @@ function renderReview() {
 
     var edit = el('button', 'edit-link', 'חזרה לעריכת השלב הזה');
     edit.type = 'button';
-    edit.addEventListener('click', function () { goto(idx + 1); });
+    edit.addEventListener('click', function () { goto(stepOfStage(idx)); });
     block.appendChild(edit);
     host.appendChild(block);
   });
@@ -1310,16 +1352,27 @@ function renderReview() {
 /* ═══════════════════════════════════ ‏ניווט ══ */
 
 function goto(step) {
-  S.step = step;
+  S.step = Math.max(0, Math.min(step, totalSteps() - 1));
   saveDraft();
   paintProgress();
-  if (step === 0) { renderWho(); show('scWho'); }
-  else if (step <= S.form.stages.length) { renderStage(); show('scStage'); }
+  var st = stepAt(S.step);
+  if (st.kind === 'who') { renderWho(); show('scWho'); }
+  else if (st.kind === 'stage') { renderStage(); show('scStage'); }
   else { renderReview(); show('scReview'); }
+}
+
+/* ‏הצעד הראשון של שלב מסוים · כפתור העריכה בסקירה מצביע אליו. */
+function stepOfStage(i) {
+  var all = steps();
+  for (var n = 0; n < all.length; n++) {
+    if (all[n].kind === 'stage' && all[n].i === i) return n;
+  }
+  return 0;
 }
 
 function startForm(form, resume) {
   S.form = form;
+  S.steps = null;                 /* ‏נבנה מחדש לפי הטופס והפיצול */
   if (!resume) {
     S.who = {}; S.answers = {}; S.split = true;
     S.startedAt = new Date().toISOString();
@@ -1327,7 +1380,8 @@ function startForm(form, resume) {
   }
   if (!S.submitToken) S.submitToken = uuid();
   if (!S.startedAt) S.startedAt = new Date().toISOString();
-  goto(resume ? Math.min(S.step, S.form.stages.length + 1) : 0);
+  S.steps = buildSteps();
+  goto(resume ? Math.min(S.step, totalSteps() - 1) : 0);
 }
 
 /* ═══════════════════════════════════ ‏שליחה ══ */
@@ -1432,7 +1486,7 @@ $('stageNext').addEventListener('click', function () {
   if (validateStage()) goto(S.step + 1);
 });
 
-$('reviewBack').addEventListener('click', function () { goto(S.form.stages.length); });
+$('reviewBack').addEventListener('click', function () { goto(S.step - 1); });
 $('consentBox').addEventListener('change', function () {
   $('sendBtn').disabled = !this.checked;
 });
