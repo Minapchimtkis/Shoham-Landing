@@ -145,6 +145,29 @@ export function mountImport(A) {
     $('impDropSub').textContent = k === 'credit'
       ? 'פירוט החיובים של הכרטיס, אקסל, CSV או PDF'
       : 'דף התנועות של החשבון, אקסל, CSV או PDF';
+    paintLast();
+  }
+
+  /* ‏מתי נכנס כאן דף מהסוג הזה לאחרונה. עובדה אחת,
+     ‏בלי המלצה ובלי נזיפה · הרצועה במסך הבית היא שאומרת
+     ‏כשזה מתיישן, וכאן, כשכבר באו לייבא, צריך רק לדעת
+     ‏מאיזה תאריך להוריד את הדף הבא.
+
+     ‏אין משפט "עוד לא ייבאתם": בפעם הראשונה שורה
+     ‏כזאת אינה אומרת כלום שהמסך לא אומר כבר. */
+  function paintLast() {
+    const node = $('impLast');
+    const ts = S.lastImp && S.lastImp[impKind];
+    if (!ts) { hide(node); node.textContent = ''; return; }
+    const d = A.daysSince(ts);
+    /* ‏"ב" לפני ספרה נדבקת אליה בעברית, והתרופה הרגילה
+       ‏לזה היא מקף · לכן התאריך בא אחרי נקודה ולא
+       ‏אחרי תחילית, והיום ואתמול עומדים לבדם. */
+    node.textContent = 'הדף האחרון מהסוג הזה נכנס ' +
+      (d <= 0 ? 'היום'
+       : d === 1 ? 'אתמול'
+       : 'לפני ' + d + ' ימים · ' + A.dayMonth(ts));
+    show(node);
   }
 
   function resetImport() {

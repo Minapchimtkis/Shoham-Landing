@@ -394,6 +394,21 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
 
+    <!-- ‏בן כמה ימים המספר שלמעלה. הוא נאמר כאן ולא
+         ‏בכרטיס תובנה בתחתית המסך, כי הסתייגות שמגיעה
+         ‏אחרי שכבר פעלת לפי המספר אינה סתייגות.
+
+         ‏ושקט ולא ענבר: זו אינה התראה על כסף שעומד
+         ‏לצאת אלא גיל של נתונים, ושתי רצועות באותו צבע
+         ‏היו מתחרות זו בזו על אותה תשומת לב. -->
+    <button class="coming quiet hidden" id="homeStale" type="button">
+      <span class="coming-text">
+        <span class="coming-main" id="staleMain"></span>
+        <span class="coming-sub" id="staleSub"></span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
     <!-- ‏נכנס ויצא, זה ליד זה. מחליף שתי שורות פרוזה שאמרו את
          ‏אותם שני מספרים במשפט · מספר נקרא בהצצה, משפט לא. -->
     <div class="flow hidden" id="homeFlow">
@@ -890,6 +905,11 @@
         <button type="button" id="impBank" aria-pressed="true">עובר ושב</button>
         <button type="button" id="impCredit" aria-pressed="false">כרטיס אשראי</button>
       </div>
+
+      <!-- מתי נכנס כאן דף כזה לאחרונה · השאלה הראשונה של
+           מי שעומד כאן היא "עד מתי כבר יש לי", ובלי תשובה
+           הדרך היחידה לדעת היא לייבא ולראות מה מסומן ככפול. -->
+      <p class="note hidden" id="impLast" style="margin:-8px 0 20px"></p>
 
       <label class="drop" id="impDrop" for="impFile">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5m0 0L8 9m4-4l4 4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>

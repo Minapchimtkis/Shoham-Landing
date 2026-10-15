@@ -190,6 +190,15 @@ function periodLabel(anchor) {
   return `${SHORT.format(atNoon(from))} עד ${SHORT.format(atNoon(to))}`;
 }
 
+/* ‏"3 באוקטובר" · בלי יום בשבוע, כשהתאריך הוא עובדה
+   ‏בתוך משפט ולא כותרת של רשימה. */
+const DMON = new Intl.DateTimeFormat('he-IL', { day: 'numeric', month: 'long' });
+const dayMonth = ts => DMON.format(new Date(ts));
+
+/* ‏כמה ימים שלמים עברו · מעגל למטה, כדי שמשהו
+   ‏שקרה לפני שלושים שעות לא ייקרא "לפני יומיים". */
+const daysSince = ts => Math.floor((Date.now() - new Date(ts).getTime()) / DAY);
+
 const DFMT = new Intl.DateTimeFormat('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
 function dayName(iso) {
   const d = new Date(iso + 'T12:00:00');
@@ -291,7 +300,8 @@ const S = {
   lastLeft: null,
   ever: true,               // ‏האם היה במשק הבית אי פעם תקציב או תנועה
   assets: [],               // ‏החסכונות והנכסים, נקראים פעם אחת לטעינה
-  debts: []                 // ‏החובות, גם הם
+  debts: [],                // ‏החובות, גם הם
+  lastImp: { bank: null, credit: null }   // ‏הייבוא האחרון מכל סוג
 };
 
 const byId  = id => S.cats.find(c => c.id === id);
@@ -938,7 +948,7 @@ async function loadAll(pre) {
      ‏היא עדיין נסיעה שלמה לשרת גם כשהיא מקבילה לאחרות. */
   const have = v => Promise.resolve({ data: v, error: null });
 
-  const [cats, buds, txs, refl, pros, hh, anyB, anyT, ast, dbt, mru, mem, hist] = await Promise.all([
+  const [cats, buds, txs, refl, pros, hh, anyB, anyT, ast, dbt, mru, mem, hist, imps] = await Promise.all([
     sb.from('categories').select('*'),
     sb.from('budgets').select('category_id,planned_agorot').eq('month', m0),
     sb.from('transactions').select('*').gte('occurred_on', p0).lte('occurred_on', p1)
@@ -964,7 +974,13 @@ async function loadAll(pre) {
     pre && pre.members ? have(pre.members) : sb.from('household_members').select('*'),
     sb.from('transactions')
       .select('occurred_on,amount_agorot,direction,category_id,description,is_transfer')
-      .gte('occurred_on', hFrom).lte('occurred_on', hTo)
+      .gte('occurred_on', hFrom).lte('occurred_on', hTo),
+    /* ‏מתי יובא כאן דף לאחרונה. שתים עשרה השורות האחרונות
+       ‏מספיקות כדי למצוא את האחרונה מכל סוג, וגם כאן באותה
+       ‏סובלנות כמו השאר: עד שהמיגרציה תרוץ אין רצועה ואין
+       ‏שורה במסך הייבוא, במקום שהאפליקציה תיפול. */
+    sb.from('imports').select('kind,created_at')
+      .order('created_at', { ascending: false }).limit(12)
   ]);
 
   for (const r of [cats, buds, txs, pros]) if (r.error) throw r.error;
@@ -1017,6 +1033,18 @@ async function loadAll(pre) {
   if (!mru.error) for (const r of (mru.data || []))
     S.mrules.set(r.merchant, { catId: r.category_id, move: !!r.is_move });
   S.prevTxs = null;
+
+  /* ‏הייבוא האחרון מכל סוג. עובר ושב ואשראי אינם אותו דבר:
+     ‏דף של חשבון נמשך כל יום, ופירוט של כרטיס נסגר פעם
+     ‏בחודש · ולכן אחד מהם מתיישן בשבועיים והשני לא.
+     ‏הרשומות חוזרות מהחדשה לעתיקה, ולכן הראשונה מכל סוג
+     ‏היא האחרונה שהייתה. */
+  S.lastImp = { bank: null, credit: null };
+  if (!imps.error) for (const r of (imps.data || [])) {
+    if (!r.created_at) continue;
+    if (r.kind !== 'bank' && r.kind !== 'credit') continue;
+    if (!S.lastImp[r.kind]) S.lastImp[r.kind] = r.created_at;
+  }
 
   /* ‏שתי רשימות שנגזרות מההיסטוריה, ונחשבות פעם אחת לטעינה ·
      ‏קודם renderInsight חישבה אותן בכל ציור של הבית, וגם
@@ -1289,6 +1317,7 @@ function renderHome() {
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
   renderComing();
+  renderStale();
   renderFlow();
   renderSplit();
   renderPulse(current, dim, now);
@@ -1339,6 +1368,58 @@ function renderComing() {
 }
 
 $('homeComing').addEventListener('click', () => openRecurring());
+
+/* ‏בן כמה ימים המספר שלמעלה · הדבר הראשון שצריך
+   ‏להיות נכון במסך הזה הוא שהמספרים שלו אמיתיים.
+   ‏אפליקציה שאומרת בביטחון כמה נשאר, כששלושה שבועות
+   ‏של הוצאות פשוט לא נכנסו לתוכה, מלמדת אדם לא
+   ‏לסמוך על עצמו · והסתייגות הזאת חייבת לשבת ליד
+   ‏המספר ולא בתחתית המסך, כי סתייגות שמגיעה אחרי
+   ‏שכבר פעלת לפיו אינה סתייגות.
+
+   ‏שתי מידות ולא אחת, כי אלה שני דברים שונים: דף של
+   ‏חשבון נמשך כל יום ולכן שבועיים הם הרבה, ופירוט
+   ‏של כרטיס נסגר פעם בחודש ולכן שלושים יום בו הם לא
+   ‏כלום. מידה אחת לשניהם היתה מציקה בלי סיבה.
+
+   ‏וזו עובדה על המסך ולא עצה שאפשר לסגור · הרצועה
+   ‏יורדת מעצמה ברגע שנכנס דף חדש, ולא לפני כן. */
+const STALE_AFTER = { bank: 14, credit: 40 };
+const STALE_SRC   = { bank: 'מהבנק', credit: 'מהאשראי' };
+
+function staleImports() {
+  if (!inCurrentPeriod()) return [];
+  return ['bank', 'credit'].filter(k =>
+    S.lastImp && S.lastImp[k] && daysSince(S.lastImp[k]) >= STALE_AFTER[k]);
+}
+
+function renderStale() {
+  const box = $('homeStale');
+  const stale = staleImports();
+  if (!stale.length) { hide(box); return; }
+
+  /* ‏הצעיר מבין השניים · אמירה שהייבוא האחרון היה לפני
+     ‏חודשיים כשבפועל נכנס דף לפני שבועיים הייתה המצאה,
+     ‏גם אם הייתה מרשימה יותר. */
+  const d = Math.min(...stale.map(k => daysSince(S.lastImp[k])));
+  const who = stale.length === 2 ? '' : ' ' + STALE_SRC[stale[0]];
+
+  const main = $('staleMain');
+  main.textContent = '';
+  main.append(document.createTextNode('הייבוא האחרון' + who + ' היה לפני '));
+  main.append(el('b', null, String(d)));
+  main.append(document.createTextNode(' ימים'));
+
+  $('staleSub').textContent =
+    'מה שקרה מאז ולא הוקלד ביד עוד לא נמצא כאן';
+
+  box.setAttribute('aria-label',
+    'הייבוא האחרון' + who + ' היה לפני ' + d +
+    ' ימים. למעבר למסך הייבוא.');
+  show(box);
+}
+
+$('homeStale').addEventListener('click', () => tab('import'));
 
 /* ────────────────────────────────── נכנס ויצא ── */
 
@@ -5870,6 +5951,7 @@ if ('serviceWorker' in navigator && !location.hostname.match(/^(127\.|localhost$
 const IMP = mountImport({
   sb, S, $, el, show, hide, toast, openSheet, closeSheet,
   fmt, setMoney, toAgorot, isoDate, byId, outCats, inCats, human,
+  dayMonth, daysSince,
   goTab: tab,
   ruleFor, learnMerchant,
   monthName, monthKeyOf: monthKey,
