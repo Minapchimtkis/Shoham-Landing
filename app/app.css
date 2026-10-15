@@ -926,6 +926,30 @@ html{
    ‏התכנון מסתדר עם ההכנסה, ושותקת כשהוא מסתדר בדיוק. */
 /* ‏התחזית · שקטה כשהיא בתוך התכנון, ובענבר כשלא. לא אדום:
    ‏זה עוד לא קרה, וענבר הוא "זה מגיע" בשפה של האפליקציה. */
+/* ‏מה שעוד אמור לצאת.
+   ‏ענבר ולא אדום · הכסף עוד לא יצא, והכלל הוא שענבר הוא "זה
+   ‏מגיע" ואדום הוא "זה כבר קרה". השורה אינה משטח מורם נוסף:
+   ‏היא נשענת על אותו גוון רך מעל הנייר, כמו התחזית. */
+.coming{
+  width:100%;display:flex;align-items:center;gap:10px;
+  margin-top:14px;padding:12px 15px;min-height:44px;
+  text-align:start;
+  background:linear-gradient(var(--amber-soft),var(--amber-soft)),var(--paper);
+  border:0;border-radius:14px;color:var(--ink);
+  transition:background-color .14s var(--ease);
+}
+.coming-text{flex:1;min-width:0}
+.coming-main{display:block;font-size:14.5px;font-weight:var(--w-ui-soft);line-height:1.5}
+.coming-main b{font-weight:var(--w-ui);color:var(--ink)}
+.coming-main .money{font-weight:var(--w-amount);font-size:15.5px;color:var(--amber)}
+.coming-sub{display:block;margin-top:3px;font-size:13px;color:var(--ink-2);line-height:1.55}
+.coming-sub .money{font-weight:var(--w-ui)}
+.coming svg{flex:none;width:17px;height:17px;color:var(--ink-3)}
+@media (hover:hover) and (pointer:fine){
+  .coming:hover{background:linear-gradient(var(--wash),var(--wash)),var(--paper)}
+}
+.coming:active{background:linear-gradient(var(--wash),var(--wash)),var(--paper)}
+
 .cast{
   margin-top:16px;padding:13px 15px;
   background:linear-gradient(var(--wash),var(--wash)),var(--paper);

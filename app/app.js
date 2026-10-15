@@ -1288,6 +1288,7 @@ function renderHome() {
   if (moved > 0) line(document.createTextNode('ועוד '), strong(moved),
                       document.createTextNode(' בהעברות, שאינן הוצאה'));
 
+  renderComing();
   renderFlow();
   renderSplit();
   renderPulse(current, dim, now);
@@ -1298,6 +1299,46 @@ function renderHome() {
   renderBal();
   renderInsight();
 }
+
+/* ────────────────────────── מה שעוד אמור לצאת ── */
+
+/* ‏כל עוד הוצאה קבועה לא נרשמה, "כמה יש לי" גדול ממנה.
+   ‏קודם זה נאמר בכרטיס תובנה שאפשר לסגור לצמיתות, ומאותו
+   ‏רגע המספר היה שגוי בשקט · וזה נכון ב-20 בחודש בדיוק כמו
+   ‏ב-2 בו. כאן זה עובדה קבועה על המסך, ולחיצה עליה פותחת
+   ‏את אותו גלון שרושם את כולן בלחיצה. */
+function renderComing() {
+  const box = $('homeComing');
+  const pend = inCurrentPeriod() ? pendingRecurring() : [];
+  if (!pend.length) { hide(box); return; }
+
+  const sum = pend.reduce((s, r) => s + r.amount, 0);
+  const after = leftToSpend() - sum;
+
+  const main = $('comingMain');
+  main.textContent = '';
+  main.append(document.createTextNode('עוד אמורות לצאת '));
+  main.append(el('b', null, String(pend.length)));
+  main.append(document.createTextNode(pend.length === 1 ? ' קבועה · ' : ' קבועות · '));
+  main.append(moneyEl(sum, 'money'));
+
+  const sub = $('comingSub');
+  sub.textContent = '';
+  if (after >= 0) {
+    sub.append(document.createTextNode('אחריהן יישארו '));
+    sub.append(moneyEl(after, 'money'));
+  } else {
+    sub.append(document.createTextNode('אחריהן יחסרו '));
+    sub.append(moneyEl(-after, 'money'));
+  }
+
+  box.setAttribute('aria-label',
+    pend.length + (pend.length === 1 ? ' הוצאה קבועה' : ' הוצאות קבועות') +
+    ' שעוד לא נרשמו, יחד ' + fmt(sum) + '. לפתיחה ורישום.');
+  show(box);
+}
+
+$('homeComing').addEventListener('click', () => openRecurring());
 
 /* ────────────────────────────────── נכנס ויצא ── */
 
@@ -2408,25 +2449,10 @@ async function renderInsight() {
     }
   }
 
-  /* ‏ההוצאות הקבועות שעוד לא נרשמו, לפני כל שאר הכרטיסים ·
-     ‏זאת הפעולה שחוסכת הכי הרבה הקלדה.
-
-     ‏בלי חלון של ימים בתחילת החודש: כל עוד שכר הדירה לא נרשם,
-     ‏המספר הגדול שגוי בגובה שכר הדירה, וזה נכון ב-20 בחודש
-     ‏בדיוק כמו ב-2 בו. מי שלא רוצה אותן לוחץ "לא עכשיו", וזה
-     ‏משתיק אותן עד החודש הבא. */
-  if (current && !recSeen()) {
-    const pend = pendingRecurring();
-    if (pend.length >= 2) {
-      const sum = pend.reduce((s, r) => s + r.amount, 0);
-      card(`${pend.length} הוצאות קבועות עוד לא נרשמו החודש`,
-        `יחד ${fmt(sum)}. הן חוזרות אצלכם כל חודש באותו סכום, ואפשר לרשום את כולן בלחיצה אחת במקום אחת אחת.`,
-        [['לראות ולרשום', () => openRecurring()],
-         ['לא עכשיו', () => { markRecSeen(); renderInsight(); }]],
-        { kick: 'חוסך הקלדה' });
-      return;
-    }
-  }
+  /* ‏הקבועות שעוד לא נרשמו עברו לרצועה קבועה מתחת למספר
+     ‏הגדול. כרטיס תובנה נסגר לצמיתות ב"לא עכשיו", ומאותו רגע
+     ‏המספר היה שגוי בגובהן בלי ששום דבר אומר את זה · וזאת
+     ‏עובדה על המסך ולא עצה שאפשר לדחות. */
 
 
   /* ‏החריגה שכבר קרתה · הזמנה, לא חקירה. היא יורדת ברגע שענו
@@ -4346,8 +4372,10 @@ function pendingRecurring() {
    ‏יכולת להוריד שורה אחת הוא כפתור שאנשים לא לוחצים עליו. */
 let recRows = [];
 
+/* ‏נשמר כדי שגלון שנסגר לא ייפתח מעצמו שוב באותו חודש.
+   ‏הקורא השני שלו, כרטיס התובנה, ירד · הרצועה שמתחת למספר
+   ‏אומרת את זה תמיד ואינה נסגרת. */
 const markRecSeen = () => LS.set('rec.' + monthKey(S.month), 1);
-const recSeen = () => !!LS.get('rec.' + monthKey(S.month), 0);
 
 async function openRecurring() {
   recRows = pendingRecurring().map(r => ({ ...r, take: true }));
