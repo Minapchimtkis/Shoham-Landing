@@ -1841,7 +1841,7 @@ section {
    ‏ומשבשת את הגרסה האנגלית. */
 .tm-section {
   padding: 0 24px 120px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
 }
@@ -1860,23 +1860,68 @@ section {
   font-size: clamp(24px, 3.5vw, 40px);
   font-weight: 900;
   color: #ffffff;
-  margin-bottom: 44px;
+  margin-bottom: 36px;
 }
 
-.testimonials {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  /* ‏כל כרטיס בגובה הטבעי שלו · בברירת המחדל הרשת
-     ‏מותחת את שניהם לגובה הגבוה, והקצרה היתה מקבלת
-     ‏חצי כרטיס ריק. */
-  align-items: start;
-  text-align: start;
+/* ‏רצועה שמחליקים בה · גלילה אופקית עם נעיצה, כך
+   ‏שכל צילום נעצר במרכז במקום לעצור באמצע. שולי
+   ‏שליליים מבטלים את ריפוד המקטע, כך שהצילום
+   ‏יכול להגיע עד קצה המסך בטלפון. */
+.tm-rail {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 24px;
+  padding: 4px 24px 8px;
+  margin-inline: -24px;
+  scrollbar-width: none;
+}
+.tm-rail::-webkit-scrollbar { display: none; }
+
+.tm-slide {
+  flex: 0 0 auto;
+  width: min(330px, 78vw);
+  scroll-snap-align: center;
+  margin: 0;
 }
 
-/* ‏ההמלצה הארוכה היא שש פסקות, והיא מוצגת כמו
-   ‏שנכתבה · הרווח בין הפסקות הוא מה שעושה אותה קריאה. */
-.testimonial-text p + p { margin-top: 15px; }
+.tm-slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(168,85,247,0.28);
+  box-shadow: 0 24px 60px -24px rgba(0,0,0,0.9);
+}
+
+/* ‏מוסתר כברירת מחדל · במסך רחב שני הצילומים נכנסים
+   ‏זה לצד זה ואין לאן להחליק, וכיתוב שמבקש להחליק
+   ‏גרוע מכיתוב שאינו. ה-JS מדוד ומחליט. */
+.tm-hint {
+  display: none;
+  margin-top: 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.46);
+}
+.tm-rail.can-swipe + .tm-hint { display: block; }
+
+/* ‏התמלול של כל צילום · אינו נראה בעין, אבל קורא
+   ‏מסך מקריא אותו ומנועי חיפוש מוצאים אותו · תמונה
+   ‏שכולה טקסט היא שתיקה גמורה בלעדיו. */
+.tm-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .testimonial {
   background: rgba(255,255,255,0.03);
@@ -4189,37 +4234,32 @@ footer {
 </section>
 
 <!-- TESTIMONIALS -->
-<!-- ‏הטקסטים הועתקו מילה במילה מהודעות שלקוחות שלחו
-     ‏בוואטסאפ. לא קוצרו, לא נוסחו מחדש ולא חוברו זו לזו.
-     ‏השמות מוסתרים מטעמי פרטיות, והצילומים עצמם לא עולים
-     ‏לאתר · טקסט נקרא במנועי חיפוש, נטען מהר ועובד בנייד. -->
+<!-- ‏צילומי מסך מקוריים של הודעות שלקוחות שלחו. שמות ותמונות
+     ‏פרופיל טושטשו מטעמי פרטיות, וסרגל הכותרת של וואטסאפ נחתך
+     ‏לגמרי · הטשטוש של תמונת הפרופיל במקור לא כיסה את כולה,
+     ‏ושברים ממנה הציצו מצידי המלבן השחור.
+
+     ‏התמלול ב-tm-sr אינו נראה בעין אבל נקרא בקורא מסך
+     ‏ובמנועי חיפוש · תמונה שכולה טקסט היא שתיקה בלעדיהם. -->
 <section class="tm-section">
   <div class="tm-label reveal" id="tmLabel">המלצות</div>
-  <h2 class="tm-title reveal" id="tmTitle">מה שכתבו לי</h2>
+  <h2 class="tm-title reveal" id="tmTitle">לקוחות ממליצים</h2>
 
-  <div class="testimonials">
-    <blockquote class="testimonial reveal">
-      <div class="testimonial-text">
-        <p>שוהם היקר, ❤️</p>
-        <p>רצינו להגיד לך תודה מכל הלב על הליווי, האכפתיות, הסבלנות והזמינות לאורך כל הדרך.</p>
-        <p>גם כשהדברים לא תמיד הלכו חלק, תמיד היית שם בשבילנו, לא ויתרת עלינו ולא נתת לנו לוותר לעצמנו. המשכת ללוות, לכוון, למצוא פתרונות ולהאמין בתהליך גם ברגעים המאתגרים.</p>
-        <p>מעבר למקצועיות שלך, מה שבאמת בלט לנו הוא היחס האישי, התחושה שיש מישהו שבאמת אכפת לו מאיתנו ומההצלחה שלנו.</p>
-        <p>תודה שלא עזבת אותנו עד שהגענו ליעדים שהצבנו לעצמנו, ותודה שהיית חלק משמעותי מהדרך שלנו.</p>
-        <p>ממליצים עליך מכל הלב לכל מי שמחפש לא רק יועץ פיננסי, אלא מישהו שבאמת הולך איתך יד ביד עד שמגיעים למטרה. ❤️🙏</p>
-      </div>
-      <cite class="testimonial-name">זוג בליווי אישי</cite>
-    </blockquote>
+  <div class="tm-rail reveal" id="tmRail" tabindex="0" role="group" aria-label="המלצות מלקוחות, להחלקה לצדדים">
+    <figure class="tm-slide">
+      <img src="assets/rec-2.webp?v=50a2024f" width="736" height="1380" loading="lazy" decoding="async"
+           alt="הודעת תודה בוואטסאפ מלקוחות">
+      <figcaption class="tm-sr">שוהם היקר, רצינו להגיד לך תודה מכל הלב על הליווי, האכפתיות, הסבלנות והזמינות לאורך כל הדרך. גם כשהדברים לא תמיד הלכו חלק, תמיד היית שם בשבילנו, לא ויתרת עלינו ולא נתת לנו לוותר לעצמנו. מעבר למקצועיות שלך, מה שבאמת בלט לנו הוא היחס האישי. ממליצים עליך מכל הלב לכל מי שמחפש לא רק יועץ פיננסי, אלא מישהו שבאמת הולך איתך יד ביד עד שמגיעים למטרה.</figcaption>
+    </figure>
 
-    <blockquote class="testimonial reveal">
-      <div class="testimonial-text">
-        <p>נראה מטורף</p>
-        <p>איזה אלוף אתה</p>
-        <p>ואיזה סדר זה כשלעצמו עושה לנו!!</p>
-        <p>תודה שוהם!</p>
-      </div>
-      <cite class="testimonial-name">זוג בליווי אישי</cite>
-    </blockquote>
+    <figure class="tm-slide">
+      <img src="assets/rec-1.webp?v=fd2692cf" width="800" height="1527" loading="lazy" decoding="async"
+           alt="הודעת וואטסאפ מלקוחות">
+      <figcaption class="tm-sr">נראה מטורף. איזה אלוף אתה. ואיזה סדר זה כשלעצמו עושה לנו! תודה שוהם!</figcaption>
+    </figure>
   </div>
+
+  <p class="tm-hint" id="tmHint">← החליקו לעוד</p>
 </section>
 
 <!-- PHILOSOPHY -->
@@ -6037,6 +6077,20 @@ window.addEventListener('scroll', () => {
   handoff.observe(heroLogo);
 })();
 
+// ── ‏הרמז להחליק ──
+// ‏מופיע רק כשהרצועה באמת רחבה מהמסגרת שלה · במחשב
+// ‏שני הצילומים נכנסים זה לצד זה, ואז אין לאן להחליק.
+(function () {
+  const rail = document.getElementById('tmRail');
+  if (!rail) return;
+  const check = () => rail.classList.toggle('can-swipe', rail.scrollWidth - rail.clientWidth > 4);
+  check();
+  addEventListener('resize', check);
+  // ‏הצילומים הם lazy · לפני שהם נטענים אין להם גובה,
+  // ‏והמדידה הראשונה יכולה לצאת שגויה.
+  rail.querySelectorAll('img').forEach(i => i.addEventListener('load', check, { once: true }));
+})();
+
 // ── LANGUAGE TOGGLE ──
 const translations = {
   he: {
@@ -6071,7 +6125,7 @@ const translations = {
     s3t: 'תוכנית פעולה מעשית', s3d: 'צעד אחר צעד, לאט ובבטחה. כלים טכניים שמותאמים לך, לא לאף אחד אחר.',
     s4t: 'מעקב וצמיחה', s4d: 'אני לא נעלם אחרי הפגישה הראשונה. אני כאן כדי להוביל אותך עד שהכסף מתחיל לשרת את החיים שלך.',
     aboutLabel: 'אז מי אני?',
-    tmLabel: 'המלצות', tmTitle: 'מה שכתבו לי',
+    tmLabel: 'המלצות', tmTitle: 'לקוחות ממליצים', tmHint: '← החליקו לעוד',
     aboutQuote: 'אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.',
     eqTitle: 'האינטליגנציה הרגשית היא הכלי הראשון שאני מביא לחדר.',
     eqBody: 'למדתי אותה בקורס מפקדים, מול לוחמים שהיו צריכים אוזן לפני שהיו צריכים פקודה. מול כסף זה בדיוק אותו דבר: לפני שנוגעים במספרים, צריך מישהו שמבין למה קשה לכם להסתכל עליהם.',
@@ -6157,7 +6211,7 @@ const translations = {
     s3t: 'Practical action plan', s3d: 'Step by step, slowly and safely. Tools tailored to you, not anyone else.',
     s4t: 'Follow-up & Growth', s4d: "I don't disappear after the first meeting. I'm here to guide you until money starts serving your life.",
     aboutLabel: 'So who am I?',
-    tmLabel: 'Testimonials', tmTitle: 'What they wrote me',
+    tmLabel: 'Testimonials', tmTitle: 'Clients recommend', tmHint: 'Swipe for more →',
     aboutQuote: "",
     eqTitle: "Emotional intelligence is the first tool I bring into the room.",
     eqBody: "I learned it on a commanders course in the army, in front of soldiers who needed an ear before they needed an order. Money is no different: before anyone touches the numbers, there has to be someone who understands why they are hard for you to look at.",
@@ -6283,6 +6337,8 @@ function setLang(lang) {
   if (tmL) tmL.textContent = t.tmLabel;
   const tmT = document.getElementById('tmTitle');
   if (tmT) tmT.textContent = t.tmTitle;
+  const tmH = document.getElementById('tmHint');
+  if (tmH) tmH.textContent = t.tmHint;
   document.querySelector('.about-quote').innerHTML = t.aboutQuote;
   document.querySelector('.about-body').innerHTML = t.aboutBody;
   const eqT = document.querySelector('.eq-title');
