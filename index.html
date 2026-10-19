@@ -743,10 +743,14 @@ section {
   border-bottom-color: rgba(168,85,247,0.28);
 }
 
+/* ‏הסרגל עצמו ברוחב מלא, ולכן גם התוכן שלו · קודם הוא היה חסום
+   ‏ל-1000 פיקסל, וכך במסך של 1440 הסמל ישב 244 פיקסל מהפינה
+   ‏ונראה תלוש באמצע פס ריק. הריפוד גדל עם המסך במקום תקרה
+   ‏קבועה, כך שהוא נשאר ליד הפינה גם ב-2560. */
 .navbar-inner {
-  max-width: 1000px;
+  max-width: none;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(16px, 2.5vw, 56px);
   height: 80px;
   display: flex;
   align-items: center;
@@ -901,7 +905,10 @@ section {
 }
 
 .hero-title {
-  font-size: clamp(52px, 13vw, 130px);
+  /* ‏13vw כוון למסך של טלפון, ושם הרצפה של 52 תופסת בין כה.
+     ‏במחשב הוא הגיע לתקרה של 130 ומילא את כל המסך בשלוש שורות ·
+     ‏הכותרת צעקה והשורה שמתחתיה נלחשה. התקרה ירדה ל-76. */
+  font-size: clamp(52px, 7.5vw, 76px);
   font-weight: 900;
   line-height: 1.0;
   margin-bottom: 32px;
@@ -1272,12 +1279,16 @@ section {
   margin-bottom: 20px;
 }
 
+/* ‏שורה של 94 תווים · העין מאבדת את תחילת השורה הבאה. התקרה
+   ‏בתווים ולא בפיקסלים, כך שהיא נשארת נכונה גם אם הגופן ישתנה. */
 .method-sub {
   font-size: 17px;
   font-weight: 300;
   color: rgba(255,255,255,0.78);
   margin-bottom: 72px;
   line-height: 1.7;
+  max-width: 52ch;
+  margin-inline: auto;
 }
 
 .steps {
@@ -1356,11 +1367,15 @@ section {
    there is no rectangle anywhere — a face coming out of the dark, the same
    thing the first screen does. It stands beside the opening line rather than
    sitting above it in a block of its own. */
+/* ‏התמונה מעל המשפט ולא לצידו · ליד הטקסט היא דחסה אותו לחצי
+   ‏מסך והשאירה את החצי השני ריק, ו"אני לא אדם מיוחד" נקרא כמו
+   ‏כיתוב של תמונה במקום כמו אמירה. */
 .about-head {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 36px;
+  gap: 8px;
   margin-bottom: 44px;
 }
 
@@ -1372,7 +1387,7 @@ section {
 
 .about-portrait {
   flex: none;
-  width: clamp(190px, 23vw, 258px);
+  width: min(258px, 62vw);
   height: auto;
   /* He is cut out of his backdrop in the file itself, so nothing needs hiding
      — except where the frame runs out. His shoulders reach the foot of the
@@ -1393,7 +1408,7 @@ section {
 /* On a narrow screen it goes above the line instead of beside it, and the
    section keeps the centred rhythm it already had. */
 @media (max-width: 820px) {
-  .about-head { flex-direction: column; gap: 4px; margin-bottom: 34px; }
+  .about-head { gap: 4px; margin-bottom: 34px; }
   .about-portrait { width: min(235px, 62vw); }
 }
 .about {
@@ -1424,6 +1439,8 @@ section {
   line-height: 1.9;
   margin-bottom: 40px;
   text-align: center;
+  max-width: 52ch;
+  margin-inline: auto;
 }
 
 .about-body strong {
@@ -1753,6 +1770,7 @@ section {
   color: rgba(255,255,255,0.85);
   line-height: 1.9;
   margin-bottom: 24px;
+  max-width: 34em;
 }
 
 .mission-block-text strong {
@@ -2610,7 +2628,7 @@ footer {
   font-size: 11px;
   line-height: 1.7;
   color: rgba(255,255,255,0.32);
-  max-width: 640px;
+  max-width: 44em;
   margin-inline: auto;
 }
 
@@ -3061,6 +3079,7 @@ footer {
   color: rgba(255,255,255,0.85);
   line-height: 1.85;
   direction: rtl;
+  max-width: 34em;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.45s cubic-bezier(0.22,1,0.36,1),
