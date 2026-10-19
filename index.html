@@ -1834,11 +1834,49 @@ section {
   margin-bottom: 60px;
 }
 
+/* ‏המלצות · הסגנון לכרטיסים כבר היה כאן ללא מקטע
+   ‏שמשתמש בו. התווית והכותרת מקבלות מחלקות משלהן
+   ‏ולא section-label · setLang מחלק את התוויות לפי אינדקס,
+   ‏ותווית תשיעית באמצע הדף היתה מזיזה את כל מה שאחריה
+   ‏ומשבשת את הגרסה האנגלית. */
+.tm-section {
+  padding: 0 24px 120px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.tm-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--p6);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-shadow: 0 0 18px rgba(168,85,247,0.5);
+}
+
+.tm-title {
+  font-size: clamp(24px, 3.5vw, 40px);
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 44px;
+}
+
 .testimonials {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
+  /* ‏כל כרטיס בגובה הטבעי שלו · בברירת המחדל הרשת
+     ‏מותחת את שניהם לגובה הגבוה, והקצרה היתה מקבלת
+     ‏חצי כרטיס ריק. */
+  align-items: start;
+  text-align: start;
 }
+
+/* ‏ההמלצה הארוכה היא שש פסקות, והיא מוצגת כמו
+   ‏שנכתבה · הרווח בין הפסקות הוא מה שעושה אותה קריאה. */
+.testimonial-text p + p { margin-top: 15px; }
 
 .testimonial {
   background: rgba(255,255,255,0.03);
@@ -4150,6 +4188,40 @@ footer {
   <img decoding="async" src="assets/signature.webp" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy" />
 </section>
 
+<!-- TESTIMONIALS -->
+<!-- ‏הטקסטים הועתקו מילה במילה מהודעות שלקוחות שלחו
+     ‏בוואטסאפ. לא קוצרו, לא נוסחו מחדש ולא חוברו זו לזו.
+     ‏השמות מוסתרים מטעמי פרטיות, והצילומים עצמם לא עולים
+     ‏לאתר · טקסט נקרא במנועי חיפוש, נטען מהר ועובד בנייד. -->
+<section class="tm-section">
+  <div class="tm-label reveal" id="tmLabel">המלצות</div>
+  <h2 class="tm-title reveal" id="tmTitle">מה שכתבו לי</h2>
+
+  <div class="testimonials">
+    <blockquote class="testimonial reveal">
+      <div class="testimonial-text">
+        <p>שוהם היקר, ❤️</p>
+        <p>רצינו להגיד לך תודה מכל הלב על הליווי, האכפתיות, הסבלנות והזמינות לאורך כל הדרך.</p>
+        <p>גם כשהדברים לא תמיד הלכו חלק, תמיד היית שם בשבילנו, לא ויתרת עלינו ולא נתת לנו לוותר לעצמנו. המשכת ללוות, לכוון, למצוא פתרונות ולהאמין בתהליך גם ברגעים המאתגרים.</p>
+        <p>מעבר למקצועיות שלך, מה שבאמת בלט לנו הוא היחס האישי, התחושה שיש מישהו שבאמת אכפת לו מאיתנו ומההצלחה שלנו.</p>
+        <p>תודה שלא עזבת אותנו עד שהגענו ליעדים שהצבנו לעצמנו, ותודה שהיית חלק משמעותי מהדרך שלנו.</p>
+        <p>ממליצים עליך מכל הלב לכל מי שמחפש לא רק יועץ פיננסי, אלא מישהו שבאמת הולך איתך יד ביד עד שמגיעים למטרה. ❤️🙏</p>
+      </div>
+      <cite class="testimonial-name">זוג בליווי אישי</cite>
+    </blockquote>
+
+    <blockquote class="testimonial reveal">
+      <div class="testimonial-text">
+        <p>נראה מטורף</p>
+        <p>איזה אלוף אתה</p>
+        <p>ואיזה סדר זה כשלעצמו עושה לנו!!</p>
+        <p>תודה שוהם!</p>
+      </div>
+      <cite class="testimonial-name">זוג בליווי אישי</cite>
+    </blockquote>
+  </div>
+</section>
+
 <!-- PHILOSOPHY -->
 <section data-stage="philosophy" data-stage-i="6" class="proof" id="philosophy">
   <div class="proof-inner">
@@ -5999,6 +6071,7 @@ const translations = {
     s3t: 'תוכנית פעולה מעשית', s3d: 'צעד אחר צעד, לאט ובבטחה. כלים טכניים שמותאמים לך, לא לאף אחד אחר.',
     s4t: 'מעקב וצמיחה', s4d: 'אני לא נעלם אחרי הפגישה הראשונה. אני כאן כדי להוביל אותך עד שהכסף מתחיל לשרת את החיים שלך.',
     aboutLabel: 'אז מי אני?',
+    tmLabel: 'המלצות', tmTitle: 'מה שכתבו לי',
     aboutQuote: 'אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.',
     eqTitle: 'האינטליגנציה הרגשית היא הכלי הראשון שאני מביא לחדר.',
     eqBody: 'למדתי אותה בקורס מפקדים, מול לוחמים שהיו צריכים אוזן לפני שהיו צריכים פקודה. מול כסף זה בדיוק אותו דבר: לפני שנוגעים במספרים, צריך מישהו שמבין למה קשה לכם להסתכל עליהם.',
@@ -6084,6 +6157,7 @@ const translations = {
     s3t: 'Practical action plan', s3d: 'Step by step, slowly and safely. Tools tailored to you, not anyone else.',
     s4t: 'Follow-up & Growth', s4d: "I don't disappear after the first meeting. I'm here to guide you until money starts serving your life.",
     aboutLabel: 'So who am I?',
+    tmLabel: 'Testimonials', tmTitle: 'What they wrote me',
     aboutQuote: "",
     eqTitle: "Emotional intelligence is the first tool I bring into the room.",
     eqBody: "I learned it on a commanders course in the army, in front of soldiers who needed an ear before they needed an order. Money is no different: before anyone touches the numbers, there has to be someone who understands why they are hard for you to look at.",
@@ -6200,6 +6274,15 @@ function setLang(lang) {
 
   // About
   sectionLabels[3].textContent = t.aboutLabel;
+
+  // ‏המלצות · לפי מזהה ולא לפי אינדקס ב-sectionLabels,
+  // ‏כדי שהמקטע הזה לא יזיז את כל התוויות שאחריו.
+  // ‏הציטוטים עצמם נשארים בעברית בשתי השפות · אלה
+  // ‏המילים שלקוחות כתבו, ותרגום שלהן היה שינוי שלהן.
+  const tmL = document.getElementById('tmLabel');
+  if (tmL) tmL.textContent = t.tmLabel;
+  const tmT = document.getElementById('tmTitle');
+  if (tmT) tmT.textContent = t.tmTitle;
   document.querySelector('.about-quote').innerHTML = t.aboutQuote;
   document.querySelector('.about-body').innerHTML = t.aboutBody;
   const eqT = document.querySelector('.eq-title');
