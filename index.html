@@ -2948,6 +2948,24 @@ footer {
   pointer-events: auto;
 }
 
+/* ‏הווידג׳ט יושב קבוע בפינה התחתונה, ותשובה פתוחה בשאלות
+   ‏ותשובות משתרעת בדיוק לשם. נמדד בטלפון ב-390: הוא כיסה
+   ‏כ-40 אחוז משטח כל אחת משמונה התשובות, כולל זאת שעונה על
+   ‏ההתנגדות המרכזית. שאלות ותשובות הוא המקום שבו מפרקים
+   ‏התנגדות, ולכן הוא מתפנה כל עוד תשובה פתוחה וחוזר כשהיא
+   ‏נסגרת. היציאה מהירה מהכניסה · הוא צריך לפנות מקום מיד,
+   ‏ולחזור בנחת. */
+html.faq-open .iphone-wrap.visible {
+  opacity: 0;
+  transform: translateY(90px) scale(0.92);
+  transition-duration: 0.3s;
+}
+
+html.faq-open .iphone-wrap.visible .iphone-wa-btn,
+html.faq-open .iphone-wrap.visible .iphone-close {
+  pointer-events: none;
+}
+
 /* phone shell */
 .iphone-body {
   width: 168px;
@@ -6138,6 +6156,10 @@ function toggleFaq(btn) {
     // measure real height to avoid jump
     answer.style.maxHeight = answer.scrollHeight + 40 + 'px';
   }
+
+  /* ‏כל עוד תשובה פתוחה, הווידג׳ט המרחף מתפנה. הוא יושב
+     ‏באותה פינה שאליה התשובה משתרעת. */
+  document.documentElement.classList.toggle('faq-open', !!document.querySelector('.faq-a.open'));
 }
 // ── NAVBAR SCROLL ──
 const navbar = document.getElementById('navbar');
