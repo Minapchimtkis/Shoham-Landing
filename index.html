@@ -2618,6 +2618,20 @@ footer {
   gap: 10px;
 }
 
+/* ‏בטלפון שלוש שורות מלאות ולא שלוש קופסאות שנגררות
+   ‏לשתי שורות · הכתובות באורכים שונים, ולכן הקופסאות
+   ‏יצאו 201, 143 ו-155 פיקסל ושום דבר לא התיישר עם דבר.
+   ‏רוחב מלא מבטל את השאלה הזאת לגמרי. */
+@media (max-width: 720px) {
+  .footer-links {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+  }
+  .footer-link { width: 100%; }
+}
+
 .footer-meta {
   display: flex;
   flex-direction: column;
