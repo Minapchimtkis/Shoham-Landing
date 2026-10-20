@@ -2654,20 +2654,42 @@ footer {
   .footer-meta { align-items: center; text-align: center; }
 }
 
+/* ‏שלושה ערוצים, ולכל אחד כתובת מפורשת מתחת לשם ·
+   ‏"אימייל" לבדו אינו אומר למי כותבים, ו"מנפחים ת'כיס"
+   ‏לבדו אינו אומר כלום למי שלא מכיר את הפלטפורמה. שורה
+   ‏שנייה היא מה שהופך שלושה תגים זהים לשלושה יעדים.
+
+   ‏והגובה עלה ל-56 · קודם הם היו 30 עד 36 פיקסל בנייד,
+   ‏מתחת לרצפה של 44 שכל שאר הדף עומד בה. */
 .footer-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border-radius: 999px;
+  gap: 11px;
+  min-height: 56px;
+  padding: 10px 18px;
+  border-radius: 14px;
   border: 1px solid rgba(168,85,247,0.28);
   background: rgba(168,85,247,0.06);
   color: rgba(255,255,255,0.72);
   font-size: 13px;
   font-weight: 500;
   text-decoration: none;
+  text-align: start;
   transition: border-color 0.3s, background 0.3s, color 0.3s, transform 0.3s;
 }
+
+.footer-link-text { display: flex; flex-direction: column; gap: 2px; line-height: 1.25; }
+.footer-link-label { font-weight: 700; font-size: 13.5px; color: rgba(255,255,255,0.92); }
+.footer-link-sub {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.2px;
+  direction: ltr;
+  text-align: start;
+}
+/* ‏שתי השורות שאינן כתובות הן עברית וחוזרות לימין. */
+.footer-link-sub.he { direction: rtl; }
 
 @media (hover: hover) and (pointer: fine) {
   .footer-link:hover {
@@ -4583,13 +4605,13 @@ footer {
   <div class="footer-top">
   <div class="footer-links">
     <a class="footer-link footer-link-mail" href="mailto:shohamfinance23@gmail.com?subject=%D7%A4%D7%A0%D7%99%D7%99%D7%94%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8" id="mailLink">
-      <svg class="mail-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="M3 7.5l8.1 5.6a1.6 1.6 0 0 0 1.8 0L21 7.5"/></svg><span class="footer-link-label">אימייל</span>
+      <svg class="mail-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="M3 7.5l8.1 5.6a1.6 1.6 0 0 0 1.8 0L21 7.5"/></svg><span class="footer-link-text"><span class="footer-link-label">אימייל</span><span class="footer-link-sub">shohamfinance23@gmail.com</span></span>
     </a>
     <a class="footer-link" href="https://www.instagram.com/shoham._abo" target="_blank" rel="noopener noreferrer">
-      <svg class="ig-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="url(#igGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="url(#igGrad)" stroke="none"/></svg><span class="footer-link-label">שוהם אבו</span>
+      <svg class="ig-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="url(#igGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="url(#igGrad)" stroke="none"/></svg><span class="footer-link-text"><span class="footer-link-label">שוהם אבו</span><span class="footer-link-sub">@shoham._abo</span></span>
     </a>
     <a class="footer-link" href="https://www.instagram.com/minapchim_tkis" target="_blank" rel="noopener noreferrer">
-      <svg class="ig-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="url(#igGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="url(#igGrad)" stroke="none"/></svg><span class="footer-link-label">מנפחים ת'כיס</span>
+      <svg class="ig-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="url(#igGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.25" fill="url(#igGrad)" stroke="none"/></svg><span class="footer-link-text"><span class="footer-link-label">מנפחים ת'כיס</span><span class="footer-link-sub">@minapchim_tkis</span></span>
     </a>
   </div>
     <div class="footer-meta">
