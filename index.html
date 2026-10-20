@@ -2606,7 +2606,7 @@ footer {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px 28px;
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto 26px;
   direction: rtl;
 }
@@ -2615,21 +2615,8 @@ footer {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  flex-shrink: 0;
   gap: 10px;
-}
-
-/* ‏בטלפון שלוש שורות מלאות ולא שלוש קופסאות שנגררות
-   ‏לשתי שורות · הכתובות באורכים שונים, ולכן הקופסאות
-   ‏יצאו 201, 143 ו-155 פיקסל ושום דבר לא התיישר עם דבר.
-   ‏רוחב מלא מבטל את השאלה הזאת לגמרי. */
-@media (max-width: 720px) {
-  .footer-links {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 9px;
-  }
-  .footer-link { width: 100%; }
 }
 
 .footer-meta {
@@ -2678,6 +2665,7 @@ footer {
 .footer-link {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 11px;
   min-height: 56px;
   padding: 10px 18px;
@@ -2714,8 +2702,32 @@ footer {
   }
 }
 
+/* ‏הקופסאות הגדולות, עם הכתובת מתחת לשם, הן למסך רחב
+   ‏בלבד. בטלפון אין להן מקום · שלוש כתובות באורכים
+   ‏שונים נשברו לשתי שורות ושום דבר לא התיישר, ורוחב
+   ‏מלא הפך אותן לשלושה פסים. שם הן חוזרות להיות
+   ‏גלולות קצרות עם שם בלבד, כפי שהיו.
+
+   ‏מה שלא חוזר אחורה הוא הגובה · הגלולות היו 30 עד 36
+   ‏פיקסל, מתחת לרצפה של 44 שכל שאר הדף עומד בה. */
+@media (max-width: 720px) {
+  .footer-links {
+    justify-content: center;
+    gap: 10px;
+  }
+  .footer-link {
+    min-height: 44px;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 999px;
+  }
+  .footer-link-sub { display: none; }
+  .footer-link-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.72); }
+}
+
 @media (max-width: 480px) {
   .footer-link { padding: 8px 13px; font-size: 12px; }
+  .footer-link-label { font-size: 12px; }
   .footer-links { gap: 9px; }
 }
 
@@ -3702,8 +3714,10 @@ footer {
   padding: 11px 0 3px;
 }
 
-/* ‏ריפוד ושוליים שמתקזזים: הקופסה גדלה, השורה נשארת במקומה. */
-.footer-link-mail { padding: 5px 0; margin: -5px 0; }
+/* ‏קישור האימייל היה פעם שורת טקסט וקיבל כאן ריפוד
+   ‏עם שוליים שליליים. היום הוא קופסה בגובה 56 עם ריפוד
+   ‏משלו, והכלל הזה רק ביטל לו את הריפוד האופקי · הכתובת
+   ‏נגעה במסגרת. הוא הוסר. */
 
 /* ‏גודל קבוע, ולכן מרחיבים מסביב בלי לגעת בו. */
 .lang-btn, .iphone-close, .privacy-close, .skip-link { position: relative; }
