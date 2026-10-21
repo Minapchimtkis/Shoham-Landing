@@ -104,7 +104,7 @@
           "name": "איך אני עוזר לכם בפועל?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "1. ניהול פיננסי חכם: אני עוזר לכם לזהות את ה\"חורים בכיס\", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש. 2. קבלת החלטות: אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. 3. בניית הרגלים שנשארים: המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר."
+            "text": "1. ניהול פיננסי חכם: אני עוזר לכם לזהות את ה\"חורים בכיס\", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש. 2. קבלת החלטות: אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה. 3. בניית הרגלים שנשארים: המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר."
           }
         },
         {
@@ -3923,6 +3923,27 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .iv-play:active .iv-play-ring { transform: translate(-50%, -50%) scale(0.95); }
 
+
+/* ══ אוויר בטלפון ════════════════════════════════════════════
+   ‏הריפוד האנכי של הסקשנים היה 2,354 פיקסל, 17 אחוז מהדף.
+   ‏רובם 120 למעלה ו-120 למטה, שהם כמעט שליש ממסך של 844.
+   ‏במחשב זה נכון ולא נגעתי בו. בטלפון זה פשוט גלילה.
+
+   ‏הבלוק הזה יושב בסוף הגיליון בכוונה: שאילתת מדיה אינה
+   ‏מוסיפה ספציפיות, ולכן רק סדר הכתיבה מבטיח שהוא ינצח את
+   ‏ההגדרות של כל סקשן. ══════════════════════════════════ */
+/* ‏השוליים התחתונים שלה הפרידו אותה מארבעת הכרטיסים שירדו,
+   ‏וכשהיא נשארה אחרונה הם הפכו ל-72 פיקסל של כלום. */
+.method-sub:last-child { margin-bottom: 0; }
+
+@media (max-width: 720px) {
+  .pain, .method, .about { padding-top: 72px; padding-bottom: 72px; }
+  .tm-section { padding-bottom: 72px; }
+  .proof { padding-bottom: 72px; }
+  .faq-section { padding-top: 72px; padding-bottom: 72px; }
+  .process-section { padding-top: 56px; }
+  .cta-section { padding-top: 88px; padding-bottom: 88px; }
+}
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -4230,7 +4251,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         </button>
         <div class="faq-a">
           <strong style="color:var(--p6); font-weight:700;">1. ניהול פיננסי חכם:</strong> אני עוזר לכם לזהות את ה"חורים בכיס", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש.<br><br>
-          <strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם.<br><br>
+          <strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.<br><br>
           <strong style="color:var(--p6); font-weight:700;">3. בניית הרגלים שנשארים:</strong> המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר.
         </div>
       </div>
@@ -4255,36 +4276,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
     <h2 class="method-title reveal">קודם הראש, אחר כך הכסף.</h2>
     <p class="method-sub reveal">ניהול כסף הוא לא משחק של מספרים. הוא ברוב רובו עניין של התנהגות, ידע והרגלים נכונים. אקסל יבנה לכם תקציב מצוין, ו־AI יבנה לכם אותו בשלוש שניות. מה שאין להם הוא מישהו שיושב מולכם כשאתם נבהלים מהמספר שיצא, ויודע למה נבהלתם. את זה אי אפשר לשכפל.</p>
 
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <div class="step-title">פסיכולוגיה פיננסית</div>
-          <div class="step-desc">מזהים יחד את האמונות, הפחדים וההרגלים שמונעים ממך להתקדם. בלי שיפוט. בלי בושה.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <div class="step-title">בניית תמונה ברורה</div>
-          <div class="step-desc">מסתכלים על המצב הפיננסי שלך כמו שהוא: הכנסות, הוצאות, חובות, מטרות. ללא פחד.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <div class="step-title">תוכנית פעולה מעשית</div>
-          <div class="step-desc">צעד אחר צעד, לאט ובבטחה. כלים טכניים שמותאמים לך, לא לאף אחד אחר.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <div class="step-content">
-          <div class="step-title">מעקב וצמיחה</div>
-          <div class="step-desc">אני לא נעלם אחרי הפגישה הראשונה. אני כאן כדי להוביל אותך עד שהכסף מתחיל לשרת את החיים שלך.</div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -4379,27 +4370,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
       <!-- text in front -->
       <p class="phil-intro-text">בתור לוחם ומפקד לשעבר בחטיבת גבעתי, למדתי שאין קיצורי דרך. החתירה למגע והנחישות להמשיך גם כשקשה. אלו הערכים שאני מביא לעולם הפיננסי.</p>
     </div>
-    </div>
-
-    <div class="phil-grid">
-      <div class="phil-card reveal-scale" style="transition-delay:0s">
-        <span class="surf" aria-hidden="true"></span>
-        <div class="phil-num">01</div>
-        <div class="phil-title">משחררים את הלחץ</div>
-        <div class="phil-desc">הניסיון מהצבא לימד אותי שהכול מתחיל בחוסן מנטלי. לפני שנוגעים במספרים, נבנה שקט נפשי וסדר בראש.</div>
-      </div>
-      <div class="phil-card reveal-scale" style="transition-delay:0.12s">
-        <span class="surf" aria-hidden="true"></span>
-        <div class="phil-num">02</div>
-        <div class="phil-title">כלים שבאמת עובדים</div>
-        <div class="phil-desc">נמאס לך ממושגים מסובכים? גם לי. אלמד אותך איך לנהל את הכסף בדרך פשוטה וחכמה שמתאימה לחיים ולרצונות שלך בלבד.</div>
-      </div>
-      <div class="phil-card reveal-scale" style="transition-delay:0.24s">
-        <span class="surf" aria-hidden="true"></span>
-        <div class="phil-num">03</div>
-        <div class="phil-title">מפענחים את התמונה</div>
-        <div class="phil-desc">נעבור יחד על קרן הפנסיה, קרן ההשתלמות ואפיקי החיסכון, ונבין מה כל אחד מהם ואיך הוא עובד, כדי שתדעו בדיוק מה יש לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.</div>
-      </div>
     </div>
 
     <div class="mission-block reveal">
@@ -6227,17 +6197,13 @@ const translations = {
     whatisQ3: 'ומה לגבי ביטוח, מס ומשכנתא?',
     whatisA3: '<strong style="color:var(--p6); font-weight:700;">אני לא בעל רישיון בתחומים האלה, ולא מתיימר להיות.</strong> לביטוח, למס ולמשכנתאות יש אנשי מקצוע מורשים, וכשצריך אותם אני מפנה אתכם אליהם.<br><br><strong style="color:var(--p6); font-weight:700;">אבל אף אחד מהם לא שומע את השאר.</strong> תחשבו על זה כמו תזמורת. יועץ המשכנתאות מנגן את המשכנתא, גוף הפנסיה את הפנסיה, מי שמטפל בהשקעות את ההשקעות. כל אחד מצוין בכלי שלו, וכל אחד מנגן בקצב אחר. מה שיוצא מזה הוא לא מוזיקה.<br><br><strong style="color:var(--p6); font-weight:700;">שם אני נכנס.</strong> התפקיד שלי הוא לוודא שכל הכלים מנגנים באותו קצב ולא מזייפים. המנצח לא מנגן באף כלי, והוא היחיד ששומע את כולם ביחד.',
     whatisA1: '<strong style="color:var(--p6); font-weight:700;">ליחידים ולזוגות צעירים</strong> בתחילת הדרך: משכורת ראשונה, יציאה מהבית, חתונה, דירה ראשונה. זה הגיל שבו כל שקל שמסדרים נכון שווה פי כמה בעוד עשור, וזה גם הגיל שבו הכי קל לא לשים לב שהוא פשוט נעלם.<br><br><strong style="color:var(--p6); font-weight:700;">למשפחות צעירות</strong> שמרגישות שהחודש מנהל אותן ולא הפוך: משכנתא, גן, חוגים, חופשת לידה, וההרגשה שלמרות ששניכם עובדים לא נשאר כלום בסוף החודש. המטרה היא לא להוציא פחות. היא לדעת לאן הכסף הולך, ולהחליט ביחד מה באמת חשוב לכם.',
-    whatisA2: '<strong style="color:var(--p6); font-weight:700;">1. ניהול פיננסי חכם:</strong> אני עוזר לכם לזהות את ה"חורים בכיס", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש.<br><br><strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם.<br><br><strong style="color:var(--p6); font-weight:700;">3. בניית הרגלים שנשארים:</strong> המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר.',
+    whatisA2: '<strong style="color:var(--p6); font-weight:700;">1. ניהול פיננסי חכם:</strong> אני עוזר לכם לזהות את ה"חורים בכיס", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש.<br><br><strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.<br><br><strong style="color:var(--p6); font-weight:700;">3. בניית הרגלים שנשארים:</strong> המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר.',
     painTitle: 'הבעיה האמיתית היא לא המספרים.<br>היא מה שאנחנו מאמינים עליהם.',
     d1t: '״זה לא בשבילי״', d1d: 'האמונה שכסף וצמיחה כלכלית שמורים לאנשים אחרים. לא לך. זה השקר הכי יקר שעולה לך.',
     d2t: 'פחד להסתכל בחשבון', d2d: 'כשהחרדה גדולה מהרצון לדעת. אנשים מעדיפים לא לדעת כי הידיעה מכאיבה. אבל חוסר הידיעה עולה יותר.',
     d3t: 'אנחנו חוזרים על הדפוסים', d3d: 'כי הרגלים פיננסיים נבנו שנים. לשנות אותם דורש כלים נכונים, לא רק רצון טוב.',
     methodLabel: 'הגישה שלי', methodTitle: 'קודם הראש, אחר כך הכסף.',
     methodSub: 'ניהול כסף הוא לא משחק של מספרים. הוא ברוב רובו עניין של התנהגות, ידע והרגלים נכונים. אקסל יבנה לכם תקציב מצוין, ו־AI יבנה לכם אותו בשלוש שניות. מה שאין להם הוא מישהו שיושב מולכם כשאתם נבהלים מהמספר שיצא, ויודע למה נבהלתם. את זה אי אפשר לשכפל.',
-    s1t: 'פסיכולוגיה פיננסית', s1d: 'מזהים יחד את האמונות, הפחדים וההרגלים שמונעים ממך להתקדם. בלי שיפוט. בלי בושה.',
-    s2t: 'בניית תמונה ברורה', s2d: 'מסתכלים על המצב הפיננסי שלך כמו שהוא: הכנסות, הוצאות, חובות, מטרות. ללא פחד.',
-    s3t: 'תוכנית פעולה מעשית', s3d: 'צעד אחר צעד, לאט ובבטחה. כלים טכניים שמותאמים לך, לא לאף אחד אחר.',
-    s4t: 'מעקב וצמיחה', s4d: 'אני לא נעלם אחרי הפגישה הראשונה. אני כאן כדי להוביל אותך עד שהכסף מתחיל לשרת את החיים שלך.',
     aboutLabel: 'אז מי אני?',
     tmLabel: 'המלצות', tmTitle: 'לקוחות ממליצים', tmHint: '← החליקו לעוד',
     aboutQuote: 'אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.',
@@ -6250,9 +6216,6 @@ const translations = {
     aboutSig: 'שוהם אבו | יועץ כלכלי',
     philLabel: 'הפילוסופיה שלי', philTitle: 'צמיחה בונים מהיסודות',
     philIntro: 'בתור לוחם ומפקד לשעבר בחטיבת גבעתי, למדתי שאין קיצורי דרך. החתירה למגע והנחישות להמשיך גם כשקשה. אלו הערכים שאני מביא לעולם הפיננסי.',
-    p1t: 'משחררים את הלחץ', p1d: 'הניסיון מהצבא לימד אותי שהכול מתחיל בחוסן מנטלי. לפני שנוגעים במספרים, נבנה שקט נפשי וסדר בראש.',
-    p2t: 'כלים שבאמת עובדים', p2d: 'נמאס לך ממושגים מסובכים? גם לי. אלמד אותך איך לנהל את הכסף בדרך פשוטה וחכמה שמתאימה לחיים ולרצונות שלך בלבד.',
-    p3t: 'מפענחים את התמונה', p3d: 'נעבור יחד על קרן הפנסיה, קרן ההשתלמות ואפיקי החיסכון, ונבין מה כל אחד מהם ואיך הוא עובד, כדי שתדעו בדיוק מה יש לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.',
     missionLabel: 'השליחות שלי',
     siteLink: 'לאתר מנפחים ת׳כיס',
     missionText: 'הקמתי את מנפחים ת׳כיס, פלטפורמה חינמית שמלמדת בני נוער בישראל להתנהל עם כסף, עוד לפני המשכורת הראשונה. בניתי אותה כי בסיס פיננסי איתן מגיע לכל אחד מההתחלה, ולא רק למי שנולד לתוכו. היא באוויר, פתוחה לכולם, ואין בה שקל אחד לשלם.',
@@ -6317,17 +6280,13 @@ const translations = {
     whatisQ3: 'What about insurance, tax and mortgages?',
     whatisA3: '<strong style="color:var(--p6); font-weight:700;">I am not licensed in those fields, and I do not pretend to be.</strong> Insurance, tax and mortgages each have licensed professionals, and when you need them I will point you to them.<br><br><strong style="color:var(--p6); font-weight:700;">But none of them hears the others.</strong> Think of it as an orchestra. The mortgage adviser plays the mortgage, the pension fund plays the pension, whoever handles the investments plays those. Each is excellent on their own instrument, and each is playing to a different beat. What comes out of that is not music.<br><br><strong style="color:var(--p6); font-weight:700;">That is where I come in.</strong> My job is to make sure every instrument keeps the same time and none of them plays out of tune. The conductor plays nothing, and is the only one who hears all of them at once.',
     whatisA1: '<strong style="color:var(--p6); font-weight:700;">Young individuals and couples</strong> starting out: a first salary, moving out, a wedding, a first flat. This is the age when every shekel put in the right place is worth several in a decade, and the age when it is easiest not to notice it disappearing.<br><br><strong style="color:var(--p6); font-weight:700;">Young families</strong> who feel the month is running them rather than the other way round: a mortgage, nursery, clubs, maternity leave, and the sense that although you both work there is nothing left at the end of it. The goal is not to spend less. It is to know where the money goes, and to decide together what actually matters to you.',
-    whatisA2: '<strong style="color:var(--p6); font-weight:700;">1. Smart financial management:</strong> I help you identify the "holes in your pocket", optimize expenses and build an action plan that leaves more money in your pocket at the end of the month.<br><br><strong style="color:var(--p6); font-weight:700;">2. Decision making:</strong> I help you understand where to invest your money passively, according to your time horizon (short, medium or long) and the risk level that suits you.<br><br><strong style="color:var(--p6); font-weight:700;">3. Habits that outlast me:</strong> My goal is for you not to need me. I teach you to read your own situation, make decisions and correct course on your own, so that by the end you are independent with your money. Not dependent on me, not on the bank, not on anyone.',
+    whatisA2: '<strong style="color:var(--p6); font-weight:700;">1. Smart financial management:</strong> I help you identify the "holes in your pocket", optimize expenses and build an action plan that leaves more money in your pocket at the end of the month.<br><br><strong style="color:var(--p6); font-weight:700;">2. Decision making:</strong> I help you understand where to invest your money passively, according to your time horizon (short, medium or long) and the risk level that suits you. I explain and lay out the options; the decision is always yours, and for any step that requires a licence you will be referred to a licensed professional.<br><br><strong style="color:var(--p6); font-weight:700;">3. Habits that outlast me:</strong> My goal is for you not to need me. I teach you to read your own situation, make decisions and correct course on your own, so that by the end you are independent with your money. Not dependent on me, not on the bank, not on anyone.',
     painTitle: "The real problem isn't the numbers.<br>It's what we believe about them.",
     d1t: '"This isn\'t for me"', d1d: 'The belief that money and financial growth are reserved for others. Not you. That\'s the most expensive lie you\'ve told yourself.',
     d2t: 'Fear of checking the account', d2d: 'When anxiety is stronger than the will to know. People avoid looking because it hurts. But not knowing costs more.',
     d3t: 'We keep repeating patterns', d3d: 'Because financial habits are built over years. Changing them requires the right tools, not just willpower.',
     methodLabel: 'My Approach', methodTitle: 'Mind first. Money second.',
     methodSub: 'Managing money isn\'t a numbers game. It\'s mostly about behavior, knowledge and the right habits. A spreadsheet will build you an excellent budget, and AI will build you one in three seconds. What neither of them has is someone sitting across from you when the number frightens you, who knows why it frightened you. That part cannot be copied.',
-    s1t: 'Financial Psychology', s1d: 'We identify together the beliefs, fears and habits holding you back. No judgment. No shame.',
-    s2t: 'Building a clear picture', s2d: 'We look at your financial situation as it really is: income, expenses, debts, goals. Without fear.',
-    s3t: 'Practical action plan', s3d: 'Step by step, slowly and safely. Tools tailored to you, not anyone else.',
-    s4t: 'Follow-up & Growth', s4d: "I don't disappear after the first meeting. I'm here to guide you until money starts serving your life.",
     aboutLabel: 'So who am I?',
     tmLabel: 'Testimonials', tmTitle: 'Clients recommend', tmHint: 'Swipe for more →',
     aboutQuote: "",
@@ -6340,9 +6299,6 @@ const translations = {
     aboutSig: 'Shoham Abo | Financial Coach',
     philLabel: 'My Philosophy', philTitle: 'Growth is built from the ground up.',
     philIntro: 'As a Givati Brigade veteran and former commander, I learned there are no shortcuts. The drive and determination to keep going even when it\'s hard are the values I bring to the financial world.',
-    p1t: 'Releasing the pressure', p1d: 'My military experience taught me everything starts with mental resilience. Before touching the numbers, we build inner calm and clarity.',
-    p2t: 'Tools that actually work', p2d: 'Tired of complicated jargon? So am I. I will teach you how to manage money in a simple, smart way that fits your life and your goals only.',
-    p3t: 'Making sense of the picture', p3d: 'We go through your pension fund, savings fund and other channels together, so you understand what each one is, how it works and exactly what you have. I explain and lay out the options; the decision is always yours, and anything requiring a license gets referred to a licensed professional.',
     missionLabel: 'My Mission',
     siteLink: "Visit Minapchim T'kis",
     missionText: "I founded Minapchim T'kis, a free platform that teaches teenagers in Israel to handle money, before their first payslip. I built it because a solid financial footing should belong to everyone from the start, not only to whoever was born into one. It is live, open to anyone, and there is nothing to pay.",
@@ -6441,12 +6397,6 @@ function setLang(lang) {
   sectionLabels[1].textContent = t.whatisLabel;
   document.querySelector('.method-title').textContent = t.methodTitle;
   document.querySelector('.method-sub').textContent = t.methodSub;
-  const sTitles = document.querySelectorAll('.step-title');
-  const sDescs = document.querySelectorAll('.step-desc');
-  sTitles[0].textContent = t.s1t; sDescs[0].textContent = t.s1d;
-  sTitles[1].textContent = t.s2t; sDescs[1].textContent = t.s2d;
-  sTitles[2].textContent = t.s3t; sDescs[2].textContent = t.s3d;
-  sTitles[3].textContent = t.s4t; sDescs[3].textContent = t.s4d;
 
   // About
   sectionLabels[3].textContent = t.aboutLabel;
@@ -6482,11 +6432,6 @@ function setLang(lang) {
   ptEl.dir = (lang === 'en') ? 'ltr' : 'rtl';
   const philIntroEl = document.querySelector('.phil-intro-text');
   if (philIntroEl) philIntroEl.textContent = t.philIntro;
-  const pTitles = document.querySelectorAll('.phil-title');
-  const pDescs = document.querySelectorAll('.phil-desc');
-  pTitles[0].textContent = t.p1t; pDescs[0].textContent = t.p1d;
-  pTitles[1].textContent = t.p2t; pDescs[1].textContent = t.p2d;
-  pTitles[2].textContent = t.p3t; pDescs[2].textContent = t.p3d;
   document.querySelector('.mission-block-label').textContent = t.missionLabel;
   document.querySelector('.mission-block-text').textContent = t.missionText;
   document.getElementById('siteLinkText').textContent = t.siteLink;
