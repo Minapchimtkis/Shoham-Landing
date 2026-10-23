@@ -4045,62 +4045,19 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   font-variant-numeric: tabular-nums;
 }
 
+/* ‏השוליים התחתונים כאן הפרידו אותה מרשימת הפירוט שעברה
+   ‏לחלון. בלי הרשימה הם 22 פיקסל של כלום בתחתית הכרטיס. */
 .pr-sub {
   font-size: 13px;
   font-weight: 400;
   color: rgba(255,255,255,0.52);
-  margin-bottom: 22px;
+  margin-bottom: 0;
 }
 
-.pr-list {
-  list-style: none;
-  margin: 0 0 18px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
 
-.pr-list li {
-  position: relative;
-  padding-inline-start: 26px;
-  font-size: 14.5px;
-  font-weight: 300;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.80);
-}
 
-.pr-list li::before {
-  content: '';
-  position: absolute;
-  inset-inline-start: 0;
-  top: 8px;
-  width: 13px;
-  height: 8px;
-  /* ‏גבול שמאלי פיזי ולא הגיוני · וי נבנה מצלע שמאל וצלע
-     ‏תחתית מסובבות. ב־RTL גבול הגיוני מתהפך לימין, והצורה
-     ‏יצאה חץ במקום וי. */
-  border-left: 2px solid var(--p6);
-  border-bottom: 2px solid var(--p6);
-  transform: rotate(-45deg);
-}
 
-/* ‏השורות שמדברות על הליווי עצמו · זה מה שהוא מוכר, ולכן
-   ‏הן לא נראות כמו עוד פריט ברשימה. */
-.pr-list li.pr-star {
-  color: rgba(255,255,255,0.96);
-  font-weight: 500;
-}
 
-.pr-foot {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid rgba(168,85,247,0.18);
-  font-size: 13.5px;
-  font-weight: 500;
-  line-height: 1.6;
-  color: var(--p6);
-}
 
 .pr-guarantee {
   display: flex;
@@ -4173,6 +4130,107 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 .intake-link:active { opacity: 0.7; }
+
+/* ‏העיגול שבפינה · הוא הדבר היחיד שאפשר ללחוץ עליו בכרטיס
+   ‏מלבד הכפתור הראשי, ולכן הוא צריך להיראות כמו כפתור
+   ‏ולעמוד ברצפה של 44 פיקסל. הסמל עצמו 34, והריפוד משלים. */
+.pr-info {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--p6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pr-info::before {
+  content: '';
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(168,85,247,0.4);
+  background: rgba(168,85,247,0.1);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.pr-info svg { position: relative; z-index: 1; }
+
+@media (hover: hover) and (pointer: fine) {
+  .pr-info:hover::before { background: rgba(168,85,247,0.24); border-color: rgba(168,85,247,0.8); }
+}
+
+.pr-info:active { opacity: 0.65; }
+
+.pr-info:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; border-radius: 50%; }
+
+/* ‏בלי השורה הזאת העיגול הוא קישוט · איש לא לוחץ על משהו
+   ‏שלא אמרו לו שהוא כפתור. */
+.pr-hint {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+}
+
+.pr-hint-dot {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(168,85,247,0.55);
+  background: rgba(168,85,247,0.14);
+  vertical-align: -2px;
+  margin: 0 2px;
+}
+
+/* ── החלון עצמו ── */
+.pr-modal { max-width: 560px; }
+
+/* ‏כפתור הסגירה יושב בפינה של צד ההתחלה, ולכן שתי שורות
+   ‏הכותרת מתרחקות ממנו. נמדד בשתי השפות: בלי זה השם נגע
+   ‏בעיגול ב-18 פיקסל. */
+.pr-modal-name, .pr-modal-price { padding-inline-start: 48px; }
+
+.pr-modal-name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--p6);
+  margin-bottom: 6px;
+}
+
+.pr-modal-price {
+  font-size: 28px !important;
+  font-weight: 800;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 22px !important;
+}
+
+.pr-modal-body p {
+  font-size: 15.5px;
+  font-weight: 300;
+  line-height: 1.9;
+  color: rgba(255,255,255,0.82);
+  margin: 0 0 15px;
+}
+
+.pr-modal-body p:last-child { margin-bottom: 0; }
+.pr-modal-body strong { color: #fff; font-weight: 600; }
+
+@media (max-width: 480px) {
+  .pr-modal-price { font-size: 25px !important; }
+  .pr-modal-body p { font-size: 15px; }
+}
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -4655,6 +4713,73 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<!-- ‏אין כאן data-stage בכוונה, מאותה סיבה שאין בסרטון: המדידה
+     ‏בדף סופרת סקשנים לפי אינדקס רץ, והוספת אחד באמצע הייתה
+     ‏מזיזה את כל המספרים שאחריו ומשנה את משמעות נתוני העבר.
+
+     ‏התוויות כאן הן pr-label ולא section-label · setLang מחלק
+     ‏את תוויות הסקשנים לפי אינדקס, ותווית תשיעית באמצע הדף
+     ‏הייתה מערבבת את כל הגרסה האנגלית. התרגום כאן לפי מזהה.
+
+     ‏ובכרטיס עצמו יש שם, מחיר ושורה אחת, וזהו. הפירוט המלא
+     ‏יושב מאחורי העיגול שבפינה · מי שגולל רואה שלושה מחירים,
+     ‏ומי שמתעניין באמת פותח וקורא. -->
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="pr-label reveal" id="prLabel">ההשקעה</div>
+    <h2 class="pr-title reveal" id="prTitle">לא תעברו את זה לבד.</h2>
+    <p class="pr-lead reveal" id="prLead">זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, עד שהכסף מתחיל לעבוד בשבילכם.</p>
+
+    <div class="pr-grid">
+
+      <div class="pr-card reveal">
+        <button class="pr-info" type="button" id="pr1btn" aria-label="מה כולל המיפוי הכלכלי" onclick="openPr('prModal1', this)">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.4"/><path d="M12 7.6v.1"/></svg>
+        </button>
+        <div class="pr-name" id="pr1n">מיפוי כלכלי</div>
+        <div class="pr-price" id="pr1p">690 ₪</div>
+        <div class="pr-sub" id="pr1s">הצעד הראשון · ומתקזז בליווי</div>
+      </div>
+
+      <div class="pr-card pr-main reveal">
+        <div class="pr-badge" id="pr2badge">הליווי המלא</div>
+        <button class="pr-info" type="button" id="pr2btn" aria-label="מה כולל הליווי האישי" onclick="openPr('prModal2', this)">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.4"/><path d="M12 7.6v.1"/></svg>
+        </button>
+        <div class="pr-name" id="pr2n">ליווי אישי</div>
+        <div class="pr-price" id="pr2p">מתחיל ב־3,990 ₪</div>
+        <div class="pr-sub" id="pr2s">ליחידים · ארבעה חודשים לפחות</div>
+      </div>
+
+      <div class="pr-card reveal">
+        <button class="pr-info" type="button" id="pr3btn" aria-label="מה כולל הליווי לזוגות ולמשפחות" onclick="openPr('prModal3', this)">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.4"/><path d="M12 7.6v.1"/></svg>
+        </button>
+        <div class="pr-name" id="pr3n">ליווי לזוגות ולמשפחות</div>
+        <div class="pr-price" id="pr3p">מתחיל ב־5,500 ₪</div>
+        <div class="pr-sub" id="pr3s">לשניכם · ארבעה חודשים לפחות</div>
+      </div>
+
+    </div>
+
+    <p class="pr-hint reveal" id="prHint">לחצו על <span class="pr-hint-dot" aria-hidden="true"></span> כדי לקרוא מה בדיוק כלול בכל אחד</p>
+
+    <div class="pr-guarantee reveal">
+      <span class="pr-g-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg>
+      </span>
+      <p id="prGuarantee">אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
+    </div>
+
+    <div class="pr-act reveal">
+      <a class="btn-primary" href="#contact" id="prCta">לשיחת היכרות חינם ←</a>
+      <p class="pr-note" id="prNote">שיחת ההיכרות תמיד בחינם ובלי התחייבות. המחירים סופיים.</p>
+    </div>
+
   </div>
 </section>
 
@@ -5411,6 +5536,51 @@ function showFormError(msg, focusId) {
 })();
 
 // ── PRIVACY MODAL ──
+// ── ‏חלונות הפירוט של המחירים ──
+// ‏אותה מעטפת של מדיניות הפרטיות, אבל גנרית לשלושה חלונות,
+// ‏ועם שני דברים שחסרו שם: המיקוד נכנס לחלון ביציאה חוזר
+// ‏לעיגול שפתח אותו, ו-Tab לא בורח אל הדף שמאחור.
+let prOpenEl = null, prOpener = null;
+
+function prFocusables(box) {
+  return [...box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.offsetParent !== null);
+}
+
+function openPr(id, btn) {
+  const ov = document.getElementById(id);
+  if (!ov) return;
+  prOpener = btn || null;
+  prOpenEl = ov;
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const f = prFocusables(ov);
+  if (f.length) f[0].focus();
+}
+
+function closePr() {
+  if (!prOpenEl) return;
+  prOpenEl.classList.remove('open');
+  prOpenEl = null;
+  document.body.style.overflow = '';
+  if (prOpener) { prOpener.focus(); prOpener = null; }
+}
+
+function closePrOutside(e) {
+  if (e.target && e.target.classList.contains('privacy-overlay')) closePr();
+}
+
+document.addEventListener('keydown', e => {
+  if (!prOpenEl) return;
+  if (e.key === 'Escape') { closePr(); return; }
+  if (e.key !== 'Tab') return;
+  const f = prFocusables(prOpenEl);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
 function openPrivacy(e) {
   if (e) e.preventDefault();
   const ov = document.getElementById('privacyOverlay');
@@ -6490,31 +6660,28 @@ const translations = {
     waName: 'שוהם אבו',
     qPrice: 'כמה זה עולה?',
     prLabel: 'ההשקעה',
+    pr1s: 'הצעד הראשון · ומתקזז בליווי',
+    prHint: 'לחצו על <span class="pr-hint-dot" aria-hidden="true"></span> כדי לקרוא מה בדיוק כלול בכל אחד',
+    prM1Name: 'מיפוי כלכלי',
+    prM1Title: '690 ₪',
+    prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
+    prM2Name: 'ליווי אישי',
+    prM2Title: 'מתחיל ב־3,990 ₪',
+    prM2Body: '<p>כאן מתחיל מה שבאמת עושה את ההבדל.</p><p>מתחילים מהמיפוי המלא, וממנו בונים ביחד תוכנית שתפורה אליכם בלבד. לא תבנית, ולא משהו שעבד למישהו אחר.</p><p><strong>ואז מתחיל החלק שאי אפשר לקנות באקסל.</strong> ארבעה חודשים לפחות, ולפעמים גם חצי שנה, שבהם אני איתכם. לא רק בפגישות · גם ביניהן. בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00. להחלטה שצצה באמצע החודש, לשאלה לפני קנייה גדולה, ולחודש שפשוט לא הלך ואנחנו יושבים להבין ביחד למה.</p><p>המטרה שלי היא שבסוף התהליך לא תצטרכו אותי. ועד שזה קורה, אתם לא לבד בזה.</p><p>וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה.</p>',
+    prM3Name: 'ליווי לזוגות ולמשפחות',
+    prM3Title: 'מתחיל ב־5,500 ₪',
+    prM3Body: '<p>הכול כמו בליווי האישי, רק ששניכם בפנים.</p><p><strong>רוב הוויכוחים על כסף הם לא באמת על כסף.</strong> אחד חוסך ואחד מוציא ושניכם צודקים, כי כל אחד מכם גדל בבית אחר עם יחס אחר לכסף. לכן אני לא ממפה התנהלות אחת אלא שתיים, ובונה תוכנית אחת שמוסכמת על שניכם.</p><p>הפגישות תמיד משותפות, שניכם באותו חדר, כי מה שאנחנו באים לפתור קורה ביניכם. בשאלון שלפניהן כל אחד מכם עונה בנפרד על אותן חמש שאלות, וככה שתי הזוויות על השולחן עוד לפני שאנחנו יושבים.</p><p>וגם כאן · ארבעה חודשים לפחות, ואני איתכם שניכם לאורך כל הדרך, יד ביד.</p>',
     prTitle: 'לא תעברו את זה לבד.',
     prLead: 'זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, לאורך כל הדרך, עד שהכסף מתחיל לעבוד בשבילכם. יש לכם על מי לסמוך.',
     pr1n: 'מיפוי כלכלי',
     pr1p: '690 ₪',
-    pr1s: 'הצעד הראשון, בלי להתחייב',
-    pr1a: 'פגישת אבחון אישית',
-    pr1b: 'מיפוי מלא של התמונה הכלכלית שלכם',
-    pr1c: 'קובץ התקציב האישי',
-    pr1f: 'ממשיכים לליווי תוך 30 יום? ה־690 יורדים מהמחיר.',
     pr2badge: 'הליווי המלא',
     pr2n: 'ליווי אישי',
     pr2p: 'מתחיל ב־3,990 ₪',
     pr2s: 'ליחידים · ארבעה חודשים לפחות',
-    pr2a: 'כל מה שבמיפוי הכלכלי',
-    pr2b: 'תוכנית אישית, תפורה אליכם בלבד',
-    pr2c: 'אני איתכם גם בין הפגישות · וואטסאפ וטלפון, ראשון עד חמישי, 9:00 עד 19:00',
-    pr2d: 'לכל התלבטות, לכל החלטה, ולכל חודש שפחות הלך',
-    pr2e: 'וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה',
     pr3n: 'ליווי לזוגות ולמשפחות',
     pr3p: 'מתחיל ב־5,500 ₪',
     pr3s: 'לשניכם · ארבעה חודשים לפחות',
-    pr3a: 'כל מה שבליווי האישי, לשניכם',
-    pr3b: 'מיפוי של שתי ההתנהלויות, לא של אחת',
-    pr3c: 'אני איתכם שניכם לאורך כל הדרך, יד ביד',
-    pr3d: 'החלטות משותפות במקום ויכוחים על כסף',
     prGuarantee: 'אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
     prCta: 'לשיחת היכרות חינם ←',
     prNote: 'שיחת ההיכרות תמיד בחינם ובלי התחייבות. המחירים סופיים.',
@@ -6603,31 +6770,28 @@ const translations = {
     waName: 'Shoham Abu',
     qPrice: 'How much does it cost?',
     prLabel: "The investment",
+    pr1s: "The first step · and it comes off the guidance",
+    prHint: 'Tap <span class="pr-hint-dot" aria-hidden="true"></span> to read exactly what each one includes',
+    prM1Name: "Financial mapping",
+    prM1Title: "₪690",
+    prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
+    prM2Name: "Personal guidance",
+    prM2Title: "From ₪3,990",
+    prM2Body: "<p>This is where the real difference begins.</p><p>We start from the full mapping, and from it we build a plan made for you alone. Not a template, and not something that worked for somebody else.</p><p><strong>And then comes the part you cannot buy in a spreadsheet.</strong> At least four months, and sometimes six, in which I am with you. Not only in the sessions · between them too. On WhatsApp and by phone, Sunday to Thursday, 9:00 to 19:00. For the decision that comes up mid-month, for the question before a big purchase, and for the month that simply did not work, where we sit down together to understand why.</p><p>My goal is that by the end of the process you will not need me. And until that happens, you are not alone in this.</p><p>And when the process ends, my door stays open.</p>",
+    prM3Name: "Guidance for couples and families",
+    prM3Title: "From ₪5,500",
+    prM3Body: "<p>Everything in personal guidance, with both of you inside it.</p><p><strong>Most arguments about money are not really about money.</strong> One of you saves, one spends, and you are both right, because each of you grew up in a different home with a different relationship to money. So I do not map one set of habits, I map two, and build one plan you both agree on.</p><p>The sessions are always joint, both of you in the same room, because what we are here to solve happens between you. In the questionnaire beforehand each of you answers the same five questions separately, so both perspectives are on the table before we even sit down.</p><p>And here too · at least four months, and I am with both of you the whole way, hand in hand.</p>",
     prTitle: "You will not go through this alone.",
     prLead: "That is the whole difference. I do not hand you a plan and disappear. I walk with you, hand in hand, the whole way, until your money starts working for you. You have someone to lean on.",
     pr1n: "Financial mapping",
     pr1p: "₪690",
-    pr1s: "The first step, with no commitment",
-    pr1a: "A personal diagnostic session",
-    pr1b: "A full map of your financial picture",
-    pr1c: "Your personal budget file",
-    pr1f: "Continue to full guidance within 30 days? The ₪690 comes off the price.",
     pr2badge: "Full guidance",
     pr2n: "Personal guidance",
     pr2p: "From ₪3,990",
     pr2s: "For individuals · four months minimum",
-    pr2a: "Everything in the financial mapping",
-    pr2b: "A plan built for you and nobody else",
-    pr2c: "I am with you between sessions too · WhatsApp and phone, Sunday to Thursday, 9:00 to 19:00",
-    pr2d: "For every doubt, every decision, and every month that went less well",
-    pr2e: "And when the process ends, my door stays open",
     pr3n: "Guidance for couples and families",
     pr3p: "From ₪5,500",
     pr3s: "For both of you · four months minimum",
-    pr3a: "Everything in personal guidance, for both of you",
-    pr3b: "A map of two sets of habits, not one",
-    pr3c: "I am with both of you the whole way, hand in hand",
-    pr3d: "Shared decisions instead of arguments about money",
     prGuarantee: "If after the second session you feel this is not for you, I give you your money back.",
     prCta: "Book a free intro call →",
     prNote: "The intro call is always free and with no commitment. Prices are final.",
@@ -6768,12 +6932,17 @@ function setLang(lang) {
 
   /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
      ‏יוכל לערבב את תוויות שאר הדף. */
-  ['prLabel','prTitle','prLead','pr1n','pr1p','pr1s','pr1a','pr1b','pr1c','pr1f',
-   'pr2badge','pr2n','pr2p','pr2s','pr2a','pr2b','pr2c','pr2d','pr2e',
-   'pr3n','pr3p','pr3s','pr3a','pr3b','pr3c','pr3d',
+  ['prLabel','prTitle','prLead','pr1n','pr1p','pr1s','pr2badge','pr2n','pr2p','pr2s',
+   'pr3n','pr3p','pr3s','prM1Name','prM1Title','prM2Name','prM2Title','prM3Name','prM3Title',
    'prGuarantee','prCta','prNote'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
+  });
+  /* ‏אלה נושאים תגיות בתוכם · הרמז נושא את העיגול, וגופי
+     ‏החלונות בנויים מפסקאות. */
+  ['prHint','prM1Body','prM2Body','prM3Body'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.innerHTML = t[k];
   });
 
   // CTA
@@ -6904,6 +7073,52 @@ function setLang(lang) {
     </label>
     <button class="btn-primary" id="waGo" style="width:100%; justify-content:center;">המשך לוואטסאפ ←</button>
     <button class="wa-skip" id="waSkip" type="button">לדלג ולעבור ישירות</button>
+  </div>
+</div>
+
+<!-- ‏שלושת חלונות הפירוט · אותה מעטפת בדיוק של מדיניות הפרטיות
+     ‏ושל הצהרת הנגישות, כדי שלא יהיו באתר שלושה סוגי חלונות. -->
+<div class="privacy-overlay" id="prModal1" onclick="closePrOutside(event)">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM1Title">
+    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
+    <div class="pr-modal-name" id="prM1Name">מיפוי כלכלי</div>
+    <h3 class="privacy-title pr-modal-price" id="prM1Title">690 ₪</h3>
+    <div class="pr-modal-body" id="prM1Body">
+      <p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p>
+      <p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p>
+      <p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p>
+      <p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p>
+      <p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>
+    </div>
+  </div>
+</div>
+
+<div class="privacy-overlay" id="prModal2" onclick="closePrOutside(event)">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM2Title">
+    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
+    <div class="pr-modal-name" id="prM2Name">ליווי אישי</div>
+    <h3 class="privacy-title pr-modal-price" id="prM2Title">מתחיל ב־3,990 ₪</h3>
+    <div class="pr-modal-body" id="prM2Body">
+      <p>כאן מתחיל מה שבאמת עושה את ההבדל.</p>
+      <p>מתחילים מהמיפוי המלא, וממנו בונים ביחד תוכנית שתפורה אליכם בלבד. לא תבנית, ולא משהו שעבד למישהו אחר.</p>
+      <p><strong>ואז מתחיל החלק שאי אפשר לקנות באקסל.</strong> ארבעה חודשים לפחות, ולפעמים גם חצי שנה, שבהם אני איתכם. לא רק בפגישות · גם ביניהן. בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00. להחלטה שצצה באמצע החודש, לשאלה לפני קנייה גדולה, ולחודש שפשוט לא הלך ואנחנו יושבים להבין ביחד למה.</p>
+      <p>המטרה שלי היא שבסוף התהליך לא תצטרכו אותי. ועד שזה קורה, אתם לא לבד בזה.</p>
+      <p>וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה.</p>
+    </div>
+  </div>
+</div>
+
+<div class="privacy-overlay" id="prModal3" onclick="closePrOutside(event)">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM3Title">
+    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
+    <div class="pr-modal-name" id="prM3Name">ליווי לזוגות ולמשפחות</div>
+    <h3 class="privacy-title pr-modal-price" id="prM3Title">מתחיל ב־5,500 ₪</h3>
+    <div class="pr-modal-body" id="prM3Body">
+      <p>הכול כמו בליווי האישי, רק ששניכם בפנים.</p>
+      <p><strong>רוב הוויכוחים על כסף הם לא באמת על כסף.</strong> אחד חוסך ואחד מוציא ושניכם צודקים, כי כל אחד מכם גדל בבית אחר עם יחס אחר לכסף. לכן אני לא ממפה התנהלות אחת אלא שתיים, ובונה תוכנית אחת שמוסכמת על שניכם.</p>
+      <p>הפגישות תמיד משותפות, שניכם באותו חדר, כי מה שאנחנו באים לפתור קורה ביניכם. בשאלון שלפניהן כל אחד מכם עונה בנפרד על אותן חמש שאלות, וככה שתי הזוויות על השולחן עוד לפני שאנחנו יושבים.</p>
+      <p>וגם כאן · ארבעה חודשים לפחות, ואני איתכם שניכם לאורך כל הדרך, יד ביד.</p>
+    </div>
   </div>
 </div>
 
