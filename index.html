@@ -88,7 +88,7 @@
           "name": "כמה זה עולה?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים, לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך."
+            "text": "שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף."
           }
         },
         {
@@ -3944,6 +3944,207 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   .process-section { padding-top: 56px; }
   .cta-section { padding-top: 88px; padding-bottom: 88px; }
 }
+
+/* ══ מחירים ═══════════════════════════════════════════════════
+   ‏הסקשן הזה נמצא אחרי התהליך ולפני השאלות, כי זה הסדר שבו
+   ‏אדם שואל: מי אתה, מה עשית לאחרים, איך זה עובד, כמה זה
+   ‏עולה, ורק אז ההתנגדויות. מחיר לפני הוכחה הוא מספר בלי
+   ‏הקשר.
+
+   ‏והכרטיס האמצעי הוא זה שאמור להימכר, ולכן הוא הבולט. ═══ */
+.pricing {
+  padding: 120px 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.pricing-inner { max-width: 1120px; margin: 0 auto; }
+
+.pr-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--p6);
+  text-align: center;
+  margin-bottom: 16px;
+  text-shadow: 0 0 18px rgba(168,85,247,0.5);
+}
+
+.pr-title {
+  font-family: var(--font);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  color: var(--white);
+  text-align: center;
+  margin: 0 0 18px;
+  line-height: 1.2;
+}
+
+.pr-lead {
+  text-align: center;
+  font-size: 16.5px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.78);
+  max-width: 52ch;
+  margin: 0 auto 52px;
+}
+
+.pr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.pr-card {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 26px;
+  border: 1px solid rgba(168,85,247,0.22);
+  border-radius: 18px;
+  background: linear-gradient(158deg, rgba(22,5,48,0.55), rgba(11,2,28,0.74));
+  position: relative;
+}
+
+/* ‏האמצעי הוא המוצר. הוא מקבל מסגרת חזקה יותר, רקע עמוק
+   ‏יותר ותג · לא גודל אחר, כי שלושה כרטיסים בגבהים שונים
+   ‏נראים שבורים ולא מכוונים. */
+.pr-main {
+  border-color: rgba(168,85,247,0.55);
+  background: linear-gradient(158deg, rgba(44,12,92,0.72), rgba(15,3,38,0.88));
+  box-shadow: 0 24px 60px -30px rgba(124,58,237,0.75);
+}
+
+.pr-badge {
+  position: absolute;
+  top: -11px;
+  inset-inline-start: 26px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--p4), var(--p5));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.pr-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--p6);
+  margin-bottom: 10px;
+}
+
+.pr-price {
+  font-size: 27px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.25;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.52);
+  margin-bottom: 22px;
+}
+
+.pr-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.pr-list li {
+  position: relative;
+  padding-inline-start: 26px;
+  font-size: 14.5px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.80);
+}
+
+.pr-list li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 8px;
+  width: 13px;
+  height: 8px;
+  /* ‏גבול שמאלי פיזי ולא הגיוני · וי נבנה מצלע שמאל וצלע
+     ‏תחתית מסובבות. ב־RTL גבול הגיוני מתהפך לימין, והצורה
+     ‏יצאה חץ במקום וי. */
+  border-left: 2px solid var(--p6);
+  border-bottom: 2px solid var(--p6);
+  transform: rotate(-45deg);
+}
+
+/* ‏השורות שמדברות על הליווי עצמו · זה מה שהוא מוכר, ולכן
+   ‏הן לא נראות כמו עוד פריט ברשימה. */
+.pr-list li.pr-star {
+  color: rgba(255,255,255,0.96);
+  font-weight: 500;
+}
+
+.pr-foot {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(168,85,247,0.18);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--p6);
+}
+
+.pr-guarantee {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 640px;
+  margin: 34px auto 0;
+  padding: 18px 24px;
+  border: 1px solid rgba(168,85,247,0.26);
+  border-radius: 16px;
+  background: rgba(168,85,247,0.06);
+}
+
+.pr-guarantee p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.92);
+}
+
+.pr-g-mark { color: var(--p6); flex-shrink: 0; display: flex; }
+
+.pr-act { text-align: center; margin-top: 36px; }
+
+.pr-note {
+  margin: 16px 0 0;
+  font-size: 12.5px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.45);
+}
+
+@media (max-width: 920px) {
+  .pr-grid { grid-template-columns: 1fr; gap: 26px; max-width: 520px; margin-inline: auto; }
+}
+
+@media (max-width: 720px) {
+  .pricing { padding: 72px 20px; }
+  .pr-lead { font-size: 15.5px; margin-bottom: 40px; }
+  .pr-card { padding: 26px 22px; }
+  .pr-price { font-size: 25px; }
+  .pr-guarantee { flex-direction: column; text-align: center; gap: 10px; padding: 18px 20px; }
+}
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -4429,6 +4630,77 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   </div>
 </section>
 
+<!-- PRICING -->
+<!-- ‏אין כאן data-stage בכוונה, מאותה סיבה שאין בסרטון: המדידה
+     ‏בדף סופרת סקשנים לפי אינדקס רץ, והוספת אחד באמצע הייתה
+     ‏מזיזה את כל המספרים שאחריו ומשנה את משמעות נתוני העבר.
+
+     ‏והתוויות כאן הן pr-label ולא section-label · setLang מחלק
+     ‏את תוויות הסקשנים לפי אינדקס, ותווית תשיעית באמצע הדף
+     ‏הייתה מערבבת את כל הגרסה האנגלית. התרגום כאן לפי מזהה. -->
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="pr-label reveal" id="prLabel">ההשקעה</div>
+    <h2 class="pr-title reveal" id="prTitle">לא תעברו את זה לבד.</h2>
+    <p class="pr-lead reveal" id="prLead">זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, לאורך כל הדרך, עד שהכסף מתחיל לעבוד בשבילכם. יש לכם על מי לסמוך.</p>
+
+    <div class="pr-grid">
+
+      <div class="pr-card reveal">
+        <div class="pr-name" id="pr1n">מיפוי כלכלי</div>
+        <div class="pr-price" id="pr1p">690 ₪</div>
+        <div class="pr-sub" id="pr1s">הצעד הראשון, בלי להתחייב</div>
+        <ul class="pr-list">
+          <li id="pr1a">פגישת אבחון אישית</li>
+          <li id="pr1b">מיפוי מלא של התמונה הכלכלית שלכם</li>
+          <li id="pr1c">קובץ התקציב האישי</li>
+        </ul>
+        <div class="pr-foot" id="pr1f">ממשיכים לליווי תוך 30 יום? ה־690 יורדים מהמחיר.</div>
+      </div>
+
+      <div class="pr-card pr-main reveal">
+        <div class="pr-badge" id="pr2badge">הליווי המלא</div>
+        <div class="pr-name" id="pr2n">ליווי אישי</div>
+        <div class="pr-price" id="pr2p">מתחיל ב־3,990 ₪</div>
+        <div class="pr-sub" id="pr2s">ליחידים · ארבעה חודשים לפחות</div>
+        <ul class="pr-list">
+          <li id="pr2a">כל מה שבמיפוי הכלכלי</li>
+          <li id="pr2b">תוכנית אישית, תפורה אליכם בלבד</li>
+          <li class="pr-star" id="pr2c">אני איתכם גם בין הפגישות · וואטסאפ וטלפון, ראשון עד חמישי, 9:00 עד 19:00</li>
+          <li class="pr-star" id="pr2d">לכל התלבטות, לכל החלטה, ולכל חודש שפחות הלך</li>
+          <li id="pr2e">וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה</li>
+        </ul>
+      </div>
+
+      <div class="pr-card reveal">
+        <div class="pr-name" id="pr3n">ליווי לזוגות ולמשפחות</div>
+        <div class="pr-price" id="pr3p">מתחיל ב־5,500 ₪</div>
+        <div class="pr-sub" id="pr3s">לשניכם · ארבעה חודשים לפחות</div>
+        <ul class="pr-list">
+          <li id="pr3a">כל מה שבליווי האישי, לשניכם</li>
+          <li id="pr3b">מיפוי של שתי ההתנהלויות, לא של אחת</li>
+          <li class="pr-star" id="pr3c">אני איתכם שניכם לאורך כל הדרך, יד ביד</li>
+          <li id="pr3d">החלטות משותפות במקום ויכוחים על כסף</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="pr-guarantee reveal">
+      <span class="pr-g-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg>
+      </span>
+      <p id="prGuarantee">אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
+    </div>
+
+    <div class="pr-act reveal">
+      <a class="btn-primary" href="#contact" id="prCta">לשיחת היכרות חינם ←</a>
+      <p class="pr-note" id="prNote">שיחת ההיכרות תמיד בחינם ובלי התחייבות. המחירים סופיים.</p>
+    </div>
+
+  </div>
+</section>
+
 <!-- FAQ -->
 <section data-stage="faq" data-stage-i="8" class="faq-section">
   <div class="faq-inner">
@@ -4474,7 +4746,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
           <span>כמה זה עולה?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים, לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך.</div>
+        <div class="faq-a">שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -6254,7 +6526,36 @@ const translations = {
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
     qPrice: 'כמה זה עולה?',
-    aPrice: 'שיחת ההיכרות חינם, בלי התחייבות. את המחיר אני קובע איתכם בשיחה עצמה, אחרי שאני מבין מה המצב ומה אתם צריכים, לא לפני. אין מחירון אחיד, כי אין שני מצבים זהים. מה שבטוח: תדעו את המספר מראש ותסכימו לו, בלי הפתעות בהמשך.',
+    prLabel: 'ההשקעה',
+    prTitle: 'לא תעברו את זה לבד.',
+    prLead: 'זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, לאורך כל הדרך, עד שהכסף מתחיל לעבוד בשבילכם. יש לכם על מי לסמוך.',
+    pr1n: 'מיפוי כלכלי',
+    pr1p: '690 ₪',
+    pr1s: 'הצעד הראשון, בלי להתחייב',
+    pr1a: 'פגישת אבחון אישית',
+    pr1b: 'מיפוי מלא של התמונה הכלכלית שלכם',
+    pr1c: 'קובץ התקציב האישי',
+    pr1f: 'ממשיכים לליווי תוך 30 יום? ה־690 יורדים מהמחיר.',
+    pr2badge: 'הליווי המלא',
+    pr2n: 'ליווי אישי',
+    pr2p: 'מתחיל ב־3,990 ₪',
+    pr2s: 'ליחידים · ארבעה חודשים לפחות',
+    pr2a: 'כל מה שבמיפוי הכלכלי',
+    pr2b: 'תוכנית אישית, תפורה אליכם בלבד',
+    pr2c: 'אני איתכם גם בין הפגישות · וואטסאפ וטלפון, ראשון עד חמישי, 9:00 עד 19:00',
+    pr2d: 'לכל התלבטות, לכל החלטה, ולכל חודש שפחות הלך',
+    pr2e: 'וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה',
+    pr3n: 'ליווי לזוגות ולמשפחות',
+    pr3p: 'מתחיל ב־5,500 ₪',
+    pr3s: 'לשניכם · ארבעה חודשים לפחות',
+    pr3a: 'כל מה שבליווי האישי, לשניכם',
+    pr3b: 'מיפוי של שתי ההתנהלויות, לא של אחת',
+    pr3c: 'אני איתכם שניכם לאורך כל הדרך, יד ביד',
+    pr3d: 'החלטות משותפות במקום ויכוחים על כסף',
+    prGuarantee: 'אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
+    prCta: 'לשיחת היכרות חינם ←',
+    prNote: 'שיחת ההיכרות תמיד בחינם ובלי התחייבות. המחירים סופיים.',
+    aPrice: 'שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף.',
     q6: 'מה קורה ביום שאחרי?',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ותהיה לכם האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
@@ -6337,7 +6638,36 @@ const translations = {
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
     qPrice: 'How much does it cost?',
-    aPrice: "The first call is free, with no commitment. I set the price with you in that conversation, once I understand where you stand and what you need — not before. There is no fixed price list, because no two situations are the same. What is certain: you will know the number up front and agree to it, with no surprises later.",
+    prLabel: "The investment",
+    prTitle: "You will not go through this alone.",
+    prLead: "That is the whole difference. I do not hand you a plan and disappear. I walk with you, hand in hand, the whole way, until your money starts working for you. You have someone to lean on.",
+    pr1n: "Financial mapping",
+    pr1p: "₪690",
+    pr1s: "The first step, with no commitment",
+    pr1a: "A personal diagnostic session",
+    pr1b: "A full map of your financial picture",
+    pr1c: "Your personal budget file",
+    pr1f: "Continue to full guidance within 30 days? The ₪690 comes off the price.",
+    pr2badge: "Full guidance",
+    pr2n: "Personal guidance",
+    pr2p: "From ₪3,990",
+    pr2s: "For individuals · four months minimum",
+    pr2a: "Everything in the financial mapping",
+    pr2b: "A plan built for you and nobody else",
+    pr2c: "I am with you between sessions too · WhatsApp and phone, Sunday to Thursday, 9:00 to 19:00",
+    pr2d: "For every doubt, every decision, and every month that went less well",
+    pr2e: "And when the process ends, my door stays open",
+    pr3n: "Guidance for couples and families",
+    pr3p: "From ₪5,500",
+    pr3s: "For both of you · four months minimum",
+    pr3a: "Everything in personal guidance, for both of you",
+    pr3b: "A map of two sets of habits, not one",
+    pr3c: "I am with both of you the whole way, hand in hand",
+    pr3d: "Shared decisions instead of arguments about money",
+    prGuarantee: "If after the second session you feel this is not for you, I give you your money back.",
+    prCta: "Book a free intro call →",
+    prNote: "The intro call is always free and with no commitment. Prices are final.",
+    aPrice: "The intro call is free and carries no obligation. The financial mapping is ₪690, and it comes off the price in full if you continue to full guidance within 30 days. Guidance starts at ₪3,990 for individuals and ₪5,500 for couples and families, and the final figure is set with you in the call, according to what you actually need. Prices are final, with no surprises later. And if after the second session you feel this is not for you, I give you your money back.",
     q6: 'What happens the day after?',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
@@ -6471,6 +6801,16 @@ function setLang(lang) {
     if (wAs[1]) wAs[1].innerHTML = t.whatisA2;
     if (wAs[2]) wAs[2].innerHTML = t.whatisA3;
   }
+
+  /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
+     ‏יוכל לערבב את תוויות שאר הדף. */
+  ['prLabel','prTitle','prLead','pr1n','pr1p','pr1s','pr1a','pr1b','pr1c','pr1f',
+   'pr2badge','pr2n','pr2p','pr2s','pr2a','pr2b','pr2c','pr2d','pr2e',
+   'pr3n','pr3p','pr3s','pr3a','pr3b','pr3c','pr3d',
+   'prGuarantee','prCta','prNote'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t[k];
+  });
 
   // CTA
   sectionLabels[7].textContent = t.ctaLabel;
