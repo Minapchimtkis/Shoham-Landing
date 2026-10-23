@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- ════════════════════════════════════════════════════════════════════
+     ‏הדף הזה אינו מקושר משום מקום: לא מדף הנחיתה, לא מהתפריט ולא
+     ‏מהפוטר. זה מכוון. שוהם שולח את הכתובת בעצמו, לזוגות, בפרסום
+     ‏ובהודעות.
+
+     ‏הוא כן פתוח למנועי חיפוש ורשום ב-sitemap.xml, כדי שמי שמחפש
+     ‏"ייעוץ כלכלי לזוגות" ימצא אותו ישירות. כדי לסגור אותו לגמרי:
+     ‏להחליף את שורת ה-robots שמתחת ב-
+         <meta name="robots" content="noindex, nofollow">
+     ‏ולמחוק את הבלוק של /couples/ מתוך sitemap.xml שבשורש.
+     ════════════════════════════════════════════════════════════════════ -->
+<meta name="robots" content="index, follow, max-image-preview:large">
+<title>ליווי פיננסי לזוגות | שוהם אבו</title>
+<meta name="description" content="שניכם עובדים ובסוף החודש עדיין לא נשאר. ליווי פיננסי אישי לזוגות, שמתחיל מהדינמיקה שלכם עם כסף ולא מטבלת אקסל.">
+<link rel="canonical" href="https://shohamfinance.co.il/couples/">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="../assets/favicon.ico?v=1bc87ca4" sizes="16x16 32x32 48x48 96x96 144x144 192x192">
+<link rel="icon" type="image/png" href="../assets/icon-192.png?v=8dc49811" sizes="192x192">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png?v=8dc49811">
+<link rel="manifest" href="../assets/site.webmanifest">
+<meta name="theme-color" content="#0c0b11">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="שוהם אבו · ליווי וייעוץ פיננסי">
+<meta property="og:locale" content="he_IL">
+<meta property="og:url" content="https://shohamfinance.co.il/couples/">
+<meta property="og:title" content="ליווי פיננסי לזוגות | שוהם אבו">
+<meta property="og:description" content="שניכם עובדים ובסוף החודש עדיין לא נשאר. ליווי אישי שמתחיל מהדינמיקה שלכם עם כסף.">
+<meta property="og:image" content="https://shohamfinance.co.il/assets/share-home.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
+<style>
+/* ‏אותם אסימונים בדיוק של דף הנחיתה ושל האפליקציה · אתר אחד
+   ‏ולא שלושה. */
+:root {
+  --font: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --p1: #0c0b11;
+  --p2: #161322;
+  --p3: #2e1148;
+  --p4: #7c3aed;
+  --p5: #a855f7;
+  --p6: #d8b4fe;
+  --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--p1);
+  color: rgba(255,255,255,0.86);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ‏זוהר סגול רך מאחורי הכול, סטטי. שום דבר כאן לא זז מעצמו. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(60% 40% at 78% 8%, rgba(124,58,237,0.20), transparent 70%),
+    radial-gradient(55% 40% at 12% 62%, rgba(168,85,247,0.12), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+main, header, footer { position: relative; z-index: 1; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 22px; }
+
+/* ── ניווט ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px clamp(16px, 4vw, 40px);
+  border-bottom: 1px solid rgba(168,85,247,0.14);
+  background: rgba(12,11,17,0.82);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.logo { height: 38px; width: auto; display: block; }
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(168,85,247,0.3);
+  color: rgba(255,255,255,0.8);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back:hover { border-color: rgba(168,85,247,0.7); color: #fff; }
+}
+
+.back:active { opacity: 0.7; }
+
+/* ── פתיח ── */
+.hero { padding: 64px 0 56px; text-align: center; }
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--p6);
+  margin-bottom: 18px;
+  text-shadow: 0 0 18px rgba(168,85,247,0.5);
+}
+
+h1 {
+  font-size: clamp(30px, 6.4vw, 50px);
+  font-weight: 800;
+  line-height: 1.22;
+  color: var(--white);
+  margin-bottom: 22px;
+  letter-spacing: -0.5px;
+}
+
+h1 .soft { color: var(--p6); }
+
+.hero p {
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.78);
+  max-width: 48ch;
+  margin: 0 auto 32px;
+}
+
+.btn {
+  display: inline-block;
+  min-height: 56px;
+  padding: 16px 38px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, var(--p4), var(--p5));
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 12px 34px -12px rgba(124,58,237,0.8);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 18px 44px -14px rgba(124,58,237,0.95); }
+}
+
+.btn:active { transform: translateY(0); opacity: 0.88; }
+
+.btn-note {
+  margin-top: 14px;
+  font-size: 12.5px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.45);
+}
+
+/* ── סקשן ── */
+section { padding: 56px 0; }
+
+h2 {
+  font-size: clamp(23px, 4.6vw, 33px);
+  font-weight: 800;
+  line-height: 1.28;
+  color: var(--white);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.lead {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.76);
+  max-width: 50ch;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+
+/* ── כרטיסי הדינמיקה ── */
+.cards { display: grid; gap: 14px; }
+
+.card {
+  padding: 24px 22px;
+  border: 1px solid rgba(168,85,247,0.2);
+  border-radius: 16px;
+  background: linear-gradient(158deg, rgba(22,5,48,0.55), rgba(11,2,28,0.74));
+}
+
+.card h3 {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--p6);
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+
+.card p {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.78);
+}
+
+@media (min-width: 720px) {
+  .cards { grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+
+/* ── האמונה · 90 ל-10 ── */
+.belief {
+  padding: 34px 28px;
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 20px;
+  background: linear-gradient(158deg, rgba(44,12,92,0.6), rgba(15,3,38,0.85));
+  text-align: center;
+}
+
+.belief .q {
+  font-size: clamp(20px, 3.6vw, 27px);
+  font-weight: 800;
+  line-height: 1.45;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+
+.belief .q b { color: var(--p6); font-weight: 800; }
+
+.belief p {
+  font-size: 15.5px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.8);
+  max-width: 46ch;
+  margin: 0 auto;
+  text-align: start;
+}
+
+.belief p + p { margin-top: 13px; }
+
+/* ── שלבים ── */
+.steps { display: grid; gap: 14px; counter-reset: s; }
+
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px solid rgba(168,85,247,0.16);
+  border-radius: 14px;
+  background: rgba(22,5,48,0.38);
+}
+
+.step .n {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--p6);
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.step h3 { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+.step p { font-size: 14.5px; font-weight: 300; line-height: 1.75; color: rgba(255,255,255,0.75); }
+
+/* ── החבילה ── */
+.plan {
+  padding: 32px 28px;
+  border: 1px solid rgba(168,85,247,0.5);
+  border-radius: 20px;
+  background: linear-gradient(158deg, rgba(44,12,92,0.7), rgba(15,3,38,0.88));
+  box-shadow: 0 26px 64px -32px rgba(124,58,237,0.8);
+}
+
+.plan .name { font-size: 17px; font-weight: 700; color: var(--p6); margin-bottom: 8px; }
+.plan .price { font-size: 30px; font-weight: 800; color: var(--white); font-variant-numeric: tabular-nums; }
+.plan .sub { font-size: 13.5px; color: rgba(255,255,255,0.52); margin-bottom: 22px; }
+
+.plan ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+
+.plan li {
+  position: relative;
+  padding-inline-start: 26px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.82);
+}
+
+/* ‏גבול שמאלי פיזי ולא הגיוני · גבול הגיוני מתהפך ב-RTL
+   ‏והווי יוצא חץ. */
+.plan li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 9px;
+  width: 13px;
+  height: 8px;
+  border-left: 2px solid var(--p6);
+  border-bottom: 2px solid var(--p6);
+  transform: rotate(-45deg);
+}
+
+.plan li.key { color: #fff; font-weight: 500; }
+
+.guarantee {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(168,85,247,0.22);
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.92);
+}
+
+.guarantee svg { color: var(--p6); flex-shrink: 0; }
+
+/* ── מי אני ── */
+.me {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 24px 22px;
+  border: 1px solid rgba(168,85,247,0.18);
+  border-radius: 16px;
+  background: rgba(22,5,48,0.4);
+}
+
+.me img { width: 92px; height: 92px; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+.me h3 { font-size: 16.5px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.me p { font-size: 14.5px; font-weight: 300; line-height: 1.75; color: rgba(255,255,255,0.76); }
+
+@media (max-width: 480px) {
+  .me { flex-direction: column; text-align: center; }
+}
+
+/* ── סיום ── */
+.end { text-align: center; padding: 56px 0 64px; }
+
+footer {
+  border-top: 1px solid rgba(168,85,247,0.12);
+  padding: 28px 22px 40px;
+  text-align: center;
+}
+
+.disclaimer {
+  font-size: 11.5px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.32);
+  max-width: 44em;
+  margin: 0 auto 14px;
+}
+
+/* ‏ריפוד עם שוליים שמתקזזים · אזור הנגיעה גדל ל-45 פיקסל
+   ‏והשורה לא זזה במילימטר. שאר האתר עומד ברצפה של 44. */
+.foot-link {
+  display: inline-block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(168,85,247,0.3);
+  padding: 14px 0 12px;
+  margin: -14px 0 -12px;
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 48px 0 44px; }
+  section { padding: 44px 0; }
+  .belief { padding: 28px 20px; }
+  .plan { padding: 26px 22px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="../assets/logo.webp?v=7ad752ae" width="600" height="415" alt="שוהם אבו · ליווי וייעוץ פיננסי">
+  <a class="back" href="/">לאתר המלא</a>
+</header>
+
+<main>
+
+  <div class="wrap hero">
+    <div class="label">ליווי פיננסי לזוגות</div>
+    <h1>שניכם עובדים.<br>ובסוף החודש <span class="soft">עדיין לא נשאר.</span></h1>
+    <p>זה לא בגלל שאתם בזבזנים, וזה לא בגלל שאתם לא מבינים בכסף. זה בגלל ששני אנשים מנהלים כסף אחד, ואף אחד מעולם לא לימד אתכם איך עושים את זה ביחד.</p>
+    <a class="btn" href="/#contact">לשיחת היכרות חינם</a>
+    <p class="btn-note">בלי התחייבות ובלי מחירון מופתע בסוף.</p>
+  </div>
+
+  <section class="wrap">
+    <h2>רוב הוויכוחים על כסף<br>הם לא באמת על כסף.</h2>
+    <p class="lead">הם על ביטחון, על שליטה, על איך כל אחד מכם גדל. המספרים הם רק המקום שבו זה מתפוצץ.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h3>אחד חוסך, אחד מוציא, ושניכם צודקים</h3>
+        <p>כל אחד מכם גדל בבית אחר, עם יחס אחר לכסף. זה לא ויכוח על 200 שקל, זה שתי תפיסות עולם שנפגשות בחשבון אחד.</p>
+      </div>
+      <div class="card">
+        <h3>אותה שיחה חוזרת כל חודש</h3>
+        <p>אותן מילים, אותה נימה, ואף פעם לא נגמרת בהחלטה. כי אין מולכם תמונה אחת מוסכמת, רק שתי גרסאות של מה קרה החודש.</p>
+      </div>
+      <div class="card">
+        <h3>מי שמרוויח יותר</h3>
+        <p>לפעמים יש הרגשה שלמי שמביא יותר יש יותר זכות להגיד. גם כשאף אחד לא אמר את זה בקול, זה יושב שם.</p>
+      </div>
+      <div class="card">
+        <h3>ומה שלא אומרים</h3>
+        <p>קנייה שלא סיפרתם עליה, חשבון שלא פתחתם ביחד, סכום שאחד יודע והשני מעריך. זה לא שקר, זו הימנעות. והיא עולה כסף.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="belief">
+      <p class="q">אני מאמין שניהול פיננסי הוא <b>90 אחוז התנהגות וידע</b>, ו־<b>10 אחוז מתמטיקה ונוסחאות</b>.</p>
+      <p>לכן אני לא מתחיל מאקסל. אני מתחיל מכם · ממה שכל אחד מכם מרגיש כשהוא פותח את האפליקציה של הבנק, ממה שמלחיץ, וממה שגורם לאותה שיחה לחזור בכל חודש מחדש.</p>
+      <p>המספרים הם החלק הקל. אקסל יבנה לכם טבלה מצוינת, ו־AI יבנה אותה בשלוש שניות. מה שאין להם הוא מישהו שיושב מול שניכם ומבין למה דווקא המספר הזה הצית ויכוח.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>ולא, זה לא בראש שלכם.<br>באמת יקר היום.</h2>
+    <p class="lead">שכר דירה או משכנתא, חשבונות, קנייה שבועית שעולה כל פעם קצת יותר, וגן או חוגים אם יש ילדים. זוג ששניכם בו עובדים יכול להרגיש שהוא רץ מהר ונשאר באותו מקום · וזאת לא אשמתכם.</p>
+    <p class="lead" style="margin-bottom:0;"><strong style="color:#fff; font-weight:600;">את המחירים אי אפשר לשנות. את מה שאתם עושים מולם, ביחד, אפשר.</strong> לזה בדיוק נועד הליווי.</p>
+  </section>
+
+  <section class="wrap">
+    <h2>איך זה עובד</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <div>
+          <h3>שיחת היכרות, בחינם</h3>
+          <p>נכיר, ותספרו לי מה מעיק עליכם מבחינה כלכלית, מה אתם רוצים לשנות ומה המטרות שלכם. בלי התחייבות ובלי מחיר בסוף השיחה.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <div>
+          <h3>מיפוי של שניכם, לא של אחד</h3>
+          <p>נמפה את התמונה המלאה · הכנסות, הוצאות, חובות ומטרות. ובמקביל נכיר את הפסיכולוגיה של הכסף של כל אחד מכם בנפרד, כי שם נמצא ההסבר לרוב מה שקורה ביניכם.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <div>
+          <h3>תוכנית אחת, מוסכמת על שניכם</h3>
+          <p>לא תוכנית שלי שאתם מיישמים, אלא תוכנית שבנינו ביחד ושנינו יודעים למה כל סעיף בה נמצא שם. זה ההבדל בין משהו שמחזיק לבין משהו שנשבר בחודש השני.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">04</div>
+        <div>
+          <h3>ואז מתחיל הליווי</h3>
+          <p>ארבעה חודשים לפחות, ולפעמים גם חצי שנה. אני איתכם גם בין הפגישות, בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00. להתלבטות, להחלטה גדולה, ולחודש שפחות הלך וצריך להבין ביחד למה.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="me">
+      <img src="../assets/shoham.webp?v=7e78317a" width="896" height="1195" loading="lazy" decoding="async" alt="שוהם אבו, יועץ כלכלי">
+      <div>
+        <h3>שוהם אבו · יועץ כלכלי</h3>
+        <p>יועץ לכלכלת המשפחה עם תעודה רשמית מטעם חברת UNI פיננסים, בפיקוח אוניברסיטת אריאל בשומרון. לוחם ומפקד לשעבר בחטיבת גבעתי. מלווה יחידים, זוגות ומשפחות צעירות, ומאמין שבסיס פיננסי איתן מגיע לכל אחד מההתחלה.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>הליווי לזוגות</h2>
+    <div class="plan">
+      <div class="name">ליווי לזוגות ולמשפחות</div>
+      <div class="price">מתחיל ב־5,500 ₪</div>
+      <div class="sub">לשניכם · ארבעה חודשים לפחות</div>
+      <ul>
+        <li>פגישת אבחון ומיפוי מלא של התמונה הכלכלית</li>
+        <li>מיפוי של שתי ההתנהלויות, לא של אחת</li>
+        <li>קובץ תקציב אישי שבנוי לשניכם</li>
+        <li class="key">אני איתכם שניכם לאורך כל הדרך, יד ביד</li>
+        <li class="key">זמין בוואטסאפ ובטלפון בין הפגישות, ראשון עד חמישי, 9:00 עד 19:00</li>
+        <li>החלטות משותפות במקום ויכוחים על כסף</li>
+        <li>וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה</li>
+      </ul>
+      <div class="guarantee">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg>
+        <span>אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap end">
+    <h2>הצעד הראשון הוא שיחה.<br>היא בחינם.</h2>
+    <p class="lead">נדבר עשרים דקות, אבין איפה אתם עומדים, ותחליטו אחר כך בלי שאף אחד לוחץ עליכם.</p>
+    <a class="btn" href="/#contact">לשיחת היכרות חינם</a>
+    <p class="btn-note">או מלאו את <a class="foot-link" href="/intake.html">שאלון ההיכרות לזוגות</a> ואחזור אליכם עם תמונה ראשונית.</p>
+  </div>
+
+</main>
+
+<footer>
+  <p class="disclaimer">התוכן בעמוד זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.</p>
+  <a class="foot-link" href="/">חזרה לאתר של שוהם אבו</a>
+</footer>
+
+</body>
+</html>
