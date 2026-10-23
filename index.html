@@ -4145,6 +4145,34 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   .pr-price { font-size: 25px; }
   .pr-guarantee { flex-direction: column; text-align: center; gap: 10px; padding: 18px 20px; }
 }
+
+/* ‏שורת השאלון מתחת לטופס · שקטה, והקישור בתוכה מקבל אזור
+   ‏נגיעה מלא בריפוד עם שוליים שמתקזזים, בלי להזיז את השורה. */
+.intake-row {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.62);
+  letter-spacing: 0.3px;
+}
+
+.intake-link {
+  display: inline-block;
+  color: var(--p6);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(168,85,247,0.4);
+  padding: 15px 2px 13px;
+  margin: -15px 0 -13px;
+  transition: color 0.25s, border-color 0.25s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .intake-link:hover { color: #fff; border-color: rgba(168,85,247,0.85); }
+}
+
+.intake-link:active { opacity: 0.7; }
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -4837,6 +4865,11 @@ html.faq-open .iphone-wrap.visible .iphone-close {
       <bdi>050-722-8755</bdi>
     </a>
   </div>
+
+  <!-- ‏מי שכבר החליט ממלא טופס או מרים טלפון. השאלון הוא למי
+       ‏שרוצה להגיע לשיחה כשהתמונה כבר על השולחן, ולכן הוא
+       ‏האפשרות השלישית ולא הראשונה. -->
+  <p class="intake-row reveal" id="intakeRow">או מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ואחזור אליכם עם תמונה ראשונית.</p>
 </section>
 
 
@@ -6505,6 +6538,7 @@ const translations = {
     q5: 'תוך כמה זמן רואים תוצאות?', a5: 'סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.',
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
     callOr: 'או פשוט תרימו טלפון',
+    intakeRow: 'או מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ואחזור אליכם עם תמונה ראשונית.',
     ctaSub: 'השאירו פרטים ואחזור אליכם תוך שעתיים בשעות היום. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
@@ -6617,6 +6651,7 @@ const translations = {
     q5: 'How long until I see results?', a5: "You'll gain clarity and structure from the first month. Significant financial results are built over time with consistency. I don't make empty promises. I build a real process with you, step by step.",
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
     callOr: 'Or simply pick up the phone',
+    intakeRow: 'Or fill in the <a class="intake-link" href="/intake.html">intake questionnaire</a> and I will come back to you with a first picture.',
     ctaSub: "Leave your details and I'll get back to you within two hours during the day. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
@@ -6815,6 +6850,9 @@ function setLang(lang) {
   // CTA
   sectionLabels[7].textContent = t.ctaLabel;
   document.querySelector('.cta-title').textContent = t.ctaTitle;
+  const intakeRowEl = document.getElementById('intakeRow');
+  /* ‏השורה נושאת קישור בתוכה, ולכן innerHTML. */
+  if (intakeRowEl) intakeRowEl.innerHTML = t.intakeRow;
   const callOr = document.getElementById('callOr');
   if (callOr) callOr.textContent = t.callOr;
   const callLink = document.getElementById('callLink');
