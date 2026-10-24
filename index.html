@@ -945,15 +945,18 @@ section {
    ‏ומטשטש אותו. לכן ההילה היא drop-shadow, שפועל על הצורה
    ‏שנותרה אחרי החיתוך. */
 .hero-title {
+  /* ‏עוצמה מופחתת · אותו מסלול צבע בדיוק, רק עם פחות רוויה
+     ‏בשלוש העצירות שאחרי הסגול. הסגול הפותח נשאר כפי שהוא כי
+     ‏הוא צבע המותג, והזהב הסוגר הוחלף בזהב חיוור. */
   background: linear-gradient(135deg,
     var(--p5) 0%,
-    #e0649b 42%,
-    #f28a4c 70%,
-    var(--gold) 100%);
+    #cf8fb4 46%,
+    #dfb089 74%,
+    #e6cf96 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 26px rgba(168,85,247,0.55));
+  filter: drop-shadow(0 2px 22px rgba(168,85,247,0.40));
 }
 
 /* A photograph at the foot of the first screen. It is the last thing inside
