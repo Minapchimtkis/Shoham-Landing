@@ -1950,6 +1950,9 @@ section {
 /* ‏התמלול של כל צילום · אינו נראה בעין, אבל קורא
    ‏מסך מקריא אותו ומנועי חיפוש מוצאים אותו · תמונה
    ‏שכולה טקסט היא שתיקה גמורה בלעדיו. */
+/* ‏תוויות שנקראות בקורא מסך ואינן נראות בעין · אותה שיטה
+   ‏בדיוק של תמלולי ההמלצות, ולכן אותם כללים. */
+.field-label,
 .tm-sr {
   position: absolute;
   width: 1px; height: 1px;
@@ -3775,7 +3778,16 @@ html.faq-open .iphone-wrap.visible .iphone-close {
    ‏נגעה במסגרת. הוא הוסר. */
 
 /* ‏גודל קבוע, ולכן מרחיבים מסביב בלי לגעת בו. */
-.lang-btn, .iphone-close, .privacy-close, .skip-link { position: relative; }
+/* ‏רק ללחצני השפה אין position משלהם, ולכן רק הם צריכים
+   ‏את זה כדי שה-after ייצמד אליהם.
+
+   ‏השלושה האחרים הוסרו מכאן. absolute ו-fixed כבר מייצרים
+   ‏בלוק מכיל בעצמם, אבל השורה הזאת יושבת מאוחר יותר בגיליון
+   ‏ובאותה ספציפיות, ולכן היא דרסה להם את המיקום. נמדד:
+   ‏האיקס של הווידג׳ט ירד אל מתחת לטלפון במקום לשבת על
+   ‏פינתו, האיקס של החלונות ישב על הכותרת, וקישור הדילוג
+   ‏יצא מחוץ למסך כשקיבל מיקוד. */
+.lang-btn { position: relative; }
 
 .lang-btn::after {
   content: '';
@@ -4885,13 +4897,13 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   <div class="form-wrap reveal">
     <div id="contactForm">
       <div class="form-field">
-        <input type="text" id="fname" placeholder="מה השם שלך?" />
+        <label class="field-label" for="fname" id="lblFname">השם שלכם</label><input type="text" id="fname" placeholder="מה השם שלך?" />
       </div>
       <div class="form-field">
-        <input type="tel" id="fphone" placeholder="מה מספר הטלפון שלך?" />
+        <label class="field-label" for="fphone" id="lblFphone">מספר טלפון</label><input type="tel" id="fphone" placeholder="מה מספר הטלפון שלך?" />
       </div>
       <div class="form-field">
-        <textarea id="fmsg" placeholder="ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)"></textarea>
+        <label class="field-label" for="fmsg" id="lblFmsg">מה הכי מעיק עליכם כלכלית, לא חובה</label><textarea id="fmsg" placeholder="ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)"></textarea>
       </div>
       <label class="consent-row" for="fconsent">
         <input type="checkbox" id="fconsent" />
@@ -5596,7 +5608,7 @@ function closePr() {
   if (!prOpenEl) return;
   prOpenEl.classList.remove('open');
   prOpenEl = null;
-  document.body.style.overflow = '';
+  releaseScrollIfNoOverlay();
   if (prOpener) { prOpener.focus(); prOpener = null; }
 }
 
@@ -5614,6 +5626,16 @@ document.addEventListener('keydown', e => {
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 });
+
+/* ‏יותר מחלון אחד יכול להיות פתוח בו זמנית · שורת ההסכמה
+   ‏שבחלון הוואטסאפ פותחת את מדיניות הפרטיות מעליו. סגירת
+   ‏הפנימי שחררה את הגלילה בעוד החיצוני פתוח, והדף התחיל לזוז
+   ‏מאחוריו. נמדד. לכן משחררים רק כששום חלון אינו פתוח. */
+function releaseScrollIfNoOverlay() {
+  if (!document.querySelector('.privacy-overlay.open, .wa-overlay.open')) {
+    document.body.style.overflow = '';
+  }
+}
 
 function openPrivacy(e) {
   if (e) e.preventDefault();
@@ -5636,7 +5658,7 @@ function closePrivacy() {
   const ov = document.getElementById('privacyOverlay');
   if (!ov) return;
   ov.classList.remove('open');
-  document.body.style.overflow = '';
+  releaseScrollIfNoOverlay();
 }
 
 // ── ACCESSIBILITY STATEMENT ──
@@ -5655,7 +5677,7 @@ function closeA11y() {
   const ov = document.getElementById('a11yOverlay');
   if (!ov) return;
   ov.classList.remove('open');
-  document.body.style.overflow = '';
+  releaseScrollIfNoOverlay();
 }
 
 function closeA11yOutside(e) {
@@ -6071,7 +6093,7 @@ window.trackVideo = function () {};
     setTimeout(() => document.getElementById('waName').focus(), 60);
   });
 
-  const close = () => { overlay.classList.remove('open'); document.body.style.overflow = ''; };
+  const close = () => { overlay.classList.remove('open'); releaseScrollIfNoOverlay(); };
 
   document.getElementById('waSkip').addEventListener('click', () => {
     record({ p_page: 'landing' });
@@ -6618,6 +6640,12 @@ const translations = {
   he: {
     heroBadge: 'יועץ כלכלי · שוהם אבו',
     heroLine1: 'אפשר ליהנות מהכסף שלך',
+    pageTitle: 'שוהם אבו | יועץ כלכלי',
+    lblFname: 'השם שלכם',
+    lblFphone: 'מספר טלפון',
+    lblFmsg: 'מה הכי מעיק עליכם כלכלית, לא חובה',
+    lblWaName: 'השם שלכם',
+    lblWaPhone: 'מספר טלפון',
     heroLine2: 'ולבנות איתו <span class="accent">עתיד</span>.',
     heroAudience: 'ליווי פיננסי אישי לצעירים, זוגות ומשפחות שרוצים לעשות סדר בכסף, להתנהל בביטחון ולהתקדם למטרות שלהם, בלי לוותר על הדברים שעושים להם טוב.',
     heroCta: 'לשיחת היכרות',
@@ -6727,6 +6755,12 @@ const translations = {
   en: {
     heroBadge: 'Financial Coach · Shoham Abo',
     heroLine1: 'You can enjoy your money',
+    pageTitle: 'Shoham Abo | Financial Adviser',
+    lblFname: 'Your name',
+    lblFphone: 'Phone number',
+    lblFmsg: 'What weighs on you most financially, optional',
+    lblWaName: 'Your name',
+    lblWaPhone: 'Phone number',
     heroLine2: 'and build a <span class="accent">future</span> with it.',
     heroAudience: 'Personal financial guidance for young people, couples and families who want to bring order to their money, manage it with confidence and move towards their goals, without giving up the things that make them happy.',
     heroCta: 'Book an intro call',
@@ -6844,6 +6878,11 @@ function setLang(lang) {
 
   // Direction
   document.documentElement.dir = t.dir;
+  /* ‏בלי זה קורא מסך מבטא את האנגלית בכללי הגייה עבריים,
+     ‏והאנליטיקס מדווח "עברית" על כל מבקר אנגלי, כי הוא קורא
+     ‏את lang ולא את dir. */
+  document.documentElement.lang = isEN ? 'en' : 'he';
+  document.title = t.pageTitle;
   document.body.dir = t.dir;
   document.body.style.direction = t.dir; // overrides the hardcoded CSS rule on body
 
@@ -6861,6 +6900,12 @@ function setLang(lang) {
      ‏והמחרוזת מגיעה מהמילון ולא כתובה כאן פעמיים. */
   document.querySelector('.hero-title .line2').innerHTML = t.heroLine2;
   document.querySelector('.hero-cta a').textContent = t.heroCta;
+  /* ‏תוויות השדות אינן נראות בעין אבל כן נקראות, ולכן הן
+     ‏צריכות להתחלף בשפה כמו כל טקסט אחר. */
+  ['lblFname','lblFphone','lblFmsg','lblWaName','lblWaPhone'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t[k];
+  });
 
   // ‏סרטון התדמית. שתי מחרוזות, ושתיהן עוברות דרך כאן כדי
   // שהמעבר לאנגלית לא ישאיר אותן בעברית.
@@ -7095,8 +7140,8 @@ function setLang(lang) {
   <div class="wa-card">
     <h3 id="waTitle">רגע לפני שעוברים</h3>
     <p class="wa-sub" id="waSub">שם וטלפון, כדי שאדע מי פנה ואוכל לחזור אליכם גם אם נתנתק באמצע.</p>
-    <div class="form-field"><input type="text" id="waName" placeholder="מה השם שלך?" autocomplete="name" /></div>
-    <div class="form-field"><input type="tel" id="waPhone" placeholder="מה מספר הטלפון שלך?" autocomplete="tel" inputmode="tel" /></div>
+    <div class="form-field"><label class="field-label" for="waName" id="lblWaName">השם שלכם</label><input type="text" id="waName" placeholder="מה השם שלך?" autocomplete="name" /></div>
+    <div class="form-field"><label class="field-label" for="waPhone" id="lblWaPhone">מספר טלפון</label><input type="tel" id="waPhone" placeholder="מה מספר הטלפון שלך?" autocomplete="tel" inputmode="tel" /></div>
     <label class="consent-row" for="waConsent">
       <input type="checkbox" id="waConsent" />
       <span class="consent-text" id="waConsentText">קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.</span>
