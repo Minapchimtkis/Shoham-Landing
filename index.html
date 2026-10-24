@@ -919,9 +919,17 @@ section {
   /* ‏התקרה עלתה מ-76 ל-88 · הנימוק שהוריד אותה בזמנו היה
      ‏שהכותרת צועקת והשורה שמתחתיה נלחשת, והשורה הזאת התקצרה
      ‏מאז ל-40 תווים. */
-  font-size: clamp(54px, 8.2vw, 88px);
+  /* ‏הגודל נגזר מרוחב המסך ולא מרצפה קבועה, כדי שהשורה
+     ‏הראשונה תיכנס בשלמותה בכל רוחב והכותרת תישאר שתי שורות
+     ‏ולא שלוש. נמדדה נקודת השבירה בכל רוחב, והמקדם נבחר
+     ‏בערך שמונה אחוזים מתחתיה, כמרווח לפונט האמיתי שאינו
+     ‏נטען כאן.
+
+     ‏וגובה השורה עלה מ-1.02 ל-1.16 · בשתי שורות קצרות של
+     ‏אותיות ענקיות, 1.02 הדביק אותן זו לזו. */
+  font-size: clamp(32px, 10vw, 88px);
   font-weight: 900;
-  line-height: 1.02;
+  line-height: 1.16;
   margin-bottom: 32px;
   opacity: 0;
   animation: fadeUp 0.9s 0.4s forwards;
@@ -1067,7 +1075,10 @@ section {
 @media (max-width: 820px) and (max-height: 960px) {
   .hero { --band: clamp(120px, 18vh, 175px); padding-top: calc(80px + env(safe-area-inset-top, 0px)); }
   .hero-logo { height: 94px; margin-bottom: 8px; }
-  .hero-title { font-size: 42px; margin-bottom: 20px; }
+  /* ‏נגזר מרוחב המסך, כדי שהשורה הראשונה תיכנס בשלמותה
+     ‏והכותרת תישאר שתי שורות גם ב-320 וב-360. התקרה היא
+     ‏הערך שהיה כאן קודם. */
+  .hero-title { font-size: clamp(30px, 10.2vw, 42px); margin-bottom: 20px; }
   .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 20px; }
 }
@@ -1075,7 +1086,7 @@ section {
 @media (max-width: 820px) and (max-height: 820px) {
   .hero { padding-top: calc(88px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 18px); }
   .hero-logo { height: 111px; margin-bottom: 11px; }
-  .hero-title { font-size: 44px; margin-bottom: 22px; }
+  .hero-title { font-size: clamp(30px, 10.2vw, 44px); margin-bottom: 22px; }
   .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 22px; }
 }
@@ -1083,7 +1094,7 @@ section {
 @media (max-width: 820px) and (max-height: 700px) {
   .hero { --band: clamp(100px, 16vh, 150px); padding-top: calc(74px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 14px); }
   .hero-logo { height: 81px; margin-bottom: 5px; }
-  .hero-title { font-size: 34px; margin-bottom: 14px; }
+  .hero-title { font-size: clamp(24px, 8.4vw, 34px); margin-bottom: 14px; }
   .hero-audience { font-size: 13px; margin-top: 9px; margin-bottom: 18px; }
   .license-badge { margin-top: 14px; }
 }
@@ -4482,8 +4493,8 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 <section data-stage="hero" data-stage-i="0" class="hero">
   <img class="hero-logo" id="heroLogo" fetchpriority="high" decoding="async" alt="שוהם אבו · ליווי וייעוץ פיננסי">
   <h1 class="hero-title">
-    <span class="line1">כסף שעובד למענך,</span>
-    <span class="line2">לא להפך.</span>
+    <span class="line1">כסף שעובד למענך</span>
+    <span class="line2">לא להפך</span>
   </h1>
   <p class="hero-audience">ליווי פיננסי אישי למשפחות צעירות ויחידים</p>
   <div class="hero-cta">
@@ -6597,14 +6608,14 @@ window.addEventListener('scroll', () => {
 const translations = {
   he: {
     heroBadge: 'יועץ כלכלי · שוהם אבו',
-    heroLine1: 'כסף שעובד למענך,',
+    heroLine1: 'כסף שעובד למענך',
     pageTitle: 'שוהם אבו | יועץ כלכלי',
     lblFname: 'השם שלכם',
     lblFphone: 'מספר טלפון',
     lblFmsg: 'מה הכי מעיק עליכם כלכלית, לא חובה',
     lblWaName: 'השם שלכם',
     lblWaPhone: 'מספר טלפון',
-    heroLine2: 'לא להפך.',
+    heroLine2: 'לא להפך',
     heroAudience: 'ליווי פיננסי אישי למשפחות צעירות ויחידים',
     heroCta: 'לשיחת היכרות',
     videoTitle: 'חצי דקה איתי',
@@ -6712,14 +6723,14 @@ const translations = {
   },
   en: {
     heroBadge: 'Financial Coach · Shoham Abo',
-    heroLine1: 'Money that works for you,',
+    heroLine1: 'Money that works for you',
     pageTitle: 'Shoham Abo | Financial Adviser',
     lblFname: 'Your name',
     lblFphone: 'Phone number',
     lblFmsg: 'What weighs on you most financially, optional',
     lblWaName: 'Your name',
     lblWaPhone: 'Phone number',
-    heroLine2: 'not the other way round.',
+    heroLine2: 'not the other way round',
     heroAudience: 'Personal financial guidance for young families and individuals',
     heroCta: 'Book an intro call',
     videoTitle: 'Half a minute with me, in Hebrew',
