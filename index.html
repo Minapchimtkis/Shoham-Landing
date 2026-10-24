@@ -85,10 +85,10 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "כמה זה עולה?",
+          "name": "כמה עולה תהליך הליווי?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף."
+            "text": "עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. באתר תוכלו להכיר את המסלולים, להבין מה כל אחד כולל ולראות את המחיר שלו. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך."
           }
         },
         {
@@ -120,7 +120,7 @@
           "name": "למה אבחר דווקא בך?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "המטרה שלי היא לבנות איתך תוכנית כלכלית אישית שמתאימה בדיוק למצב התודעתי והכלכלי שלך. אין לי אינטרס להרוויח עליך כמו שהבנקים עושים. במילים פשוטות, הצלחה שלך היא הצלחה שלי."
+            "text": "המטרה שלי היא לעזור לכם לקבל החלטות כלכליות מתוך הבנה, בהתאם למטרות ולצרכים שלכם. תהליך הליווי מתמקד בהתנהלות הכלכלית שלכם, בבניית תוכנית אישית ובהתקדמות לעבר היעדים שהגדרתם. במילים פשוטות, ההצלחה שלכם היא ההצלחה שלי."
           }
         },
         {
@@ -1006,12 +1006,16 @@ section {
 .license-shield { flex: none; color: var(--p6); }
 .license-copy { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 
+/* ‏34 תווים ומשקל 700 התאימו לשורה אחת בת 49 תווים. הטקסט
+   ‏החדש ארוך פי שלושה, וברוחב הזה הוא היה חמש שורות של
+   ‏מודגש מתחת לכותרת. הרוחב והמשקל הותאמו לאורך, וזה
+   ‏השינוי היחיד בריווח ההירו. */
 .hero-audience {
   margin: 18px auto 52px;
-  max-width: 34ch;
+  max-width: 52ch;
   color: #c9a8ff;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.2px;
   opacity: 0;
@@ -4433,13 +4437,12 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 <section data-stage="hero" data-stage-i="0" class="hero">
   <img class="hero-logo" id="heroLogo" fetchpriority="high" decoding="async" alt="שוהם אבו · ליווי וייעוץ פיננסי">
   <h1 class="hero-title">
-    <span class="line1">הכסף שלך הוא</span>
-    <span class="line2">לא <span class="accent">גזירת גורל</span></span>
-    <span class="line2">הוא <span class="accent">בחירה.</span></span>
+    <span class="line1">אפשר ליהנות מהכסף שלך</span>
+    <span class="line2">ולבנות איתו <span class="accent">עתיד</span>.</span>
   </h1>
-  <p class="hero-audience">ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך</p>
+  <p class="hero-audience">ליווי פיננסי אישי לצעירים, זוגות ומשפחות שרוצים לעשות סדר בכסף, להתנהל בביטחון ולהתקדם למטרות שלהם, בלי לוותר על הדברים שעושים להם טוב.</p>
   <div class="hero-cta">
-    <a href="#contact" class="btn-primary">מתחילים לצמוח · לתיאום פגישה</a>
+    <a href="#contact" class="btn-primary">לשיחת היכרות</a>
   </div>
 
   <div class="license-badge">
@@ -4589,13 +4592,10 @@ html.faq-open .iphone-wrap.visible .iphone-close {
          alt="שוהם אבו, יועץ כלכלי">
     <div class="about-head-copy">
       <div class="section-label reveal" style="margin-bottom:28px;">אז מי אני?</div>
-      <div class="about-quote reveal" style="padding-right:0;">
-        אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.
-      </div>
     </div>
   </div>
   <p class="about-body reveal" style="text-align:center;">
-    קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיית שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>המטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.
+    נעים מאוד, אני שוהם אבו. בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>אני מאמין שהתנהלות כלכלית טובה מתחילה הרבה לפני המספרים. היא מתחילה בהבנה של ההרגלים שלנו, של הדברים שחשובים לנו ושל העתיד שאנחנו רוצים לבנות.<br><br>את הגישה הזאת אני מביא לתהליך הליווי שלי: הקשבה אמיתית, מיפוי מסודר ותוכנית כלכלית שמותאמת לאדם שמולי, ולא לתבנית קבועה.<br><br>המטרה שלי היא לעזור לכם לקבל החלטות מתוך הבנה וביטחון, ליהנות מהכסף שלכם בהווה ולבנות בסיס כלכלי להמשך.
   </p>
 
 
@@ -4691,7 +4691,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <div class="process-num">2</div>
         <div class="process-content">
           <div class="process-title">אבחון המצב הקיים</div>
-          <div class="process-desc">נמפה ביחד את התמונה המלאה: הכנסות, הוצאות, חובות, ובנוסף נכיר את הפסיכולוגיה של הכסף שלכם. הכי חשוב, נתרכז בהתנהגות עם כסף מהבסיס.</div>
+          <div class="process-desc">נמפה ביחד את התמונה המלאה · הכנסות, הוצאות, התחייבויות ונכסים, לצד ההרגלים והמטרות שלכם. והכי חשוב, נבין איך אתם מתנהלים עם כסף מהבסיס.</div>
         </div>
         <div class="process-line"></div>
       </div>
@@ -4700,7 +4700,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <div class="process-num">3</div>
         <div class="process-content">
           <div class="process-title">בניית תוכנית אישית</div>
-          <div class="process-desc">נגבש תוכנית פעולה שתהיה תפורה אך ורק אליכם, צעד אחרי צעד, בלי לחץ מיותר.</div>
+          <div class="process-desc">נבנה מסגרת כלכלית שתפורה אך ורק אליכם · כזאת שמתקדמת למטרות העתידיות שלכם, ובו בזמן לא מוותרת על איכות החיים בהווה.</div>
         </div>
         <div class="process-line"></div>
       </div>
@@ -4709,7 +4709,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <div class="process-num">4</div>
         <div class="process-content">
           <div class="process-title">ליווי וצמיחה ביחד</div>
-          <div class="process-desc">אני איתכם לאורך הדרך עד שהכסף מתחיל לעבוד, ולא להפך.</div>
+          <div class="process-desc">נעבוד על היישום בפועל, נעקוב ביחד אחרי מה שקורה, ונתאים את התוכנית לאורך הדרך עד שהכסף מתחיל לעבוד בשבילכם.</div>
         </div>
       </div>
     </div>
@@ -4796,7 +4796,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
           <span>למה אבחר דווקא בך?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">המטרה שלי היא לבנות איתך תוכנית כלכלית אישית שמתאימה בדיוק למצב התודעתי והכלכלי שלך. אין לי אינטרס להרוויח עליך כמו שהבנקים עושים. במילים פשוטות, הצלחה שלך היא הצלחה שלי.</div>
+        <div class="faq-a">המטרה שלי היא לעזור לכם לקבל החלטות כלכליות מתוך הבנה, בהתאם למטרות ולצרכים שלכם. תהליך הליווי מתמקד בהתנהלות הכלכלית שלכם, בבניית תוכנית אישית ובהתקדמות לעבר היעדים שהגדרתם. במילים פשוטות, ההצלחה שלכם היא ההצלחה שלי.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -4825,10 +4825,10 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
       <div class="faq-item reveal">
         <button class="faq-q" onclick="toggleFaq(this)">
-          <span>כמה זה עולה?</span>
+          <span>כמה עולה תהליך הליווי?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף.</div>
+        <div class="faq-a">עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. באתר תוכלו להכיר את המסלולים, להבין מה כל אחד כולל ולראות את המחיר שלו. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -6583,11 +6583,10 @@ window.addEventListener('scroll', () => {
 const translations = {
   he: {
     heroBadge: 'יועץ כלכלי · שוהם אבו',
-    heroLine1: 'הכסף שלך הוא',
-    heroLine2: 'לא גזירת גורל',
-    heroLine3: 'הוא בחירה.',
-    heroAudience: 'ליווי פיננסי למשפחות צעירות ויחידים בתחילת הדרך',
-    heroCta: 'מתחילים לצמוח · לתיאום פגישה',
+    heroLine1: 'אפשר ליהנות מהכסף שלך',
+    heroLine2: 'ולבנות איתו <span class="accent">עתיד</span>.',
+    heroAudience: 'ליווי פיננסי אישי לצעירים, זוגות ומשפחות שרוצים לעשות סדר בכסף, להתנהל בביטחון ולהתקדם למטרות שלהם, בלי לוותר על הדברים שעושים להם טוב.',
+    heroCta: 'לשיחת היכרות',
     videoTitle: 'חצי דקה איתי',
     videoPlay: 'נגן את הסרטון',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
@@ -6610,13 +6609,12 @@ const translations = {
     methodSub: 'ניהול כסף הוא לא משחק של מספרים. הוא ברוב רובו עניין של התנהגות, ידע והרגלים נכונים. אקסל יבנה לכם תקציב מצוין, ו־AI יבנה לכם אותו בשלוש שניות. מה שאין להם הוא מישהו שיושב מולכם כשאתם נבהלים מהמספר שיצא, ויודע למה נבהלתם. את זה אי אפשר לשכפל.',
     aboutLabel: 'אז מי אני?',
     tmLabel: 'המלצות', tmTitle: 'לקוחות ממליצים', tmHint: '← החליקו לעוד',
-    aboutQuote: 'אני לא אדם מיוחד,<br>אני פשוט אדם שנמאס לו.',
     heartLead: 'ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.',
     heartBody1: 'הכסף שאתם משלמים לי הוא לא עוד מספר שזז בחשבון הבנק שלכם, הוא החיים שלכם, השעות, החודש שעבדתם בשבילו קשה, הדברים שוויתרתם עליהם בדרך.',
     heartBody2: 'אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ובגלל זה אני לא מרשה לעצמי לתת לכם פחות ממה שאני מסוגל לתת.',
     heartBody3: 'וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.',
     heartKicker: 'אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!',
-    aboutBody: 'קוראים לי שוהם אבו, אני בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>העובדה שאני בתחילת הדרך הפיננסית שלי היא היתרון הכי גדול שלכם, אני מגיע עם רעב בלתי מתפשר להצלחה שלכם, אנרגיית שיא ופוקוס מוחלט בכל אדם שאני מלווה.<br><br>המטרה שלי היא לייצר עבורכם סביבה שבה כסף מפסיק להפחיד ומתחיל לשרת את המטרות הכלכליות שלכם.',
+    aboutBody: 'נעים מאוד, אני שוהם אבו. בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>אני מאמין שהתנהלות כלכלית טובה מתחילה הרבה לפני המספרים. היא מתחילה בהבנה של ההרגלים שלנו, של הדברים שחשובים לנו ושל העתיד שאנחנו רוצים לבנות.<br><br>את הגישה הזאת אני מביא לתהליך הליווי שלי: הקשבה אמיתית, מיפוי מסודר ותוכנית כלכלית שמותאמת לאדם שמולי, ולא לתבנית קבועה.<br><br>המטרה שלי היא לעזור לכם לקבל החלטות מתוך הבנה וביטחון, ליהנות מהכסף שלכם בהווה ולבנות בסיס כלכלי להמשך.',
     aboutSig: 'שוהם אבו | יועץ כלכלי',
     philLabel: 'הפילוסופיה שלי', philTitle: 'צמיחה בונים מהיסודות',
     philIntro: 'בתור לוחם ומפקד לשעבר בחטיבת גבעתי, למדתי שאין קיצורי דרך. החתירה למגע והנחישות להמשיך גם כשקשה. אלו הערכים שאני מביא לעולם הפיננסי.',
@@ -6625,11 +6623,11 @@ const translations = {
     missionText: 'הקמתי את מנפחים ת׳כיס, פלטפורמה חינמית שמלמדת בני נוער בישראל להתנהל עם כסף, עוד לפני המשכורת הראשונה. בניתי אותה כי בסיס פיננסי איתן מגיע לכל אחד מההתחלה, ולא רק למי שנולד לתוכו. היא באוויר, פתוחה לכולם, ואין בה שקל אחד לשלם.',
     processLabel: 'איך זה עובד', processTitle: 'התהליך, צעד אחר צעד.',
     pr1t: 'שיחת ייעוץ בחינם', pr1d: 'נכיר ותספרו לי מה מעיק עליכם מבחינה כלכלית, מה אתם רוצים לשנות ומה המטרות שלכם לעתיד.',
-    pr2t: 'אבחון המצב הקיים', pr2d: 'נמפה ביחד את התמונה המלאה: הכנסות, הוצאות, חובות, ובנוסף נכיר את הפסיכולוגיה של הכסף שלכם. הכי חשוב, נתרכז בהתנהגות עם כסף מהבסיס.',
-    pr3t: 'בניית תוכנית אישית', pr3d: 'נגבש תוכנית פעולה שתהיה תפורה אך ורק אליכם, צעד אחרי צעד, בלי לחץ מיותר.',
-    pr4t: 'ליווי וצמיחה ביחד', pr4d: 'אני איתכם לאורך הדרך עד שהכסף מתחיל לעבוד, ולא להפך.',
+    pr2t: 'אבחון המצב הקיים', pr2d: 'נמפה ביחד את התמונה המלאה · הכנסות, הוצאות, התחייבויות ונכסים, לצד ההרגלים והמטרות שלכם. והכי חשוב, נבין איך אתם מתנהלים עם כסף מהבסיס.',
+    pr3t: 'בניית תוכנית אישית', pr3d: 'נבנה מסגרת כלכלית שתפורה אך ורק אליכם · כזאת שמתקדמת למטרות העתידיות שלכם, ובו בזמן לא מוותרת על איכות החיים בהווה.',
+    pr4t: 'ליווי וצמיחה ביחד', pr4d: 'נעבוד על היישום בפועל, נעקוב ביחד אחרי מה שקורה, ונתאים את התוכנית לאורך הדרך עד שהכסף מתחיל לעבוד בשבילכם.',
     faqLabel: 'שאלות ותשובות', faqTitle: 'שאלות שכדאי לשאול.',
-    q1: 'למה אבחר דווקא בך?', a1: 'המטרה שלי היא לבנות איתך תוכנית כלכלית אישית שמתאימה בדיוק למצב התודעתי והכלכלי שלך. אין לי אינטרס להרוויח עליך כמו שהבנקים עושים. במילים פשוטות, הצלחה שלך היא הצלחה שלי.',
+    q1: 'למה אבחר דווקא בך?', a1: 'המטרה שלי היא לעזור לכם לקבל החלטות כלכליות מתוך הבנה, בהתאם למטרות ולצרכים שלכם. תהליך הליווי מתמקד בהתנהלות הכלכלית שלכם, בבניית תוכנית אישית ובהתקדמות לעבר היעדים שהגדרתם. במילים פשוטות, ההצלחה שלכם היא ההצלחה שלי.',
     qPersonal: 'עד כמה הליווי באמת אישי?', aPersonal: 'הליווי שלי אישי באמת, כי אין שני אנשים שמתנהלים אותו דבר. אנחנו בונים יחד תוכנית שמתאימה להכנסות, להרגלים, למטרות ולחששות שלכם סביב כסף.<br><br>אבל הליווי לא מסתכם ב־4 פגישות. אני כאן גם בין הפגישות, בוואטסאפ ובטלפון בשעות העבודה, להתייעצויות, להתלבטויות וגם כשחודש פחות הולך וצריך להבין יחד מה לשפר.<br><br>אני מלווה אתכם לאורך הדרך, וגם כשהתהליך מסתיים, הדלת שלי תמיד נשארת פתוחה.',
     q2: 'יש לך הסמכה רשמית?', a2: 'כן, אני יועץ לכלכלת המשפחה עם תעודה רשמית מטעם חברת UNI פיננסים בפיקוח אוניברסיטת אריאל בשומרון.',
     q3: 'אני צעיר ועדיין בלי כסף, זה בשבילי?', a3: 'דווקא עכשיו, בגלל הגיל הצעיר, זה הזמן הכי טוב להשקיע בעתיד הפיננסי שלך. גם בלי הרבה כסף אפשר לבנות הרגלים תודעתיים וכלכליים חכמים שישרתו אותך ואת מי שאתה אוהב.',
@@ -6658,7 +6656,7 @@ const translations = {
     quizText: 'חמש שאלות קצרות, דקה אחת, בלי להשאיר טלפון. בסוף תקבלו תמונה ברורה של המצב שלכם. ואם תרצו, אחזור אליכם עם הכיוון הראשון.',
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
-    qPrice: 'כמה זה עולה?',
+    qPrice: 'כמה עולה תהליך הליווי?',
     prLabel: 'ההשקעה',
     pr1s: 'הצעד הראשון · ומתקזז בליווי',
     prHint: 'לחצו על <span class="pr-hint-dot" aria-hidden="true"></span> כדי לקרוא מה בדיוק כלול בכל אחד',
@@ -6685,7 +6683,7 @@ const translations = {
     prGuarantee: 'אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
     prCta: 'לשיחת היכרות חינם ←',
     prNote: 'שיחת ההיכרות תמיד בחינם ובלי התחייבות. המחירים סופיים.',
-    aPrice: 'שיחת ההיכרות חינם ובלי התחייבות. המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. הליווי מתחיל ב־3,990 ₪ ליחידים וב־5,500 ₪ לזוגות ולמשפחות, והמחיר הסופי נקבע איתכם בשיחה לפי מה שאתם באמת צריכים. המחירים סופיים, בלי הפתעות בהמשך. ואם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם, אני מחזיר לכם את הכסף.',
+    aPrice: 'עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. באתר תוכלו להכיר את המסלולים, להבין מה כל אחד כולל ולראות את המחיר שלו. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך.',
     q6: 'מה קורה ביום שאחרי?',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ותהיה לכם האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
@@ -6693,11 +6691,10 @@ const translations = {
   },
   en: {
     heroBadge: 'Financial Coach · Shoham Abo',
-    heroLine1: 'Your money is',
-    heroLine2: 'not fate',
-    heroLine3: "It's a choice.",
-    heroAudience: 'Financial guidance for young families and individuals starting out',
-    heroCta: "Let's Grow · Book a Meeting",
+    heroLine1: 'You can enjoy your money',
+    heroLine2: 'and build a <span class="accent">future</span> with it.',
+    heroAudience: 'Personal financial guidance for young people, couples and families who want to bring order to their money, manage it with confidence and move towards their goals, without giving up the things that make them happy.',
+    heroCta: 'Book an intro call',
     videoTitle: 'Half a minute with me, in Hebrew',
     videoPlay: 'Play the video',
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
@@ -6720,13 +6717,12 @@ const translations = {
     methodSub: 'Managing money isn\'t a numbers game. It\'s mostly about behavior, knowledge and the right habits. A spreadsheet will build you an excellent budget, and AI will build you one in three seconds. What neither of them has is someone sitting across from you when the number frightens you, who knows why it frightened you. That part cannot be copied.',
     aboutLabel: 'So who am I?',
     tmLabel: 'Testimonials', tmTitle: 'Clients recommend', tmHint: 'Swipe for more →',
-    aboutQuote: "",
     heartLead: "And I will say this without embarrassment: I put my heart into this.",
     heartBody1: "The money you pay me is not just another number moving through your bank account. It is your life. The hours, the month you worked hard for it, the things you gave up along the way.",
     heartBody2: "I know what stood behind every one of those shekels. That is why I respect you, and why I do not allow myself to give you less than everything I am capable of.",
     heartBody3: "And that is why I do not disappear once the plan is ready. That is exactly where the work begins: in the month it did not go well, in the decision you lie awake over, in the moment you want to give up and throw in the towel.",
     heartKicker: 'I do not do half a job.<br>With me it is <span class="heart-full">100%</span> or nothing!',
-    aboutBody: "My name is Shoham Abo. I am 23, born and raised in Tiberias, and I am here to prove that where you started does not decide where you end up.<br><br>Financial guidance is not just another profession to me, it is a calling.<br><br>The fact that I am at the start of my own financial road is your greatest advantage: I arrive with an uncompromising hunger for your success, full energy and complete focus on every person I guide.<br><br>My aim is to build you an environment where money stops frightening you and starts serving your financial goals.",
+    aboutBody: "Good to meet you, I am Shoham Abo. I am 23, born and raised in Tiberias, and I am here to prove that where you started does not decide where you end up.<br><br>Financial guidance is not just another profession to me, it is a calling.<br><br>I believe that managing money well starts long before the numbers. It starts with understanding our habits, the things that matter to us, and the future we want to build.<br><br>That is the approach I bring to the guidance itself: real listening, orderly mapping, and a financial plan fitted to the person in front of me rather than to a fixed template.<br><br>My goal is to help you make decisions out of understanding and confidence, enjoy your money in the present, and build a financial base for what comes next.",
     aboutSig: 'Shoham Abo | Financial Coach',
     philLabel: 'My Philosophy', philTitle: 'Growth is built from the ground up.',
     philIntro: 'As a Givati Brigade veteran and former commander, I learned there are no shortcuts. The drive and determination to keep going even when it\'s hard are the values I bring to the financial world.',
@@ -6735,11 +6731,11 @@ const translations = {
     missionText: "I founded Minapchim T'kis, a free platform that teaches teenagers in Israel to handle money, before their first payslip. I built it because a solid financial footing should belong to everyone from the start, not only to whoever was born into one. It is live, open to anyone, and there is nothing to pay.",
     processLabel: 'How it works', processTitle: 'The process, step by step.',
     pr1t: 'Free consultation call', pr1d: "We'll get to know each other. Tell me what weighs on you financially, what you want to change, and your goals for the future.",
-    pr2t: 'Assessing your current situation', pr2d: "Together we'll map the full picture: income, expenses, debts, and we'll explore your money psychology. Most importantly, we focus on money behavior from the ground up.",
-    pr3t: 'Building your personal plan', pr3d: "We'll create an action plan tailored only to you, step by step, without unnecessary pressure.",
-    pr4t: 'Ongoing support & growth', pr4d: "I'm with you all the way until your money starts working for you, not the other way around.",
+    pr2t: 'Assessing your current situation', pr2d: "Together we map the full picture: income, expenses, liabilities and assets, alongside your habits and your goals. Most importantly, we understand how you handle money from the ground up.",
+    pr3t: 'Building your personal plan', pr3d: "We build a financial framework made only for you: one that moves towards your future goals while not giving up quality of life in the present.",
+    pr4t: 'Ongoing support & growth', pr4d: "We work on putting it into practice, track together what actually happens, and adjust the plan along the way until your money starts working for you.",
     faqLabel: 'FAQ', faqTitle: 'Questions worth asking.',
-    q1: 'Why choose you specifically?', a1: 'My goal is to build a personal financial plan that fits your exact mental and financial situation. I have no interest in profiting off you like banks do. Simply put, your success is my success.',
+    q1: 'Why choose you specifically?', a1: 'My goal is to help you make financial decisions out of understanding, in line with your goals and your needs. The guidance focuses on how you handle money, on building a personal plan, and on moving towards the targets you set. Simply put, your success is my success.',
     qPersonal: "How personal is the guidance, really?", aPersonal: "My guidance is genuinely personal, because no two people handle their money the same way. We build a plan together that fits your income, your habits, your goals and your worries around money.<br><br>But it does not end after 4 sessions. I am here between them too, on WhatsApp and by phone during working hours, for questions, for decisions you are weighing, and for the month that went less well and we need to work out together what to improve.<br><br>I am with you along the way, and when the process ends, my door always stays open.",
     q2: 'Do you have a formal qualification?', a2: 'Yes, I\'m a family-economics advisor with an official certificate from UNI Finance under Ariel University in Samaria.',
     q3: "I'm young with no money yet. Is this for me?", a3: 'Especially now, because of your young age, this is the best time to invest in your financial future. Even without much money, you can build smart mental and financial habits that will serve you and those you love.',
@@ -6768,7 +6764,7 @@ const translations = {
     quizText: 'Five short questions, one minute, no phone number needed. You will come away with a clear picture of where you stand, and if you want, I will get back to you with a first direction.',
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
-    qPrice: 'How much does it cost?',
+    qPrice: 'How much does the guidance cost?',
     prLabel: "The investment",
     pr1s: "The first step · and it comes off the guidance",
     prHint: 'Tap <span class="pr-hint-dot" aria-hidden="true"></span> to read exactly what each one includes',
@@ -6795,7 +6791,7 @@ const translations = {
     prGuarantee: "If after the second session you feel this is not for you, I give you your money back.",
     prCta: "Book a free intro call →",
     prNote: "The intro call is always free and with no commitment. Prices are final.",
-    aPrice: "The intro call is free and carries no obligation. The financial mapping is ₪690, and it comes off the price in full if you continue to full guidance within 30 days. Guidance starts at ₪3,990 for individuals and ₪5,500 for couples and families, and the final figure is set with you in the call, according to what you actually need. Prices are final, with no surprises later. And if after the second session you feel this is not for you, I give you your money back.",
+    aPrice: "The cost depends on the track you choose and the scope of the service. On this site you can see the tracks, what each one includes and what it costs. If you are not sure which track fits you, book an intro call and we will work it out together. The intro call is free and carries no obligation, and prices are final, with no surprises later.",
     q6: 'What happens the day after?',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
@@ -6825,10 +6821,9 @@ function setLang(lang) {
   heroTitle.dir = isEN ? 'ltr' : 'rtl';
   if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.textContent = t.heroAudience; }
   document.querySelector('.hero-title .line1').textContent = t.heroLine1;
-  document.querySelector('.hero-title .line2').innerHTML = 'לא <span class="accent">גזירת גורל</span>';
-  if (isEN) document.querySelector('.hero-title .line2').innerHTML = 'not <span class="accent">fate</span>';
-  const line3 = document.querySelectorAll('.hero-title .line2');
-  if (line3[1]) line3[1].innerHTML = isEN ? "It's a <span class='accent'>choice.</span>" : 'הוא <span class="accent">בחירה.</span>';
+  /* ‏השורה השנייה נושאת את מילת ההדגשה בתוכה, ולכן innerHTML
+     ‏והמחרוזת מגיעה מהמילון ולא כתובה כאן פעמיים. */
+  document.querySelector('.hero-title .line2').innerHTML = t.heroLine2;
   document.querySelector('.hero-cta a').textContent = t.heroCta;
 
   // ‏סרטון התדמית. שתי מחרוזות, ושתיהן עוברות דרך כאן כדי
@@ -6869,7 +6864,6 @@ function setLang(lang) {
   if (tmT) tmT.textContent = t.tmTitle;
   const tmH = document.getElementById('tmHint');
   if (tmH) tmH.textContent = t.tmHint;
-  document.querySelector('.about-quote').innerHTML = t.aboutQuote;
   document.querySelector('.about-body').innerHTML = t.aboutBody;
   const hL = document.querySelector('.heart-lead');
   const hB = document.querySelectorAll('.heart-body');
