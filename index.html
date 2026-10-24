@@ -4348,7 +4348,11 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   .pr-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
     gap: 20px;
-    align-items: stretch;
+    /* ‏כל כרטיס בגובה התוכן שלו ולא נמתח לגובה שכנו · המומלץ
+       ‏נושא רשימה ונימוק, והמיפוי קצר ממנו. מתיחה הייתה פותחת
+       ‏בכרטיס הקצר חלל ריק של כמה מאות פיקסלים לפני הכפתור,
+       ‏והעין קוראת חלל כזה כתקלה ולא ככוונה. */
+    align-items: start;
     max-width: 920px;
     margin-inline: auto;
   }
@@ -4897,17 +4901,34 @@ html.faq-open .iphone-wrap.visible .iphone-close {
      ‏בשיחה, ולכן הפאנל השני מתאר אותם בלי מספר. -->
 <section class="pricing">
   <div class="pricing-inner">
-    <div class="pr-label reveal" id="prLabel">הצעד הראשון</div>
+    <div class="pr-label reveal" id="prLabel">איך עובדים איתי</div>
     <h2 class="pr-title reveal" id="prTitle">לא תעברו את זה לבד.</h2>
-    <p class="pr-lead reveal" id="prLead">מתחילים במיפוי אחד שנותן לכם תמונה מלאה. מה קורה אחריו, נחליט ביחד.</p>
+    <p class="pr-lead reveal" id="prLead">הליווי האישי הוא הלב של מה שאני עושה. המיפוי הוא הדרך להיכנס אליו בלי להתחייב מראש.</p>
 
     <div class="pr-grid">
 
       <div class="pr-card pr-main reveal">
-        <div class="pr-badge" id="prBadge">חבילה ראשונית</div>
+        <div class="pr-badge" id="prBadge">המסלול המומלץ</div>
+        <div class="pr-name" id="pr2n">ליווי אישי</div>
+        <div class="pr-price pr-price-soft" id="pr2p">המחיר נקבע בשיחה</div>
+        <div class="pr-sub" id="pr2s">שני מסלולים · ליחידים ולזוגות</div>
+        <div class="pr-rule" aria-hidden="true"></div>
+        <ul class="pr-list">
+          <li id="prG1">תוכנית כלכלית שנבנית עליכם, ומתעדכנת לאורך הדרך</li>
+          <li id="prG2">אני איתכם גם בין הפגישות · וואטסאפ וטלפון, ‏ראשון עד חמישי בין 9:00 ל־19:00‏</li>
+          <li id="prG3">את הפירוט המלא של שני המסלולים אני שולח לכם אישית</li>
+          <li class="pr-key" id="prG4">ה־690 של המיפוי מתקזזים במלואם</li>
+        </ul>
+        <p class="pr-avail" id="pr2av"><strong>למה דווקא זה:</strong> ניהול כסף הוא 90% התנהגות ו־10% מתמטיקה. התנהגות לא משתנה מפגישה אחת, אלא בחודשים שאחריה. זה בדיוק מה שהליווי נותן, וזאת הסיבה שאני ממליץ עליו.</p>
+        <div class="pr-act">
+          <a class="pr-btn" href="#contact" id="pr2cta">לשיחת היכרות</a>
+        </div>
+      </div>
+
+      <div class="pr-card pr-soft reveal">
         <div class="pr-name" id="pr1n">מיפוי כלכלי</div>
         <div class="pr-price">690 ₪</div>
-        <div class="pr-sub" id="pr1s">פגישה אחת · בלי להתחייב להמשך</div>
+        <div class="pr-sub" id="pr1s">חבילה ראשונית · פגישה אחת, בלי להתחייב</div>
         <div class="pr-rule" aria-hidden="true"></div>
         <ul class="pr-list">
           <li id="pr1a">פגישת אבחון ומיפוי מלא של התמונה הכלכלית</li>
@@ -4918,19 +4939,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <div class="pr-act">
           <button class="pr-more" type="button" id="pr1more" onclick="openPr('prModal1', this)">מה בדיוק כלול</button>
           <a class="pr-btn" href="#contact" id="pr1cta">לשיחת היכרות</a>
-        </div>
-      </div>
-
-      <div class="pr-card pr-soft reveal">
-        <div class="pr-name" id="pr2n">ומה שבא אחרי</div>
-        <div class="pr-price pr-price-soft" id="pr2p">המחיר נקבע בשיחה</div>
-        <div class="pr-sub" id="pr2s">שני מסלולי ליווי · ליחידים ולזוגות</div>
-        <div class="pr-rule" aria-hidden="true"></div>
-        <p class="pr-body" id="pr2b1">אחרי המיפוי תדעו בדיוק איפה אתם עומדים. מכאן יש שני מסלולי ליווי, אחד ליחידים ואחד לזוגות, ואת הפירוט המלא של שניהם אני שולח לכם שחור על לבן.</p>
-        <p class="pr-body" id="pr2b2">איזה מסלול מתאים לכם, ומה הוא כולל בדיוק, נחליט ביחד בשיחה. <strong>וה־690 של המיפוי מתקזזים.</strong></p>
-        <p class="pr-avail" id="pr2av"><strong>זה ההבדל האמיתי:</strong> בשני המסלולים אני איתכם לאורך כל הדרך, ולא רק בפגישות. זמין בוואטסאפ ובטלפון, ‏ראשון עד חמישי, בין 9:00 ל־19:00‏.</p>
-        <div class="pr-act">
-          <a class="pr-btn" href="#contact" id="pr2cta">נדבר על זה בשיחה</a>
         </div>
       </div>
 
@@ -6877,19 +6885,21 @@ const translations = {
     pr1cta: 'לשיחת היכרות',
     pr1more: 'מה בדיוק כלול',
     prGuarantee: 'אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
-    prBadge: 'חבילה ראשונית',
+    prBadge: 'המסלול המומלץ',
+    prG1: 'תוכנית כלכלית שנבנית עליכם, ומתעדכנת לאורך הדרך',
+    prG2: 'אני איתכם גם בין הפגישות · וואטסאפ וטלפון, ‏ראשון עד חמישי בין 9:00 ל־19:00‏',
+    prG3: 'את הפירוט המלא של שני המסלולים אני שולח לכם אישית',
+    prG4: 'ה־690 של המיפוי מתקזזים במלואם',
     pr2p: 'המחיר נקבע בשיחה',
-    prLabel: 'הצעד הראשון',
+    prLabel: 'איך עובדים איתי',
     prTitle: 'לא תעברו את זה לבד.',
-    prLead: 'מתחילים במיפוי אחד שנותן לכם תמונה מלאה. מה קורה אחריו, נחליט ביחד.',
+    prLead: 'הליווי האישי הוא הלב של מה שאני עושה. המיפוי הוא הדרך להיכנס אליו בלי להתחייב מראש.',
     pr1n: 'מיפוי כלכלי',
-    pr1s: 'פגישה אחת · בלי להתחייב להמשך',
-    pr2n: 'ומה שבא אחרי',
-    pr2s: 'שני מסלולי ליווי · ליחידים ולזוגות',
-    pr2b1: 'אחרי המיפוי תדעו בדיוק איפה אתם עומדים. מכאן יש שני מסלולי ליווי, אחד ליחידים ואחד לזוגות, ואת הפירוט המלא של שניהם אני שולח לכם שחור על לבן.',
-    pr2b2: 'איזה מסלול מתאים לכם, ומה הוא כולל בדיוק, נחליט ביחד בשיחה. <strong>וה־690 של המיפוי מתקזזים.</strong>',
-    pr2av: '<strong>זה ההבדל האמיתי:</strong> בשני המסלולים אני איתכם לאורך כל הדרך, ולא רק בפגישות. זמין בוואטסאפ ובטלפון, ‏ראשון עד חמישי, בין 9:00 ל־19:00‏.',
-    pr2cta: 'נדבר על זה בשיחה',
+    pr1s: 'חבילה ראשונית · פגישה אחת, בלי להתחייב',
+    pr2n: 'ליווי אישי',
+    pr2s: 'שני מסלולים · ליחידים ולזוגות',
+    pr2av: '<strong>למה דווקא זה:</strong> ניהול כסף הוא 90% התנהגות ו־10% מתמטיקה. התנהגות לא משתנה מפגישה אחת, אלא בחודשים שאחריה. זה בדיוק מה שהליווי נותן, וזאת הסיבה שאני ממליץ עליו.',
+    pr2cta: 'לשיחת היכרות',
     prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
     prM1Name: 'מיפוי כלכלי',
     prM1Title: '690 ₪',
@@ -6990,19 +7000,21 @@ const translations = {
     pr1cta: 'Book an intro call',
     pr1more: 'See what is included',
     prGuarantee: 'If at the end of the mapping session you feel this is not for you, I give you your money back.',
-    prBadge: 'Starter package',
+    prBadge: 'The recommended track',
+    prG1: 'A financial plan built around you, updated as you go',
+    prG2: 'I am with you between the sessions too · WhatsApp and phone, Sunday to Thursday between 9:00 and 19:00',
+    prG3: 'I send you the full details of both tracks personally',
+    prG4: 'The ₪690 from the mapping comes off in full',
     pr2p: 'The price is set in the call',
-    prLabel: 'The first step',
+    prLabel: 'How working with me goes',
     prTitle: 'You will not go through this alone.',
-    prLead: 'We start with one mapping session that gives you the full picture. What happens after it, we decide together.',
+    prLead: 'The personal guidance is the heart of what I do. The mapping is the way into it without committing up front.',
     pr1n: 'Financial mapping',
-    pr1s: 'One session · with no commitment to continue',
-    pr2n: 'And what comes after',
-    pr2s: 'Two guidance tracks · for individuals and for couples',
-    pr2b1: 'After the mapping you will know exactly where you stand. From there there are two guidance tracks, one for individuals and one for couples, and I send you the full details of both in writing.',
-    pr2b2: 'Which track fits you, and what exactly it covers, we decide together in the call. <strong>And the ₪690 from the mapping comes off.</strong>',
-    pr2av: '<strong>This is the real difference:</strong> on both tracks I am with you the whole way, not only in the sessions. Reachable on WhatsApp and by phone, Sunday to Thursday, 9:00 to 19:00.',
-    pr2cta: 'We will talk about it in the call',
+    pr1s: 'Starter package · one session, no commitment',
+    pr2n: 'Personal guidance',
+    pr2s: 'Two tracks · for individuals and for couples',
+    pr2av: '<strong>Why this one:</strong> managing money is 90% behaviour and 10% maths. Behaviour does not change in a single session, it changes in the months that follow. That is exactly what the guidance gives, and that is why I recommend it.',
+    pr2cta: 'Book an intro call',
     prNote: 'The price is final. The intro call is always free and carries no obligation.',
     prM1Name: "Financial mapping",
     prM1Title: "₪690",
@@ -7156,12 +7168,13 @@ function setLang(lang) {
      ‏יוכל לערבב את תוויות שאר הדף. */
   ['prBadge','prLabel','prTitle','prLead','prGuarantee','prNote',
    'pr1n','pr1s','pr1a','pr1b','pr1c','prNoGuide','pr1cta','pr1more',
-   'pr2n','pr2p','pr2s','pr2cta','prM1Name','prM1Title'].forEach(k => {
+   'pr2n','pr2p','pr2s','pr2cta','prG1','prG2','prG3','prG4',
+   'prM1Name','prM1Title'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
   /* ‏אלה נושאים תגיות בתוכם. */
-  ['pr2b1','pr2b2','pr2av','prM1Body'].forEach(k => {
+  ['pr2av','prM1Body'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.innerHTML = t[k];
   });
