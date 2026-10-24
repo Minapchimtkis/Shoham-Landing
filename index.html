@@ -5563,6 +5563,25 @@ function prFocusables(box) {
     .filter(el => el.offsetParent !== null);
 }
 
+/* ‏המעטפת היא visibility: hidden עם מעבר, ו-focus על אלמנט
+   ‏נסתר אינו עושה דבר בשקט. הוספת המחלקה לבדה אינה מספיקה,
+   ‏וגם הכרחת חישוב סגנון אינה מספיקה · נמדד שהשקיפות
+   ‏מתהפכת רק בפריים השני. לכן ממתינים עד שהחלון באמת נראה
+   ‏ולא סופרים פריימים, עם תקרה שלא תיווצר לולאה.
+
+   ‏בלי זה המיקוד נשאר על העיגול שפתח, מחוץ לחלון, ו-Tab
+   ‏מטייל בדף שמאחור. מלכודת הפוכה לחלוטין ממה שהקוד הזה
+   ‏נועד לעשות. */
+function prFocusWhenVisible(ov, tries) {
+  if (tries > 40) return;
+  if (getComputedStyle(ov).visibility !== 'visible') {
+    requestAnimationFrame(() => prFocusWhenVisible(ov, tries + 1));
+    return;
+  }
+  const f = prFocusables(ov);
+  if (f.length) f[0].focus();
+}
+
 function openPr(id, btn) {
   const ov = document.getElementById(id);
   if (!ov) return;
@@ -5570,8 +5589,7 @@ function openPr(id, btn) {
   prOpenEl = ov;
   ov.classList.add('open');
   document.body.style.overflow = 'hidden';
-  const f = prFocusables(ov);
-  if (f.length) f[0].focus();
+  prFocusWhenVisible(ov, 0);
 }
 
 function closePr() {
@@ -6686,7 +6704,7 @@ const translations = {
     prM3Title: 'מתחיל ב־5,500 ₪',
     prM3Body: '<p>הכול כמו בליווי האישי, רק ששניכם בפנים.</p><p><strong>רוב הוויכוחים על כסף הם לא באמת על כסף.</strong> אחד חוסך ואחד מוציא ושניכם צודקים, כי כל אחד מכם גדל בבית אחר עם יחס אחר לכסף. לכן אני לא ממפה התנהלות אחת אלא שתיים, ובונה תוכנית אחת שמוסכמת על שניכם.</p><p>הפגישות תמיד משותפות, שניכם באותו חדר, כי מה שאנחנו באים לפתור קורה ביניכם. בשאלון שלפניהן כל אחד מכם עונה בנפרד על אותן חמש שאלות, וככה שתי הזוויות על השולחן עוד לפני שאנחנו יושבים.</p><p>וגם כאן · ארבעה חודשים לפחות, ואני איתכם שניכם לאורך כל הדרך, יד ביד.</p>',
     prTitle: 'לא תעברו את זה לבד.',
-    prLead: 'זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, לאורך כל הדרך, עד שהכסף מתחיל לעבוד בשבילכם. יש לכם על מי לסמוך.',
+    prLead: 'זה כל ההבדל. אני לא בונה לכם תוכנית ונעלם · אני הולך איתכם יד ביד, עד שהכסף מתחיל לעבוד בשבילכם.',
     pr1n: 'מיפוי כלכלי',
     pr1p: '690 ₪',
     pr2badge: 'הליווי המלא',
@@ -6795,7 +6813,7 @@ const translations = {
     prM3Title: "From ₪5,500",
     prM3Body: "<p>Everything in personal guidance, with both of you inside it.</p><p><strong>Most arguments about money are not really about money.</strong> One of you saves, one spends, and you are both right, because each of you grew up in a different home with a different relationship to money. So I do not map one set of habits, I map two, and build one plan you both agree on.</p><p>The sessions are always joint, both of you in the same room, because what we are here to solve happens between you. In the questionnaire beforehand each of you answers the same five questions separately, so both perspectives are on the table before we even sit down.</p><p>And here too · at least four months, and I am with both of you the whole way, hand in hand.</p>",
     prTitle: "You will not go through this alone.",
-    prLead: "That is the whole difference. I do not hand you a plan and disappear. I walk with you, hand in hand, the whole way, until your money starts working for you. You have someone to lean on.",
+    prLead: "That is the whole difference. I do not hand you a plan and disappear. I walk with you, hand in hand, until your money starts working for you.",
     pr1n: "Financial mapping",
     pr1p: "₪690",
     pr2badge: "Full guidance",
@@ -7091,7 +7109,7 @@ function setLang(lang) {
 <!-- ‏שלושת חלונות הפירוט · אותה מעטפת בדיוק של מדיניות הפרטיות
      ‏ושל הצהרת הנגישות, כדי שלא יהיו באתר שלושה סוגי חלונות. -->
 <div class="privacy-overlay" id="prModal1" onclick="closePrOutside(event)">
-  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM1Title">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM1Name">
     <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
     <div class="pr-modal-name" id="prM1Name">מיפוי כלכלי</div>
     <h3 class="privacy-title pr-modal-price" id="prM1Title">690 ₪</h3>
@@ -7106,7 +7124,7 @@ function setLang(lang) {
 </div>
 
 <div class="privacy-overlay" id="prModal2" onclick="closePrOutside(event)">
-  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM2Title">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM2Name">
     <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
     <div class="pr-modal-name" id="prM2Name">ליווי אישי</div>
     <h3 class="privacy-title pr-modal-price" id="prM2Title">מתחיל ב־3,990 ₪</h3>
@@ -7121,7 +7139,7 @@ function setLang(lang) {
 </div>
 
 <div class="privacy-overlay" id="prModal3" onclick="closePrOutside(event)">
-  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM3Title">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM3Name">
     <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
     <div class="pr-modal-name" id="prM3Name">ליווי לזוגות ולמשפחות</div>
     <h3 class="privacy-title pr-modal-price" id="prM3Title">מתחיל ב־5,500 ₪</h3>
