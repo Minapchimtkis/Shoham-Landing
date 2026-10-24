@@ -4166,6 +4166,26 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .pr-list li.pr-key { color: #fff; font-weight: 500; }
 
+/* ‏מה שלא כלול מסומן ב-X ולא בווי. חבילה שמסמנת את הכל
+   ‏באותו סימן מבקשת מהקורא להאמין לה על המילה, ומי שיגלה
+   ‏את ההבדל רק בשיחה ירגיש שהוסתר ממנו משהו. */
+.pr-list li.pr-no { color: rgba(255,255,255,0.5); }
+
+.pr-list li.pr-no::before,
+.pr-list li.pr-no::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 2px;
+  top: 11px;
+  width: 11px;
+  height: 0;
+  border: 0;
+  border-top: 2px solid rgba(255,255,255,0.3);
+  transform: rotate(45deg);
+}
+
+.pr-list li.pr-no::after { transform: rotate(-45deg); }
+
 /* ‏margin-top: auto דוחף את אזור הפעולה לתחתית הכרטיס, וכך
    ‏שלושת הכפתורים יושבים על אותו קו גם כשהרשימות באורכים
    ‏שונים. זה הפרט שמבדיל רשת מכוונת מרשת שהסתדרה לבד. */
@@ -4293,6 +4313,28 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 .pr-body:last-of-type { margin-bottom: 0; }
+
+/* ‏הזמינות היא הבידול, ולכן היא לא עוד שורה בגוף הטקסט.
+   ‏רקע עדין וקו בצד מרימים אותה מהפסקאות בלי להפוך אותה
+   ‏לכרטיס שלישי בתוך הכרטיס. */
+.pr-avail {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border-inline-start: 2px solid rgba(168,85,247,0.55);
+  /* ‏הפינות המעוגלות הן בצד שממול לקו, ולכן לוגיות ולא פיזיות ·
+     ‏ב-LTR הדף מתהפך והקו עובר צד, והפינות חייבות לעבור איתו.
+     ‏השורה הראשונה היא נפילה לאחור לדפדפן שלא מכיר אותן. */
+  border-radius: 10px;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  background: rgba(168,85,247,0.09);
+  font-size: 14.5px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.86);
+}
+
+.pr-avail strong { color: var(--p6); font-weight: 700; }
 .pr-body strong { color: #fff; font-weight: 600; }
 
 @media (min-width: 921px) {
@@ -4871,6 +4913,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
           <li id="pr1a">פגישת אבחון ומיפוי מלא של התמונה הכלכלית</li>
           <li id="pr1b">קובץ התקציב האישי שלכם, להמשיך איתו גם לבד</li>
           <li class="pr-key" id="pr1c">מתקזז במלואו אם ממשיכים לליווי תוך 30 יום</li>
+          <li class="pr-no" id="pr1d">בלי ליווי אישי אחרי הפגישה · מכאן אתם ממשיכים לבד</li>
         </ul>
         <div class="pr-act">
           <button class="pr-more" type="button" id="pr1more" onclick="openPr('prModal1', this)">מה בדיוק כלול</button>
@@ -4885,6 +4928,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <div class="pr-rule" aria-hidden="true"></div>
         <p class="pr-body" id="pr2b1">אחרי המיפוי תדעו בדיוק איפה אתם עומדים. מכאן יש שני מסלולי ליווי, אחד ליחידים ואחד לזוגות, ואת הפירוט המלא של שניהם אני שולח לכם שחור על לבן.</p>
         <p class="pr-body" id="pr2b2">איזה מסלול מתאים לכם, ומה הוא כולל בדיוק, נחליט ביחד בשיחה. <strong>וה־690 של המיפוי מתקזזים.</strong></p>
+        <p class="pr-avail" id="pr2av"><strong>זה ההבדל האמיתי:</strong> בשני המסלולים אני איתכם לאורך כל הדרך, ולא רק בפגישות. זמין בוואטסאפ ובטלפון, ‏ראשון עד חמישי, בין 9:00 ל־19:00‏.</p>
         <div class="pr-act">
           <a class="pr-btn" href="#contact" id="pr2cta">נדבר על זה בשיחה</a>
         </div>
@@ -4925,7 +4969,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
           <span>עד כמה הליווי באמת אישי?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">הליווי שלי אישי באמת, כי אין שני אנשים שמתנהלים אותו דבר. אנחנו בונים יחד תוכנית שמתאימה להכנסות, להרגלים, למטרות ולחששות שלכם סביב כסף.<br><br>אבל הליווי לא מסתכם ב־4 פגישות. אני כאן גם בין הפגישות, בוואטסאפ ובטלפון בשעות העבודה, להתייעצויות, להתלבטויות וגם כשחודש פחות הולך וצריך להבין יחד מה לשפר.<br><br>אני מלווה אתכם לאורך הדרך, וגם כשהתהליך מסתיים, הדלת שלי תמיד נשארת פתוחה.</div>
+        <div class="faq-a">הליווי שלי אישי באמת, כי אין שני אנשים שמתנהלים אותו דבר. אנחנו בונים יחד תוכנית שמתאימה להכנסות, להרגלים, למטרות ולחששות שלכם סביב כסף.<br><br>אבל הליווי לא מסתכם ב־4 פגישות. אני כאן גם בין הפגישות, בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00, להתייעצויות, להתלבטויות וגם כשחודש פחות הולך וצריך להבין יחד מה לשפר.<br><br>אני מלווה אתכם לאורך הדרך, וגם כשהתהליך מסתיים, הדלת שלי תמיד נשארת פתוחה.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -6797,7 +6841,7 @@ const translations = {
     pr4t: 'ליווי וצמיחה ביחד', pr4d: 'נעבוד על היישום בפועל, נעקוב ביחד אחרי מה שקורה, ונתאים את התוכנית לאורך הדרך עד שהכסף מתחיל לעבוד בשבילכם.',
     faqLabel: 'שאלות ותשובות', faqTitle: 'שאלות שכדאי לשאול.',
     q1: 'למה אבחר דווקא בך?', a1: 'המטרה שלי היא לעזור לכם לקבל החלטות כלכליות מתוך הבנה, בהתאם למטרות ולצרכים שלכם. תהליך הליווי מתמקד בהתנהלות הכלכלית שלכם, בבניית תוכנית אישית ובהתקדמות לעבר היעדים שהגדרתם. במילים פשוטות, ההצלחה שלכם היא ההצלחה שלי.',
-    qPersonal: 'עד כמה הליווי באמת אישי?', aPersonal: 'הליווי שלי אישי באמת, כי אין שני אנשים שמתנהלים אותו דבר. אנחנו בונים יחד תוכנית שמתאימה להכנסות, להרגלים, למטרות ולחששות שלכם סביב כסף.<br><br>אבל הליווי לא מסתכם ב־4 פגישות. אני כאן גם בין הפגישות, בוואטסאפ ובטלפון בשעות העבודה, להתייעצויות, להתלבטויות וגם כשחודש פחות הולך וצריך להבין יחד מה לשפר.<br><br>אני מלווה אתכם לאורך הדרך, וגם כשהתהליך מסתיים, הדלת שלי תמיד נשארת פתוחה.',
+    qPersonal: 'עד כמה הליווי באמת אישי?', aPersonal: 'הליווי שלי אישי באמת, כי אין שני אנשים שמתנהלים אותו דבר. אנחנו בונים יחד תוכנית שמתאימה להכנסות, להרגלים, למטרות ולחששות שלכם סביב כסף.<br><br>אבל הליווי לא מסתכם ב־4 פגישות. אני כאן גם בין הפגישות, בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00, להתייעצויות, להתלבטויות וגם כשחודש פחות הולך וצריך להבין יחד מה לשפר.<br><br>אני מלווה אתכם לאורך הדרך, וגם כשהתהליך מסתיים, הדלת שלי תמיד נשארת פתוחה.',
     q2: 'יש לך הסמכה רשמית?', a2: 'כן, אני יועץ לכלכלת המשפחה עם תעודה רשמית מטעם חברת UNI פיננסים בפיקוח אוניברסיטת אריאל בשומרון.',
     q3: 'אני צעיר ועדיין בלי כסף, זה בשבילי?', a3: 'דווקא עכשיו, בגלל הגיל הצעיר, זה הזמן הכי טוב להשקיע בעתיד הפיננסי שלך. גם בלי הרבה כסף אפשר לבנות הרגלים תודעתיים וכלכליים חכמים שישרתו אותך ואת מי שאתה אוהב.',
     q4: 'מה ההבדל בינך לבין יועץ בבנק?', a4: 'יועץ בבנק מוגבל למוצרים של הבנק ויש לו אינטרס של הגוף עצמו. אני יועץ עצמאי. המשימה שלי היא לנתח את התמונה המלאה ולהתאים לך פתרון שתפור אישית אליך. האינטרס היחיד שלי הוא ההצלחה של שנינו במסע הזה.',
@@ -6829,6 +6873,7 @@ const translations = {
     pr1a: 'פגישת אבחון ומיפוי מלא של התמונה הכלכלית',
     pr1b: 'קובץ התקציב האישי שלכם, להמשיך איתו גם לבד',
     pr1c: 'מתקזז במלואו אם ממשיכים לליווי תוך 30 יום',
+    pr1d: 'בלי ליווי אישי אחרי הפגישה · מכאן אתם ממשיכים לבד',
     pr1cta: 'לשיחת היכרות',
     pr1more: 'מה בדיוק כלול',
     prGuarantee: 'אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
@@ -6843,11 +6888,12 @@ const translations = {
     pr2s: 'שני מסלולי ליווי · ליחידים ולזוגות',
     pr2b1: 'אחרי המיפוי תדעו בדיוק איפה אתם עומדים. מכאן יש שני מסלולי ליווי, אחד ליחידים ואחד לזוגות, ואת הפירוט המלא של שניהם אני שולח לכם שחור על לבן.',
     pr2b2: 'איזה מסלול מתאים לכם, ומה הוא כולל בדיוק, נחליט ביחד בשיחה. <strong>וה־690 של המיפוי מתקזזים.</strong>',
+    pr2av: '<strong>זה ההבדל האמיתי:</strong> בשני המסלולים אני איתכם לאורך כל הדרך, ולא רק בפגישות. זמין בוואטסאפ ובטלפון, ‏ראשון עד חמישי, בין 9:00 ל־19:00‏.',
     pr2cta: 'נדבר על זה בשיחה',
     prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
     prM1Name: 'מיפוי כלכלי',
     prM1Title: '690 ₪',
-    prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
+    prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>מה שאין כאן:</strong> המיפוי הוא פגישה אחת, ואין אחריו ליווי אישי. אתם מקבלים את התמונה ואת הקובץ וממשיכים איתם לבד. הליווי הצמוד, והזמינות שלי בוואטסאפ ובטלפון, שייכים למסלולי ההמשך.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
     aPrice: 'המיפוי הכלכלי הוא 690 ₪, והוא החבילה הראשונית. הוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. מעבר לו יש שני מסלולי ליווי, אחד ליחידים ואחד לזוגות, ואת הפירוט המלא שלהם אני שולח לכם שחור על לבן. איזה מסלול מתאים לכם נחליט ביחד בשיחה. שיחת ההיכרות חינם ובלי התחייבות, והמחיר שתסכימו לו הוא סופי, בלי הפתעות בהמשך.',
     q6: 'מה קורה ביום שאחרי?',
     qCall: 'מה בעצם קורה בשיחת ההיכרות?', aCall: 'נכיר. תספרו לי מה מעיק עליכם מבחינה כלכלית, מה הייתם רוצים לשנות ולאן אתם רוצים להגיע. אני אשאל כמה שאלות כדי להבין את התמונה המלאה, ואני לא עוצר את השיחה עד שאני מבין ב־100% מה אתם צריכים, בין אם אתם יחידים או זוג. ואם אחרי זה אני חושב שאני לא האדם הנכון בשבילכם, אגיד לכם את זה. אין מה להכין מראש ואין מה להביא. השיחה בחינם, בלי התחייבות, ואף אחד לא ילחץ עליכם להחליט בסופה.',
@@ -6908,7 +6954,7 @@ const translations = {
     pr4t: 'Ongoing support & growth', pr4d: "We work on putting it into practice, track together what actually happens, and adjust the plan along the way until your money starts working for you.",
     faqLabel: 'FAQ', faqTitle: 'Questions worth asking.',
     q1: 'Why choose you specifically?', a1: 'My goal is to help you make financial decisions out of understanding, in line with your goals and your needs. The guidance focuses on how you handle money, on building a personal plan, and on moving towards the targets you set. Simply put, your success is my success.',
-    qPersonal: "How personal is the guidance, really?", aPersonal: "My guidance is genuinely personal, because no two people handle their money the same way. We build a plan together that fits your income, your habits, your goals and your worries around money.<br><br>But it does not end after 4 sessions. I am here between them too, on WhatsApp and by phone during working hours, for questions, for decisions you are weighing, and for the month that went less well and we need to work out together what to improve.<br><br>I am with you along the way, and when the process ends, my door always stays open.",
+    qPersonal: "How personal is the guidance, really?", aPersonal: "My guidance is genuinely personal, because no two people handle their money the same way. We build a plan together that fits your income, your habits, your goals and your worries around money.<br><br>But it does not end after 4 sessions. I am here between them too, on WhatsApp and by phone, Sunday to Thursday between 9:00 and 19:00, for questions, for decisions you are weighing, and for the month that went less well and we need to work out together what to improve.<br><br>I am with you along the way, and when the process ends, my door always stays open.",
     q2: 'Do you have a formal qualification?', a2: 'Yes, I\'m a family-economics advisor with an official certificate from UNI Finance under Ariel University in Samaria.',
     q3: "I'm young with no money yet. Is this for me?", a3: 'Especially now, because of your young age, this is the best time to invest in your financial future. Even without much money, you can build smart mental and financial habits that will serve you and those you love.',
     q4: "What's the difference between you and a bank advisor?", a4: 'A bank advisor is limited to the bank\'s products and serves the bank\'s interests. I\'m an independent coach. My mission is to analyze the full picture and tailor a personal solution for you. My only interest is our shared success.',
@@ -6940,6 +6986,7 @@ const translations = {
     pr1a: 'A diagnostic session and a full map of your financial picture',
     pr1b: 'Your personal budget file, yours to keep working with',
     pr1c: 'Comes off the price in full if you continue within 30 days',
+    pr1d: 'No personal guidance after the session · from there you carry on alone',
     pr1cta: 'Book an intro call',
     pr1more: 'See what is included',
     prGuarantee: 'If after the second session you feel this is not for you, I give you your money back.',
@@ -6954,11 +7001,12 @@ const translations = {
     pr2s: 'Two guidance tracks · for individuals and for couples',
     pr2b1: 'After the mapping you will know exactly where you stand. From there there are two guidance tracks, one for individuals and one for couples, and I send you the full details of both in writing.',
     pr2b2: 'Which track fits you, and what exactly it covers, we decide together in the call. <strong>And the ₪690 from the mapping comes off.</strong>',
+    pr2av: '<strong>This is the real difference:</strong> on both tracks I am with you the whole way, not only in the sessions. Reachable on WhatsApp and by phone, Sunday to Thursday, 9:00 to 19:00.',
     pr2cta: 'We will talk about it in the call',
     prNote: 'The price is final. The intro call is always free and carries no obligation.',
     prM1Name: "Financial mapping",
     prM1Title: "₪690",
-    prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
+    prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>What is not here:</strong> the mapping is one session, and no personal guidance follows it. You get the picture and the file and carry on with them on your own. The close guidance, and my availability on WhatsApp and by phone, belong to the continuing tracks.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
     aPrice: "The financial mapping is ₪690, and it is the starter package. It comes off the price in full if you continue to full guidance within 30 days. Beyond it there are two guidance tracks, one for individuals and one for couples, and I send you the full details of both in writing. Which track fits you we decide together in the call. The intro call is free and carries no obligation, and the price you agree to is final, with no surprises later.",
     q6: 'What happens the day after?',
     qCall: 'What actually happens in the intro call?', aCall: 'We get to know each other. You tell me what is weighing on you financially, what you would like to change and where you want to get to. I ask questions to understand the full picture, and I do not end the call until I understand 100% what you need, whether you come on your own or as a couple. And if after that I think I am not the right person for you, I will tell you so. There is nothing to prepare and nothing to bring. The call is free, carries no obligation, and nobody will push you to decide at the end of it.',
@@ -7107,13 +7155,13 @@ function setLang(lang) {
   /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
      ‏יוכל לערבב את תוויות שאר הדף. */
   ['prBadge','prLabel','prTitle','prLead','prGuarantee','prNote',
-   'pr1n','pr1s','pr1a','pr1b','pr1c','pr1cta','pr1more',
+   'pr1n','pr1s','pr1a','pr1b','pr1c','pr1d','pr1cta','pr1more',
    'pr2n','pr2p','pr2s','pr2cta','prM1Name','prM1Title'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
   /* ‏אלה נושאים תגיות בתוכם. */
-  ['pr2b1','pr2b2','prM1Body'].forEach(k => {
+  ['pr2b1','pr2b2','pr2av','prM1Body'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.innerHTML = t[k];
   });
@@ -7260,7 +7308,7 @@ function setLang(lang) {
       <p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p>
       <p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p>
       <p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p>
-      <p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p>
+      <p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>מה שאין כאן:</strong> המיפוי הוא פגישה אחת, ואין אחריו ליווי אישי. אתם מקבלים את התמונה ואת הקובץ וממשיכים איתם לבד. הליווי הצמוד, והזמינות שלי בוואטסאפ ובטלפון, שייכים למסלולי ההמשך.</p>
       <p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>
     </div>
   </div>
