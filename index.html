@@ -916,23 +916,35 @@ section {
   /* ‏13vw כוון למסך של טלפון, ושם הרצפה של 52 תופסת בין כה.
      ‏במחשב הוא הגיע לתקרה של 130 ומילא את כל המסך בשלוש שורות ·
      ‏הכותרת צעקה והשורה שמתחתיה נלחשה. התקרה ירדה ל-76. */
-  font-size: clamp(52px, 7.5vw, 76px);
+  /* ‏התקרה עלתה מ-76 ל-88 · הנימוק שהוריד אותה בזמנו היה
+     ‏שהכותרת צועקת והשורה שמתחתיה נלחשת, והשורה הזאת התקצרה
+     ‏מאז ל-40 תווים. */
+  font-size: clamp(54px, 8.2vw, 88px);
   font-weight: 900;
-  line-height: 1.0;
+  line-height: 1.02;
   margin-bottom: 32px;
   opacity: 0;
   animation: fadeUp 0.9s 0.4s forwards;
   letter-spacing: -1px;
 }
 
-.hero-title .line1 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
-.hero-title .line2 { display: block; color: var(--p6); text-shadow: 0 2px 26px rgba(0,0,0,0.5); }
-.hero-title .accent {
-  /* Violet and gold sit almost opposite each other, so mixing them in a
-     straight line runs the middle of the word through grey — a dull brown
-     landed on exactly the words that carry the sentence. These two stops
-     walk the colour round through rose and warm orange instead, which keeps
-     the ends where they were and the middle alive. */
+/* ‏בלי צבע ובלי צל משלהן · צבע על הילד היה מבטל את החיתוך
+   ‏של האב, וצל טקסט היה מופיע מאחורי האותיות השקופות. */
+.hero-title .line1 { display: block; }
+.hero-title .line2 { display: block; }
+/* ‏הגרדיאנט היה על מילה אחת והכותרת סביבו הייתה בצבע אחיד.
+   ‏עכשיו הוא על הכותרת כולה, ועל האלמנט החיצוני ולא על כל
+   ‏שורה בנפרד, כדי שהמעבר יימשך רצוף על פני שתי השורות
+   ‏במקום להתחיל מחדש בכל אחת.
+
+   ‏סגול וזהב יושבים כמעט זה מול זה, וערבוב ישיר ביניהם מעביר
+   ‏את האמצע דרך אפור. שתי העצירות באמצע מוליכות את הצבע דרך
+   ‏ורוד וכתום חם, ולכן הקצוות נשארים והאמצע חי.
+
+   ‏text-shadow אינו עובד על טקסט שקוף · הוא נצבע מאחוריו
+   ‏ומטשטש אותו. לכן ההילה היא drop-shadow, שפועל על הצורה
+   ‏שנותרה אחרי החיתוך. */
+.hero-title {
   background: linear-gradient(135deg,
     var(--p5) 0%,
     #e0649b 42%,
@@ -941,7 +953,7 @@ section {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 20px rgba(168,85,247,0.45));
+  filter: drop-shadow(0 2px 26px rgba(168,85,247,0.55));
 }
 
 /* A photograph at the foot of the first screen. It is the last thing inside
@@ -4458,9 +4470,9 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   <img class="hero-logo" id="heroLogo" fetchpriority="high" decoding="async" alt="שוהם אבו · ליווי וייעוץ פיננסי">
   <h1 class="hero-title">
     <span class="line1">אפשר ליהנות מהכסף שלך</span>
-    <span class="line2">ולבנות איתו <span class="accent">עתיד</span>.</span>
+    <span class="line2">ולבנות איתו עתיד.</span>
   </h1>
-  <p class="hero-audience">ליווי פיננסי אישי לצעירים, זוגות ומשפחות שרוצים לעשות סדר בכסף, להתנהל בביטחון ולהתקדם למטרות שלהם, בלי לוותר על הדברים שעושים להם טוב.</p>
+  <p class="hero-audience">ליווי פיננסי אישי למשפחות צעירות ויחידים</p>
   <div class="hero-cta">
     <a href="#contact" class="btn-primary">לשיחת היכרות</a>
   </div>
@@ -6579,8 +6591,8 @@ const translations = {
     lblFmsg: 'מה הכי מעיק עליכם כלכלית, לא חובה',
     lblWaName: 'השם שלכם',
     lblWaPhone: 'מספר טלפון',
-    heroLine2: 'ולבנות איתו <span class="accent">עתיד</span>.',
-    heroAudience: 'ליווי פיננסי אישי לצעירים, זוגות ומשפחות שרוצים לעשות סדר בכסף, להתנהל בביטחון ולהתקדם למטרות שלהם, בלי לוותר על הדברים שעושים להם טוב.',
+    heroLine2: 'ולבנות איתו עתיד.',
+    heroAudience: 'ליווי פיננסי אישי למשפחות צעירות ויחידים',
     heroCta: 'לשיחת היכרות',
     videoTitle: 'חצי דקה איתי',
     videoPlay: 'נגן את הסרטון',
@@ -6694,8 +6706,8 @@ const translations = {
     lblFmsg: 'What weighs on you most financially, optional',
     lblWaName: 'Your name',
     lblWaPhone: 'Phone number',
-    heroLine2: 'and build a <span class="accent">future</span> with it.',
-    heroAudience: 'Personal financial guidance for young people, couples and families who want to bring order to their money, manage it with confidence and move towards their goals, without giving up the things that make them happy.',
+    heroLine2: 'and build a future with it.',
+    heroAudience: 'Personal financial guidance for young families and individuals',
     heroCta: 'Book an intro call',
     videoTitle: 'Half a minute with me, in Hebrew',
     videoPlay: 'Play the video',
