@@ -956,7 +956,17 @@ section {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 22px rgba(168,85,247,0.40));
+  /* ‏צל שחור ולא הילה צבעונית. ההילה הסגולה נמרחה סביב
+     ‏האותיות וטשטשה את הקצוות, והכותרת נקראה ככתם ולא
+     ‏כאותיות. שני צללים: הראשון הדוק ונותן הפרדה מהרקע,
+     ‏השני רחב ורך ונותן עומק.
+
+     ‏drop-shadow ולא text-shadow, כי הטקסט שקוף והצבע מגיע
+     ‏מהרקע שמאחוריו · text-shadow היה נצבע מאחורי האותיות
+     ‏במקום מתחתיהן. */
+  filter:
+    drop-shadow(0 2px 3px rgba(0,0,0,0.70))
+    drop-shadow(0 8px 22px rgba(0,0,0,0.55));
 }
 
 /* A photograph at the foot of the first screen. It is the last thing inside
