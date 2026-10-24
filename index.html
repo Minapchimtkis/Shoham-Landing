@@ -88,7 +88,7 @@
           "name": "כמה עולה תהליך הליווי?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. המיפוי הכלכלי הוא 690 ₪ והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום, הליווי האישי מתחיל ב־3,990 ₪, וליווי לזוגות ולמשפחות מתחיל ב־5,500 ₪. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך."
+            "text": "המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. את ההיקף ואת המחיר של הליווי עצמו נקבע יחד בשיחה, לפי מה שאתם באמת צריכים ולא לפי תבנית, כי אין שני מצבים זהים. שיחת ההיכרות חינם ובלי התחייבות, והמחיר שתסכימו לו הוא סופי, בלי הפתעות בהמשך."
           }
         },
         {
@@ -4265,26 +4265,37 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 /* ‏שלוש עמודות, ו-subgrid כדי שהשם, המחיר, התיאור והכפתור
    ‏יישבו על אותו קו אופקי בשלושת הכרטיסים. בלעדיו כל כרטיס
    ‏מסדר את עצמו לבד והעין רואה שורה עקומה. */
-@media (min-width: 921px) {
-  .pr-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto auto auto 1fr auto;
-    gap: 18px;
-    align-items: stretch;
-  }
-  .pr-card {
-    grid-row: span 6;
-    display: grid;
-    grid-template-rows: subgrid;
-    gap: 0;
-  }
-  .pr-act { padding-top: 28px; }
+/* ‏הפאנל השני אינו נושא מחיר, ולכן הוא גם אינו נראה כמוצר
+   ‏שני · מסגרת רכה יותר, בלי רקע מודגש ובלי צל. הוא המשך
+   ‏של הסיפור, לא אפשרות מתחרה. */
+.pr-card.pr-soft {
+  border-color: rgba(168,85,247,0.16);
+  background: rgba(22,5,48,0.34);
+  box-shadow: none;
 }
 
-@supports not (grid-template-rows: subgrid) {
-  @media (min-width: 921px) {
-    .pr-card { display: flex; flex-direction: column; }
+.pr-sub-top { margin-top: 14px; }
+
+.pr-body {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.78);
+}
+
+.pr-body:last-of-type { margin-bottom: 0; }
+.pr-body strong { color: #fff; font-weight: 600; }
+
+@media (min-width: 921px) {
+  .pr-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    gap: 20px;
+    align-items: stretch;
+    max-width: 920px;
+    margin-inline: auto;
   }
+  .pr-act { padding-top: 28px; }
 }
 
 @media (max-width: 920px) {
@@ -4823,23 +4834,22 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
      ‏והתוויות הן pr-label ולא section-label · setLang מחלק את
      ‏תוויות הסקשנים לפי אינדקס, ותווית תשיעית באמצע הדף הייתה
-     ‏מערבבת את כל הגרסה האנגלית. התרגום כאן לפי מזהה. -->
+     ‏מערבבת את כל הגרסה האנגלית. התרגום כאן לפי מזהה.
+
+     ‏מחיר אחד מוצג, והוא של הצעד הראשון. מסלולי הליווי נקבעים
+     ‏בשיחה, ולכן הפאנל השני מתאר אותם בלי מספר. -->
 <section class="pricing">
   <div class="pricing-inner">
-    <div class="pr-label reveal" id="prLabel">ההשקעה</div>
+    <div class="pr-label reveal" id="prLabel">הצעד הראשון</div>
     <h2 class="pr-title reveal" id="prTitle">לא תעברו את זה לבד.</h2>
-    <p class="pr-lead reveal" id="prLead">שלוש דרכים להתחיל. בכולן אני הולך איתכם יד ביד, והשיחה הראשונה תמיד בחינם.</p>
+    <p class="pr-lead reveal" id="prLead">מתחילים במיפוי אחד שנותן לכם תמונה מלאה. מה קורה אחריו, נחליט ביחד.</p>
 
     <div class="pr-grid">
 
-      <div class="pr-card reveal">
+      <div class="pr-card pr-main reveal">
         <div class="pr-name" id="pr1n">מיפוי כלכלי</div>
-        <!-- ‏שורה ריקה מעל המספר · בשני הכרטיסים האחרים יש מעליו
-             ‏"מתחיל ב", ובלי מקביל כאן המספר של 690 היה יושב 20
-             ‏פיקסל גבוה משני האחרים. נמדד. aria-hidden כי אין בה
-             ‏תוכן לקרוא. -->
-        <div class="pr-price"><span class="pr-from" aria-hidden="true">&nbsp;</span>690 ₪</div>
-        <div class="pr-sub" id="pr1s">פגישה אחת · הצעד הראשון, בלי להתחייב</div>
+        <div class="pr-price">690 ₪</div>
+        <div class="pr-sub" id="pr1s">פגישה אחת · בלי להתחייב להמשך</div>
         <div class="pr-rule" aria-hidden="true"></div>
         <ul class="pr-list">
           <li id="pr1a">פגישת אבחון ומיפוי מלא של התמונה הכלכלית</li>
@@ -4852,37 +4862,14 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         </div>
       </div>
 
-      <div class="pr-card pr-main reveal">
-        <div class="pr-badge" id="pr2badge">הכי נבחר</div>
-        <div class="pr-name" id="pr2n">ליווי אישי</div>
-        <div class="pr-price" id="pr2p"><span class="pr-from" id="pr2from">מתחיל ב</span>3,990 ₪</div>
-        <div class="pr-sub" id="pr2s">ליחידים · ארבעה חודשים לפחות</div>
+      <div class="pr-card pr-soft reveal">
+        <div class="pr-name" id="pr2n">ומה שבא אחרי</div>
+        <div class="pr-sub pr-sub-top" id="pr2s">ליחידים, לזוגות ולמשפחות</div>
         <div class="pr-rule" aria-hidden="true"></div>
-        <ul class="pr-list">
-          <li id="pr2a">כל מה שבמיפוי הכלכלי</li>
-          <li id="pr2b">תוכנית אישית, תפורה אליכם בלבד</li>
-          <li class="pr-key" id="pr2c">אני איתכם גם בין הפגישות · וואטסאפ וטלפון</li>
-          <li id="pr2d">וגם כשהתהליך נגמר, הדלת נשארת פתוחה</li>
-        </ul>
+        <p class="pr-body" id="pr2b1">אחרי המיפוי תדעו בדיוק איפה אתם עומדים. אם תרצו להמשיך, נבנה ביחד ליווי שמתאים למצב שלכם · ארבעה חודשים לפחות, ולפעמים גם חצי שנה.</p>
+        <p class="pr-body" id="pr2b2">את ההיקף ואת המחיר נקבע יחד בשיחה, לפי מה שאתם באמת צריכים, ולא לפי תבנית. <strong>וה־690 של המיפוי מתקזזים.</strong></p>
         <div class="pr-act">
-          <a class="pr-btn" href="#contact" id="pr2cta">לשיחת היכרות</a>
-          <button class="pr-more" type="button" id="pr2more" onclick="openPr('prModal2', this)">מה בדיוק כלול</button>
-        </div>
-      </div>
-
-      <div class="pr-card reveal">
-        <div class="pr-name" id="pr3n">ליווי לזוגות ולמשפחות</div>
-        <div class="pr-price" id="pr3p"><span class="pr-from" id="pr3from">מתחיל ב</span>5,500 ₪</div>
-        <div class="pr-sub" id="pr3s">לשניכם · ארבעה חודשים לפחות</div>
-        <div class="pr-rule" aria-hidden="true"></div>
-        <ul class="pr-list">
-          <li id="pr3a">כל מה שבליווי האישי, לשניכם</li>
-          <li id="pr3b">מיפוי של שתי ההתנהלויות, לא של אחת</li>
-          <li class="pr-key" id="pr3c">פגישות משותפות תמיד, שניכם באותו חדר</li>
-        </ul>
-        <div class="pr-act">
-          <a class="pr-btn" href="#contact" id="pr3cta">לשיחת היכרות</a>
-          <button class="pr-more" type="button" id="pr3more" onclick="openPr('prModal3', this)">מה בדיוק כלול</button>
+          <a class="pr-btn" href="#contact" id="pr2cta">נדבר על זה בשיחה</a>
         </div>
       </div>
 
@@ -4895,7 +4882,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
       <p id="prGuarantee">אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
     </div>
 
-    <p class="pr-note reveal" id="prNote">המחירים סופיים. שיחת ההיכרות תמיד בחינם ובלי התחייבות.</p>
+    <p class="pr-note reveal" id="prNote">המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.</p>
 
   </div>
 </section>
@@ -4945,7 +4932,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
           <span>כמה עולה תהליך הליווי?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. המיפוי הכלכלי הוא 690 ₪ והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום, הליווי האישי מתחיל ב־3,990 ₪, וליווי לזוגות ולמשפחות מתחיל ב־5,500 ₪. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך.</div>
+        <div class="faq-a">המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. את ההיקף ואת המחיר של הליווי עצמו נקבע יחד בשיחה, לפי מה שאתם באמת צריכים ולא לפי תבנית, כי אין שני מצבים זהים. שיחת ההיכרות חינם ובלי התחייבות, והמחיר שתסכימו לו הוא סופי, בלי הפתעות בהמשך.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -6822,7 +6809,6 @@ const translations = {
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
     qPrice: 'כמה עולה תהליך הליווי?',
-    prLead: 'שלוש דרכים להתחיל. בכולן אני הולך איתכם יד ביד, והשיחה הראשונה תמיד בחינם.',
     pr1n: 'מיפוי כלכלי',
     pr1s: 'פגישה אחת · הצעד הראשון, בלי להתחייב',
     pr1a: 'פגישת אבחון ומיפוי מלא של התמונה הכלכלית',
@@ -6830,40 +6816,22 @@ const translations = {
     pr1c: 'מתקזז במלואו אם ממשיכים לליווי תוך 30 יום',
     pr1cta: 'לשיחת היכרות',
     pr1more: 'מה בדיוק כלול',
-    pr2badge: 'הכי נבחר',
-    pr2n: 'ליווי אישי',
-    pr2from: 'מתחיל ב',
-    pr2s: 'ליחידים · ארבעה חודשים לפחות',
-    pr2a: 'כל מה שבמיפוי הכלכלי',
-    pr2b: 'תוכנית אישית, תפורה אליכם בלבד',
-    pr2c: 'אני איתכם גם בין הפגישות · וואטסאפ וטלפון',
-    pr2d: 'וגם כשהתהליך נגמר, הדלת נשארת פתוחה',
-    pr2cta: 'לשיחת היכרות',
-    pr2more: 'מה בדיוק כלול',
-    pr3n: 'ליווי לזוגות ולמשפחות',
-    pr3from: 'מתחיל ב',
-    pr3s: 'לשניכם · ארבעה חודשים לפחות',
-    pr3a: 'כל מה שבליווי האישי, לשניכם',
-    pr3b: 'מיפוי של שתי ההתנהלויות, לא של אחת',
-    pr3c: 'פגישות משותפות תמיד, שניכם באותו חדר',
-    pr3cta: 'לשיחת היכרות',
-    pr3more: 'מה בדיוק כלול',
-    prNote: 'המחירים סופיים. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
-    prLabel: 'ההשקעה',
-    prTitle: 'לא תעברו את זה לבד.',
     prGuarantee: 'אם אחרי הפגישה השנייה תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
+    prLabel: 'הצעד הראשון',
+    prTitle: 'לא תעברו את זה לבד.',
+    prLead: 'מתחילים במיפוי אחד שנותן לכם תמונה מלאה. מה קורה אחריו, נחליט ביחד.',
+    pr1n: 'מיפוי כלכלי',
+    pr1s: 'פגישה אחת · בלי להתחייב להמשך',
+    pr2n: 'ומה שבא אחרי',
+    pr2s: 'ליחידים, לזוגות ולמשפחות',
+    pr2b1: 'אחרי המיפוי תדעו בדיוק איפה אתם עומדים. אם תרצו להמשיך, נבנה ביחד ליווי שמתאים למצב שלכם · ארבעה חודשים לפחות, ולפעמים גם חצי שנה.',
+    pr2b2: 'את ההיקף ואת המחיר נקבע יחד בשיחה, לפי מה שאתם באמת צריכים, ולא לפי תבנית. <strong>וה־690 של המיפוי מתקזזים.</strong>',
+    pr2cta: 'נדבר על זה בשיחה',
+    prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
     prM1Name: 'מיפוי כלכלי',
     prM1Title: '690 ₪',
     prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
-    prM2Name: 'ליווי אישי',
-    prM2Title: 'מתחיל ב־3,990 ₪',
-    prM2Body: '<p>כאן מתחיל מה שבאמת עושה את ההבדל.</p><p>מתחילים מהמיפוי המלא, וממנו בונים ביחד תוכנית שתפורה אליכם בלבד. לא תבנית, ולא משהו שעבד למישהו אחר.</p><p><strong>ואז מתחיל החלק שאי אפשר לקנות באקסל.</strong> ארבעה חודשים לפחות, ולפעמים גם חצי שנה, שבהם אני איתכם. לא רק בפגישות · גם ביניהן. בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00. להחלטה שצצה באמצע החודש, לשאלה לפני קנייה גדולה, ולחודש שפשוט לא הלך ואנחנו יושבים להבין ביחד למה.</p><p>המטרה שלי היא שבסוף התהליך לא תצטרכו אותי. ועד שזה קורה, אתם לא לבד בזה.</p><p>וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה.</p>',
-    prM3Name: 'ליווי לזוגות ולמשפחות',
-    prM3Title: 'מתחיל ב־5,500 ₪',
-    prM3Body: '<p>הכול כמו בליווי האישי, רק ששניכם בפנים.</p><p><strong>רוב הוויכוחים על כסף הם לא באמת על כסף.</strong> אחד חוסך ואחד מוציא ושניכם צודקים, כי כל אחד מכם גדל בבית אחר עם יחס אחר לכסף. לכן אני לא ממפה התנהלות אחת אלא שתיים, ובונה תוכנית אחת שמוסכמת על שניכם.</p><p>הפגישות תמיד משותפות, שניכם באותו חדר, כי מה שאנחנו באים לפתור קורה ביניכם. בשאלון שלפניהן כל אחד מכם עונה בנפרד על אותן חמש שאלות, וככה שתי הזוויות על השולחן עוד לפני שאנחנו יושבים.</p><p>וגם כאן · ארבעה חודשים לפחות, ואני איתכם שניכם לאורך כל הדרך, יד ביד.</p>',
-    pr2p: 'מתחיל ב־3,990 ₪',
-    pr3p: 'מתחיל ב־5,500 ₪',
-    aPrice: 'עלות הליווי תלויה במסלול הנבחר ובהיקף השירות. המיפוי הכלכלי הוא 690 ₪ והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום, הליווי האישי מתחיל ב־3,990 ₪, וליווי לזוגות ולמשפחות מתחיל ב־5,500 ₪. אם אתם לא בטוחים איזה מסלול מתאים לכם, אפשר לתאם שיחת היכרות ולבדוק ביחד את ההתאמה. שיחת ההיכרות חינם ובלי התחייבות, והמחירים סופיים, בלי הפתעות בהמשך.',
+    aPrice: 'המיפוי הכלכלי הוא 690 ₪, והוא מתקזז במלואו אם ממשיכים לליווי תוך 30 יום. את ההיקף ואת המחיר של הליווי עצמו נקבע יחד בשיחה, לפי מה שאתם באמת צריכים ולא לפי תבנית, כי אין שני מצבים זהים. שיחת ההיכרות חינם ובלי התחייבות, והמחיר שתסכימו לו הוא סופי, בלי הפתעות בהמשך.',
     q6: 'מה קורה ביום שאחרי?',
     qCall: 'מה בעצם קורה בשיחת ההיכרות?', aCall: 'נכיר. תספרו לי מה מעיק עליכם מבחינה כלכלית, מה הייתם רוצים לשנות ולאן אתם רוצים להגיע. אני אשאל כמה שאלות כדי להבין את התמונה המלאה, ואני לא עוצר את השיחה עד שאני מבין ב־100% מה אתם צריכים, בין אם אתם יחידים או זוג. ואם אחרי זה אני חושב שאני לא האדם הנכון בשבילכם, אגיד לכם את זה. אין מה להכין מראש ואין מה להביא. השיחה בחינם, בלי התחייבות, ואף אחד לא ילחץ עליכם להחליט בסופה.',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ותהיה לכם האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
@@ -6952,7 +6920,6 @@ const translations = {
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
     qPrice: 'How much does the guidance cost?',
-    prLead: 'Three ways to start. In all of them I walk with you, hand in hand, and the first call is always free.',
     pr1n: 'Financial mapping',
     pr1s: 'One session · the first step, with no commitment',
     pr1a: 'A diagnostic session and a full map of your financial picture',
@@ -6960,40 +6927,22 @@ const translations = {
     pr1c: 'Comes off the price in full if you continue within 30 days',
     pr1cta: 'Book an intro call',
     pr1more: 'See what is included',
-    pr2badge: 'Most chosen',
-    pr2n: 'Personal guidance',
-    pr2from: 'from',
-    pr2s: 'For individuals · four months minimum',
-    pr2a: 'Everything in the financial mapping',
-    pr2b: 'A plan built for you and nobody else',
-    pr2c: 'I am with you between sessions too · WhatsApp and phone',
-    pr2d: 'And when the process ends, my door stays open',
-    pr2cta: 'Book an intro call',
-    pr2more: 'See what is included',
-    pr3n: 'Couples and families',
-    pr3from: 'from',
-    pr3s: 'For both of you · four months minimum',
-    pr3a: 'Everything in personal guidance, for both of you',
-    pr3b: 'A map of two sets of habits, not one',
-    pr3c: 'Sessions are always joint, both of you in the same room',
-    pr3cta: 'Book an intro call',
-    pr3more: 'See what is included',
-    prNote: 'Prices are final. The intro call is always free and carries no obligation.',
-    prLabel: 'The investment',
-    prTitle: 'You will not go through this alone.',
     prGuarantee: 'If after the second session you feel this is not for you, I give you your money back.',
+    prLabel: 'The first step',
+    prTitle: 'You will not go through this alone.',
+    prLead: 'We start with one mapping session that gives you the full picture. What happens after it, we decide together.',
+    pr1n: 'Financial mapping',
+    pr1s: 'One session · with no commitment to continue',
+    pr2n: 'And what comes after',
+    pr2s: 'For individuals, couples and families',
+    pr2b1: 'After the mapping you will know exactly where you stand. If you want to continue, we build the guidance that fits your situation together · at least four months, and sometimes six.',
+    pr2b2: 'The scope and the price we set together in the call, according to what you actually need, not according to a template. <strong>And the ₪690 from the mapping comes off.</strong>',
+    pr2cta: 'We will talk about it in the call',
+    prNote: 'The price is final. The intro call is always free and carries no obligation.',
     prM1Name: "Financial mapping",
     prM1Title: "₪690",
     prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
-    prM2Name: "Personal guidance",
-    prM2Title: "From ₪3,990",
-    prM2Body: "<p>This is where the real difference begins.</p><p>We start from the full mapping, and from it we build a plan made for you alone. Not a template, and not something that worked for somebody else.</p><p><strong>And then comes the part you cannot buy in a spreadsheet.</strong> At least four months, and sometimes six, in which I am with you. Not only in the sessions · between them too. On WhatsApp and by phone, Sunday to Thursday, 9:00 to 19:00. For the decision that comes up mid-month, for the question before a big purchase, and for the month that simply did not work, where we sit down together to understand why.</p><p>My goal is that by the end of the process you will not need me. And until that happens, you are not alone in this.</p><p>And when the process ends, my door stays open.</p>",
-    prM3Name: "Guidance for couples and families",
-    prM3Title: "From ₪5,500",
-    prM3Body: "<p>Everything in personal guidance, with both of you inside it.</p><p><strong>Most arguments about money are not really about money.</strong> One of you saves, one spends, and you are both right, because each of you grew up in a different home with a different relationship to money. So I do not map one set of habits, I map two, and build one plan you both agree on.</p><p>The sessions are always joint, both of you in the same room, because what we are here to solve happens between you. In the questionnaire beforehand each of you answers the same five questions separately, so both perspectives are on the table before we even sit down.</p><p>And here too · at least four months, and I am with both of you the whole way, hand in hand.</p>",
-    pr2p: "From ₪3,990",
-    pr3p: "From ₪5,500",
-    aPrice: "The cost depends on the track you choose and the scope of the service. The financial mapping is ₪690 and comes off the price in full if you continue to full guidance within 30 days, personal guidance starts at ₪3,990, and guidance for couples and families starts at ₪5,500. If you are not sure which track fits you, book an intro call and we will work it out together. The intro call is free and carries no obligation, and prices are final, with no surprises later.",
+    aPrice: "The financial mapping is ₪690, and it comes off the price in full if you continue to full guidance within 30 days. The scope and the price of the guidance itself we set together in the call, according to what you actually need rather than a template, because no two situations are the same. The intro call is free and carries no obligation, and the price you agree to is final, with no surprises later.",
     q6: 'What happens the day after?',
     qCall: 'What actually happens in the intro call?', aCall: 'We get to know each other. You tell me what is weighing on you financially, what you would like to change and where you want to get to. I ask questions to understand the full picture, and I do not end the call until I understand 100% what you need, whether you come on your own or as a couple. And if after that I think I am not the right person for you, I will tell you so. There is nothing to prepare and nothing to bring. The call is free, carries no obligation, and nobody will push you to decide at the end of it.',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
@@ -7140,18 +7089,14 @@ function setLang(lang) {
 
   /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
      ‏יוכל לערבב את תוויות שאר הדף. */
-  /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
-     ‏יוכל לערבב את תוויות שאר הדף. */
   ['prLabel','prTitle','prLead','prGuarantee','prNote',
    'pr1n','pr1s','pr1a','pr1b','pr1c','pr1cta','pr1more',
-   'pr2badge','pr2n','pr2from','pr2s','pr2a','pr2b','pr2c','pr2d','pr2cta','pr2more',
-   'pr3n','pr3from','pr3s','pr3a','pr3b','pr3c','pr3cta','pr3more',
-   'prM1Name','prM1Title','prM2Name','prM2Title','prM3Name','prM3Title'].forEach(k => {
+   'pr2n','pr2s','pr2cta','prM1Name','prM1Title'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
-  /* ‏גופי החלונות בנויים מפסקאות, ולכן innerHTML. */
-  ['prM1Body','prM2Body','prM3Body'].forEach(k => {
+  /* ‏אלה נושאים תגיות בתוכם. */
+  ['pr2b1','pr2b2','prM1Body'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.innerHTML = t[k];
   });
@@ -7304,34 +7249,7 @@ function setLang(lang) {
   </div>
 </div>
 
-<div class="privacy-overlay" id="prModal2" onclick="closePrOutside(event)">
-  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM2Name">
-    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
-    <div class="pr-modal-name" id="prM2Name">ליווי אישי</div>
-    <h3 class="privacy-title pr-modal-price" id="prM2Title">מתחיל ב־3,990 ₪</h3>
-    <div class="pr-modal-body" id="prM2Body">
-      <p>כאן מתחיל מה שבאמת עושה את ההבדל.</p>
-      <p>מתחילים מהמיפוי המלא, וממנו בונים ביחד תוכנית שתפורה אליכם בלבד. לא תבנית, ולא משהו שעבד למישהו אחר.</p>
-      <p><strong>ואז מתחיל החלק שאי אפשר לקנות באקסל.</strong> ארבעה חודשים לפחות, ולפעמים גם חצי שנה, שבהם אני איתכם. לא רק בפגישות · גם ביניהן. בוואטסאפ ובטלפון, ראשון עד חמישי בין 9:00 ל־19:00. להחלטה שצצה באמצע החודש, לשאלה לפני קנייה גדולה, ולחודש שפשוט לא הלך ואנחנו יושבים להבין ביחד למה.</p>
-      <p>המטרה שלי היא שבסוף התהליך לא תצטרכו אותי. ועד שזה קורה, אתם לא לבד בזה.</p>
-      <p>וגם כשהתהליך נגמר, הדלת שלי נשארת פתוחה.</p>
-    </div>
-  </div>
-</div>
 
-<div class="privacy-overlay" id="prModal3" onclick="closePrOutside(event)">
-  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM3Name">
-    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
-    <div class="pr-modal-name" id="prM3Name">ליווי לזוגות ולמשפחות</div>
-    <h3 class="privacy-title pr-modal-price" id="prM3Title">מתחיל ב־5,500 ₪</h3>
-    <div class="pr-modal-body" id="prM3Body">
-      <p>הכול כמו בליווי האישי, רק ששניכם בפנים.</p>
-      <p><strong>רוב הוויכוחים על כסף הם לא באמת על כסף.</strong> אחד חוסך ואחד מוציא ושניכם צודקים, כי כל אחד מכם גדל בבית אחר עם יחס אחר לכסף. לכן אני לא ממפה התנהלות אחת אלא שתיים, ובונה תוכנית אחת שמוסכמת על שניכם.</p>
-      <p>הפגישות תמיד משותפות, שניכם באותו חדר, כי מה שאנחנו באים לפתור קורה ביניכם. בשאלון שלפניהן כל אחד מכם עונה בנפרד על אותן חמש שאלות, וככה שתי הזוויות על השולחן עוד לפני שאנחנו יושבים.</p>
-      <p>וגם כאן · ארבעה חודשים לפחות, ואני איתכם שניכם לאורך כל הדרך, יד ביד.</p>
-    </div>
-  </div>
-</div>
 
 <div class="privacy-overlay" id="a11yOverlay" onclick="closeA11yOutside(event)">
   <div class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="a11yTitle">
