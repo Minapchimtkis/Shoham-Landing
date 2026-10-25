@@ -3027,15 +3027,23 @@ footer {
     right: 12px;
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     z-index: 999;
-    padding: 10px;
-    border-radius: 100px;
-    border: 1px solid rgba(168,85,247,0.28);
-    background: rgba(14,4,32,0.92);
-    /* ‏הטשטוש הוא מה שמאפשר רקע חצי שקוף · בלעדיו טקסט
-       ‏שנגלל מתחת לפס נקרא דרכו. */
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 14px 40px -12px rgba(0,0,0,0.85);
+    padding: 9px;
+    /* ‏פינה של 22 ולא גלולה מלאה · גלולה קוראת ידידותי ורך,
+       ‏ומלבן מעוגל קורא ממשק. זה ההבדל בין כפתור לבין פס
+       ‏פעולה. */
+    border-radius: 22px;
+    /* ‏הגבול כאן הוא נפילה לאחור · הטבעת האמיתית היא ::before
+       ‏מתחת, ודפדפן שלא מכיר mask יישאר עם זה. */
+    border: 1px solid rgba(168,85,247,0.22);
+    background: rgba(10,3,24,0.72);
+    /* ‏טשטוש חזק יותר ורוויה · מה שנגלל מתחת לפס הופך
+       ‏למשטח צבע מטושטש במקום לטקסט שנקרא דרכו. */
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    /* ‏הקו הפנימי העליון הוא מה שנותן את תחושת הזכוכית ·
+       ‏אור שנתפס בקצה העליון של משטח שקוף. */
+    box-shadow: 0 18px 50px -14px rgba(0,0,0,0.9),
+                inset 0 1px 0 rgba(255,255,255,0.09);
     /* ‏visibility ולא רק שקיפות · אלמנט שקוף נשאר בסדר
        ‏הטאבים, ומקלדת הייתה נוחתת על כפתור שאיש אינו רואה. */
     opacity: 0;
@@ -3052,7 +3060,28 @@ footer {
     transform: translateY(0);
   }
 
-  /* ‏מרובע 48 · אגודל, ולא סמן עכבר. */
+  /* ‏טבעת גרדיאנט בעובי פיקסל · גרדיאנט נמרח על כל השטח,
+     ‏ומסכה חותכת ממנו את הפנים ומשאירה רק את המסגרת.
+     ‏mask-composite הוא מה שמבצע את החיתוך. */
+  .sticky-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(115deg,
+      rgba(168,85,247,0.9) 0%,
+      rgba(216,180,254,0.55) 38%,
+      rgba(230,207,150,0.5) 66%,
+      rgba(37,211,102,0.45) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ‏48 על 48 · אגודל, ולא סמן עכבר. */
   .sticky-wa {
     display: flex;
     align-items: center;
@@ -3060,29 +3089,61 @@ footer {
     flex: 0 0 auto;
     width: 48px;
     height: 48px;
-    border-radius: 50%;
-    background: rgba(37,211,102,0.14);
-    border: 1px solid rgba(37,211,102,0.35);
+    border-radius: 16px;
+    background: rgba(37,211,102,0.10);
+    border: 1px solid rgba(37,211,102,0.30);
+    /* ‏הזוהר יושב בפנים ולא בחוץ · בחוץ הוא היה הילה ירוקה
+       ‏על פס סגול, ובפנים הוא נקרא כתאורה של הריבוע עצמו. */
+    box-shadow: inset 0 0 20px -8px rgba(37,211,102,0.75);
     color: #25d366;
     text-decoration: none;
   }
 
   .sticky-main {
+    position: relative;
+    /* ‏הברק נע בתוך הכפתור, ובלי זה הוא זולג מעבר לפינות. */
+    overflow: hidden;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
     min-height: 48px;
     padding: 12px 18px;
-    border-radius: 100px;
-    background: linear-gradient(135deg, var(--p4), var(--p5));
+    border-radius: 16px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 48%, #c084fc 100%);
     color: #fff;
     font-family: var(--font);
     font-size: 15.5px;
     font-weight: 700;
+    letter-spacing: 0.2px;
     text-decoration: none;
-    box-shadow: 0 10px 26px -12px rgba(124,58,237,0.9);
+    box-shadow: 0 10px 28px -10px rgba(168,85,247,0.95),
+                inset 0 1px 0 rgba(255,255,255,0.22);
   }
+
+  /* ‏ברק שעובר פעם בכמה שניות · קצר, חלש, ועם הפסקה ארוכה
+     ‏בין מעבר למעבר. אנימציה רציפה על אלמנט קבוע הופכת
+     ‏לרעש שהעין לומדת להתעלם ממנו. */
+  .sticky-main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg,
+      transparent 25%,
+      rgba(255,255,255,0.26) 50%,
+      transparent 75%);
+    transform: translateX(-130%);
+    animation: stickySheen 6s ease-in-out 1.6s infinite;
+    pointer-events: none;
+  }
+
+  @keyframes stickySheen {
+    0%, 72%  { transform: translateX(-130%); }
+    88%, 100% { transform: translateX(130%); }
+  }
+
+  .sticky-main span { position: relative; }
 
   .sticky-wa:active, .sticky-main:active { opacity: 0.82; }
 
@@ -3107,6 +3168,8 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .sticky-cta { transition: opacity 0.2s, visibility 0.2s; transform: none; }
   .sticky-cta.visible { transform: none; }
+  /* ‏מי שביקש פחות תנועה לא מקבל ברק שחוזר כל שש שניות. */
+  .sticky-main::after { animation: none; opacity: 0; }
 }
 
 .iphone-wrap {
@@ -5291,7 +5354,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
     </svg>
   </a>
-  <a class="sticky-main" href="#contact" id="stickyCtaText">לשיחת היכרות</a>
+  <a class="sticky-main" href="#contact"><span id="stickyCtaText">לשיחת היכרות</span><span aria-hidden="true">←</span></a>
 </div>
 
 <!-- ── IPHONE STICKY WIDGET ── -->
@@ -6363,11 +6426,20 @@ window.trackVideo = function () {};
   // The overlay markup sits after this script in the document, so wiring it
   // up has to wait until the document has finished parsing.
   const init = function () {
-  const link = document.querySelector('.iphone-wa-btn');
-  const overlay = document.getElementById('waOverlay');
-  if (!link || !overlay) return;
+  /* ‏כל כניסה לוואטסאפ באתר עוברת כאן, ולא רק זאת של
+     ‏הווידג׳ט. כשהפס התחתון נוסף הוא נשאר מחוץ ליירוט, ולכן
+     ‏בנייד היה מסלול שני לוואטסאפ שיוצא ישר החוצה: בלי חלון
+     ‏הפרטים, בלי הסכמה ובלי שורה בדשבורד. כל פנייה משם
+     ‏הייתה מגיעה כהודעה ממספר לא מוכר.
 
-  const waUrl = link.getAttribute('href');
+     ‏querySelectorAll ולא querySelector · זאת בדיוק הנקודה
+     ‏שבה התיקון הזה יישבר שוב אם יתווסף כפתור שלישי, ולכן
+     ‏הוא תופס מחלקה ולא אלמנט. */
+  const links = [...document.querySelectorAll('.iphone-wa-btn, .sticky-wa')];
+  const overlay = document.getElementById('waOverlay');
+  if (!links.length || !overlay) return;
+
+  const waUrl = links[0].getAttribute('href');
 
   // keepalive lets the request finish after the page has already navigated,
   // so nobody waits on the network before WhatsApp opens.
@@ -6387,14 +6459,14 @@ window.trackVideo = function () {};
 
   const leave = () => { window.location.href = waUrl; };
 
-  link.addEventListener('click', e => {
+  links.forEach(link => link.addEventListener('click', e => {
     e.preventDefault();
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
     const saved = (() => { try { return localStorage.getItem('shoham_lead_phone') || ''; } catch (e) { return ''; } })();
     if (saved) document.getElementById('waPhone').value = saved;
     setTimeout(() => document.getElementById('waName').focus(), 60);
-  });
+  }));
 
   const close = () => { overlay.classList.remove('open'); releaseScrollIfNoOverlay(); };
 
