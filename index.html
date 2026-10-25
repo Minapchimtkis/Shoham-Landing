@@ -2545,7 +2545,10 @@ section {
   gap: 10px;
 }
 @media (min-width: 720px) {
-  .gift-grid { grid-template-columns: 1fr 1fr; }
+  /* ‏כרטיס אחד בלבד · רשת של שתי עמודות הייתה משאירה חצי
+     ‏ריק לידו, ורוחב מלא היה הופך אותו לבאנר. רוחב קצוב
+     ‏וממורכז שומר עליו ככרטיס. */
+  .gift-grid { max-width: 520px; margin-inline: auto; }
 }
 
 .gift-card {
@@ -5144,7 +5147,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 </section>
 
 
-<!-- ── THE TWO GIFTS ── -->
+<!-- ── THE GIFT ── -->
 <section class="gift-section reveal">
   <div class="gift-rule"><span>מתנה ממני אליכם</span></div>
 
@@ -5161,21 +5164,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
       <span class="gift-text">
         <h3>מחשבון ביטחון כלכלי</h3>
         <p>מתי הכסף יתחיל לעבוד במקומכם</p>
-      </span>
-      <span class="gift-side">
-        <b class="gift-free">חינם</b>
-        <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
-      </span>
-    </a>
-
-    <a class="gift-card" href="/app/">
-      <span class="gift-ico">
-        <img src="assets/app-icon-192.png?v=8aa1a648" width="192" height="192"
-             loading="lazy" decoding="async" alt="כמה יש לי">
-      </span>
-      <span class="gift-text">
-        <h3>כמה יש לי</h3>
-        <p>כמה נשאר לכם עד סוף החודש, בלי הרשמה</p>
       </span>
       <span class="gift-side">
         <b class="gift-free">חינם</b>
