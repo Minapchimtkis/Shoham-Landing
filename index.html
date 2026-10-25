@@ -6717,13 +6717,28 @@ function setQuizPhone(phone) {
   // section it is advertising is actually on screen.
   const from = document.getElementById('philosophy');
   const upTo = document.getElementById('contact');
-  /* ‏הפס התחתון בנייד · אותה הדלקה בדיוק, בלי לוגיקה שנייה
-     ‏שתצטרך להישאר מסונכרנת עם זאת. */
+  /* ‏הפס התחתון קיבל כללים משלו, אחרי שניסיתי להדליק אותו
+     ‏יחד עם הווידג׳ט. הכללים של הווידג׳ט נכתבו לריבוע שצף
+     ‏מעל התוכן באמצע המסך, ולכן הם מצמצמים אותו לחלון קצר
+     ‏ומפנים אותו מעל המחירים. על פס שיושב בקצה התחתון זה
+     ‏נקרא כתקלה: הוא מופיע לכמה שניות ונעלם תוך כדי גלילה.
+
+     ‏פס פעולה קבוע נמדד אחרת. הוא צריך להיות שם כל הדרך
+     ‏שבה מישהו עוד שוקל, ולרדת רק כשהטופס עצמו על המסך,
+     ‏כי שם הוא כבר מציע את מה שנמצא ממילא מול העיניים. */
+  const heroSec = document.querySelector('.hero');
   const bar = document.getElementById('stickyCta');
-  function setVisible(on) {
-    if (on) { widget.classList.add('visible'); if (bar) bar.classList.add('visible'); }
-    else { widget.classList.remove('visible'); if (bar) bar.classList.remove('visible'); }
+
+  function checkBar() {
+    if (!bar || !heroSec || !upTo) return;
+    /* ‏אחרי שההירו ירד מהמסך · לפני זה הדף עדיין מציג את
+       ‏קריאת הפעולה הראשית שלו, ואין טעם בשנייה. */
+    const pastHero = heroSec.getBoundingClientRect().bottom < 0;
+    /* ‏ברגע שהטופס מתחיל להיכנס, ולא כשהוא כבר באמצע. */
+    const formInView = upTo.getBoundingClientRect().top < window.innerHeight * 0.9;
+    bar.classList.toggle('visible', pastHero && !formInView);
   }
+
   let shown = false;
 
   function checkScroll() {
@@ -6751,19 +6766,21 @@ function setQuizPhone(phone) {
           if (!widget.isConnected) return;
           var stillBefore = from.getBoundingClientRect().top < window.innerHeight * 0.6;
           var notYetThere = upTo.getBoundingClientRect().top >= window.innerHeight * 0.55;
-          if (stillBefore && notYetThere) setVisible(true);
+          if (stillBefore && notYetThere) widget.classList.add('visible');
         }, 600);
       }
-      else setVisible(true);
+      else widget.classList.add('visible');
     } else {
-      setVisible(false);
+      widget.classList.remove('visible');
     }
   }
 
-  window.addEventListener('scroll', checkScroll, { passive: true });
-  window.addEventListener('resize', checkScroll, { passive: true });
+  /* ‏מאזין אחד לשניהם · שתי פונקציות, לא שני מאזינים. */
+  function onScroll() { checkScroll(); checkBar(); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
 
-  checkScroll();
+  onScroll();
 })();
 
 function closeIphone() {
