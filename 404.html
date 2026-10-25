@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ‏GitHub Pages מגיש את הקובץ הזה בכל כתובת שאינה קיימת באתר,
+     ‏בלי שצריך להגדיר דבר. השם 404.html בשורש הוא כל ההגדרה.
+
+     ‏העמוד קיים כדי שקישור ישן או כתובת עם שגיאת הקלדה יחזירו
+     ‏את האדם לאתר במקום להשאיר אותו מול עמוד השגיאה האפור של
+     ‏GitHub, שאין בו לוגו, אין בו עברית ואין ממנו דרך חזרה.
+
+     ‏noindex בכוונה · זה העמוד היחיד באתר שאסור לו להופיע בגוגל.
+     ‏בלי זה גוגל עלול לרשום אותו ככתובת לגיטימית.
+
+     ‏אין כאן JavaScript ואין הפניה אוטומטית. מי שהגיע לכאן לא
+     ‏ביקש לעבור לדף הבית, הוא ביקש משהו מסוים, ולכן מוצגות לו
+     ‏הדרכים ולא נבחרת עבורו אחת.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<meta name="robots" content="noindex, follow">
+
+<title>הדף לא נמצא | שוהם אבו, ליווי וייעוץ פיננסי</title>
+<meta name="description" content="הכתובת שחיפשתם לא קיימת באתר.">
+
+<link rel="icon" href="assets/favicon.ico?v=1bc87ca4" sizes="16x16 32x32 48x48 96x96 144x144 192x192">
+<meta name="theme-color" content="#0c0b11">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  color-scheme: dark;
+  --font: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --p4: #7c3aed;
+  --p5: #a855f7;
+  --p6: #d8b4fe;
+  --white: #ffffff;
+  --ground: #0c0b11;
+}
+
+body {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 20px calc(40px + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(1100px 620px at 50% -10%, rgba(124,58,237,0.17), transparent 68%),
+    var(--ground);
+  color: rgba(255,255,255,0.78);
+  font-family: var(--font);
+  text-align: center;
+}
+
+.logo {
+  width: 136px;
+  height: auto;
+  margin-bottom: 26px;
+}
+
+/* ‏המספר הוא קישוט ולא הודעה · הוא גדול כי הוא ממלא את מקום
+   ‏האיור, ודהוי כי מי שהגיע לכאן לא צריך לקרוא "404", הוא צריך
+   ‏לקרוא את המשפט שמתחתיו. */
+.code {
+  font-size: clamp(64px, 18vw, 104px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--p5) 0%, #cf8fb4 55%, #e6cf96 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.70));
+}
+
+h1 {
+  margin-top: 14px;
+  font-size: clamp(21px, 5.4vw, 27px);
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--white);
+}
+
+.sub {
+  max-width: 38ch;
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+  text-wrap: balance;
+  color: rgba(255,255,255,0.68);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+/* ‏48 פיקסל גובה · אגודל ולא סמן עכבר. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 13px 26px;
+  border-radius: 100px;
+  border: 1px solid rgba(216,180,254,0.30);
+  background: rgba(168,85,247,0.07);
+  color: var(--p6);
+  font-family: var(--font);
+  font-size: 15.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
+}
+
+.btn.primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--p4), var(--p5));
+  color: #fff;
+  box-shadow: 0 12px 30px -14px rgba(124,58,237,0.9);
+}
+
+/* ‏מצב ריחוף רק למי שיש לו מצביע אמיתי · בטלפון כלל כזה
+   ‏נדבק אחרי נגיעה ונשאר דולק. */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: rgba(168,85,247,0.16);
+    border-color: rgba(168,85,247,0.8);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  .btn.primary:hover {
+    background: linear-gradient(135deg, var(--p5), var(--p4));
+    transform: translateY(-2px);
+  }
+}
+
+/* ‏אחרי כללי הריחוף, אחרת הם גוברים עליו · אותה רמת ספציפיות,
+   ‏וסדר הכתיבה הוא שמכריע. */
+.btn:active { transform: translateY(0); opacity: 0.85; }
+
+.btn:focus-visible {
+  outline: 2px solid var(--p6);
+  outline-offset: 3px;
+}
+
+.call {
+  margin-top: 26px;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+}
+
+.call a {
+  color: var(--p6);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  /* ‏הריפוד עם השוליים המתקזזים מביא את הקישור ל-44 פיקסל
+     ‏בלי להזיז את השורה שסביבו. */
+  display: inline-block;
+  padding: 14px 6px;
+  margin: -14px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+  .btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+  <img class="logo" src="assets/logo.webp?v=7ad752ae" width="600" height="415"
+       alt="שוהם אבו, ליווי וייעוץ פיננסי">
+
+  <div class="code" aria-hidden="true">404</div>
+
+  <h1>הדף הזה לא קיים</h1>
+  <p class="sub">
+    יכול להיות שהכתובת השתנתה, ויכול להיות שנפלה טעות קטנה בהקלדה.
+    מכאן אפשר להמשיך לאן שרציתם.
+  </p>
+
+  <div class="actions">
+    <a class="btn primary" href="/">לדף הבית</a>
+    <a class="btn" href="/financial-security/">מחשבון ביטחון כלכלי</a>
+    <a class="btn" href="/intake.html">שאלון ההיכרות</a>
+  </div>
+
+  <p class="call">
+    או פשוט תרימו טלפון ·
+    <a href="tel:+972507228755" aria-label="התקשרו לשוהם אבו, 050-722-8755">050-722-8755</a>
+  </p>
+
+</body>
+</html>
