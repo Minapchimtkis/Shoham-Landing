@@ -3079,10 +3079,18 @@ footer {
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
     pointer-events: none;
+    /* ‏הטבעת מתחת לכפתורים · היא אלמנט ממוקם, והכפתורים
+       ‏בלי מיקום היו נצבעים מתחתיה. ובדפדפן שבו החיתוך
+       ‏במסכה לא עובד, הגרדיאנט נפרש על כל הפס במקום על
+       ‏המסגרת בלבד, ואז הוא מכסה אותם לגמרי. */
+    z-index: 0;
   }
 
   /* ‏48 על 48 · אגודל, ולא סמן עכבר. */
   .sticky-wa {
+    /* ‏מיקום ושכבה · מה שמחזיק אותו מעל הטבעת. */
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3101,6 +3109,7 @@ footer {
 
   .sticky-main {
     position: relative;
+    z-index: 1;
     /* ‏הברק נע בתוך הכפתור, ובלי זה הוא זולג מעבר לפינות. */
     overflow: hidden;
     flex: 1;
@@ -3129,13 +3138,19 @@ footer {
     content: '';
     position: absolute;
     inset: 0;
+    /* ‏rgba שקוף ולא המילה transparent · היא שקולה לשחור
+       ‏שקוף, וגרדיאנט שעובר ממנה ללבן מתערבב דרך אפור.
+       ‏על רקע סגול זה נקרא כמריחה כהה שנסחבת על הכיתוב. */
     background: linear-gradient(100deg,
-      transparent 25%,
+      rgba(255,255,255,0) 25%,
       rgba(255,255,255,0.26) 50%,
-      transparent 75%);
+      rgba(255,255,255,0) 75%);
     transform: translateX(-130%);
     animation: stickySheen 6s ease-in-out 1.6s infinite;
     pointer-events: none;
+    /* ‏מתחת לכיתוב ולא מעליו · גם אם הברק ייצבע אי פעם
+       ‏אחרת ממה שהתכוונתי, הוא לא יכול להסתיר את הטקסט. */
+    z-index: 1;
   }
 
   @keyframes stickySheen {
@@ -3143,7 +3158,8 @@ footer {
     88%, 100% { transform: translateX(130%); }
   }
 
-  .sticky-main span { position: relative; }
+  /* ‏הכיתוב והחץ מעל הברק, תמיד. */
+  .sticky-main span { position: relative; z-index: 2; }
 
   .sticky-wa:active, .sticky-main:active { opacity: 0.82; }
 
