@@ -5149,7 +5149,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 <!-- ── THE GIFT ── -->
 <section class="gift-section reveal">
-  <div class="gift-rule"><span>מתנה ממני אליכם</span></div>
+  <div class="gift-rule"><span id="giftRule">מתנה ממני אליכם</span></div>
 
   <div class="gift-grid">
     <a class="gift-card" href="/financial-security/">
@@ -5162,11 +5162,11 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         </svg>
       </span>
       <span class="gift-text">
-        <h3>מחשבון ביטחון כלכלי</h3>
-        <p>מתי הכסף יתחיל לעבוד במקומכם</p>
+        <h3 id="giftTitle">מחשבון ביטחון כלכלי</h3>
+        <p id="giftText">מתי הכסף יתחיל לעבוד במקומכם</p>
       </span>
       <span class="gift-side">
-        <b class="gift-free">חינם</b>
+        <b class="gift-free" id="giftFree">חינם</b>
         <svg class="gift-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
       </span>
     </a>
@@ -5932,7 +5932,7 @@ function submitForm() {
   const originalBtnText = submitBtn ? submitBtn.textContent : '';
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = 'שולח...';
+    submitBtn.textContent = en ? 'Sending…' : 'שולח…';
   }
 
   // The consent record is the part that actually has legal weight: what the
@@ -5973,7 +5973,14 @@ function submitForm() {
     if (window.turnstile) {
       try { window.turnstile.reset(); } catch (_) {}
     }
-    alert('אירעה שגיאה בשליחה, נסה שוב.');
+    /* ‏קודם כאן ישב alert של הדפדפן · חלון אפור של המערכת
+       ‏שנראה כמו תקלה ולא כמו האתר, חוסם את הדף עד שלוחצים
+       ‏עליו, ומקובע בעברית. הטופס כבר מחזיק מנגנון שגיאות
+       ‏משלו שמשמש את כל בדיקות הקלט, והודעה בתוך הטופס גם
+       ‏נשארת על המסך וגם נקראת בקול על ידי קורא מסך. */
+    showFormError(en
+      ? 'That did not go through. Please try again, or call me directly.'
+      : 'השליחה לא עברה. נסו שוב, או פשוט תתקשרו אליי.');
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -6283,12 +6290,42 @@ window.trackVideo = function () {};
     const consent = document.getElementById('waConsent');
     const isEN = document.documentElement.dir === 'ltr';
 
-    if (!name || !phone) {
-      alert(isEN ? 'Please fill in your name and phone, or skip.' : 'אנא מלאו שם וטלפון, או דלגו.');
+    /* ‏גם כאן ישבו alert-ים של הדפדפן. החלון הזה הוא טופס
+       ‏לכל דבר, ולכן הוא מתנהג כמו הטופס הראשי: הודעה בתוך
+       ‏החלון, השדה החסר מסומן ומקבל את המיקוד, ושגיאה אחת
+       ‏בכל פעם · הראשונה שחסרה, כדי שלא יוגש למישהו רשימה
+       ‏של כל מה שהוא שכח. */
+    const waErr = document.getElementById('waError');
+    const waRow = document.querySelector('#waOverlay .consent-row');
+    if (waErr) { waErr.classList.remove('show'); waErr.textContent = ''; }
+    if (waRow) waRow.classList.remove('consent-error');
+    ['waName', 'waPhone'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.removeAttribute('aria-invalid');
+    });
+
+    function waFail(msg, focusId) {
+      if (waErr) { waErr.textContent = msg; waErr.classList.add('show'); }
+      const el = focusId && document.getElementById(focusId);
+      if (el) {
+        el.setAttribute('aria-invalid', 'true');
+        try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      }
+    }
+
+    if (!name) {
+      waFail(isEN ? 'Your name, please.' : 'חסר השם שלך.', 'waName');
+      return;
+    }
+    if (!phone) {
+      waFail(isEN ? 'A phone number, so I can get back to you.'
+                  : 'חסר מספר טלפון, כדי שאוכל לחזור אליך.', 'waPhone');
       return;
     }
     if (consent && !consent.checked) {
-      alert(isEN ? 'Please confirm you agree to the privacy policy.' : 'יש לאשר את מדיניות הפרטיות כדי להמשיך.');
+      if (waRow) waRow.classList.add('consent-error');
+      waFail(isEN ? 'Please tick the box to agree to the privacy policy.'
+                  : 'צריך לאשר את מדיניות הפרטיות כדי להמשיך.');
       return;
     }
     const label = document.getElementById('waConsentText');
@@ -6925,6 +6962,10 @@ const translations = {
     pr2av: '<strong>למה דווקא זה:</strong> ניהול כסף הוא 90% התנהגות ו־10% מתמטיקה. התנהגות לא משתנה מפגישה אחת, אלא בחודשים שאחריה. זה בדיוק מה שהליווי נותן, וזאת הסיבה שאני ממליץ עליו.',
     pr2cta: 'לשיחת היכרות',
     prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
+    giftRule: 'מתנה ממני אליכם',
+    giftTitle: 'מחשבון ביטחון כלכלי',
+    giftText: 'מתי הכסף יתחיל לעבוד במקומכם',
+    giftFree: 'חינם',
     prM1Name: 'מיפוי כלכלי',
     prM1Title: '690 ₪',
     prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>מה שאין כאן:</strong> המיפוי הוא פגישה אחת, ואין אחריו ליווי אישי. אתם מקבלים את התמונה ואת הקובץ וממשיכים איתם לבד. הליווי הצמוד, והזמינות שלי בוואטסאפ ובטלפון, שייכים למסלולי ההמשך.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
@@ -7040,6 +7081,10 @@ const translations = {
     pr2av: '<strong>Why this one:</strong> managing money is 90% behaviour and 10% maths. Behaviour does not change in a single session, it changes in the months that follow. That is exactly what the guidance gives, and that is why I recommend it.',
     pr2cta: 'Book an intro call',
     prNote: 'The price is final. The intro call is always free and carries no obligation.',
+    giftRule: 'A gift from me to you',
+    giftTitle: 'Financial security calculator',
+    giftText: 'When your money starts working for you',
+    giftFree: 'Free',
     prM1Name: "Financial mapping",
     prM1Title: "₪690",
     prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>What is not here:</strong> the mapping is one session, and no personal guidance follows it. You get the picture and the file and carry on with them on your own. The close guidance, and my availability on WhatsApp and by phone, belong to the continuing tracks.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
@@ -7197,6 +7242,13 @@ function setLang(lang) {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
+  /* ‏סקשן המתנה · עד עכשיו לא היה לו אף מפתח, והוא נשאר
+     ‏עברי לגמרי גם באנגלית. לפי מזהה, כמו המחירים. */
+  ['giftRule','giftTitle','giftText','giftFree'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t[k];
+  });
+
   /* ‏אלה נושאים תגיות בתוכם. */
   ['pr2av','prM1Body'].forEach(k => {
     const el = document.getElementById(k);
@@ -7329,6 +7381,7 @@ function setLang(lang) {
       <input type="checkbox" id="waConsent" />
       <span class="consent-text" id="waConsentText">קראתי ואני מסכים/ה ל<a href="#" onclick="openPrivacy(event)">מדיניות הפרטיות</a>.</span>
     </label>
+    <p class="form-error" id="waError" role="alert" aria-live="assertive"></p>
     <button class="btn-primary" id="waGo" style="width:100%; justify-content:center;">המשך לוואטסאפ ←</button>
     <button class="wa-skip" id="waSkip" type="button">לדלג ולעבור ישירות</button>
   </div>
