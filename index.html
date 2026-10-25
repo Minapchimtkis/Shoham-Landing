@@ -2067,6 +2067,42 @@ section {
      the separating. */
   margin: 56px auto 0;
 }
+/* ‏האפשרות השלישית · שקטה מהטלפון בכוונה, לפי אותה היררכיה
+   ‏של .call-or. בלי כללים משלה היא ירשה את גודל הטקסט של הדף
+   ‏ואת הקו הכחול שהדפדפן נותן לקישור, ויצאה רועשת יותר
+   ‏מהכפתור שמעליה · בדיוק ההפך ממה שהיא אמורה להיות. */
+.intake-row {
+  max-width: 40ch;
+  margin: 20px auto 0;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.75;
+  text-align: center;
+  /* ‏מאזן את אורכי השורות במקום למלא את הראשונה עד הסוף
+     ‏ולהשאיר בשנייה שארית. דפדפן שאינו מכיר פשוט שובר רגיל. */
+  text-wrap: balance;
+  color: rgba(255,255,255,0.62);
+}
+
+/* ‏אותו קישור מוטבע כמו בטקסט ההסכמה · סגול עם קו תחתון
+   ‏מרווח, ולא ברירת המחדל של הדפדפן. */
+.intake-link {
+  color: var(--p6);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .intake-link:hover { color: #fff; }
+}
+
+.intake-link:focus-visible {
+  outline: 2px solid var(--p6);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 .call-or {
   font-size: 13px;
   font-weight: 300;
@@ -5104,7 +5140,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   <!-- ‏מי שכבר החליט ממלא טופס או מרים טלפון. השאלון הוא למי
        ‏שרוצה להגיע לשיחה כשהתמונה כבר על השולחן, ולכן הוא
        ‏האפשרות השלישית ולא הראשונה. -->
-  <p class="intake-row reveal" id="intakeRow">או מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ואחזור אליכם עם תמונה ראשונית.</p>
+  <p class="intake-row reveal" id="intakeRow">מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ותגיעו לשיחה כשהתמונה כבר על השולחן.</p>
 </section>
 
 
@@ -6856,7 +6892,7 @@ const translations = {
     q5: 'תוך כמה זמן רואים תוצאות?', a5: 'סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.',
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
     callOr: 'או פשוט תרימו טלפון',
-    intakeRow: 'או מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ואחזור אליכם עם תמונה ראשונית.',
+    intakeRow: 'מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ותגיעו לשיחה כשהתמונה כבר על השולחן.',
     ctaSub: 'השאירו פרטים ואחזור אליכם תוך שעתיים, ראשון עד חמישי בין 9:00 ל־19:00. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
@@ -6971,7 +7007,7 @@ const translations = {
     q5: 'How long until I see results?', a5: "You'll gain clarity and structure from the first month. Significant financial results are built over time with consistency. I don't make empty promises. I build a real process with you, step by step.",
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
     callOr: 'Or simply pick up the phone',
-    intakeRow: 'Or fill in the <a class="intake-link" href="/intake.html">intake questionnaire</a> and I will come back to you with a first picture.',
+    intakeRow: 'Fill in the <a class="intake-link" href="/intake.html">intake questionnaire</a> and come to the call with the picture already on the table.',
     ctaSub: "Leave your details and I'll get back to you within two hours, Sunday to Thursday between 9:00 and 19:00. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
