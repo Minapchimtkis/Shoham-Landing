@@ -3535,6 +3535,111 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 
+/* ── ‏"מה זה בכלל יועץ כלכלי" · ‏סקשן שנפתח בלחיצה ──
+   ‏זה הסקשן הארוך בדף, והוא יושב מוקדם · לפני השיטה, לפני
+   ‏התהליך ולפני ההמלצות. מי שמגיע לכאן עוד לא יודע אם הוא
+   ‏רוצה לקרוא ארבע פסקאות ושלוש שאלות, והטקסט הפתוח גבה
+   ‏ממנו את ההחלטה מראש. עכשיו השאלה עצמה היא כל מה שרואים:
+   ‏מי שהיא נוגעת בו פותח, ומי שלא ממשיך הלאה בגלילה אחת. */
+
+/* ‏הכותרת לבדה נושאת את הסקשן, ולכן היא גדולה וכבדה יותר
+   ‏מכותרת שיש טקסט מתחתיה. צל הטקסט מגיע מ-.faq-title. */
+.whatis-title {
+  font-size: clamp(31px, 4.6vw, 50px);
+  font-weight: 900;
+  margin-bottom: 30px;
+}
+
+.whatis-gate {
+  display: flex;
+  justify-content: center;
+}
+
+.whatis-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 32px;
+  border: 1px solid rgba(216,180,254,0.34);
+  border-radius: 100px;
+  background: rgba(168,85,247,0.08);
+  color: var(--p6);
+  font-family: var(--font);
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
+}
+
+/* ‏החץ מצביע למטה כשסגור ולמעלה כשפתוח · הסיבוב הוא ההבטחה
+   ‏שהלחיצה עשתה משהו, עוד לפני שהטקסט הספיק להיפתח. */
+.whatis-chev {
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+
+.whatis-btn.open .whatis-chev { transform: rotate(180deg); }
+
+@media (hover: hover) and (pointer: fine) {
+  .whatis-btn:hover {
+    background: rgba(168,85,247,0.17);
+    border-color: rgba(168,85,247,0.78);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+}
+
+/* ‏אחרי כללי הריחוף · אותה ספציפיות, וסדר הכתיבה מכריע. */
+.whatis-btn:active { transform: translateY(0); opacity: 0.85; }
+.whatis-btn:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
+
+/* ‏הגובה נמדד ונכתב מ-JS · ערך קבוע היה חותך את השאלות
+   ‏שנפתחות בפנים, ולכן ברגע שהפתיחה נגמרת הוא משוחרר ל-none. */
+.whatis-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  /* ‏גובה אפס לבדו משאיר את השאלות בסדר הטאבים ובעץ הנגישות ·
+     ‏מקלדת הייתה נוחתת על כפתור שאי אפשר לראות. ההשהיה היא
+     ‏אורך הסגירה, כדי שהתוכן ייעלם רק אחרי שהוא כבר נסגר. */
+  visibility: hidden;
+  transition: max-height 0.5s cubic-bezier(0.22,1,0.36,1),
+              opacity 0.4s ease,
+              visibility 0s linear 0.5s;
+}
+
+.whatis-body.open {
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.5s cubic-bezier(0.22,1,0.36,1),
+              opacity 0.4s ease,
+              visibility 0s;
+}
+
+.whatis-intro {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  max-width: 640px;
+  margin: 36px auto 48px;
+  line-height: 1.9;
+}
+
+@media (max-width: 720px) {
+  .whatis-btn { width: 100%; max-width: 340px; }
+  .whatis-intro { margin-top: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatis-btn { transition: none; }
+  .whatis-btn:hover { transform: none; }
+  .whatis-chev { transition: none; }
+  .whatis-body { transition: opacity 0.2s linear; }
+}
+
+
 
 
 .lang-btn {
@@ -4591,39 +4696,53 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 <section data-stage="whatis" data-stage-i="2" class="faq-section whatis-section">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">לפני שמתחילים</div>
-    <h2 class="faq-title reveal" style="margin-bottom:24px;">מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?</h2>
-    <p class="reveal" style="text-align:center; font-size:16px; font-weight:400; color:rgba(255,255,255,0.8); max-width:640px; margin:0 auto 48px; line-height:1.9;">ניהול פיננסי הוא הרבה מעבר למספרים בבנק שלכם, הוא קשור להרגלים שלנו, לרגשות שלנו ולדרך שבה אנחנו מקבלים החלטות עם הכסף.<br><br>אני מלווה צעירים ומשפחות שרוצים לשפר את המצב הכלכלי שלהם, להתמודד עם אתגרים ולבנות תוכנית פיננסית שתעזור להם להתקדם לעבר המטרות שלהם.<br><br>אבל מבחינתי, זה לא מסתכם בלבנות תקציב או לצמצם הוצאות. חשוב לי להבין גם מה עומד מאחורי ההתנהלות הפיננסית שלכם: מה מלחיץ אתכם, מה עוצר אתכם, ואיך אפשר ליצור שינוי שמתאים לא רק למספרים, אלא גם לחיים שלכם.<br><br>המטרה שלי היא לא להגיד לכם על מה להוציא את הכסף שלכם, אלא לעזור לכם לקבל החלטות פיננסיות טובות יותר, ליהנות מההווה ולבנות לעצמכם עתיד כלכלי טוב יותר.</p>
+    <h2 class="faq-title whatis-title reveal">מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?</h2>
 
-    <div class="faq-list">
-      <div class="faq-item reveal">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>למי אני עוזר?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          <strong style="color:var(--p6); font-weight:700;">ליחידים ולזוגות צעירים</strong> בתחילת הדרך: משכורת ראשונה, יציאה מהבית, חתונה, דירה ראשונה. זה הגיל שבו כל שקל שמסדרים נכון שווה פי כמה בעוד עשור, וזה גם הגיל שבו הכי קל לא לשים לב שהוא פשוט נעלם.<br><br><strong style="color:var(--p6); font-weight:700;">למשפחות צעירות</strong> שמרגישות שהחודש מנהל אותן ולא הפוך: משכנתא, גן, חוגים, חופשת לידה, וההרגשה שלמרות ששניכם עובדים לא נשאר כלום בסוף החודש. המטרה היא לא להוציא פחות. היא לדעת לאן הכסף הולך, ולהחליט ביחד מה באמת חשוב לכם.
+    <div class="whatis-gate reveal">
+      <button class="whatis-btn" type="button" id="whatisBtn"
+              data-open="לקרוא את התשובה" data-close="לסגור"
+              aria-expanded="false" aria-controls="whatisBody" onclick="toggleWhatis(this)">
+        <span id="whatisBtnText">לקרוא את התשובה</span>
+        <svg class="whatis-chev" width="17" height="17" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="whatis-body" id="whatisBody">
+      <p class="whatis-intro" id="whatisIntro">ניהול פיננסי הוא הרבה מעבר למספרים בבנק שלכם, הוא קשור להרגלים שלנו, לרגשות שלנו ולדרך שבה אנחנו מקבלים החלטות עם הכסף.<br><br>אני מלווה צעירים ומשפחות שרוצים לשפר את המצב הכלכלי שלהם, להתמודד עם אתגרים ולבנות תוכנית פיננסית שתעזור להם להתקדם לעבר המטרות שלהם.<br><br>אבל מבחינתי, זה לא מסתכם בלבנות תקציב או לצמצם הוצאות. חשוב לי להבין גם מה עומד מאחורי ההתנהלות הפיננסית שלכם: מה מלחיץ אתכם, מה עוצר אתכם, ואיך אפשר ליצור שינוי שמתאים לא רק למספרים, אלא גם לחיים שלכם.<br><br>המטרה שלי היא לא להגיד לכם על מה להוציא את הכסף שלכם, אלא לעזור לכם לקבל החלטות פיננסיות טובות יותר, ליהנות מההווה ולבנות לעצמכם עתיד כלכלי טוב יותר.</p>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            <span>למי אני עוזר?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            <strong style="color:var(--p6); font-weight:700;">ליחידים ולזוגות צעירים</strong> בתחילת הדרך: משכורת ראשונה, יציאה מהבית, חתונה, דירה ראשונה. זה הגיל שבו כל שקל שמסדרים נכון שווה פי כמה בעוד עשור, וזה גם הגיל שבו הכי קל לא לשים לב שהוא פשוט נעלם.<br><br><strong style="color:var(--p6); font-weight:700;">למשפחות צעירות</strong> שמרגישות שהחודש מנהל אותן ולא הפוך: משכנתא, גן, חוגים, חופשת לידה, וההרגשה שלמרות ששניכם עובדים לא נשאר כלום בסוף החודש. המטרה היא לא להוציא פחות. היא לדעת לאן הכסף הולך, ולהחליט ביחד מה באמת חשוב לכם.
+          </div>
         </div>
-      </div>
 
-      <div class="faq-item reveal">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>איך אני עוזר לכם בפועל?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          <strong style="color:var(--p6); font-weight:700;">1. ניהול פיננסי חכם:</strong> אני עוזר לכם לזהות את ה"חורים בכיס", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש.<br><br>
-          <strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.<br><br>
-          <strong style="color:var(--p6); font-weight:700;">3. בניית הרגלים שנשארים:</strong> המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר.
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            <span>איך אני עוזר לכם בפועל?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            <strong style="color:var(--p6); font-weight:700;">1. ניהול פיננסי חכם:</strong> אני עוזר לכם לזהות את ה"חורים בכיס", לייעל הוצאות ולבנות תוכנית פעולה שמשאירה לכם יותר כסף בכיס בסוף החודש.<br><br>
+            <strong style="color:var(--p6); font-weight:700;">2. קבלת החלטות:</strong> אני עוזר לכם להבין איפה נכון להשקיע את הכסף שלכם בצורה פסיבית, בהתאם לטווח הזמן שלכם (קצר, בינוני או ארוך) ובהתאם לרמת הסיכון שמתאימה לכם. אני מסביר ומציג אפשרויות, ההחלטה תמיד שלכם, ולכל צעד שמצריך רישיון תקבלו הפניה לבעל מקצוע מורשה.<br><br>
+            <strong style="color:var(--p6); font-weight:700;">3. בניית הרגלים שנשארים:</strong> המטרה שלי היא שלא תצטרכו אותי. אני מלמד אתכם לקרוא את המצב שלכם, לקבל החלטות ולתקן לבד, כדי שבסוף הדרך תהיו עצמאיים עם הכסף שלכם. לא תלויים בי, לא בבנק ולא באף אחד אחר.
+          </div>
         </div>
-      </div>
 
-      <div class="faq-item reveal">
-        <button class="faq-q" onclick="toggleFaq(this)">
-          <span>ומה לגבי ביטוח, מס ומשכנתא?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          <strong style="color:var(--p6); font-weight:700;">אני לא בעל רישיון בתחומים האלה, ולא מתיימר להיות.</strong> לביטוח, למס ולמשכנתאות יש אנשי מקצוע מורשים, וכשצריך אותם אני מפנה אתכם אליהם.<br><br><strong style="color:var(--p6); font-weight:700;">אבל אף אחד מהם לא שומע את השאר.</strong> תחשבו על זה כמו תזמורת. יועץ המשכנתאות מנגן את המשכנתא, גוף הפנסיה את הפנסיה, מי שמטפל בהשקעות את ההשקעות. כל אחד מצוין בכלי שלו, וכל אחד מנגן בקצב אחר. מה שיוצא מזה הוא לא מוזיקה.<br><br><strong style="color:var(--p6); font-weight:700;">שם אני נכנס.</strong> התפקיד שלי הוא לוודא שכל הכלים מנגנים באותו קצב ולא מזייפים. המנצח לא מנגן באף כלי, והוא היחיד ששומע את כולם ביחד.
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            <span>ומה לגבי ביטוח, מס ומשכנתא?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            <strong style="color:var(--p6); font-weight:700;">אני לא בעל רישיון בתחומים האלה, ולא מתיימר להיות.</strong> לביטוח, למס ולמשכנתאות יש אנשי מקצוע מורשים, וכשצריך אותם אני מפנה אתכם אליהם.<br><br><strong style="color:var(--p6); font-weight:700;">אבל אף אחד מהם לא שומע את השאר.</strong> תחשבו על זה כמו תזמורת. יועץ המשכנתאות מנגן את המשכנתא, גוף הפנסיה את הפנסיה, מי שמטפל בהשקעות את ההשקעות. כל אחד מצוין בכלי שלו, וכל אחד מנגן בקצב אחר. מה שיוצא מזה הוא לא מוזיקה.<br><br><strong style="color:var(--p6); font-weight:700;">שם אני נכנס.</strong> התפקיד שלי הוא לוודא שכל הכלים מנגנים באותו קצב ולא מזייפים. המנצח לא מנגן באף כלי, והוא היחיד ששומע את כולם ביחד.
+          </div>
         </div>
       </div>
     </div>
@@ -6615,6 +6734,74 @@ function toggleFaq(btn) {
      ‏באותה פינה שאליה התשובה משתרעת. */
   document.documentElement.classList.toggle('faq-open', !!document.querySelector('.faq-a.open'));
 }
+
+/* ‏פתיחה וסגירה של סקשן "מה זה בכלל יועץ כלכלי".
+   ‏שלוש נקודות שאי אפשר לוותר עליהן:
+   ‏· ‏max-height מונפש חייב מספר בשני הקצוות. מ-none לאפס
+   ‏  אין מעבר, ולכן בסגירה נכתב קודם הגובה הנמדד.
+   ‏· ‏כשהפתיחה נגמרת הגובה משוחרר ל-none, אחרת שאלה שנפתחת
+   ‏  בפנים נחתכת בגובה שנמדד כשהיא הייתה סגורה.
+   ‏· ‏מי שביקש פחות תנועה לא מקבל transitionend, ולכן יש גם
+   ‏  מדידה מיידית וגם רשת ביטחון בזמן. */
+function toggleWhatis(btn) {
+  const body = document.getElementById('whatisBody');
+  const label = document.getElementById('whatisBtnText');
+  if (!body) return;
+
+  const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (wasOpen) {
+    /* ‏השאלות שבפנים נסגרות איתו · אחרת הן ממתינות פתוחות
+       ‏מאחורי מכולה סגורה, והפתיחה הבאה נראית שבורה. */
+    body.querySelectorAll('.faq-q.open').forEach(q => {
+      q.classList.remove('open');
+      q.parentElement.classList.remove('open');
+      const ans = q.nextElementSibling;
+      if (ans) { ans.classList.remove('open'); ans.style.maxHeight = null; }
+    });
+    document.documentElement.classList.toggle('faq-open', !!document.querySelector('.faq-a.open'));
+
+    body.style.maxHeight = body.scrollHeight + 'px';
+    void body.offsetHeight;
+    body.classList.remove('open');
+    body.style.maxHeight = '0px';
+
+    /* ‏מי שגלל פנימה והגיע לסוף עומד עכשיו מתחת לסקשן שהתכווץ.
+       ‏מחזירים אותו לכותרת שעליה לחץ, ולא לאמצע הסקשן הבא. */
+    const sec = btn.closest('section');
+    if (sec && sec.getBoundingClientRect().top < 0) {
+      sec.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    }
+  } else {
+    body.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    if (still) {
+      body.style.maxHeight = 'none';
+    } else {
+      clearTimeout(body._whatisTimer);
+      body._whatisTimer = setTimeout(() => {
+        if (body.classList.contains('open')) body.style.maxHeight = 'none';
+      }, 700);
+    }
+  }
+
+  btn.setAttribute('aria-expanded', wasOpen ? 'false' : 'true');
+  btn.classList.toggle('open', !wasOpen);
+  if (label) {
+    const next = wasOpen ? btn.dataset.open : btn.dataset.close;
+    if (next) label.textContent = next;
+  }
+}
+
+(function () {
+  const body = document.getElementById('whatisBody');
+  if (!body) return;
+  body.addEventListener('transitionend', e => {
+    if (e.target !== body || e.propertyName !== 'max-height') return;
+    if (body.classList.contains('open')) body.style.maxHeight = 'none';
+  });
+})();
 // ── NAVBAR SCROLL ──
 const navbar = document.getElementById('navbar');
 let navTicking = false;
@@ -6681,6 +6868,8 @@ const translations = {
     whatisLabel: 'לפני שמתחילים',
     whatisTitle: 'מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?',
     whatisIntro: 'ניהול פיננסי הוא הרבה מעבר למספרים בבנק שלכם, הוא קשור להרגלים שלנו, לרגשות שלנו ולדרך שבה אנחנו מקבלים החלטות עם הכסף.<br><br>אני מלווה צעירים ומשפחות שרוצים לשפר את המצב הכלכלי שלהם, להתמודד עם אתגרים ולבנות תוכנית פיננסית שתעזור להם להתקדם לעבר המטרות שלהם.<br><br>אבל מבחינתי, זה לא מסתכם בלבנות תקציב או לצמצם הוצאות. חשוב לי להבין גם מה עומד מאחורי ההתנהלות הפיננסית שלכם: מה מלחיץ אתכם, מה עוצר אתכם, ואיך אפשר ליצור שינוי שמתאים לא רק למספרים, אלא גם לחיים שלכם.<br><br>המטרה שלי היא לא להגיד לכם על מה להוציא את הכסף שלכם, אלא לעזור לכם לקבל החלטות פיננסיות טובות יותר, ליהנות מההווה ולבנות לעצמכם עתיד כלכלי טוב יותר.',
+    whatisBtnOpen: 'לקרוא את התשובה',
+    whatisBtnClose: 'לסגור',
     whatisQ1: 'למי אני עוזר?',
     whatisQ2: 'איך אני עוזר לכם בפועל?',
     whatisQ3: 'ומה לגבי ביטוח, מס ומשכנתא?',
@@ -6780,6 +6969,8 @@ const translations = {
     whatisLabel: 'Before we begin',
     whatisTitle: "What is a financial advisor,<br>and am I the person you need?",
     whatisIntro: "Financial management is far more than the numbers in your bank account. It is tied to our habits, our emotions, and the way we make decisions with money.<br><br>I guide young people and young families who want to improve where they stand financially, deal with the challenges in front of them, and build a financial plan that moves them towards their goals.<br><br>But to me it does not stop at building a budget or cutting expenses. I want to understand what sits behind the way you handle money: what worries you, what holds you back, and how to create a change that fits not only the numbers but your life.<br><br>My goal is not to tell you what to spend your money on. It is to help you make better financial decisions, enjoy the present, and build yourself a better financial future.",
+    whatisBtnOpen: 'Read the answer',
+    whatisBtnClose: 'Close',
     whatisQ1: 'Who do I help?',
     whatisQ2: 'How do I actually help you?',
     whatisQ3: 'What about insurance, tax and mortgages?',
@@ -6986,7 +7177,18 @@ function setLang(lang) {
   const whatis = document.querySelector('.whatis-section');
   if (whatis) {
     whatis.querySelector('.faq-title').innerHTML = t.whatisTitle;
-    whatis.querySelector('p.reveal').innerHTML = t.whatisIntro;
+    /* ‏לפי מזהה · הפסקה כבר לא נושאת reveal, היא יושבת
+       ‏בתוך מכולה שנפתחת בלחיצה. */
+    const wIntro = document.getElementById('whatisIntro');
+    if (wIntro) wIntro.innerHTML = t.whatisIntro;
+    const wBtn = document.getElementById('whatisBtn');
+    const wBtnText = document.getElementById('whatisBtnText');
+    if (wBtn && wBtnText) {
+      wBtn.dataset.open = t.whatisBtnOpen;
+      wBtn.dataset.close = t.whatisBtnClose;
+      wBtnText.textContent = wBtn.getAttribute('aria-expanded') === 'true'
+        ? t.whatisBtnClose : t.whatisBtnOpen;
+    }
     const wQs = whatis.querySelectorAll('.faq-q span:first-child');
     const wAs = whatis.querySelectorAll('.faq-a');
     if (wQs[0]) wQs[0].textContent = t.whatisQ1;
