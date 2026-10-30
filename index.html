@@ -4268,11 +4268,31 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 .pr-card {
   display: flex;
   flex-direction: column;
-  padding: 32px 28px;
+  padding: 30px 26px 28px;
   border: 1px solid rgba(168,85,247,0.2);
-  border-radius: 20px;
+  /* ‏פינה גדולה יותר בראש מאשר ברגל · הכרטיס נקרא כמשטח
+     ‏שעומד על הקרקע ולא כמלבן צף. */
+  border-radius: 22px 22px 18px 18px;
   background: linear-gradient(158deg, rgba(22,5,48,0.5), rgba(11,2,28,0.72));
+  /* ‏קו אור דק בקצה העליון · זה מה שמפריד בין ריבוע צבוע
+     ‏לבין משטח שיש לו חומר. */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
   position: relative;
+  overflow: hidden;
+}
+
+/* ‏פס מבטא בראש כל כרטיס · קצר ובגרדיאנט המותג. הוא מה
+   ‏שממיר שלושה ריבועים זהים לשלושה כרטיסים שיש להם ראש. */
+.pr-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: 26px;
+  width: 44px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--p5), #e6cf96);
+  opacity: 0.5;
 }
 
 /* ‏האמצעי הוא המוצר, ולכן הוא הבולט · מסגרת חזקה יותר, רקע
@@ -4280,9 +4300,20 @@ html.faq-open .iphone-wrap.visible .iphone-close {
    ‏בגדלים שונים נראים שבורים, לא מכוונים. */
 .pr-card.pr-main {
   border-color: rgba(168,85,247,0.55);
-  background: linear-gradient(158deg, rgba(46,13,96,0.68), rgba(15,3,38,0.86));
-  box-shadow: 0 28px 64px -34px rgba(124,58,237,0.8);
+  /* ‏זוהר רך שיוצא מהפינה העליונה ולא גרדיאנט אחיד · אור
+     ‏שנופל על משטח מגיע מכיוון כלשהו, ואחיד נקרא כצבע. */
+  background:
+    radial-gradient(130% 90% at 82% -8%, rgba(168,85,247,0.30), transparent 62%),
+    linear-gradient(158deg, rgba(46,13,96,0.68), rgba(15,3,38,0.86));
+  box-shadow: 0 28px 64px -34px rgba(124,58,237,0.8),
+              inset 0 1px 0 rgba(255,255,255,0.10);
 }
+
+.pr-card.pr-main::before { opacity: 1; width: 56px; }
+
+/* ‏כרטיס המיפוי שקט יותר בכוונה · הוא הכניסה ולא המוצר,
+   ‏ושלושה כרטיסים באותה עוצמה בדיוק הם טבלה, לא בחירה. */
+.pr-card.pr-soft::before { opacity: 0.32; }
 
 .pr-badge {
   position: absolute;
@@ -4297,19 +4328,28 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   letter-spacing: 1px;
 }
 
+/* ‏שם המסלול הוא תווית ולא כותרת · קטן, מרוּוח ובאותיות
+   ‏שקטות, כדי שהמחיר שמתחתיו יהיה הדבר היחיד שצועק. */
 .pr-name {
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--p6);
+  letter-spacing: 2px;
+  color: rgba(216,180,254,0.75);
   line-height: 1.4;
 }
 
+/* ‏המחיר נושא את הגרדיאנט של הכותרת הראשית · שני הקצוות
+   ‏בהירים בכוונה, כדי שגם הכהה שבהם יעבור ניגודיות מול
+   ‏רקע הכרטיס. לבן היה נכון וגנרי. */
 .pr-price {
-  margin-top: 14px;
-  font-size: 34px;
+  margin-top: 16px;
+  font-size: 38px;
   font-weight: 800;
-  color: var(--white);
-  line-height: 1.1;
+  line-height: 1.05;
+  background: linear-gradient(118deg, #ffffff 0%, #e9d5ff 42%, #e6cf96 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   /* ‏ספרות ברוחב אחיד · בלי זה שלושת המחירים לא מתיישרים
      ‏זה מתחת לזה בטלפון, והעין קולטת את חוסר היישור לפני
      ‏שהיא קולטת את המספרים. */
@@ -4354,10 +4394,13 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   line-height: 1.5;
 }
 
+/* ‏הקו מתעמעם לקצוות ולא נחתך · קו שנגמר באמצע כלום
+   ‏נראה כמו גבול של טבלה. */
 .pr-rule {
   height: 1px;
   margin: 24px 0 22px;
-  background: rgba(168,85,247,0.16);
+  background: linear-gradient(90deg,
+    transparent, rgba(168,85,247,0.28) 22%, rgba(168,85,247,0.28) 78%, transparent);
 }
 
 .pr-list {
