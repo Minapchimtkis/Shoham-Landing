@@ -4303,13 +4303,15 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   /* ‏זוהר רך שיוצא מהפינה העליונה ולא גרדיאנט אחיד · אור
      ‏שנופל על משטח מגיע מכיוון כלשהו, ואחיד נקרא כצבע. */
   background:
-    radial-gradient(130% 90% at 82% -8%, rgba(168,85,247,0.30), transparent 62%),
-    linear-gradient(158deg, rgba(46,13,96,0.68), rgba(15,3,38,0.86));
-  box-shadow: 0 28px 64px -34px rgba(124,58,237,0.8),
-              inset 0 1px 0 rgba(255,255,255,0.10);
+    radial-gradient(130% 90% at 82% -8%, rgba(168,85,247,0.16), transparent 64%),
+    linear-gradient(158deg, rgba(38,11,80,0.46), rgba(13,3,33,0.78));
+  /* ‏הזוהר ירד לשליש · שני כרטיסים זוהרים זה לצד זה הם
+     ‏שני מקורות אור באותו חדר, והעין לא יודעת לאן ללכת. */
+  box-shadow: 0 26px 60px -40px rgba(124,58,237,0.5),
+              inset 0 1px 0 rgba(255,255,255,0.07);
 }
 
-.pr-card.pr-main::before { opacity: 1; width: 56px; }
+.pr-card.pr-main::before { opacity: 0.7; width: 52px; }
 
 /* ‏כרטיס המיפוי שקט יותר בכוונה · הוא הכניסה ולא המוצר,
    ‏ושלושה כרטיסים באותה עוצמה בדיוק הם טבלה, לא בחירה. */
@@ -4368,12 +4370,16 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 /* ‏הקיזוז הוא לא הערת שוליים · זה הכסף שכבר יצא מהכיס
    ‏וחוזר אליו, וזאת הסיבה החזקה ביותר להמשיך. זהב, אותו
    ‏צבע שבקצה הגרדיאנט של הכותרת הראשית, ולא עוד אפור. */
+/* ‏שורת הקיזוז הייתה זהובה, והזהב הופיע גם במחיר שמעליה
+   ‏וגם בפס המבטא · שלושה מקומות באותו צבע בכרטיס אחד.
+   ‏עכשיו הזהב שייך למחיר בלבד, והשורה הזאת בסגול הבהיר
+   ‏של המערכת. צבע אחד לכל תפקיד. */
 .pr-after {
   margin-top: 7px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.5;
-  color: #e6cf96;
+  color: rgba(216,180,254,0.9);
   font-variant-numeric: tabular-nums;
 }
 
@@ -4409,16 +4415,18 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  /* ‏רווח גדול יותר בין פריטים · ברשימה שרוב שורותיה
+     ‏נשברות לשתיים, רווח קטן מדביק אותן לגוש אחד. */
+  gap: 16px;
 }
 
 .pr-list li {
   position: relative;
-  padding-inline-start: 27px;
-  font-size: 14.5px;
+  padding-inline-start: 26px;
+  font-size: 14px;
   font-weight: 300;
-  line-height: 1.65;
-  color: rgba(255,255,255,0.82);
+  line-height: 1.75;
+  color: rgba(255,255,255,0.78);
 }
 
 /* ‏גבול שמאלי פיזי ולא הגיוני · גבול הגיוני מתהפך ב-RTL
@@ -4428,10 +4436,11 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   position: absolute;
   inset-inline-start: 1px;
   top: 8px;
-  width: 12px;
-  height: 7px;
-  border-left: 2px solid var(--p6);
-  border-bottom: 2px solid var(--p6);
+  width: 11px;
+  height: 6px;
+  /* ‏דק ודהוי · הווי מאשר, הוא לא הכותרת של השורה. */
+  border-left: 1.5px solid rgba(216,180,254,0.65);
+  border-bottom: 1.5px solid rgba(216,180,254,0.65);
   transform: rotate(-45deg);
 }
 
@@ -4480,11 +4489,14 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
 }
 
+/* ‏שני כפתורים מלאים זה לצד זה, כל אחד עם הילה משלו,
+   ‏הם שני כתמי אור בתחתית הסקשן. ההילה ירדה, והגרדיאנט
+   ‏התקרב לצבע אחד · הכפתור עדיין הדבר הבהיר בכרטיס. */
 .pr-card.pr-main .pr-btn {
   border-color: transparent;
-  background: linear-gradient(135deg, var(--p4), var(--p5));
+  background: linear-gradient(135deg, #7c3aed, #9d4edd);
   color: #fff;
-  box-shadow: 0 12px 30px -14px rgba(124,58,237,0.9);
+  box-shadow: 0 10px 24px -18px rgba(124,58,237,0.7);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -5258,7 +5270,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
     </div>
 
-    <p class="pr-why reveal" id="pr2av"><strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי. ה־90% הנותרים לא משתנים מפגישה אחת, אלא בחודשים שאחריה.</p>
+    <p class="pr-why reveal" id="pr2av"><strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי, ואת ה־90% בחודשים שאחריו.</p>
 
     <!-- ‏קודם ישבו כאן שלושה מלבנים מעוגלים זה מתחת לזה, כל
          ‏אחד עם מסגרת ורקע משלו. שלוש מסגרות זהות בטור הן
@@ -7306,7 +7318,7 @@ const translations = {
     pr1s: 'הצעד הראשון · פגישה אחת, בלי להתחייב',
     pr2n: 'ליווי אישי',
     pr2s: 'ליחידים ולזוגות צעירים',
-    pr2av: '<strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי. ה־90% הנותרים לא משתנים מפגישה אחת, אלא בחודשים שאחריה.',
+    pr2av: '<strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי, ואת ה־90% בחודשים שאחריו.',
     pr2cta: 'לשיחת היכרות',
     prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
     giftRule: 'מתנה ממני אליכם',
@@ -7438,7 +7450,7 @@ const translations = {
     pr1s: 'The first step · one session, no commitment',
     pr2n: 'Personal guidance',
     pr2s: 'For individuals and young couples',
-    pr2av: '<strong>Why guidance and not one session:</strong> managing money is 90% behaviour and habits and 10% technical knowledge. The 10% is what the mapping covers. The other 90% does not change in a single session, it changes in the months that follow.',
+    pr2av: '<strong>Why guidance and not one session:</strong> managing money is 90% behaviour and habits and 10% technical knowledge. The mapping covers the 10%. The months that follow cover the 90%.',
     pr2cta: 'Book an intro call',
     prNote: 'The price is final. The intro call is always free and carries no obligation.',
     giftRule: 'A gift from me to you',
