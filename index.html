@@ -4522,34 +4522,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 .pr-more:active { opacity: 0.6; }
 .pr-more:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
 
-.pr-guarantee {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  max-width: 620px;
-  margin: 44px auto 0;
-  padding: 18px 24px;
-  border: 1px solid rgba(168,85,247,0.24);
-  border-radius: 16px;
-  background: rgba(168,85,247,0.05);
-}
-
-.pr-guarantee p {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.92);
-}
-
-.pr-g-mark { color: var(--p6); flex-shrink: 0; display: flex; }
-
-/* ‏ההתחייבות והמכסה הן זוג · שתיהן אומרות "הסיכון והמגבלה
-   ‏אצלי, לא אצלכם". המרווח ביניהן קטן מזה שמעל הראשונה,
-   ‏כדי שייקראו כבלוק אחד ולא כשתי הודעות נפרדות. */
-.pr-capacity { margin-top: 12px; }
-
 .pr-note {
   margin: 18px 0 0;
   text-align: center;
@@ -4583,38 +4555,83 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 /* ‏הזמינות היא הבידול, ולכן היא לא עוד שורה בגוף הטקסט.
    ‏רקע עדין וקו בצד מרימים אותה מהפסקאות בלי להפוך אותה
    ‏לכרטיס שלישי בתוך הכרטיס. */
-.pr-avail {
-  margin: 18px 0 0;
-  padding: 14px 16px;
-  border-inline-start: 2px solid rgba(168,85,247,0.55);
-  /* ‏הפינות המעוגלות הן בצד שממול לקו, ולכן לוגיות ולא פיזיות ·
-     ‏ב-LTR הדף מתהפך והקו עובר צד, והפינות חייבות לעבור איתו.
-     ‏השורה הראשונה היא נפילה לאחור לדפדפן שלא מכיר אותן. */
-  border-radius: 10px;
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
-  background: rgba(168,85,247,0.09);
+/* ‏ההסבר נוגע לשני מסלולי הליווי ולא לאחד מהם, ולכן הוא
+   ‏יושב מתחת לרשת ולא בתוך כרטיס · בתוך אחד מהם הוא גם
+   ‏הטה לו את הגובה. בלי מסגרת ובלי רקע: טקסט שמסביר לא
+   ‏צריך קופסה, הוא צריך מקום. */
+.pr-why {
+  max-width: 58ch;
+  margin: 26px auto 0;
+  text-align: center;
   font-size: 14.5px;
   font-weight: 300;
-  line-height: 1.75;
-  color: rgba(255,255,255,0.86);
+  line-height: 1.8;
+  text-wrap: balance;
+  color: rgba(255,255,255,0.72);
 }
 
-.pr-avail strong { color: var(--p6); font-weight: 700; }
+.pr-why strong { color: var(--p6); font-weight: 700; }
 
-/* ‏ההסבר נוגע לשני מסלולי הליווי ולא לאחד מהם, ולכן הוא
-   ‏יצא מתוך הכרטיס ויושב מתחת לרשת. בתוך כרטיס אחד הוא
-   ‏גם הטה את הגובה שלו מול השניים האחרים. */
-.pr-why {
-  max-width: 62ch;
-  margin-inline: auto;
-  margin-top: 22px;
-  text-align: center;
-  border-inline-start: 0;
-  border-radius: 14px;
-  padding: 16px 20px;
+/* ── ‏רצועת ההבטחות ── */
+
+/* ‏שני קווי שיער ותו לא. הם אומרים "זה אזור" בלי לצייר
+   ‏קופסה, ולכן הם לא מתחרים בכרטיסים שמעליהם. */
+.pr-promises {
+  display: flex;
+  max-width: 860px;
+  margin: 40px auto 0;
+  padding: 22px 0;
+  border-top: 1px solid rgba(168,85,247,0.18);
+  border-bottom: 1px solid rgba(168,85,247,0.18);
 }
-.pr-body strong { color: #fff; font-weight: 600; }
+
+.pr-promise {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 24px;
+  text-align: start;
+}
+
+/* ‏קו הפרדה בין השתיים · לוגי ולא פיזי, כדי שיעבור צד
+   ‏יחד עם הדף באנגלית. */
+.pr-promise + .pr-promise {
+  border-inline-start: 1px solid rgba(168,85,247,0.16);
+}
+
+.pr-promise p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.82);
+}
+
+/* ‏הסמל מיושר לשורה הראשונה ולא למרכז הגוש · במרכז הוא
+   ‏נראה צף כשהטקסט נשבר לשתי שורות. */
+.pr-p-mark {
+  color: var(--p6);
+  flex-shrink: 0;
+  display: flex;
+  margin-top: 2px;
+}
+
+@media (max-width: 720px) {
+  .pr-promises {
+    flex-direction: column;
+    gap: 18px;
+    padding: 20px 0;
+  }
+  .pr-promise { padding: 0; }
+  /* ‏בטור הקו עובר למעלה · קו אנכי בין שורות הוא קו
+     ‏שמפריד בין כלום לכלום. */
+  .pr-promise + .pr-promise {
+    border-inline-start: 0;
+    border-top: 1px solid rgba(168,85,247,0.16);
+    padding-top: 18px;
+  }
+}
 
 @media (min-width: 921px) {
   .pr-grid {
@@ -4643,7 +4660,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   .pr-lead { font-size: 15.5px; margin-bottom: 40px; }
   .pr-card { padding: 28px 22px; }
   .pr-price { font-size: 31px; }
-  .pr-guarantee { flex-direction: column; text-align: center; gap: 10px; }
 }
 
 /* ── ‏חלונות הפירוט ── */
@@ -5242,20 +5258,23 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
     </div>
 
-    <p class="pr-avail pr-why reveal" id="pr2av"><strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי. ה־90% הנותרים לא משתנים מפגישה אחת, אלא בחודשים שאחריה.</p>
+    <p class="pr-why reveal" id="pr2av"><strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי. ה־90% הנותרים לא משתנים מפגישה אחת, אלא בחודשים שאחריה.</p>
 
-    <div class="pr-guarantee reveal">
-      <span class="pr-g-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg>
-      </span>
-      <p id="prGuarantee">אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
-    </div>
+    <!-- ‏קודם ישבו כאן שלושה מלבנים מעוגלים זה מתחת לזה, כל
+         ‏אחד עם מסגרת ורקע משלו. שלוש מסגרות זהות בטור הן
+         ‏הערות שנשכחו בתחתית, לא הבטחות.
 
-    <div class="pr-guarantee pr-capacity reveal">
-      <span class="pr-g-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </span>
-      <p id="prCapacity">חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.</p>
+         ‏עכשיו רצועה אחת בין שני קווי שיער, בלי מסגרות ובלי
+         ‏רקע, ושתי ההבטחות בתוכה מופרדות בקו דק. -->
+    <div class="pr-promises reveal">
+      <div class="pr-promise">
+        <span class="pr-p-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg></span>
+        <p id="prGuarantee">אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
+      </div>
+      <div class="pr-promise">
+        <span class="pr-p-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <p id="prCapacity">חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.</p>
+      </div>
     </div>
 
     <p class="pr-note reveal" id="prNote">המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.</p>
