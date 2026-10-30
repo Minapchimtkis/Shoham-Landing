@@ -4502,6 +4502,11 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .pr-g-mark { color: var(--p6); flex-shrink: 0; display: flex; }
 
+/* ‏ההתחייבות והמכסה הן זוג · שתיהן אומרות "הסיכון והמגבלה
+   ‏אצלי, לא אצלכם". המרווח ביניהן קטן מזה שמעל הראשונה,
+   ‏כדי שייקראו כבלוק אחד ולא כשתי הודעות נפרדות. */
+.pr-capacity { margin-top: 12px; }
+
 .pr-note {
   margin: 18px 0 0;
   text-align: center;
@@ -5201,6 +5206,13 @@ html.faq-open .iphone-wrap.visible .iphone-close {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg>
       </span>
       <p id="prGuarantee">אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
+    </div>
+
+    <div class="pr-guarantee pr-capacity reveal">
+      <span class="pr-g-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </span>
+      <p id="prCapacity">חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.</p>
     </div>
 
     <p class="pr-note reveal" id="prNote">המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.</p>
@@ -7207,6 +7219,7 @@ const translations = {
     pr1cta: 'לשיחת היכרות',
     pr1more: 'מה בדיוק כלול',
     prGuarantee: 'אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
+    prCapacity: 'חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.',
     prP1: '690 ₪',
     prP2: '3,990 ₪',
     prP3: '5,990 ₪',
@@ -7338,6 +7351,7 @@ const translations = {
     pr1cta: 'Book an intro call',
     pr1more: 'See what is included',
     prGuarantee: 'If at the end of the mapping session you feel this is not for you, I give you your money back.',
+    prCapacity: 'It matters to me that every guidance stays focused and personal, so I take up to 6 clients at a time and no more.',
     prP1: '₪690',
     prP2: '₪3,990',
     prP3: '₪5,990',
@@ -7520,7 +7534,7 @@ function setLang(lang) {
 
   /* ‏מחירים · לפי מזהה ולא לפי אינדקס, כדי שהסקשן הזה לא
      ‏יוכל לערבב את תוויות שאר הדף. */
-  ['prLabel','prTitle','prLead','prGuarantee','prNote',
+  ['prLabel','prTitle','prLead','prGuarantee','prCapacity','prNote',
    'pr1n','pr1s','pr1a','pr1b','pr1c','prNoGuide','pr1cta','pr1more',
    'pr2n','pr2s','pr2cta','prG1','prG2','prG3','prG4',
    'pr3n','pr3s','pr3cta','prH1','prH2','prH3','prH4',
