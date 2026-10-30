@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ‏עמוד המחירים. הוא היה סקשן בדף הנחיתה והוצא ממנו, כדי שהדף
+     ‏לא יישא את כל המחירון על גבו.
+
+     ‏הוא גם כתובת שאפשר לשלוח · /pricing/ נשלח בוואטסאפ אחרי שיחת
+     ‏היכרות, במקום להקליד מחירים בהודעה או לצרף קובץ שמתיישן.
+
+     ‏גיליון הסגנונות כאן אינו העתק של זה שבדף הנחיתה. הוא חולץ
+     ‏ממנו אוטומטית · רק הכללים שהעמוד הזה באמת משתמש בהם, 72
+     ‏מתוך 470, 11KB במקום 135. העמוד נראה זהה מפני שאלה בדיוק
+     ‏אותם כללים, לא כללים שדומים להם.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<meta name="robots" content="index, follow, max-image-preview:large">
+<title>מחירים | שוהם אבו, ליווי וייעוץ פיננסי</title>
+<meta name="description" content="המיפוי הכלכלי ושני מסלולי הליווי, עם המחירים במלואם ובלי להסתיר.">
+<link rel="canonical" href="https://shohamfinance.co.il/pricing/">
+
+<link rel="icon" href="../assets/favicon.ico?v=1bc87ca4" sizes="16x16 32x32 48x48 96x96 144x144 192x192">
+<meta name="theme-color" content="#0c0b11">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300..900&display=swap" rel="stylesheet">
+
+<style>
+* { margin: 0px; padding: 0px; box-sizing: border-box; }
+button, input, select, textarea { font-family: inherit; }
+:root { --font: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif; --w-amount: 800; --w-display: 800; --w-h1: 700; --w-h2: 600; --w-ui: 600; --w-ui-soft: 500; --w-body: 400; --p1: #0c0b11; --p2: #161322; --p3: #2e1148; --p4: #7c3aed; --p5: #a855f7; --p6: #d8b4fe; --white: #ffffff; --gold: #f0c040; }
+@keyframes introSafety { 
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes introIn { 
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes introShine { 
+  0% { transform: translateX(300%) skewX(-14deg); }
+  100% { transform: translateX(-320%) skewX(-14deg); }
+}
+html { scroll-behavior: smooth; overflow-x: hidden; max-width: 100vw; background: var(--p1); -webkit-tap-highlight-color: transparent; text-size-adjust: 100%; }
+button, [role="button"], .btn-primary, .lang-btn, .faq-q, .iphone-close, .privacy-close, .iphone-wa-btn { touch-action: manipulation; user-select: none; }
+a, input, textarea, label, summary { touch-action: manipulation; }
+body { font-family: var(--font); background: radial-gradient(ellipse 120% 80% at 50% -10%, #1a1230 0%, var(--p1) 50%) var(--p1); color: var(--white); direction: rtl; overflow-x: hidden; max-width: 100vw; }
+main { display: block; }
+body::before { content: ""; position: fixed; inset: 0px; z-index: 1; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"); pointer-events: none; opacity: 0.4; }
+@media (prefers-reduced-motion: reduce) {
+.reveal, .reveal-left, .reveal-scale, .step { transform: none !important; transition: opacity 0.2s linear !important; }
+}
+section { position: relative; z-index: 2; }
+.hero > :not(.hero-view) { position: relative; z-index: 1; }
+@keyframes floatA { 
+  0%, 100% { transform: rotate(-6deg) translateY(0px); }
+  50% { transform: rotate(-6deg) translateY(-12px); }
+}
+@keyframes floatB { 
+  0%, 100% { transform: rotate(5deg) translateY(0px); }
+  50% { transform: rotate(5deg) translateY(-16px); }
+}
+@keyframes sigGlow { 
+  0%, 100% { filter: drop-shadow(rgba(168, 85, 247, 0.4) 0px 0px 8px) drop-shadow(rgba(168, 85, 247, 0.2) 0px 0px 16px); }
+  50% { filter: drop-shadow(rgba(168, 85, 247, 0.8) 0px 0px 18px) drop-shadow(rgba(168, 85, 247, 0.45) 0px 0px 36px) drop-shadow(rgba(192, 132, 252, 0.25) 0px 0px 60px); }
+}
+@keyframes smokeFlow { 
+  0% { left: -50%; opacity: 0.5; }
+  50% { left: 70%; opacity: 0.9; }
+  100% { left: -50%; opacity: 0.5; }
+}
+.privacy-overlay { position: fixed; inset: 0px; z-index: 4000; background: rgba(4, 0, 12, 0.82); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px 18px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+.privacy-overlay.open { opacity: 1; visibility: visible; }
+.privacy-modal { position: relative; width: 100%; max-width: 680px; max-height: 86vh; overflow-y: auto; background: linear-gradient(165deg, rgb(26, 5, 56), rgb(13, 2, 34)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 18px; padding: 40px 34px 34px; box-shadow: rgba(0, 0, 0, 0.9) 0px 30px 80px -20px; transform: translateY(18px) scale(0.98); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.privacy-overlay.open .privacy-modal { transform: none; }
+.privacy-close { font-family: var(--font); position: absolute; top: 14px; inset-inline-end: 14px; width: 32px; height: 32px; border-radius: 50%; background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); color: rgba(255, 255, 255, 0.7); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, color 0.2s; }
+@media (hover: hover) and (pointer: fine) {
+.privacy-close:hover { background: rgba(168, 85, 247, 0.3); color: rgb(255, 255, 255); }
+}
+.privacy-title { font-size: 24px; font-weight: 800; color: var(--white); margin-bottom: 22px; text-align: start; }
+@media (max-width: 640px) {
+.privacy-modal { padding: 36px 22px 26px; max-height: 88vh; }
+.privacy-title { font-size: 20px; }
+}
+footer { border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 32px 24px calc(32px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 12px; color: rgba(255, 255, 255, 0.2); position: relative; z-index: 2; }
+@keyframes fadeUp { 
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+@keyframes pulse-glow { 
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0px); }
+@media (max-width: 720px) {
+@keyframes stickySheen { 
+  0%, 72% { transform: translateX(-130%); }
+  88%, 100% { transform: translateX(130%); }
+}
+}
+@keyframes floatA { 
+  0%, 100% { transform: rotate(-4deg) translateY(0px); }
+  50% { transform: rotate(-4deg) translateY(-10px); }
+}
+@keyframes floatB { 
+  0%, 100% { transform: rotate(3deg) translateY(0px); }
+  50% { transform: rotate(3deg) translateY(-14px); }
+}
+.btn-primary:active, .lang-btn:active, .privacy-close:active, .iphone-close:active { transform: scale(0.97); transition-duration: 0.1s; }
+.iphone-close::after, .privacy-close::after { content: ""; position: absolute; inset: -9px; }
+.pricing { padding: 120px 24px; position: relative; z-index: 2; }
+.pricing-inner { max-width: 1120px; margin: 0px auto; }
+.pr-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; color: var(--p6); text-align: center; margin-bottom: 16px; text-shadow: rgba(168, 85, 247, 0.5) 0px 0px 18px; }
+.pr-title { font-family: var(--font); font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: var(--white); text-align: center; margin: 0px 0px 18px; line-height: 1.2; }
+.pr-lead { text-align: center; font-size: 16.5px; font-weight: 300; line-height: 1.85; color: rgba(255, 255, 255, 0.78); max-width: 48ch; margin: 0px auto 56px; }
+.pr-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.pr-card { display: flex; flex-direction: column; padding: 30px 26px 28px; border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 22px 22px 18px 18px; background: linear-gradient(158deg, rgba(22, 5, 48, 0.5), rgba(11, 2, 28, 0.72)); box-shadow: rgba(255, 255, 255, 0.06) 0px 1px 0px inset; position: relative; overflow: hidden; }
+.pr-card.pr-main { border-color: rgba(168, 85, 247, 0.55); background: radial-gradient(130% 90% at 82% -8%, rgba(168, 85, 247, 0.16), transparent 64%), linear-gradient(158deg, rgba(38, 11, 80, 0.46), rgba(13, 3, 33, 0.78)); box-shadow: rgba(124, 58, 237, 0.5) 0px 26px 60px -40px, rgba(255, 255, 255, 0.07) 0px 1px 0px inset; }
+.pr-name { font-size: 13px; font-weight: 700; letter-spacing: 2px; color: rgba(216, 180, 254, 0.75); line-height: 1.4; }
+.pr-price { margin-top: 16px; font-size: 38px; font-weight: 800; line-height: 1.05; background: linear-gradient(118deg, rgb(255, 255, 255) 0%, rgb(233, 213, 255) 42%, rgb(230, 207, 150) 100%) text; -webkit-text-fill-color: transparent; font-variant-numeric: tabular-nums; }
+.pr-after { margin-top: 7px; font-size: 13px; font-weight: 500; line-height: 1.5; color: rgba(216, 180, 254, 0.9); font-variant-numeric: tabular-nums; }
+.pr-after-plain { color: rgba(255, 255, 255, 0.52); font-weight: 500; }
+.pr-sub { margin-top: 10px; font-size: 13.5px; font-weight: 400; color: rgba(255, 255, 255, 0.52); line-height: 1.5; }
+.pr-rule { height: 1px; margin: 24px 0px 22px; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.28) 22%, rgba(168, 85, 247, 0.28) 78%, transparent); }
+.pr-list { list-style: none; margin: 0px; padding: 0px; display: flex; flex-direction: column; gap: 16px; }
+.pr-list li { position: relative; padding-inline-start: 26px; font-size: 14px; font-weight: 300; line-height: 1.75; color: rgba(255, 255, 255, 0.78); }
+.pr-list li::before { content: ""; position: absolute; inset-inline-start: 1px; top: 8px; width: 11px; height: 6px; border-left: 1.5px solid rgba(216, 180, 254, 0.65); border-bottom: 1.5px solid rgba(216, 180, 254, 0.65); transform: rotate(-45deg); }
+.pr-list li.pr-key { color: rgb(255, 255, 255); font-weight: 500; }
+.pr-list li.pr-no { color: rgba(255, 255, 255, 0.5); }
+.pr-list li.pr-no::before, .pr-list li.pr-no::after { content: ""; position: absolute; inset-inline-start: 2px; top: 11px; width: 11px; height: 0px; border-width: 2px 0px 0px; border-right-style: initial; border-bottom-style: initial; border-left-style: initial; border-right-color: initial; border-bottom-color: initial; border-left-color: initial; border-image: initial; border-top-style: solid; border-top-color: rgba(255, 255, 255, 0.3); transform: rotate(45deg); }
+.pr-list li.pr-no::after { transform: rotate(-45deg); }
+.pr-act { margin-top: auto; padding-top: 28px; }
+.pr-btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; padding: 14px 20px; border-radius: 100px; border: 1px solid rgba(168, 85, 247, 0.45); background: transparent; color: var(--p6); font-family: var(--font); font-size: 15.5px; font-weight: 700; text-decoration: none; transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s; }
+.pr-card.pr-main .pr-btn { border-color: transparent; background: linear-gradient(135deg, rgb(124, 58, 237), rgb(157, 78, 221)); color: rgb(255, 255, 255); box-shadow: rgba(124, 58, 237, 0.7) 0px 10px 24px -18px; }
+@media (hover: hover) and (pointer: fine) {
+.pr-btn:hover { background: rgba(168, 85, 247, 0.16); border-color: rgba(168, 85, 247, 0.8); color: rgb(255, 255, 255); transform: translateY(-2px); }
+.pr-card.pr-main .pr-btn:hover { background: linear-gradient(135deg, var(--p5), var(--p4)); transform: translateY(-2px); }
+}
+.pr-btn:active { transform: translateY(0px); opacity: 0.85; }
+.pr-more { display: block; width: fit-content; margin: 0px auto 14px; padding: 15px 6px 13px; background: none; border-width: 0px 0px 1px; border-top-style: initial; border-right-style: initial; border-left-style: initial; border-top-color: initial; border-right-color: initial; border-left-color: initial; border-image: initial; color: rgba(255, 255, 255, 0.55); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; border-bottom-style: solid; border-bottom-color: rgba(168, 85, 247, 0.3); transition: color 0.25s, border-color 0.25s; }
+@media (hover: hover) and (pointer: fine) {
+.pr-more:hover { color: rgb(255, 255, 255); border-color: rgba(168, 85, 247, 0.8); }
+}
+.pr-more:active { opacity: 0.6; }
+.pr-note { margin: 18px 0px 0px; text-align: center; font-size: 12.5px; font-weight: 300; color: rgba(255, 255, 255, 0.45); }
+.pr-card.pr-soft { border-color: rgba(168, 85, 247, 0.16); background: rgba(22, 5, 48, 0.34); box-shadow: none; }
+.pr-why { max-width: 58ch; margin: 26px auto 0px; text-align: center; font-size: 14.5px; font-weight: 300; line-height: 1.8; text-wrap: balance; color: rgba(255, 255, 255, 0.72); }
+.pr-why strong { color: var(--p6); font-weight: 700; }
+.pr-promises { display: flex; max-width: 860px; margin: 40px auto 0px; padding: 22px 0px; border-top: 1px solid rgba(168, 85, 247, 0.18); border-bottom: 1px solid rgba(168, 85, 247, 0.18); }
+.pr-promise { flex: 1 1 0%; display: flex; align-items: flex-start; gap: 12px; padding: 0px 24px; text-align: start; }
+.pr-promise + .pr-promise { border-inline-start: 1px solid rgba(168, 85, 247, 0.16); }
+.pr-promise p { margin: 0px; font-size: 14px; font-weight: 400; line-height: 1.65; color: rgba(255, 255, 255, 0.82); }
+.pr-p-mark { color: var(--p6); flex-shrink: 0; display: flex; margin-top: 2px; }
+@media (max-width: 720px) {
+.pr-promises { flex-direction: column; gap: 18px; padding: 20px 0px; }
+.pr-promise { padding: 0px; }
+.pr-promise + .pr-promise { border-inline-start: 0px; border-top: 1px solid rgba(168, 85, 247, 0.16); padding-top: 18px; }
+}
+@media (min-width: 921px) {
+/* ‏שלושת הכרטיסים באותו גובה · גובה טבעי לכל אחד שבר את
+     ‏השורה ונראה כמו שלושה דברים שהודבקו. margin-top: auto
+     ‏על אזור הפעולה דוחף את הכפתורים לתחתית, כך שהם יושבים
+     ‏על קו אחד למרות שהרשימות באורכים שונים. */
+  .pr-grid { grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 16px; align-items: stretch; max-width: 1060px; margin-inline: auto; }
+.pr-act { padding-top: 24px; }
+}
+@media (max-width: 920px) {
+.pr-grid { max-width: 480px; margin-inline: auto; }
+}
+@media (max-width: 720px) {
+.pricing { padding: 72px 20px; }
+.pr-lead { font-size: 15.5px; margin-bottom: 40px; }
+.pr-card { padding: 28px 22px; }
+.pr-price { font-size: 31px; }
+}
+.pr-modal { max-width: 560px; }
+.pr-modal-name, .pr-modal-price { padding-inline-start: 48px; }
+.pr-modal-name { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; color: var(--p6); margin-bottom: 6px; }
+.pr-modal-price { font-weight: 800; color: var(--white); font-variant-numeric: tabular-nums; font-size: 28px !important; margin-bottom: 22px !important; }
+.pr-modal-body p { font-size: 15.5px; font-weight: 300; line-height: 1.9; color: rgba(255, 255, 255, 0.82); margin: 0px 0px 15px; }
+.pr-modal-body p:last-child { margin-bottom: 0px; }
+.pr-modal-body strong { color: rgb(255, 255, 255); font-weight: 600; }
+@media (max-width: 480px) {
+.pr-modal-price { font-size: 25px !important; }
+.pr-modal-body p { font-size: 15px; }
+}
+body { background: rgb(12, 11, 17); min-height: 100svh; }
+.pg-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1100px; margin: 0px auto; padding: 20px 24px calc(20px + env(safe-area-inset-top, 0px)); }
+.pg-nav { display: flex; align-items: center; gap: 10px; }
+.pg-logo { width: 104px; height: auto; display: block; }
+.pg-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 11px 18px; border-radius: 100px; border: 1px solid rgba(216, 180, 254, 0.26); color: var(--p6); font-family: var(--font); font-size: 14px; font-weight: 600; text-decoration: none; }
+.pg-back svg { transform: scaleX(1); }
+html[dir="rtl"] .pg-back svg { transform: scaleX(-1); }
+.pg-lang { display: inline-flex; align-items: center; padding: 3px; border-radius: 100px; border: 1px solid rgba(216, 180, 254, 0.2); }
+.pg-lang button { min-width: 42px; min-height: 38px; padding: 8px 12px; border: 0px; border-radius: 100px; background: none; color: rgba(255, 255, 255, 0.6); font-family: var(--font); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.pg-lang button[aria-pressed="true"] { background: linear-gradient(135deg, rgb(124, 58, 237), rgb(157, 78, 221)); color: rgb(255, 255, 255); }
+.pricing { padding-top: 44px; }
+.pg-end { max-width: 560px; margin: 0px auto; padding: 0 24px calc(84px + env(safe-area-inset-bottom, 0px)); text-align: center; }
+.pg-end p { margin: 0px 0px 20px; font-size: 15.5px; font-weight: 300; line-height: 1.8; color: rgba(255, 255, 255, 0.7); }
+.pg-wa { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 14px 30px; border-radius: 100px; background: linear-gradient(135deg, rgb(124, 58, 237), rgb(157, 78, 221)); color: rgb(255, 255, 255); font-family: var(--font); font-size: 15.5px; font-weight: 700; text-decoration: none; }
+@media (hover: hover) and (pointer: fine) {
+.pg-back:hover { border-color: rgba(168, 85, 247, 0.7); color: rgb(255, 255, 255); }
+.pg-wa:hover { background: linear-gradient(135deg, rgb(157, 78, 221), rgb(124, 58, 237)); }
+}
+.pg-wa:active, .pg-back:active { opacity: 0.85; }
+@media (max-width: 720px) {
+.pg-top { padding: 14px 20px; }
+.pg-logo { width: 84px; }
+.pricing { padding-top: 28px; }
+}
+/* ── ‏מה שייחודי לעמוד הזה ── */
+body { background: #0c0b11; min-height: 100svh; }
+
+.pg-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px calc(20px + env(safe-area-inset-top, 0px));
+}
+
+.pg-nav { display: flex; align-items: center; gap: 10px; }
+
+.pg-logo { width: 104px; height: auto; display: block; }
+
+.pg-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(216,180,254,0.26);
+  color: var(--p6);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ‏החץ מצביע לכיוון הקריאה · ב-RTL שמאלה, וב-LTR ימינה.
+   ‏scale על הציר האופקי מתהפך יחד עם הדף. */
+.pg-back svg { transform: scaleX(1); }
+html[dir="rtl"] .pg-back svg { transform: scaleX(-1); }
+
+.pg-lang {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 100px;
+  border: 1px solid rgba(216,180,254,0.2);
+}
+
+.pg-lang button {
+  min-width: 46px;
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 100px;
+  background: none;
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pg-lang button[aria-pressed="true"] {
+  background: linear-gradient(135deg, #7c3aed, #9d4edd);
+  color: #fff;
+}
+
+.pg-lang button:focus-visible { outline: 2px solid var(--p6); outline-offset: 2px; }
+
+.pricing { padding-top: 44px; }
+
+.pg-end {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 24px calc(84px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+
+.pg-end p {
+  margin: 0 0 20px;
+  font-size: 15.5px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.7);
+}
+
+.pg-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 30px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #7c3aed, #9d4edd);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 15.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pg-wa:focus-visible, .pg-back:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .pg-back:hover { border-color: rgba(168,85,247,0.7); color: #fff; }
+  .pg-wa:hover { background: linear-gradient(135deg, #9d4edd, #7c3aed); }
+}
+
+.pg-wa:active, .pg-back:active { opacity: 0.85; }
+
+@media (max-width: 720px) {
+  .pg-top { padding: 14px 20px; }
+  .pg-logo { width: 84px; }
+  .pricing { padding-top: 28px; }
+}
+</style>
+</head>
+<body>
+
+<header class="pg-top">
+  <img class="pg-logo" src="../assets/logo.webp?v=7ad752ae" width="600" height="415"
+       alt="שוהם אבו, ליווי וייעוץ פיננסי">
+  <div class="pg-nav">
+    <div class="pg-lang" role="group" aria-label="שפה">
+      <!-- ‏HE ראשון, כמו בדף הנחיתה · ב-RTL הראשון הוא הימני,
+           ‏וכך HE יושב מימין ו-EN משמאל בשני המקומות. -->
+      <button type="button" id="langHe" aria-pressed="true" onclick="setLang('he')">HE</button>
+      <button type="button" id="langEn" aria-pressed="false" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="pg-back" href="/" id="pgBack">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      <span id="pgBackText">חזרה לאתר</span>
+    </a>
+  </div>
+</header>
+
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="pr-label reveal" id="prLabel">איך עובדים איתי</div>
+    <h2 class="pr-title reveal" id="prTitle">לא תעברו את זה לבד.</h2>
+    <p class="pr-lead reveal" id="prLead">הליווי האישי הוא הלב של מה שאני עושה. המיפוי הוא הדרך להיכנס אליו בלי להתחייב מראש.</p>
+
+    <div class="pr-grid">
+
+      <div class="pr-card pr-soft reveal">
+        <div class="pr-name" id="pr1n">מיפוי כלכלי</div>
+        <div class="pr-price" id="prP1">690 ₪</div>
+        <div class="pr-after pr-after-plain" id="prA1">תשלום אחד</div>
+        <div class="pr-sub" id="pr1s">הצעד הראשון · פגישה אחת, בלי להתחייב</div>
+        <div class="pr-rule" aria-hidden="true"></div>
+        <ul class="pr-list">
+          <li id="pr1a">פגישת אבחון ומיפוי מלא של התמונה הכלכלית</li>
+          <li id="pr1b">קובץ התקציב האישי שלכם, להמשיך איתו גם לבד</li>
+          <li class="pr-key" id="pr1c">מתקזז במלואו אם ממשיכים לליווי תוך 30 יום</li>
+          <li class="pr-no" id="prNoGuide">בלי ליווי אישי אחרי הפגישה · מכאן אתם ממשיכים לבד</li>
+        </ul>
+        <div class="pr-act">
+          <button class="pr-more" type="button" id="pr1more" onclick="openPr('prModal1', this)">מה בדיוק כלול</button>
+          <a class="pr-btn" href="#contact" id="pr1cta">לשיחת היכרות</a>
+        </div>
+      </div>
+
+      <div class="pr-card pr-main reveal">
+        <div class="pr-name" id="pr2n">ליווי אישי</div>
+        <div class="pr-price" id="prP2">3,990 ₪</div>
+        <div class="pr-after" id="prA2">3,300 ₪ בפועל, אחרי קיזוז המיפוי</div>
+        <div class="pr-sub" id="pr2s">ליחידים ולזוגות צעירים</div>
+        <div class="pr-rule" aria-hidden="true"></div>
+        <ul class="pr-list">
+          <li id="prG1">4 פגישות של שעה או שעה וחצי · פרונטלי או בזום, לבחירתכם</li>
+          <li id="prG2">ליווי טלפוני מלא ביניהן · ‏ראשון עד חמישי, 9:00 ל־18:00‏</li>
+          <li id="prG3">תוכנית שנבנית עליכם ומתעדכנת לאורך הדרך</li>
+          <li class="pr-key" id="prG4">ה־690 של המיפוי מתקזזים במלואם</li>
+        </ul>
+        <div class="pr-act">
+          <a class="pr-btn" href="#contact" id="pr2cta">לשיחת היכרות</a>
+        </div>
+      </div>
+
+      <div class="pr-card pr-main reveal">
+        <div class="pr-name" id="pr3n">ליווי למשפחות</div>
+        <div class="pr-price" id="prP3">5,990 ₪</div>
+        <div class="pr-after" id="prA3">5,300 ₪ בפועל · 2,995 ₪ לכל אחד מכם</div>
+        <div class="pr-sub" id="pr3s">כשהכסף של שניכם הוא כסף אחד</div>
+        <div class="pr-rule" aria-hidden="true"></div>
+        <ul class="pr-list">
+          <li id="prH1">אותן 4 פגישות ואותו ליווי טלפוני מלא ביניהן</li>
+          <li id="prH2">הדינמיקה בין שניכם סביב כסף, ולא רק המספרים</li>
+          <li id="prH3">הכנסות, הוצאות והתחייבויות של בית שלם, ותוכנית פעולה שבנויה לזה</li>
+          <li class="pr-key" id="prH4">2,995 ₪ לאדם · פחות ממה שיחיד משלם על אותו ליווי</li>
+        </ul>
+        <div class="pr-act">
+          <a class="pr-btn" href="#contact" id="pr3cta">לשיחת היכרות</a>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="pr-why reveal" id="pr2av"><strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי, ואת ה־90% בחודשים שאחריו.</p>
+
+    <!-- ‏קודם ישבו כאן שלושה מלבנים מעוגלים זה מתחת לזה, כל
+         ‏אחד עם מסגרת ורקע משלו. שלוש מסגרות זהות בטור הן
+         ‏הערות שנשכחו בתחתית, לא הבטחות.
+
+         ‏עכשיו רצועה אחת בין שני קווי שיער, בלי מסגרות ובלי
+         ‏רקע, ושתי ההבטחות בתוכה מופרדות בקו דק. -->
+    <div class="pr-promises reveal">
+      <div class="pr-promise">
+        <span class="pr-p-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.6l7.4 3v6.1c0 4.5-3 8.2-7.4 9.7-4.4-1.5-7.4-5.2-7.4-9.7V5.6z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.6"/></svg></span>
+        <p id="prGuarantee">אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.</p>
+      </div>
+      <div class="pr-promise">
+        <span class="pr-p-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <p id="prCapacity">חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.</p>
+      </div>
+    </div>
+
+    <p class="pr-note reveal" id="prNote">המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.</p>
+
+  </div>
+</section>
+
+<div class="pg-end">
+  <p id="pgEndLine">יש שאלה על אחד המסלולים? אל תתלבטו לבד.</p>
+  <a class="pg-wa" href="https://wa.me/972507228755?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%95%D7%94%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8.%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%90%D7%99%D7%9A%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%A9%D7%A0%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%94%D7%9E%D7%A1%D7%9C%D7%95%D7%9C%20%D7%94%D7%9B%D7%9C%D7%9B%D7%9C%D7%99%20%D7%A9%D7%9C%D7%99." target="_blank" rel="noopener">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span id="pgEndCta">לדבר איתי בוואטסאפ</span>
+  </a>
+</div>
+
+<div class="privacy-overlay" id="prModal1" onclick="closePrOutside(event)">
+  <div class="privacy-modal pr-modal" role="dialog" aria-modal="true" aria-labelledby="prM1Name">
+    <button class="privacy-close" type="button" onclick="closePr()" aria-label="סגירה">&#10005;</button>
+    <div class="pr-modal-name" id="prM1Name">מיפוי כלכלי</div>
+    <h3 class="privacy-title pr-modal-price" id="prM1Title">690 ₪</h3>
+    <div class="pr-modal-body" id="prM1Body">
+      <p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p>
+      <p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p>
+      <p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p>
+      <p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>מה שאין כאן:</strong> המיפוי הוא פגישה אחת, ואין אחריו ליווי אישי. אתם מקבלים את התמונה ואת הקובץ וממשיכים איתם לבד. הליווי הצמוד, והזמינות שלי בוואטסאפ ובטלפון, שייכים למסלולי ההמשך.</p>
+      <p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ‏המילון כאן מחזיק את מפתחות המחירון בלבד · הם הועברו מדף
+   ‏הנחיתה לכאן יחד עם הסקשן, ולכן אין שני עותקים שלהם. */
+const translations = {
+  he: {
+    prLabel: 'איך עובדים איתי',
+    prTitle: 'לא תעברו את זה לבד.',
+    prLead: 'הליווי האישי הוא הלב של מה שאני עושה. המיפוי הוא הדרך להיכנס אליו בלי להתחייב מראש.',
+    prGuarantee: 'אם בסוף פגישת המיפוי תרגישו שזה לא בשבילכם · אני מחזיר לכם את הכסף.',
+    prCapacity: 'חשוב לי שכל ליווי יהיה ממוקד ופרטני · לכן אני מלווה עד 6 לקוחות במקביל, ולא יותר.',
+    prNote: 'המחיר סופי. שיחת ההיכרות תמיד בחינם ובלי התחייבות.',
+    pr1n: 'מיפוי כלכלי',
+    pr1s: 'הצעד הראשון · פגישה אחת, בלי להתחייב',
+    pr1a: 'פגישת אבחון ומיפוי מלא של התמונה הכלכלית',
+    pr1b: 'קובץ התקציב האישי שלכם, להמשיך איתו גם לבד',
+    pr1c: 'מתקזז במלואו אם ממשיכים לליווי תוך 30 יום',
+    prNoGuide: 'בלי ליווי אישי אחרי הפגישה · מכאן אתם ממשיכים לבד',
+    pr1cta: 'לשיחת היכרות',
+    pr1more: 'מה בדיוק כלול',
+    pr2n: 'ליווי אישי',
+    pr2s: 'ליחידים ולזוגות צעירים',
+    pr2cta: 'לשיחת היכרות',
+    prG1: '4 פגישות של שעה או שעה וחצי · פרונטלי או בזום, לבחירתכם',
+    prG2: 'ליווי טלפוני מלא ביניהן · ‏ראשון עד חמישי, 9:00 ל־18:00‏',
+    prG3: 'תוכנית שנבנית עליכם ומתעדכנת לאורך הדרך',
+    prG4: 'ה־690 של המיפוי מתקזזים במלואם',
+    pr3n: 'ליווי למשפחות',
+    pr3s: 'כשהכסף של שניכם הוא כסף אחד',
+    pr3cta: 'לשיחת היכרות',
+    prH1: 'אותן 4 פגישות ואותו ליווי טלפוני מלא ביניהן',
+    prH2: 'הדינמיקה בין שניכם סביב כסף, ולא רק המספרים',
+    prH3: 'הכנסות, הוצאות והתחייבויות של בית שלם, ותוכנית פעולה שבנויה לזה',
+    prH4: '2,995 ₪ לאדם · פחות ממה שיחיד משלם על אותו ליווי',
+    prP1: '690 ₪',
+    prP2: '3,990 ₪',
+    prP3: '5,990 ₪',
+    prA1: 'תשלום אחד',
+    prA2: '3,300 ₪ בפועל, אחרי קיזוז המיפוי',
+    prA3: '5,300 ₪ בפועל · 2,995 ₪ לכל אחד מכם',
+    prM1Name: 'מיפוי כלכלי',
+    prM1Title: '690 ₪',
+    pr2av: '<strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי, ואת ה־90% בחודשים שאחריו.',
+    prM1Body: '<p>זאת הדרך להתחיל בלי להתחייב לתהליך מלא.</p><p>נפגשים פעם אחת, ואני שואל את השאלות שאף אחד לא שאל אתכם · לא רק כמה נכנס וכמה יוצא, אלא מה עובר לכם בראש כשאתם פותחים את האפליקציה של הבנק.</p><p>אחרי הפגישה אני בונה את התמונה המלאה: כמה באמת נכנס, לאן זה הולך, איפה הכסף נעלם בלי ששמתם לב, ומה המצב האמיתי מול המטרות שלכם. ואיתה קובץ תקציב אישי, בנוי עליכם, שתוכלו להמשיך לעבוד איתו גם לבד.</p><p>בסוף אתם יודעים בדיוק איפה אתם עומדים. מה עושים עם זה, זאת כבר ההחלטה שלכם.</p><p><strong>מה שאין כאן:</strong> המיפוי הוא פגישה אחת, ואין אחריו ליווי אישי. אתם מקבלים את התמונה ואת הקובץ וממשיכים איתם לבד. הליווי הצמוד, והזמינות שלי בוואטסאפ ובטלפון, שייכים למסלולי ההמשך.</p><p><strong>ואם תחליטו להמשיך לליווי תוך 30 יום, ה־690 יורדים מהמחיר.</strong> לא משלמים פעמיים על אותה עבודה.</p>',
+    dir: 'rtl',
+    pageTitle: 'מחירים | שוהם אבו, ליווי וייעוץ פיננסי',
+    back: 'חזרה לאתר',
+    endLine: 'יש שאלה על אחד המסלולים? אל תתלבטו לבד.',
+    endCta: 'לדבר איתי בוואטסאפ',
+    closeLabel: 'סגירה',
+  },
+  en: {
+    prLabel: 'How working with me goes',
+    prTitle: 'You will not go through this alone.',
+    prLead: 'The personal guidance is the heart of what I do. The mapping is the way into it without committing up front.',
+    prGuarantee: 'If at the end of the mapping session you feel this is not for you, I give you your money back.',
+    prCapacity: 'It matters to me that every guidance stays focused and personal, so I take up to 6 clients at a time and no more.',
+    prNote: 'The price is final. The intro call is always free and carries no obligation.',
+    pr1n: 'Financial mapping',
+    pr1s: 'The first step · one session, no commitment',
+    pr1a: 'A diagnostic session and a full map of your financial picture',
+    pr1b: 'Your personal budget file, yours to keep working with',
+    pr1c: 'Comes off the price in full if you continue within 30 days',
+    prNoGuide: 'No personal guidance after the session · from there you carry on alone',
+    pr1cta: 'Book an intro call',
+    pr1more: 'See what is included',
+    pr2n: 'Personal guidance',
+    pr2s: 'For individuals and young couples',
+    pr2cta: 'Book an intro call',
+    prG1: '4 sessions of an hour or an hour and a half · in person or on Zoom, your choice',
+    prG2: 'Full phone support between them · Sunday to Thursday, 9:00 to 18:00',
+    prG3: 'A plan built around you, updated as you go',
+    prG4: 'The ₪690 from the mapping comes off in full',
+    pr3n: 'Family guidance',
+    pr3s: 'When the money of both of you is one pot',
+    pr3cta: 'Book an intro call',
+    prH1: 'The same 4 sessions and the same full phone support between them',
+    prH2: 'The dynamic between the two of you around money, not only the numbers',
+    prH3: 'The income, spending and obligations of a whole household, and a plan built for that',
+    prH4: '₪2,995 per person · less than an individual pays for the same guidance',
+    prP1: '₪690',
+    prP2: '₪3,990',
+    prP3: '₪5,990',
+    prA1: 'One payment',
+    prA2: '₪3,300 in practice, after the mapping comes off',
+    prA3: '₪5,300 in practice · ₪2,995 each',
+    prM1Name: "Financial mapping",
+    prM1Title: "₪690",
+    pr2av: '<strong>Why guidance and not one session:</strong> managing money is 90% behaviour and habits and 10% technical knowledge. The mapping covers the 10%. The months that follow cover the 90%.',
+    prM1Body: "<p>This is the way to start without committing to a full process.</p><p>We meet once, and I ask the questions nobody has asked you · not just what comes in and what goes out, but what runs through your head when you open your banking app.</p><p>After the session I build the full picture: what actually comes in, where it goes, where money disappears without you noticing, and where you really stand against your goals. Along with a personal budget file, built around you, that you can keep working with on your own.</p><p>By the end you know exactly where you stand. What you do with that is your decision.</p><p><strong>What is not here:</strong> the mapping is one session, and no personal guidance follows it. You get the picture and the file and carry on with them on your own. The close guidance, and my availability on WhatsApp and by phone, belong to the continuing tracks.</p><p><strong>And if you decide to continue to full guidance within 30 days, the ₪690 comes off the price.</strong> You do not pay twice for the same work.</p>",
+    dir: 'ltr',
+    pageTitle: 'Pricing | Shoham Abu, financial guidance',
+    back: 'Back to the site',
+    endLine: 'A question about one of the tracks? Do not weigh it up alone.',
+    endCta: 'Message me on WhatsApp',
+    closeLabel: 'Close',
+  },
+};
+
+const TEXT_KEYS = ["prLabel", "prTitle", "prLead", "prGuarantee", "prCapacity", "prNote", "pr1n", "pr1s", "pr1a", "pr1b", "pr1c", "prNoGuide", "pr1cta", "pr1more", "pr2n", "pr2s", "pr2cta", "prG1", "prG2", "prG3", "prG4", "pr3n", "pr3s", "pr3cta", "prH1", "prH2", "prH3", "prH4", "prP1", "prP2", "prP3", "prA1", "prA2", "prA3", "prM1Name", "prM1Title"];
+const HTML_KEYS = ["pr2av", "prM1Body"];
+
+function setLang(lang) {
+  const t = translations[lang];
+  if (!t) return;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = t.dir;
+  document.body.dir = t.dir;
+  document.title = t.pageTitle;
+
+  TEXT_KEYS.forEach(function (k) {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t[k];
+  });
+  /* ‏אלה נושאים תגיות בתוכם. */
+  HTML_KEYS.forEach(function (k) {
+    const el = document.getElementById(k);
+    if (el) el.innerHTML = t[k];
+  });
+
+  document.getElementById('pgBackText').textContent = t.back;
+  document.getElementById('pgEndLine').textContent = t.endLine;
+  document.getElementById('pgEndCta').textContent = t.endCta;
+  const close = document.querySelector('.privacy-close');
+  if (close) close.setAttribute('aria-label', t.closeLabel);
+
+  document.getElementById('langHe').setAttribute('aria-pressed', String(lang === 'he'));
+  document.getElementById('langEn').setAttribute('aria-pressed', String(lang === 'en'));
+  try { localStorage.setItem('shoham_lang', lang); } catch (e) {}
+}
+
+/* ‏אותה בחירת שפה שנעשתה בדף הנחיתה ממשיכה לכאן. */
+try {
+  const saved = localStorage.getItem('shoham_lang');
+  if (saved === 'en') setLang('en');
+} catch (e) {}
+
+/* ── ‏חלון הפירוט · אותה מעטפת של האתר ── */
+let prOpenEl = null, prOpener = null;
+
+function prFocusables(ov) {
+  return [...ov.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+    .filter(function (e) { return e.offsetParent !== null; });
+}
+
+/* ‏visibility מתהפך רק במסגרת השנייה · focus באותו בלוק
+   ‏סינכרוני פשוט לא תופס, ולכן בודקים עד שהוא נראה. */
+function prFocusWhenVisible(ov, tries) {
+  if (tries > 40) return;
+  if (getComputedStyle(ov).visibility !== 'visible') {
+    requestAnimationFrame(function () { prFocusWhenVisible(ov, tries + 1); });
+    return;
+  }
+  const f = prFocusables(ov);
+  if (f.length) f[0].focus();
+}
+
+function openPr(id, btn) {
+  const ov = document.getElementById(id);
+  if (!ov) return;
+  prOpener = btn || null;
+  prOpenEl = ov;
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  prFocusWhenVisible(ov, 0);
+}
+
+function closePr() {
+  if (!prOpenEl) return;
+  prOpenEl.classList.remove('open');
+  prOpenEl = null;
+  document.body.style.overflow = '';
+  if (prOpener) { prOpener.focus(); prOpener = null; }
+}
+
+function closePrOutside(e) {
+  if (e.target && e.target.classList.contains('privacy-overlay')) closePr();
+}
+
+document.addEventListener('keydown', function (e) {
+  if (!prOpenEl) return;
+  if (e.key === 'Escape') { closePr(); return; }
+  if (e.key !== 'Tab') return;
+  const f = prFocusables(prOpenEl);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+/* ‏הסקשן בנוי להופיע בגלילה · בעמוד שכולו הסקשן אין מה לחכות לו. */
+document.querySelectorAll('.reveal').forEach(function (e) { e.classList.add('in', 'on', 'visible'); });
+</script>
+</body>
+</html>
