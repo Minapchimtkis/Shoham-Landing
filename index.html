@@ -4601,11 +4601,17 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 .license-badge::after {
   content: '';
   position: absolute;
-  top: -60%;
-  bottom: -60%;
+  /* ‏גבוה הרבה מהכרטיסייה · ‏ב-60 אחוז הקצה התחתון של הפס
+     ‏עצמו נכנס למסגרת אחרי הסיבוב ונראה כחיתוך אלכסוני. */
+  top: -170%;
+  bottom: -170%;
   width: 86px;
   inset-inline-start: -110px;
-  background: linear-gradient(100deg,
+  /* ‏90 מעלות ולא 100 · ‏זה היה החיתוך. הקופסה צרה וגבוהה,
+     ‏86 על 158, וגרדיאנט באלכסון בתוכה לא ממלא אותה · ‏הוא
+     ‏מגיע לשקוף באמצע הדרך ומשאיר קצה חד. אופקי לגמרי,
+     ‏והנטייה מגיעה מהסיבוב בלבד. */
+  background: linear-gradient(90deg,
     rgba(255,255,255,0) 0%,
     rgba(255,248,230,0.10) 28%,
     rgba(255,250,236,0.62) 50%,
@@ -6158,11 +6164,14 @@ reveals.forEach(el => observer.observe(el));
 (function () {
   const step = document.getElementById('step4');
   if (!step || reduceMotion) return;
-  let fired = false;
+  /* ‏נורה בכל פעם שמגיעים לשלב, ולא פעם אחת לכל הביקור ·
+     ‏המנעול נפתח רק אחרי שהשלב באמת יצא מהמסך, אחרת גלילה
+     ‏קטנה קדימה ואחורה מציתה אותו שוב ושוב. */
+  let live = false;
 
   const burst = () => {
-    if (fired) return;
-    fired = true;
+    if (live) return;
+    live = true;
     const host = document.createElement('span');
     host.className = 'confetti-host';
     host.setAttribute('aria-hidden', 'true');
@@ -6194,11 +6203,11 @@ reveals.forEach(el => observer.observe(el));
 
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      burst();
-      io.disconnect();
+      if (e.isIntersecting) burst();
+      /* ‏יצא מהמסך לגמרי · ‏הפעם הבאה שייכנס תפוצץ שוב. */
+      else if (e.intersectionRatio === 0) live = false;
     });
-  }, { threshold: 0.55 });
+  }, { threshold: [0, 0.55] });
   io.observe(step);
 })();
 
@@ -7360,14 +7369,52 @@ function closeIphone() {
     }
   }
 
+  /* ‏הפרלקסה כולה יורדת במסך צר.
+
+     ‏בפתיחה היא כתבה transform ו-opacity בכל פריים על חמישה
+     ‏אלמנטים · ‏ביניהם הכותרת, שנושאת גרדיאנט על טקסט ושני
+     ‏drop-shadow, ותג ההסמכה, שנושא overflow: hidden ושכבה
+     ‏מטושטשת בפנים. כל כתיבה כזאת מחייבת לצייר מחדש את כל
+     ‏המבנה הזה, והטלפון לא עומד בזה · ‏בדיוק מה ששוהם תיאר,
+     ‏שהגלילה הכי תקועה בהתחלה ומשתחררת אחר כך.
+
+     ‏מעבר לפתיחה, מערכת העומק כותבת את --d1 ו--d2 על כל
+     ‏סקשן גלוי. משתנה שיושב בתוך transform אינו עובר דרך
+     ‏ה-GPU · ‏כל שינוי שלו הוא חישוב סגנון מחדש.
+
+     ‏במחשב כל זה נשאר כפי שהוא. */
+  let narrow = window.matchMedia('(max-width: 720px)').matches;
+  window.addEventListener('resize', () => {
+    const now = window.matchMedia('(max-width: 720px)').matches;
+    if (now === narrow) return;
+    narrow = now;
+    if (narrow) clearHero();
+  }, { passive: true });
+
+  /* ‏מנקים מה שהפרלקסה הספיקה לכתוב · ‏אחרת אלמנט נשאר
+     ‏מוזז או שקוף לנצח. */
+  function clearHero() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    hero.querySelectorAll('.hero-logo, .hero-title, .hero-audience, .hero-cta, .license-badge')
+      .forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
+    const v = hero.querySelector('.hero-view-img');
+    if (v) v.style.transform = '';
+  }
+
+  /* ‏נשאל פעם אחת ולא בכל פריים. */
+  const heroEls = document.querySelectorAll('.hero .hero-logo, .hero .hero-title, .hero .hero-audience, .hero .hero-cta, .hero .license-badge');
+  const heroView = document.querySelector('.hero .hero-view-img');
+
   function applyParallax() {
+    if (narrow) { ticking = false; return; }
+
     const scrollY = window.scrollY;
 
     // Hero parallax — only once user has actually scrolled,
     // so it doesn't fight the entrance fadeUp animations on load
     const hero = document.querySelector('.hero');
     if (hero && scrollY > 2) {
-      const heroEls = hero.querySelectorAll('.hero-logo, .hero-title, .hero-audience, .hero-cta, .license-badge');
       const fade = Math.max(0, 1 - scrollY / 600);
       const travel = Math.min(scrollY, vh);
       // Past the fade the hero is invisible and its pieces have stopped
@@ -7386,10 +7433,9 @@ function closeIphone() {
       // from the foot of the frame, where the ground is, so the horizon rises
       // as it comes. Someone who asked their system for less movement gets
       // the travel without the growth.
-      const view = hero.querySelector('.hero-view-img');
-      if (view) {
+      if (heroView) {
         const dolly = prefersStill ? 1 : 1 + (travel / vh) * 0.10;
-        view.style.transform =
+        heroView.style.transform =
           `translateY(${travel * 0.09}px) scale(${dolly.toFixed(4)})`;
       }
     }
@@ -7399,7 +7445,7 @@ function closeIphone() {
     ticking = false;
   }
 
-  if (!prefersStill) { applyDepth(); applyExit(); applySteps(); }
+  if (!prefersStill && !narrow) { applyDepth(); applyExit(); applySteps(); }
 
   window.addEventListener('scroll', () => {
     if (!ticking) {
