@@ -241,8 +241,8 @@ button, input, select, textarea { font-family: inherit; }
   --w-ui-soft: 500;
   --w-body: 400;
 
-  --p1: #0c0b11;
-  --p2: #161322;
+  --p1: #100e17;
+  --p2: #181527;
   --surface: rgba(255,255,255,0.03);
   --p3: #2e1148;
   --p4: #7c3aed;
@@ -416,7 +416,7 @@ a, input, textarea, label, summary { touch-action: manipulation; }
 
 body {
   font-family: var(--font);
-  background: radial-gradient(ellipse 120% 80% at 50% -10%, #1a1230 0%, var(--p1) 50%) var(--p1);
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #241c42 0%, var(--p1) 50%) var(--p1);
   color: var(--white);
   direction: rtl;
   overflow-x: hidden;
@@ -1638,45 +1638,12 @@ section {
   margin-bottom: 80px;
 }
 
-.phil-card {
-  background: var(--surface);
-  border: 1px solid rgba(168,85,247,0.15);
-  border-radius: 16px;
-  padding: 32px 28px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.4s, background 0.4s,
-              opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
-}
 
-.phil-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--p4), var(--p5), var(--gold));
-  opacity: 0;
-  transition: opacity 0.4s;
+
+@media (hover: hover) and (pointer: fine) {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .phil-card:hover {
-    border-color: rgba(168,85,247,0.35);
-    background: rgba(168,85,247,0.06);
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .phil-card:hover::after { opacity: 1; }
-}
-
-.phil-num {
-  font-family: var(--font);
-  font-size: 48px;
-  font-weight: 900;
-  color: rgba(168,85,247,0.18);
-  line-height: 1;
-  margin-bottom: 12px;
 }
 
 .phil-title {
@@ -3952,7 +3919,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 /* ‏JS כותב חמישה מספרים בלבד, וכל השאר נגזר מהם כאן, כדי
    שבכל פריים תהיה קבוצת כתיבה אחת ולא חישוב בתוך הקוד. */
-.demon-card, .phil-card {
+.demon-card {
   --px: 0;     /* מרחק הסמן ממרכז הכרטיס, מנורמל לטווח 1± */
   --py: 0;
   --sx: 0px;   /* מרחק הברק ממרכז הכרטיס, בפיקסלים */
@@ -3961,28 +3928,8 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   transform-origin: 50% 50%;
 }
 
-/* ‏כרטיסי הפילוסופיה מקבלים את אותו משטח שכרטיסי השדים כבר
-   קיבלו. בלעדיו שתי השלשות נראות כמו שני אפקטים נפרדים
-   במקום כמו מערכת אחת. */
-.phil-card {
-  background:
-    linear-gradient(158deg, rgba(255,255,255,0.055), rgba(255,255,255,0.016));
-  box-shadow:
-    0 20px 44px -20px rgba(0,0,0,0.80),
-    0 3px 10px rgba(0,0,0,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.075);
-  transition: border-color 0.4s, box-shadow 0.4s, background 0.4s,
-              opacity 0.55s cubic-bezier(0.22,1,0.36,1),
-              transform 0.55s cubic-bezier(0.22,1,0.36,1);
-}
 
 @media (hover: hover) and (pointer: fine) {
-  .phil-card:hover {
-    box-shadow:
-      0 28px 60px -22px rgba(0,0,0,0.85),
-      0 0 34px -12px rgba(168,85,247,0.30),
-      inset 0 1px 0 rgba(255,255,255,0.10);
-  }
 }
 
 /* ‏העובי של הלוח, ועליו הברק. על אלמנט נפרד ולא על פסאודו,
@@ -4038,7 +3985,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
      שבכרטיס רחב ונמוך דווקא הסיבוב האנכי הוא שמעקם את
      הטקסט, והאופקי נקרא יפה. שני מספרים שונים כאן שומרים
      על אותה עוצמת הטיה בכרטיסים בשתי הצורות. */
-  .demon-card.visible, .phil-card.visible {
+  .demon-card.visible {
     transform:
       perspective(560px)
       rotateX(calc(var(--py) * -12deg))
@@ -4048,7 +3995,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
   /* ‏כל עוד הסמן בפנים ההטיה עוקבת אחריו בלי השהיה. ברגע
      שהוא יוצא חוזרת ההנעה הרגילה והכרטיס נח בחזרה. */
-  .demon-card.tilting, .phil-card.tilting {
+  .demon-card.tilting {
     transition: border-color 0.4s, background 0.4s;
   }
 
@@ -4063,7 +4010,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
      ההרמה והברק כבר אומרים שהסמן כאן, אז החלפה מיידית של
      הצל לא חסרה לאיש. במסך מגע אין הטיה, ושם המעבר הרך
      נשאר. */
-  .demon-card:hover, .phil-card:hover {
+  .demon-card:hover {
     box-shadow:
       0 20px 44px -20px rgba(0,0,0,0.80),
       0 3px 10px rgba(0,0,0,0.28),
@@ -4086,7 +4033,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
      ולא על הכרטיס תמיד, מפני שאותה הנעה משמשת גם לחשיפה
      בגלילה. לקצר אותה שם היה מוציא את ששת הכרטיסים האלה
      מהקצב של כל שאר הדף. */
-  .demon-card.untilting, .phil-card.untilting {
+  .demon-card.untilting {
     transition-duration: 0.4s, 0.4s, 0.4s, 0.55s, 0.22s;
   }
 
@@ -4103,36 +4050,24 @@ html.faq-open .iphone-wrap.visible .iphone-close {
     transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
   }
 
-  /* ‏הספרה נעה בכיוון ההפוך לסיבוב. זה מה שמציב אותה מתחת
-     לפני השטח במקום עליו. שאר הטקסט אינו זז: ספרה אחת
-     שנעה בניגוד לכל השאר אומרת את העומק בבירור רב יותר
-     משלוש שכבות שנעות יחד. */
-  .phil-card .phil-num {
-    transform: translate3d(calc(var(--px) * -6px), calc(var(--py) * -6px), 0);
-    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
-  }
 
   /* ‏גם השכבות שבפנים מפסיקות להשתהות כל עוד הסמן בתנועה. */
   .demon-card.tilting .demon-text-wrap,
-  .phil-card.tilting .phil-num { transition: none; }
 
   /* ‏כל שכבה שזזה מקבלת משטח צביעה משלה, אחרת כל תזוזה
      שלה מכריחה את הכרטיס כולו להיצבע מחדש. זה קיים רק
      כל עוד הסמן בפנים, מפני שמשטח צביעה עולה זיכרון. */
   .demon-card.tilting .demon-text-wrap,
   .demon-card.tilting .surf::after,
-  .phil-card.tilting .phil-num,
-  .phil-card.tilting .surf::after { will-change: transform; }
 }
 
 /* ‏מי שביקש לצמצם אנימציות מקבל את הקצה הפיזי בלבד: שום
    דבר לא מסתובב ושום שכבה לא נעה. הבלוק הזה חייב להיות
    האחרון בגיליון, אחרת הוא מפסיד בהכרעת סדר המקור. */
 @media (prefers-reduced-motion: reduce) {
-  .demon-card, .phil-card,
-  .demon-card.visible, .phil-card.visible { transform: none !important; }
+  .demon-card,
+  .demon-card.visible { transform: none !important; }
   .demon-card .demon-text-wrap,
-  .phil-card .phil-num { transform: none !important; }
   .surf::after { transition: none; }
 }
 
@@ -4548,6 +4483,99 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 @media (max-width: 480px) {
   .hero-audience { font-size: 15px; }
 }
+
+/* ── ‏מספרי התהליך בזהב ─────────────────────────────────
+   ‏ארבעה עיגולים סגולים מלאים הם ארבעה כתמים באותו משקל של
+   ‏הכפתור, והם גנבו ממנו את העין. מעגל פתוח עם ספרה בזהב
+   ‏קורא כמספור של תוכנית ולא ככפתור, וכך הזהב המלא נשאר
+   ‏שמור לדבר אחד בדף · ‏"לדבר איתי".
+
+   ‏הספרות עצמן גדולות יותר · ‏הן המבנה של הסקשן, והן ישבו
+   ‏ב-22 פיקסל בתוך עיגול של 52. */
+/* ‏בלי מילוי מאחורי הספרה · ‏מעגל פתוח וספרה בזהב. ההילה
+   ‏הוסיפה משקל לארבעה דברים שאמורים להיות מספור ותו לא. */
+.process-num {
+  background: transparent;
+  border: 1.5px solid rgba(216,184,121,0.45);
+  color: var(--gold);
+  font-size: 24px;
+  box-shadow: none;
+}
+
+/* ‏הקו שמחבר בין הצעדים עובר לזהב איתם · ‏ארבע ספרות זהב
+   ‏על חוט סגול נראות כמו שתי מערכות ולא כמו שרשרת אחת. */
+.process-line {
+  background: linear-gradient(180deg,
+    rgba(216,184,121,0.50) 0%,
+    rgba(216,184,121,0.50) calc(var(--fill) * 100%),
+    rgba(216,184,121,0.09) calc(var(--fill) * 100%),
+    rgba(216,184,121,0.09) 100%);
+}
+
+.process-line::after {
+  background: linear-gradient(180deg, transparent, #e3c68d, #fbe9c4, #e3c68d, transparent);
+  box-shadow: 0 0 12px rgba(216,184,121,0.85), 0 0 24px rgba(216,184,121,0.5);
+}
+
+/* ── ‏תג ההסמכה ─────────────────────────────────────────
+   ‏ההסמכה היא הדבר שהכי קרוב לחתימה על אמינות, והיא ישבה
+   ‏בסגול על סגול כמו כל שאר הדף. מסגרת זהב, מגן זהב וכותרת
+   ‏לבנה · ‏אותו טיפול שהזהב מקבל בכפתור, בלי מילוי מלא,
+   ‏כדי שלא יתחרה בו. */
+.license-badge {
+  border-color: rgba(216,184,121,0.42);
+  background: rgba(216,184,121,0.045);
+}
+
+/* ‏המגן גדל מ-17 ל-26 · ‏בגודל הקודם הוא היה סימן פיסוק
+   ‏ליד הטקסט, ולא חותמת. */
+.license-shield { color: var(--gold); flex-shrink: 0; }
+
+.license-title { color: #ffffff; }
+
+.license-sub { color: rgba(255,255,255,0.62); }
+
+/* ── ‏שטח נגיעה ─────────────────────────────────────────
+   ‏שלושה פקדים בדף היו מתחת לרצפת 44 הפיקסלים שכל השאר
+   ‏עומד בה · ‏מתג השפה ב-26, שני קישורי הפוטר ב-30 וקישור
+   ‏הדילוג ב-41.
+
+   ‏בכל השלושה שטח הנגיעה גדל והמראה לא · ‏פסאודו שקוף על
+   ‏מתג השפה, וריפוד עם שוליים שליליים שמתקזזים בפוטר.
+   ‏להגדיל אותם באמת היה שובר את השורה שהם יושבים בה. */
+/* ‏פסאודו שקוף לא הספיק · ‏נמדד, שטח הנגיעה נשאר 26.
+   ‏גובה אמיתי, והמתג כולו עולה ל-50 פיקסל · ‏עדיין נמוך
+   ‏משורת הניווט ועכשיו תואם לכפתור התפריט שלידו. */
+.lang-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ‏הריפוד של 3 הוסיף 8 פיקסל על 44 והמתג יצא 52 · ‏גבוה
+   ‏מכפתור התפריט שלידו, בשביל הפקד הכי פחות חשוב בשורה.
+   ‏הכפתורים נוגעים במסגרת, והמתג יושב בדיוק על 44. */
+.lang-toggle { padding: 0; }
+
+/* ‏והמילוי של הפעיל מתעדן · ‏מה שהכביד היה הצבע ולא הגודל.
+   ‏הסגול המלא בפינה העליונה גנב את העין מהלוגו. */
+.lang-btn.active {
+  background: rgba(168,85,247,0.30);
+  box-shadow: inset 0 0 0 1px rgba(216,180,254,0.22);
+}
+
+/* ‏ריפוד של 7 נתן 30 ולא 44 · ‏גובה מפורש, והשוליים
+   ‏השליליים מחזירים את המרווח כך שהשורה לא זזה. */
+.footer-privacy-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
+  margin-block: -7px;
+}
+
+.skip-link { padding: 14px 20px; }
 
 /* ── ‏משוב למגע ──────────────────────────────────────────
    ‏ארבעה אלמנטים לחיצים בדף לא הגיבו בכלל לנגיעה · ‏אצבע
@@ -5088,7 +5116,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   </div>
 
   <div class="license-badge">
-    <svg class="license-shield" viewBox="0 0 24 24" aria-hidden="true" width="17" height="17"><path d="M12 3l7 3v5.2c0 4.3-2.9 7.9-7 9.3-4.1-1.4-7-5-7-9.3V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 11.8l2 2 3.6-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="license-shield" viewBox="0 0 24 24" aria-hidden="true" width="26" height="26"><path d="M12 3l7 3v5.2c0 4.3-2.9 7.9-7 9.3-4.1-1.4-7-5-7-9.3V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 11.8l2 2 3.6-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="license-copy">
       <span class="license-title">יועץ כלכלי מוסמך מטעם חברת UNI פיננסים</span>
       <span class="license-sub">בפיקוח אוניברסיטת אריאל</span>
@@ -5139,7 +5167,8 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 </section>
 
 <!-- PAIN -->
-<section data-stage="pain" data-stage-i="1" class="pain">
+<section data-stage="pain" data-stage-i="1" class="pain band">
+  <span class="wave wave-top" aria-hidden="true"></span>
   <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">השדים שבראש</div>
   <h2 class="pain-title reveal">הבעיה האמיתית היא לא המספרים.<br>היא מה שאנחנו מאמינים עליהם.</h2>
   <div class="demons">
@@ -5156,6 +5185,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <img decoding="async" src="assets/demon-3.webp" alt="דפוס" class="demon-icon-img" loading="lazy"><div class="demon-text-wrap"><div class="demon-title">אנחנו חוזרים על הדפוסים</div><div class="demon-desc">כי הרגלים פיננסיים נבנו שנים. לשנות אותם דורש כלים נכונים, לא רק רצון טוב.</div></div>
     </div>
   </div>
+  <span class="wave wave-bottom" aria-hidden="true"></span>
 </section>
 
 <!-- WHAT IS -->
@@ -5396,7 +5426,8 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 </section>
 
 <!-- FAQ -->
-<section data-stage="faq" data-stage-i="8" class="faq-section" id="faq">
+<section data-stage="faq" data-stage-i="8" class="faq-section band" id="faq">
+  <span class="wave wave-top" aria-hidden="true"></span>
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">שאלות ותשובות</div>
     <h2 class="faq-title reveal">שאלות שכדאי לשאול.</h2>
@@ -5477,6 +5508,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 
     </div>
   </div>
+  <span class="wave wave-bottom" aria-hidden="true"></span>
 </section>
 
 <!-- CTA -->
@@ -5976,7 +6008,11 @@ const observer = new IntersectionObserver(entries => {
 
    ‏מי שביקש פחות תנועה לא מקבל השהיה בכלל. */
 if (!reduceMotion) {
-  const STEP = 70, MAX = 3;
+  /* ‏90 במקום 70 ותקרה של חמש מדרגות במקום שלוש · ‏שוהם
+     ‏ביקש שהטקסט יופיע אחד־אחד עם הגלילה ולא ייראה כעומס.
+     ‏האחרון בקבוצה מתחיל 450 מילישניות אחרי הראשון, וזה
+     ‏עדיין בתוך הזמן שלוקח לאצבע לחשוף את הקבוצה. */
+  const STEP = 90, MAX = 5;
   reveals.forEach(el => {
     let i = 0;
     for (let sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
@@ -6010,7 +6046,7 @@ reveals.forEach(el => observer.observe(el));
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  document.querySelectorAll('.demon-card, .phil-card').forEach(function (card) {
+  document.querySelectorAll('.demon-card').forEach(function (card) {
     var pending = null, frame = 0, rest = 0, box = null;
 
     function paint() {
