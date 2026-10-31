@@ -2063,30 +2063,41 @@ section {
      the separating. */
   margin: 56px auto 0;
 }
-/* ‏האפשרות השלישית · שקטה מהטלפון בכוונה, לפי אותה היררכיה
-   ‏של .call-or. בלי כללים משלה היא ירשה את גודל הטקסט של הדף
-   ‏ואת הקו הכחול שהדפדפן נותן לקישור, ויצאה רועשת יותר
-   ‏מהכפתור שמעליה · בדיוק ההפך ממה שהיא אמורה להיות. */
+/* ‏שתי האפשרויות השקטות · ‏קו שיער ושני קישורים בשורה
+   ‏אחת. ‏קודם היו כאן שני משפטים שלמים שבתוך כל אחד קבור
+   ‏קישור עם קו תחתון, ‏ופתיחה "או" ‏נפרדת לכל אחד · ‏שש
+   ‏שורות בשביל שתי לחיצות, ‏בתחתית דף ארוך שבו אדם כבר
+   ‏החליט אם הוא לוחץ או לא. ‏הקו אומר בלי מילים את מה
+   ‏ששני המשפטים ניסו לומר: ‏עד כאן זה לדבר איתי, ‏מכאן
+   ‏זה להסתכל קודם. */
 .intake-row {
-  max-width: 40ch;
-  margin: 20px auto 0;
-  font-size: 13.5px;
-  font-weight: 300;
-  line-height: 1.75;
+  max-width: 290px;
+  margin: 30px auto 0;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.07);
   text-align: center;
-  /* ‏מאזן את אורכי השורות במקום למלא את הראשונה עד הסוף
-     ‏ולהשאיר בשנייה שארית. דפדפן שאינו מכיר פשוט שובר רגיל. */
-  text-wrap: balance;
-  color: rgba(255,255,255,0.62);
+}
+
+.intake-sep {
+  color: rgba(255,255,255,0.22);
+  font-size: 13px;
+  padding: 0 6px;
 }
 
 /* ‏אותו קישור מוטבע כמו בטקסט ההסכמה · סגול עם קו תחתון
    ‏מרווח, ולא ברירת המחדל של הדפדפן. */
 .intake-link {
-  color: var(--p6);
+  display: inline-block;
+  color: #c9a9f5;
+  font-size: 14px;
   font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  /* ‏בלי קו תחתון · ‏שני קישורים מסומנים בתחתית הדף משכו
+     ‏את העין בדיוק למקום הכי משני בבלוק. */
+  text-decoration: none;
+  /* 16 ‏גובה שורה ועוד 14 ‏למעלה ולמטה · ‏44 ‏בדיוק.
+     ‏קודם הם היו 16 ‏פיקסל בלבד, ‏הרבה מתחת לרצפת הנגיעה. */
+  padding: 14px 8px;
+  line-height: 16px;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -5716,14 +5727,13 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     </a>
   </div>
 
-  <!-- ‏מי שכבר החליט ממלא טופס או מרים טלפון. השאלון הוא למי
-       ‏שרוצה להגיע לשיחה כשהתמונה כבר על השולחן, ולכן הוא
-       ‏האפשרות השלישית ולא הראשונה. -->
-  <p class="intake-row reveal" id="intakeRow">מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ותגיעו לשיחה כשהתמונה כבר על השולחן.</p>
-
-  <!-- ‏הדרך השנייה לעמוד המחירים · כאן, בקצה הדף, בשביל מי
-       ‏שגלל עד הסוף ורוצה לראות מספרים לפני שהוא פונה. -->
-  <p class="intake-row reveal" id="priceRow">או <a class="intake-link" href="/pricing/">תראו קודם את המחירים</a>, במלואם ובלי להתחייב.</p>
+  <!-- ‏מי שכבר החליט ממלא טופס או מרים טלפון. ‏שתי אלה הן למי
+       ‏שרוצה להגיע לשיחה מוכן יותר, ‏ולכן הן האחרונות ושקטות
+       ‏מכולן · ‏שם הקישור אומר את עצמו, ‏וההסבר שהיה כאן ישב
+       ‏מתחת לטופס ומתחת לטלפון, ‏במקום שבו כבר לא קוראים. -->
+  <div class="intake-row reveal">
+    <a class="intake-link" id="intakeLink" href="/intake.html">שאלון ההיכרות</a><span class="intake-sep" aria-hidden="true">·</span><a class="intake-link" id="priceLink" href="/pricing/">המחירים המלאים</a>
+  </div>
 </section>
 
 
@@ -7810,8 +7820,8 @@ const translations = {
     q5: 'תוך כמה זמן רואים תוצאות?', a5: 'סדר ובהירות תקבל כבר מהחודש הראשון. תוצאות כלכליות משמעותיות נבנות לאורך זמן ובעקביות. אני לא מבטיח הבטחות שווא, אלא בונה איתך תהליך אמיתי, צעד אחר צעד.',
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
     callOr: 'או פשוט תרימו טלפון',
-    intakeRow: 'מלאו את <a class="intake-link" href="/intake.html">שאלון ההיכרות</a> ותגיעו לשיחה כשהתמונה כבר על השולחן.',
-    priceRow: 'או <a class="intake-link" href="/pricing/">תראו קודם את המחירים</a>, במלואם ובלי להתחייב.',
+    intakeLink: 'שאלון ההיכרות',
+    priceLink: 'המחירים המלאים',
     ctaSub: 'השאירו פרטים ואחזור אליכם בהקדם האפשרי. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
@@ -7915,8 +7925,8 @@ const translations = {
     q5: 'How long until I see results?', a5: "You'll gain clarity and structure from the first month. Significant financial results are built over time with consistency. I don't make empty promises. I build a real process with you, step by step.",
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
     callOr: 'Or simply pick up the phone',
-    intakeRow: 'Fill in the <a class="intake-link" href="/intake.html">intake questionnaire</a> and come to the call with the picture already on the table.',
-    priceRow: 'Or <a class="intake-link" href="/pricing/">see the prices first</a>, in full and with no commitment.',
+    intakeLink: 'Intake questionnaire',
+    priceLink: 'Full prices',
     ctaSub: "Leave your details and I'll get back to you as soon as possible. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
@@ -8128,12 +8138,11 @@ function setLang(lang) {
   // CTA
   sectionLabels[7].textContent = t.ctaLabel;
   document.querySelector('.cta-title').textContent = t.ctaTitle;
-  const intakeRowEl = document.getElementById('intakeRow');
-  /* ‏השורה נושאת קישור בתוכה, ולכן innerHTML. */
-  if (intakeRowEl) intakeRowEl.innerHTML = t.intakeRow;
-  const priceRowEl = document.getElementById('priceRow');
-  /* ‏גם היא נושאת קישור בתוכה. */
-  if (priceRowEl) priceRowEl.innerHTML = t.priceRow;
+  /* ‏שני קישורים ולא שני משפטים · ‏textContent ‏מספיק. */
+  const intakeLinkEl = document.getElementById('intakeLink');
+  if (intakeLinkEl) intakeLinkEl.textContent = t.intakeLink;
+  const priceLinkEl = document.getElementById('priceLink');
+  if (priceLinkEl) priceLinkEl.textContent = t.priceLink;
   const callOr = document.getElementById('callOr');
   if (callOr) callOr.textContent = t.callOr;
   const callLink = document.getElementById('callLink');
