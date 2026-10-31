@@ -2479,8 +2479,19 @@ section {
 
 
 /* ── SUCCESS ── */
+/* ‏זאת פסגת הרגש של הדף · ‏מישהו בדיוק השאיר פרטים. עד
+   ‏עכשיו הטופס נעלם וההודעה הופיעה באותו פריים, בלי שום
+   ‏גשר ביניהם.
+
+   ‏display לא ניתן להנפשה, ולכן הוא עדיין מתחלף · ‏אבל
+   ‏מיד אחריו נדחף reflow והמחלקה נוספת בפריים הבא, וכך
+   ‏המעבר באמת רץ. */
 .success-msg {
   display: none;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 0.35s cubic-bezier(0.22,1,0.36,1),
+              transform 0.35s cubic-bezier(0.22,1,0.36,1);
   padding: 32px;
   background: rgba(168,85,247,0.1);
   border: 1px solid rgba(168,85,247,0.3);
@@ -2488,6 +2499,24 @@ section {
   font-size: 18px;
   font-weight: 600;
   color: var(--p6);
+}
+
+.success-msg.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ‏הטופס יוצא לפני שההודעה נכנסת · ‏160 מילישניות, קצר
+   ‏מהכניסה בכוונה: יציאה שמושכת זמן מרגישה כמו היסוס. */
+.contact-form-leaving {
+  opacity: 0;
+  transition: opacity 0.16s ease-in;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-msg { transform: none; transition: opacity 0.2s linear; }
+  .contact-form-leaving { transition: opacity 0.1s linear; }
 }
 
 .quiz-section {
@@ -2668,6 +2697,12 @@ section {
   .gift-card:hover { transform: none; }
 }
 
+/* ‏הייתה היחידה מבין שלוש השכבות בדף שקפצה · ‏display
+   ‏מ-none ל-flex באותו פריים. זה הדפוס של .privacy-overlay
+   ‏שכבר בקובץ, מועתק כלשונו ולא מומצא מחדש.
+
+   ‏visibility עם השהיה באורך היציאה · ‏בלעדיה שני השדות
+   ‏שבפנים נשארים בסדר הטאבים גם כשהשכבה סגורה. */
 .wa-overlay {
   position: fixed;
   inset: 0;
@@ -2675,13 +2710,33 @@ section {
   background: rgba(4,0,12,0.86);
   backdrop-filter: blur(7px);
   -webkit-backdrop-filter: blur(7px);
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 22px 18px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.22,1,0.36,1),
+              visibility 0s linear 0.3s;
 }
 
-.wa-overlay.open { display: flex; }
+.wa-card {
+  transform: translateY(18px) scale(0.98);
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-overlay { transition: opacity 0.2s linear, visibility 0s linear 0.2s; }
+  .wa-card { transform: none; transition: none; }
+}
+
+.wa-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s cubic-bezier(0.22,1,0.36,1), visibility 0s;
+}
+
+.wa-overlay.open .wa-card { transform: none; }
 
 .wa-card {
   width: min(100%, 420px);
@@ -2912,11 +2967,6 @@ footer {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.3; }
-  50%       { opacity: 0.6; }
-}
 
 .reveal {
   opacity: 0;
@@ -4419,6 +4469,68 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   .pr-gate-btn:hover { transform: none; }
 }
 
+/* ── ‏האור שזז ─────────────────────────────────────────
+   ‏בכל רגע נתון בדף הזה זזו שני אלמנטים בלבד, ושניהם
+   ‏תמונות רקע. כל השאר נכנס פעם אחת ונעצר · ‏ולכן הדף
+   ‏נקרא כקפוא, למרות שיש בו 77 מעברים.
+
+   ‏זאת התנועה היחידה כאן שאינה מתקנת קפיצה או משוב חסר.
+   ‏היא איטית בכוונה · ‏ארבע עשרה שניות למחזור מלא, רוחב
+   ‏כפול, ומעבר לינארי. אף אחד לא אמור לתפוס אותה במבט
+   ‏ישיר; היא עובדת בפריפריה.
+
+   ‏שתי כותרות בלבד, אלה שכבר נושאות גרדיאנט · ‏הכותרת
+   ‏הראשית וזאת שמובילה לעמוד המחירים. */
+@keyframes titleDrift {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+
+.hero-title,
+.pr-gate-title {
+  background-size: 220% 100%;
+  animation: titleDrift 14s linear infinite alternate;
+}
+
+/* ‏מי שביקש פחות תנועה מקבל את הגרדיאנט עומד · ‏הצבע נשאר,
+   ‏התנועה לא. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-title,
+  .pr-gate-title {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}
+
+/* ── ‏משוב למגע ──────────────────────────────────────────
+   ‏ארבעה אלמנטים לחיצים בדף לא הגיבו בכלל לנגיעה · ‏אצבע
+   ‏יורדת, שום דבר לא זז, והאדם לא יודע אם הוא פגע. כל שאר
+   ‏הכפתורים באתר כבר עושים את זה.
+
+   ‏על כפתור יש כיווץ, ועל קישור בתוך משפט יש עמעום בלבד ·
+   ‏כיווץ על מילה בתוך שורה מזיז את השורה. */
+.site-link:active,
+.call-link:active,
+.footer-link:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.intake-link:active { opacity: 0.6; }
+
+/* ‏המעברים המקוריים נשמרים אות באות · ‏מה שנוסף הוא רק
+   ‏transform במשך קצר. transition-duration לבדו היה מקצר
+   ‏גם את דעיכת הריחוף מ-300 מילישניות ל-140. */
+.site-link   { transition: background 0.3s, border-color 0.3s, transform 0.14s cubic-bezier(0.22,1,0.36,1); }
+.call-link   { transition: border-color 0.3s, background 0.3s, transform 0.14s cubic-bezier(0.22,1,0.36,1); }
+.footer-link { transition: background 0.25s, color 0.25s, transform 0.14s cubic-bezier(0.22,1,0.36,1); }
+
+.intake-link { transition: opacity 0.14s cubic-bezier(0.22,1,0.36,1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-link:active, .call-link:active, .footer-link:active { transform: none; }
+}
+
 /* ── ‏אוויר · ‏מרווח בין הסקשנים במסך רחב ──────────────────
    ‏בטלפון כל פיקסל אנכי נוסף הוא גלילה, ובדיוק את זה ניסינו
    ‏להוריד · ולכן הערכים שם נשארים כפי שהם. במסך רחב המצב
@@ -5742,6 +5854,37 @@ const observer = new IntersectionObserver(entries => {
   // the animation should be finished by the time it is being read.
 }, { threshold: 0, rootMargin: '0px 0px 120px 0px' });
 
+/* ‏מדרגה בין אחים · ‏בלי זה שלושת כרטיסי "השדים", ארבעת
+   ‏צעדי התהליך ושלוש השאלות חוצים את הסף באותו פריים
+   ‏ונוחתים כגוש אחד. 70 מילישניות הן מתחת לסף שבו מישהו
+   ‏סופר את הפריטים, ומעל הסף שבו הם נראים כאחד.
+
+   ‏נכתב פעם אחת בטעינה ולא בזמן הכניסה · ‏המשקיף מקבל
+   ‏אלמנטים בחבילות, והאינדקס בתוך חבילה אינו האינדקס
+   ‏במסמך. התקרה היא שלוש מדרגות, 210 מילישניות · ‏מעבר לזה
+   ‏הפריט האחרון מרגיש כאילו שכחו אותו.
+
+   ‏מי שביקש פחות תנועה לא מקבל השהיה בכלל. */
+if (!reduceMotion) {
+  const STEP = 70, MAX = 3;
+  reveals.forEach(el => {
+    let i = 0;
+    for (let sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
+      if (sib.classList.contains('reveal') ||
+          sib.classList.contains('reveal-left') ||
+          sib.classList.contains('reveal-scale') ||
+          sib.classList.contains('step')) i++;
+    }
+    /* ‏אלמנט שכבר נושא השהיה משלו בקוד נשאר כפי שהוא ·
+       ‏שלושת כרטיסי "השדים" כבר תוזמנו ביד ב-0.12 שניות,
+       ‏וזאת החלטה שנכתבה בכוונה. ההוספה כאן היא רק למי
+       ‏שאין לו. */
+    if (i > 0 && !el.style.transitionDelay) {
+      el.style.transitionDelay = Math.min(i, MAX) * STEP + 'ms';
+    }
+  });
+}
+
 reveals.forEach(el => observer.observe(el));
 
 // ── עומק בכרטיסים ──
@@ -6088,8 +6231,18 @@ function submitForm() {
   .then(function(response) {
     if (!response.ok) throw new Error('Lead API responded with status ' + response.status);
     // Show success
-    document.getElementById('contactForm').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
+    const formEl = document.getElementById('contactForm');
+    const okEl = document.getElementById('successMsg');
+    formEl.classList.add('contact-form-leaving');
+    setTimeout(function () {
+      formEl.style.display = 'none';
+      okEl.style.display = 'block';
+      /* ‏קריאה שמאלצת חישוב פריסה · ‏בלי זה הדפדפן מאחד את
+         ‏שינוי ה-display עם הוספת המחלקה לפריים אחד, ואין
+         ‏מצב התחלתי שממנו להנפיש. */
+      void okEl.offsetHeight;
+      okEl.classList.add('in');
+    }, 170);
     try { window.trackStage('lead', 10, true); } catch (e) {}
     try { localStorage.setItem('shoham_lead_phone', phone); } catch (e) {}
     setQuizPhone(phone);
