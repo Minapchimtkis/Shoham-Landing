@@ -4888,33 +4888,6 @@ html[dir="rtl"] .license-badge::after { --glint-to: -640px; }
 .nav-menu-list a:active { opacity: 0.7; }
 .nav-menu-list a:focus-visible { outline: 2px solid var(--p6); outline-offset: 2px; }
 
-/* ‏נדחף לתחתית הלוח · ‏הוא ההחלטה האחרונה בתפריט, לא עוד
-   ‏פריט ברשימה, והמרחק הוא מה שאומר את זה. */
-.nav-menu-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 56px;
-  margin-top: auto;
-  padding: 16px 28px;
-  border-radius: 100px;
-  background: linear-gradient(135deg, #7c3aed, #9d4edd);
-  color: #fff;
-  font-family: var(--font);
-  font-size: 16.5px;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 12px 30px -12px rgba(124,58,237,0.75);
-  transition: background 0.25s, transform 0.25s;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .nav-menu-cta:hover { background: linear-gradient(135deg, #9d4edd, #7c3aed); transform: translateY(-2px); }
-}
-
-.nav-menu-cta:active { transform: translateY(0); opacity: 0.9; }
-.nav-menu-cta:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
-
 /* ‏העוגן נוחת מתחת לשורה הקבועה בלי זה · ‏הדפדפן מיישר את
    ‏ראש הסקשן לראש החלון, ושם יושבת השורה. */
 html { scroll-padding-top: calc(var(--navh, 80px) + 24px); }
@@ -4933,8 +4906,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .nav-menu { transition: opacity 0.2s linear, visibility 0s linear 0.2s; transform: none; }
   .nav-menu.open { transition: opacity 0.2s linear, visibility 0s; transform: none; }
-  .nav-menu-chev, .nav-menu-btn, .nav-menu-cta { transition: none; }
-  .nav-menu-cta:hover { transform: none; }
+  .nav-menu-chev, .nav-menu-btn { transition: none; }
 }
 
 @media (min-width: 861px) {
@@ -4969,15 +4941,17 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
    ‏על רקע סגול · ‏הוא לא בלט מהדף, הוא היה חלק ממנו.
 
    ‏הכלל שנקבע כאן, והוא היחיד: זהב פירושו "לדבר איתי",
-   ‏סגול פירושו "לעבור למקום אחר". לכן הכפתור הראשי וכפתור
-   ‏התפריט התחתון הופכים לזהב, ואילו "לראות את המחירים",
-   ‏"לקרוא את התשובה" והסרגל התחתון נשארים סגולים · ‏הם
-   ‏ניווט, לא המרה.
+   ‏סגול פירושו "לעבור למקום אחר". לכן הכפתור הראשי הופך
+   ‏לזהב, ואילו "לראות את המחירים", "לקרוא את התשובה"
+   ‏והסרגל התחתון נשארים סגולים · ‏הם ניווט, לא המרה.
+
+   ‏בתפריט ישב כפתור זהב נוסף, והוא הוסר · ‏תפריט הוא מפה
+   ‏של הדף, וכפתור המרה בתחתית מפה הוא דחיפה במקום שבו
+   ‏ביקשו רק לדעת לאן ללכת.
 
    ‏טקסט כהה על הזהב ולא לבן · ‏נמדד, 8.64 מול סף של 4.5.
    ‏לבן על זהב היה נותן 2.1 ונופל. */
-.btn-primary,
-.nav-menu-cta {
+.btn-primary {
   /* ‏זהב אמיתי אינו צבע אחד · ‏הוא פס אור שנע על משטח מעוקל.
      ‏שתי עצירות נתנו משטח שטוח ומנומס; שש עצירות עם פס בהיר
      ‏ב-42 אחוז ושני קצוות עמוקים נותנות את ההחזר. */
@@ -5006,8 +4980,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 
 /* ‏בריחוף פס האור נודד · ‏אותן עצירות, מיקום אחר. */
 @media (hover: hover) and (pointer: fine) {
-  .btn-primary:hover,
-  .nav-menu-cta:hover {
+  .btn-primary:hover {
     background: linear-gradient(135deg,
       #c49b56 0%,
       #e7cb94 22%,
@@ -5250,7 +5223,6 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <a href="#faq"         id="nm7">שאלות ותשובות</a>
     </nav>
 
-    <a class="nav-menu-cta" href="#contact" id="nmCta">לשיחת היכרות</a>
   </div>
 </div>
 
@@ -7776,7 +7748,7 @@ const translations = {
     navMenu: 'תפריט', navMenuClose: 'סגירה',
     nm1: 'מה זה יועץ כלכלי', nm2: 'הגישה שלי', nm3: 'מי אני',
     nm4: 'לקוחות ממליצים', nm5: 'איך זה עובד', nm6: 'כמה זה עולה',
-    nm7: 'שאלות ותשובות', nmCta: 'לשיחת היכרות',
+    nm7: 'שאלות ותשובות',
     navMenuTitle: 'תפריט הדף',
     whatisBtnOpen: 'לקרוא את התשובה',
     whatisBtnClose: 'לסגור',
@@ -7881,7 +7853,7 @@ const translations = {
     navMenu: 'Menu', navMenuClose: 'Close',
     nm1: 'What a financial advisor is', nm2: 'My approach', nm3: 'About me',
     nm4: 'Client reviews', nm5: 'How it works', nm6: 'What it costs',
-    nm7: 'Questions and answers', nmCta: 'Book an intro call',
+    nm7: 'Questions and answers',
     navMenuTitle: 'Page menu',
     whatisBtnOpen: 'Read the answer',
     whatisBtnClose: 'Close',
@@ -8096,7 +8068,7 @@ function setLang(lang) {
     navBtnText.textContent = navBtn.getAttribute('aria-expanded') === 'true'
       ? t.navMenuClose : t.navMenu;
   }
-  ['nm1','nm2','nm3','nm4','nm5','nm6','nm7','nmCta','navMenuTitle'].forEach(k => {
+  ['nm1','nm2','nm3','nm4','nm5','nm6','nm7','navMenuTitle'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
