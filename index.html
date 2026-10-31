@@ -241,19 +241,9 @@ button, input, select, textarea { font-family: inherit; }
   --w-ui-soft: 500;
   --w-body: 400;
 
-  /* ‏הקרקע · ‏בהירות 23 במקום 11.
-     ‏צילמתי את הדף מלמעלה למטה וספרתי: 92 אחוז מהפיקסלים
-     ‏ישבו בתחום 0 עד 31, והממוצע היה 21. הדף לא הרגיש כהה
-     ‏מדי · ‏הוא הרגיש כהה *באופן אחיד*, בלי שום טווח שהעין
-     ‏תוכל לנוח עליו. מה שמשתנה כאן הוא לא הצבע אלא המרחק
-     ‏בין הקרקע למשטחים שעליה. */
-  --p1: #211d2e;
-  --p2: #2b2640;
-
-  /* ‏משטח מורם · ‏קודם הכרטיסים היו 0.03 לבן על קרקע כמעט
-     ‏שחורה, כלומר שלוש יחידות בהירות מעל הרקע. אי אפשר
-     ‏לראות כרטיס שנבדל בשלוש יחידות. */
-  --surface: rgba(255,255,255,0.055);
+  --p1: #0c0b11;
+  --p2: #161322;
+  --surface: rgba(255,255,255,0.03);
   --p3: #2e1148;
   --p4: #7c3aed;
   --p5: #a855f7;
@@ -421,7 +411,7 @@ a, input, textarea, label, summary { touch-action: manipulation; }
 
 body {
   font-family: var(--font);
-  background: radial-gradient(ellipse 120% 80% at 50% -10%, #2e2550 0%, var(--p1) 50%) var(--p1);
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #1a1230 0%, var(--p1) 50%) var(--p1);
   color: var(--white);
   direction: rtl;
   overflow-x: hidden;
