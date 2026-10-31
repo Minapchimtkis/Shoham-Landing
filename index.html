@@ -249,7 +249,12 @@ button, input, select, textarea { font-family: inherit; }
   --p5: #a855f7;
   --p6: #d8b4fe;
   --white: #ffffff;
-  --gold: #f0c040;
+  /* ‏שמפניה ולא צהוב · ‏אותה בהירות כמעט בדיוק, 186 מול
+     ‏193, אבל 55 אחוז רוויה במקום 85. בבהירות זהה הצהוב
+     ‏הרווי נקרא כסימון אזהרה והשמפניה נקראת ככסף, וזה
+     ‏ההבדל שמשנה במותג פיננסי. */
+  --gold: #d8b879;
+  --gold-deep: #c4a05c;
 }
 
 /* ── THE OPENING ─────────────────────────────────────────────────────── */
@@ -2129,7 +2134,9 @@ section {
   gap: 10px;
   /* 48px tall, which is a thumb rather than a cursor. */
   padding: 13px 26px;
-  border-radius: 100px;
+  /* ‏אותו רדיוס של שאר הפקדים בדף · ‏גלולה כאן הייתה
+     ‏השריד האחרון. */
+  border-radius: 12px;
   border: 1px solid rgba(216,180,254,0.30);
   background: rgba(168,85,247,0.07);
   color: var(--p6);
@@ -3742,7 +3749,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   overflow: hidden;
   border: 3px solid transparent;
   background: linear-gradient(#0a0015, #0a0015) padding-box,
-              linear-gradient(135deg, #f0c040, #a855f7, #f0c040) border-box;
+              linear-gradient(135deg, var(--gold), #a855f7, var(--gold)) border-box;
   box-shadow:
     0 20px 60px rgba(0,0,0,0.75),
     0 8px 20px rgba(0,0,0,0.6),
@@ -4459,6 +4466,87 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   .pr-gate-btn:hover { transform: none; }
 }
 
+/* ── ‏רצועה וגל ──────────────────────────────────────────
+   ‏שי כלכלי מחלק את הדף לשדות צבע, והמעבר ביניהם הוא קשת
+   ‏ולא קו ישר. זה כל מה שגורם לדף שלו להרגיש זורם · ‏לא
+   ‏אנימציה, צורה.
+
+   ‏אצלו הקשת מפרידה בין טורקיז לשמנת. כאן אין שמנת, ולכן
+   ‏השדה הוא אותו סגול ברוויה גבוהה יותר · ‏בהירות 17 מול
+   ‏11.6, כלומר כמעט אותו משקל, אבל צבע אחר לגמרי. הדף לא
+   ‏מתבהר, הוא מקבל גבולות.
+
+   ‏הקו הדק שעוקב אחרי הקשת הוא מה שהופך אותה לנראית · ‏בלי
+   ‏הוא שני שדות כהים זה ליד זה ואין בכלל קשת. */
+.band {
+  position: relative;
+  background: #150b28;
+}
+
+.wave {
+  position: absolute;
+  /* ‏רחב מהמסך · ‏ככה הקשת מגיעה אל הקצוות שטוחה יותר
+     ‏ונקראת כגל ולא כבועה. */
+  inset-inline: -16%;
+  height: 58px;
+  background: inherit;
+  pointer-events: none;
+}
+
+.wave-top {
+  top: -57px;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  border-top: 1px solid rgba(168,85,247,0.30);
+}
+
+.wave-bottom {
+  bottom: -57px;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  border-bottom: 1px solid rgba(168,85,247,0.30);
+}
+
+/* ‏הסקשן שמעל הגל העליון צריך לפנות לו מקום, אחרת הקשת
+   ‏נכנסת לתוך הטקסט שלו. */
+.band { margin-top: 58px; }
+.band + * { margin-top: 58px; }
+
+@media (max-width: 720px) {
+  .wave { height: 40px; inset-inline: -24%; }
+  .wave-top { top: -39px; }
+  .wave-bottom { bottom: -39px; }
+  .band, .band + * { margin-top: 40px; }
+}
+
+/* ── ‏למי זה מיועד ──────────────────────────────────────
+   ‏זה המשפט שעונה על השאלה הראשונה שכל מבקר שואל · ‏"האם
+   ‏זה בשבילי". הוא ישב ב-15 פיקסל במשקל 500, בין כותרת
+   ‏ענקית לכפתור בולט, ונקרא ככיתוב.
+
+   ‏שתי המילים שנושאות את התשובה עוברות לזהב · ‏אותו זהב של
+   ‏הכפתור, ולכן העין שכבר למדה שזהב פירושו "אותך זה נוגע"
+   ‏מוצאת אותן מיד. */
+.hero-audience {
+  font-size: 16.5px;
+  font-weight: 500;
+  /* ‏כל השורה בזהב · ‏חצי סגול וחצי זהב פיצל אותה לשני
+     ‏משפטים, ומי שקרא רק את הזהב קיבל "למשפחות צעירות
+     ‏ויחידים" בלי לדעת למה. ההדגשה נשארת, היא פשוט עוברת
+     ‏מצבע למשקל. */
+  color: var(--gold);
+  /* ‏ב-320 "ויחידים" נשארה לבדה בשורה · ‏רווח קשיח מצמיד
+     ‏אותה ל"צעירות", והאיזון מחלק את השאר שווה בשווה. */
+  text-wrap: balance;
+}
+
+.hero-audience strong {
+  font-weight: 800;
+  letter-spacing: 0.1px;
+}
+
+@media (max-width: 480px) {
+  .hero-audience { font-size: 15px; }
+}
+
 /* ── ‏האור שזז ─────────────────────────────────────────
    ‏בכל רגע נתון בדף הזה זזו שני אלמנטים בלבד, ושניהם
    ‏תמונות רקע. כל השאר נכנס פעם אחת ונעצר · ‏ולכן הדף
@@ -4724,6 +4812,65 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     padding-bottom: 152px;
   }
 }
+/* ── ‏הכפתור שמוביל לשיחה ────────────────────────────────
+   ‏עד עכשיו כל כפתור בדף היה סגול, והכפתור הראשי היה סגול
+   ‏על רקע סגול · ‏הוא לא בלט מהדף, הוא היה חלק ממנו.
+
+   ‏הכלל שנקבע כאן, והוא היחיד: זהב פירושו "לדבר איתי",
+   ‏סגול פירושו "לעבור למקום אחר". לכן הכפתור הראשי וכפתור
+   ‏התפריט התחתון הופכים לזהב, ואילו "לראות את המחירים",
+   ‏"לקרוא את התשובה" והסרגל התחתון נשארים סגולים · ‏הם
+   ‏ניווט, לא המרה.
+
+   ‏טקסט כהה על הזהב ולא לבן · ‏נמדד, 8.64 מול סף של 4.5.
+   ‏לבן על זהב היה נותן 2.1 ונופל. */
+.btn-primary,
+.nav-menu-cta {
+  /* ‏זהב אמיתי אינו צבע אחד · ‏הוא פס אור שנע על משטח מעוקל.
+     ‏שתי עצירות נתנו משטח שטוח ומנומס; שש עצירות עם פס בהיר
+     ‏ב-42 אחוז ושני קצוות עמוקים נותנות את ההחזר. */
+  background: linear-gradient(135deg,
+    #b8914e 0%,
+    #d9b87a 18%,
+    #f2dcae 42%,
+    #ddbd82 56%,
+    #bd9855 80%,
+    #d2ae6d 100%);
+  color: #1a1206;
+  /* ‏קו אור דק בקצה העליון וצל פנימי בתחתון · ‏בלעדיהם
+     ‏הגרדיאנט הוא ציור של מתכת, ולא מתכת. */
+  box-shadow:
+    inset 0 1px 0 rgba(255,250,235,0.75),
+    inset 0 -1px 0 rgba(90,62,20,0.45),
+    0 12px 30px -10px rgba(216,184,121,0.42),
+    0 4px 14px rgba(0,0,0,0.35);
+}
+
+/* ‏הברק שעובר על הכפתור היה לבן · ‏על זהב הוא נבלע.
+   ‏מולבן פחות ובעוצמה נמוכה יותר. */
+.btn-primary::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0));
+}
+
+/* ‏בריחוף פס האור נודד · ‏אותן עצירות, מיקום אחר. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover,
+  .nav-menu-cta:hover {
+    background: linear-gradient(135deg,
+      #c49b56 0%,
+      #e7cb94 22%,
+      #fbe9c4 48%,
+      #e3c68d 62%,
+      #c7a05c 84%,
+      #dcba78 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,252,242,0.85),
+      inset 0 -1px 0 rgba(90,62,20,0.4),
+      0 16px 40px -12px rgba(216,184,121,0.55),
+      0 6px 18px rgba(0,0,0,0.40);
+  }
+}
+
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -4966,7 +5113,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     <span class="line1">כסף שעובד למענך</span>
     <span class="line2">לא להפך</span>
   </h1>
-  <p class="hero-audience">ליווי פיננסי אישי למשפחות צעירות ויחידים</p>
+  <p class="hero-audience">ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong></p>
   <div class="hero-cta">
     <a href="#contact" class="btn-primary">לשיחת היכרות</a>
   </div>
@@ -5161,7 +5308,10 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 
      ‏התמלול ב-tm-sr אינו נראה בעין אבל נקרא בקורא מסך
      ‏ובמנועי חיפוש · תמונה שכולה טקסט היא שתיקה בלעדיהם. -->
-<section class="tm-section" id="testimonials">
+<section class="tm-section band" id="testimonials">
+  <!-- ‏הגל נכתב כאלמנט ולא כפסאודו · ‏בשלושה סקשנים בדף
+       ‏שני הפסאודואים כבר תפוסים על ידי כדורי האווירה. -->
+  <span class="wave wave-top" aria-hidden="true"></span>
   <div class="tm-label reveal" id="tmLabel">המלצות</div>
   <h2 class="tm-title reveal" id="tmTitle">לקוחות ממליצים</h2>
 
@@ -5186,6 +5336,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   </div>
 
   <p class="tm-hint" id="tmHint">← החליקו לעוד</p>
+  <span class="wave wave-bottom" aria-hidden="true"></span>
 </section>
 
 <!-- PHILOSOPHY -->
@@ -7320,7 +7471,7 @@ const translations = {
     lblWaName: 'השם שלכם',
     lblWaPhone: 'מספר טלפון',
     heroLine2: 'לא להפך',
-    heroAudience: 'ליווי פיננסי אישי למשפחות צעירות ויחידים',
+    heroAudience: 'ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong>',
     heroCta: 'לשיחת היכרות',
     videoTitle: 'חצי דקה איתי',
     videoPlay: 'נגן את הסרטון',
@@ -7426,7 +7577,7 @@ const translations = {
     lblWaName: 'Your name',
     lblWaPhone: 'Phone number',
     heroLine2: 'not the other way round',
-    heroAudience: 'Personal financial guidance for young families and individuals',
+    heroAudience: 'Personal financial guidance <strong>for young families and individuals</strong>',
     heroCta: 'Book an intro call',
     videoTitle: 'Half a minute with me, in Hebrew',
     videoPlay: 'Play the video',
@@ -7549,7 +7700,7 @@ function setLang(lang) {
   const heroTitle = document.querySelector('.hero-title');
   const heroAud = document.querySelector('.hero-audience');
   heroTitle.dir = isEN ? 'ltr' : 'rtl';
-  if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.textContent = t.heroAudience; }
+  if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.innerHTML = t.heroAudience; }
   document.querySelector('.hero-title .line1').textContent = t.heroLine1;
   /* ‏השורה השנייה נושאת את מילת ההדגשה בתוכה, ולכן innerHTML
      ‏והמחרוזת מגיעה מהמילון ולא כתובה כאן פעמיים. */
