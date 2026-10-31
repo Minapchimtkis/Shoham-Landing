@@ -1127,7 +1127,11 @@ section {
   position: relative;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  /* ‏צל בגוון הכפתור ולא שחור · על רקע כהה צל שחור לא נראה
+     ‏כהרמה אלא כלכלוך, וכל שאר הכפתורים בדף כבר סגולים.
+     ‏השכבה השחורה נשארת רכה מתחתיו, בשביל העומק. */
+  box-shadow: 0 12px 30px -10px rgba(124,58,237,0.62),
+              0 4px 14px rgba(0,0,0,0.35);
 }
 
 .btn-primary::before {
@@ -1141,8 +1145,9 @@ section {
 
 @media (hover: hover) and (pointer: fine) {
   .btn-primary:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 14px 38px rgba(0,0,0,0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px -12px rgba(124,58,237,0.85),
+                0 6px 18px rgba(0,0,0,0.40);
   }
 }
 @media (hover: hover) and (pointer: fine) {
@@ -1192,8 +1197,8 @@ section {
 
 .demon-card {
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(168,85,247,0.15);
-  border-radius: 16px;
+  border: 1px solid rgba(168,85,247,0.20);
+  border-radius: 22px;
   padding: 28px 32px;
   position: relative;
   overflow: hidden;
@@ -1761,8 +1766,8 @@ section {
   background-size: cover, cover;
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
-  border: 1px solid rgba(168,85,247,0.28);
-  border-radius: 16px;
+  border: 1px solid rgba(168,85,247,0.22);
+  border-radius: 22px;
   padding: 52px 40px;
   /* It had no width of its own, so on a desktop it ran the whole way across —
      1392px, against the 620 to 720 every other box on this page keeps to, and
@@ -2180,7 +2185,7 @@ section {
   text-align: right;
   background: rgba(168,85,247,0.06);
   border: 1px solid rgba(168,85,247,0.3);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 16px 20px;
   font-family: var(--font);
   /* ‏שישה עשר ולא חמישה עשר. מתחת לסף הזה ספארי באייפון מזגזג את
@@ -2559,10 +2564,10 @@ section {
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: linear-gradient(158deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
   border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 14px;
+  border-radius: 18px;
   text-decoration: none;
   color: inherit;
   transition: border-color 0.3s, background 0.3s, transform 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -3335,7 +3340,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   font-size: 12px;
   font-weight: 700;
   padding: 12px 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   margin-top: 16px;
   box-shadow: 0 0 18px rgba(37,211,102,0.4), 0 0 36px rgba(37,211,102,0.15);
   transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
@@ -3447,7 +3452,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .faq-item {
   border-bottom: 1px solid rgba(168,85,247,0.12);
-  border-radius: 12px;
+  border-radius: 14px;
   transition: background 0.4s ease, box-shadow 0.4s ease,
               opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
   padding: 0 8px;
@@ -4410,6 +4415,42 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   .pr-gate-btn:hover { transform: none; }
 }
 
+/* ── ‏אוויר · ‏מרווח בין הסקשנים במסך רחב ──────────────────
+   ‏בטלפון כל פיקסל אנכי נוסף הוא גלילה, ובדיוק את זה ניסינו
+   ‏להוריד · ולכן הערכים שם נשארים כפי שהם. במסך רחב המצב
+   ‏הפוך: יש שם רוחב מיותר ואין גובה מיותר, והמרווח האנכי
+   ‏הוא מה שמפריד בין דף אינטרנט לבין מסך באפליקציה.
+
+   ‏נכתב בסוף הגיליון ובתוך שאילתת מדיה · שאילתה לא מוסיפה
+   ‏ספציפיות, ולכן מה שמכריע כאן הוא סדר הכתיבה בלבד.
+   ‏padding-top ו-padding-bottom ולא הקיצור, אחרת הריפוד
+   ‏האופקי של כל סקשן נדרס. */
+@media (min-width: 861px) {
+  .pain,
+  .method {
+    padding-top: 136px;
+    padding-bottom: 136px;
+  }
+
+  /* ‏ל-about יש כלל נפרד מ-821 פיקסל שמקצר דווקא את הריפוד
+     ‏העליון · מעל הדיוקן נפער שם חור של 166 פיקסל, ולכן
+     ‏נוגעים כאן בתחתון בלבד. */
+  .about { padding-bottom: 136px; }
+
+  /* ‏שלושה סקשנים נושאים את המחלקה הזאת · "מה זה בכלל יועץ
+     ‏כלכלי", "התהליך צעד אחר צעד" ו"שאלות ותשובות". */
+  .faq-section {
+    padding-top: 116px;
+    padding-bottom: 116px;
+  }
+
+  .proof { padding-bottom: 116px; }
+  .tm-section { padding-bottom: 136px; }
+
+  .cta-section {
+    padding-top: 152px;
+    padding-bottom: 152px;
+  }
 }
 </style>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
