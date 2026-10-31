@@ -2922,15 +2922,6 @@ footer {
    ‏נקראת כנתון ולא כקישוט. */
 .footer-link-sub { letter-spacing: 0.35px; }
 
-.footer-disclaimer {
-  margin-top: 10px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.56);
-  max-width: 44em;
-  margin-inline: auto;
-}
-
 /* ── DIVIDER ── */
 .divider {
   width: 60px;
@@ -5836,7 +5827,6 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <a class="footer-privacy-link" href="#" id="a11yLink" onclick="openA11y(event)">הצהרת נגישות</a>
     </div>
   </div>
-  <p class="footer-disclaimer">התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.</p>
 </footer>
 
 <script>
@@ -7856,7 +7846,6 @@ const translations = {
     q6: 'מה קורה ביום שאחרי?',
     qCall: 'מה בעצם קורה בשיחת ההיכרות?', aCall: 'נכיר. תספרו לי מה מעיק עליכם מבחינה כלכלית, מה הייתם רוצים לשנות ולאן אתם רוצים להגיע. אני אשאל כמה שאלות כדי להבין את התמונה המלאה, ואני לא עוצר את השיחה עד שאני מבין ב־100% מה אתם צריכים, בין אם אתם יחידים או זוג. ואם אחרי זה אני חושב שאני לא האדם הנכון בשבילכם, אגיד לכם את זה. אין מה להכין מראש ואין מה להביא. השיחה בחינם, בלי התחייבות, ואף אחד לא ילחץ עליכם להחליט בסופה.',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ותהיה לכם האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
-    footerDisclaimer: 'התוכן באתר זה הוא כללי ומיועד להעשרה והכוונה בלבד, ואינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ ביטוחי כמשמעם בחוק. בכל החלטה בתחומים אלו מומלץ לפנות לבעל/ת רישיון מתאים.',
     dir: 'rtl'
   },
   en: {
@@ -7962,7 +7951,6 @@ const translations = {
     q6: 'What happens the day after?',
     qCall: 'What actually happens in the intro call?', aCall: 'We get to know each other. You tell me what is weighing on you financially, what you would like to change and where you want to get to. I ask questions to understand the full picture, and I do not end the call until I understand 100% what you need, whether you come on your own or as a couple. And if after that I think I am not the right person for you, I will tell you so. There is nothing to prepare and nothing to bring. The call is free, carries no obligation, and nobody will push you to decide at the end of it.',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
-    footerDisclaimer: 'The content on this site is general and intended for education and guidance only, and does not constitute investment, pension, or insurance advice as defined by law. For decisions in these areas, please consult a licensed professional.',
     dir: 'ltr'
   }
 };
@@ -8170,8 +8158,6 @@ function setLang(lang) {
   // Footer
   const fCopy = document.querySelector('.footer-copy');
   if (fCopy) fCopy.textContent = t.footerMain;
-  const fDisc = document.querySelector('.footer-disclaimer');
-  if (fDisc) fDisc.textContent = t.footerDisclaimer;
 
   // Everything below was left in Hebrew whichever language was chosen.
   const set = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
