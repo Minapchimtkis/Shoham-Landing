@@ -4575,18 +4575,71 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
    ‏בסגול על סגול כמו כל שאר הדף. מסגרת זהב, מגן זהב וכותרת
    ‏לבנה · ‏אותו טיפול שהזהב מקבל בכפתור, בלי מילוי מלא,
    ‏כדי שלא יתחרה בו. */
+/* ‏הרקע היה 4.5 אחוז זהב על הקרקע, כלומר כמעט שקוף · ‏מה
+   ‏שנגלל מאחוריו נראה דרכו והוא לא קרא ככרטיס. רקע כהה
+   ‏ואטום כמעט, עם נגיעת זהב מעליו. */
 .license-badge {
-  border-color: rgba(216,184,121,0.42);
-  background: rgba(216,184,121,0.045);
+  border-color: rgba(216,184,121,0.50);
+  background:
+    linear-gradient(150deg, rgba(216,184,121,0.10), rgba(216,184,121,0.03)),
+    rgba(13, 8, 26, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(242,220,174,0.18),
+    0 14px 34px -18px rgba(0,0,0,0.9);
+}
+
+/* ‏נצנוץ · ‏פס אור צר שחולף על הכרטיסייה אחת לשש שניות.
+   ‏transform בלבד, שרץ על ה-GPU ואינו מחייב חישוב פריסה ·
+   ‏בדף שבדיוק תיקנו בו גלילה תקועה לא אוסיף דבר שמצייר. */
+.license-badge::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  width: 86px;
+  inset-inline-start: -110px;
+  background: linear-gradient(100deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,248,230,0.10) 28%,
+    rgba(255,250,236,0.62) 50%,
+    rgba(255,248,230,0.10) 72%,
+    rgba(255,255,255,0) 100%);
+  transform: rotate(14deg) translateX(0);
+  pointer-events: none;
+  z-index: 2;
+  animation: licenseGlint 6s cubic-bezier(0.4,0,0.5,1) 2.4s infinite;
+}
+
+@keyframes licenseGlint {
+  0%, 72%  { transform: rotate(14deg) translateX(0); opacity: 0; }
+  76%      { opacity: 1; }
+  96%      { opacity: 1; }
+  100%     { transform: rotate(14deg) translateX(var(--glint-to, 520px)); opacity: 0; }
+}
+
+html[dir="rtl"] .license-badge::after { --glint-to: -520px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .license-badge::after { display: none; }
 }
 
 /* ‏המגן גדל מ-17 ל-26 · ‏בגודל הקודם הוא היה סימן פיסוק
    ‏ליד הטקסט, ולא חותמת. */
 .license-shield { color: var(--gold); flex-shrink: 0; }
 
-.license-title { color: #ffffff; }
+/* ‏עובי · ‏700 על 13 פיקסל נבלע ליד מסגרת הזהב. */
+.license-title {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13.5px;
+  letter-spacing: 0.1px;
+}
 
-.license-sub { color: rgba(255,255,255,0.62); }
+.license-sub {
+  color: rgba(255,255,255,0.70);
+  font-weight: 500;
+  font-size: 11.5px;
+}
 
 /* ── ‏שטח נגיעה ─────────────────────────────────────────
    ‏שלושה פקדים בדף היו מתחת לרצפת 44 הפיקסלים שכל השאר
@@ -5169,7 +5222,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   </div>
 
   <div class="license-badge">
-    <svg class="license-shield" viewBox="0 0 24 24" aria-hidden="true" width="26" height="26"><path d="M12 3l7 3v5.2c0 4.3-2.9 7.9-7 9.3-4.1-1.4-7-5-7-9.3V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 11.8l2 2 3.6-3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="license-shield" viewBox="0 0 24 24" aria-hidden="true" width="27" height="27" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.1 2.6 8.3 12 12.5l9.4-4.2z"/><path d="M6.6 10.2v4.6c0 1.6 2.4 2.9 5.4 2.9s5.4-1.3 5.4-2.9v-4.6"/><path d="M21.4 8.3v5"/></svg>
     <span class="license-copy">
       <span class="license-title">יועץ כלכלי מוסמך מטעם חברת UNI פיננסים</span>
       <span class="license-sub">בפיקוח אוניברסיטת אריאל</span>
