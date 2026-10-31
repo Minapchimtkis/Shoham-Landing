@@ -4425,6 +4425,169 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
    ‏ספציפיות, ולכן מה שמכריע כאן הוא סדר הכתיבה בלבד.
    ‏padding-top ו-padding-bottom ולא הקיצור, אחרת הריפוד
    ‏האופקי של כל סקשן נדרס. */
+/* ── ‏תפריט הדף ─────────────────────────────────────────
+   ‏הכפתור יושב בשורה העליונה לצד מתג השפה. הוא גבוה ממנו
+   ‏בכוונה · ‏44 פיקסל מול 26 · כי מעבר בין סקשנים הוא פעולה
+   ‏שאנשים עושים, ומעבר בין שפות היא פעולה שכמעט אף אחד לא.
+   ‏גובה האצבע הולך למה שבאמת נוגעים בו. */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.nav-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid rgba(216,180,254,0.30);
+  border-radius: 100px;
+  background: rgba(168,85,247,0.08);
+  color: var(--p6);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.nav-menu-chev { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+.nav-menu-btn.open .nav-menu-chev { transform: rotate(180deg); }
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-menu-btn:hover {
+    background: rgba(168,85,247,0.18);
+    border-color: rgba(168,85,247,0.78);
+    color: #fff;
+  }
+}
+
+.nav-menu-btn:active { opacity: 0.85; }
+.nav-menu-btn:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
+
+/* ‏הלוח יושב מתחת לשורה העליונה · ‏--navh נכתב מ-JS לפי
+   ‏הגובה האמיתי של השורה, שמשתנה בין מחשב לטלפון. */
+.nav-menu {
+  position: fixed;
+  inset: var(--navh, 80px) 0 0;
+  z-index: 9985;
+  background: rgba(10, 3, 24, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  /* ‏בלי זה הקישורים נשארים בסדר הטאבים ובעץ הנגישות
+     ‏כשהתפריט סגור · ההשהיה היא אורך היציאה. */
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1),
+              visibility 0s linear 0.28s;
+}
+
+.nav-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1),
+              visibility 0s;
+}
+
+.nav-menu-inner {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 18px 24px calc(34px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.nav-menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ‏קו מפריד אחד בין פריטים, ולא מסגרת סביב כל אחד · ‏שבע
+   ‏מסגרות הן שבעה כרטיסים, וזה בדיוק העומס שהתפריט בא
+   ‏להוריד. הקו האחרון יורד כדי שלא יישאר קו תלוי מעל
+   ‏הכפתור. */
+.nav-menu-list a {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  padding: 10px 2px;
+  border-bottom: 1px solid rgba(168,85,247,0.14);
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.22s, padding-inline-start 0.22s;
+}
+
+.nav-menu-list a:last-child { border-bottom: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-menu-list a:hover { color: var(--p6); }
+}
+
+.nav-menu-list a:active { opacity: 0.7; }
+.nav-menu-list a:focus-visible { outline: 2px solid var(--p6); outline-offset: 2px; }
+
+/* ‏נדחף לתחתית הלוח · ‏הוא ההחלטה האחרונה בתפריט, לא עוד
+   ‏פריט ברשימה, והמרחק הוא מה שאומר את זה. */
+.nav-menu-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  margin-top: auto;
+  padding: 16px 28px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #7c3aed, #9d4edd);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 16.5px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 12px 30px -12px rgba(124,58,237,0.75);
+  transition: background 0.25s, transform 0.25s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-menu-cta:hover { background: linear-gradient(135deg, #9d4edd, #7c3aed); transform: translateY(-2px); }
+}
+
+.nav-menu-cta:active { transform: translateY(0); opacity: 0.9; }
+.nav-menu-cta:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
+
+/* ‏העוגן נוחת מתחת לשורה הקבועה בלי זה · ‏הדפדפן מיישר את
+   ‏ראש הסקשן לראש החלון, ושם יושבת השורה. */
+html { scroll-padding-top: calc(var(--navh, 80px) + 24px); }
+
+/* ‏כל עוד התפריט פתוח, הדף שמתחתיו לא נגלל והסרגל התחתון
+   ‏מתפנה · ‏שניהם היו מתחרים באותה שכבה. */
+html.menu-open, html.menu-open body { overflow: hidden; }
+html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
+
+@media (max-width: 640px) {
+  .nav-menu-btn { padding: 10px 15px; font-size: 13.5px; }
+  .nav-actions { gap: 8px; }
+  .nav-menu-list a { font-size: 18.5px; min-height: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu { transition: opacity 0.2s linear, visibility 0s linear 0.2s; transform: none; }
+  .nav-menu.open { transition: opacity 0.2s linear, visibility 0s; transform: none; }
+  .nav-menu-chev, .nav-menu-btn, .nav-menu-cta { transition: none; }
+  .nav-menu-cta:hover { transform: none; }
+}
+
 @media (min-width: 861px) {
   .pain,
   .method {
@@ -4639,12 +4802,49 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   <div class="navbar-inner">
     <img class="navbar-logo" src="assets/logo.webp?v=7ad752ae" width="600" height="415" alt="שוהם אבו · ליווי וייעוץ פיננסי">
     <div class="navbar-brand">שוהם אבו <span class="navbar-sep">|</span> יועץ כלכלי</div>
-    <div class="lang-toggle" id="langToggle">
-      <button class="lang-btn active" id="btnHE" onclick="setLang('he')">HE</button>
-      <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+    <div class="nav-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button class="lang-btn active" id="btnHE" onclick="setLang('he')">HE</button>
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+      </div>
+
+      <button class="nav-menu-btn" type="button" id="navMenuBtn"
+              data-open="תפריט" data-close="סגירה"
+              aria-expanded="false" aria-controls="navMenu" onclick="toggleNavMenu()">
+        <span id="navMenuBtnText">תפריט</span>
+        <svg class="nav-menu-chev" width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- ‏תפריט הדף
+     ‏הדף ארוך, וכל מה שהיה למבקר הוא הגלילה. התפריט הוא
+     ‏המפה: שבעה יעדים בסדר שבו הם מופיעים בדף, ולא רשימה
+     ‏של כל ארבעה-עשר הסקשנים · תפריט שמציג הכל הוא עוד
+     ‏עומס ולא פתרון לעומס.
+
+     ‏יושב מתחת לשורה העליונה ולא מעליה · השורה נשארת גלויה
+     ‏עם הכפתור שפתח אותו, וכך ברור איך סוגרים. -->
+<div class="nav-menu" id="navMenu" role="dialog" aria-modal="true" aria-labelledby="navMenuTitle">
+  <div class="nav-menu-inner">
+    <h2 class="tm-sr" id="navMenuTitle">תפריט הדף</h2>
+
+    <nav class="nav-menu-list" aria-label="מעבר לחלקי הדף">
+      <a href="#whatis"      id="nm1">מה זה יועץ כלכלי</a>
+      <a href="#method"      id="nm2">הגישה שלי</a>
+      <a href="#about"       id="nm3">מי אני</a>
+      <a href="#testimonials" id="nm4">לקוחות ממליצים</a>
+      <a href="#process"     id="nm5">איך זה עובד</a>
+      <a href="#pricing"     id="nm6">כמה זה עולה</a>
+      <a href="#faq"         id="nm7">שאלות ותשובות</a>
+    </nav>
+
+    <a class="nav-menu-cta" href="#contact" id="nmCta">לשיחת היכרות</a>
+  </div>
+</div>
 
 <canvas id="bg" aria-hidden="true"></canvas>
 
@@ -4734,7 +4934,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 </section>
 
 <!-- WHAT IS -->
-<section data-stage="whatis" data-stage-i="2" class="faq-section whatis-section">
+<section data-stage="whatis" data-stage-i="2" class="faq-section whatis-section" id="whatis">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">לפני שמתחילים</div>
     <h2 class="faq-title whatis-title reveal">מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?</h2>
@@ -4791,7 +4991,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 </section>
 
 <!-- METHOD -->
-<section data-stage="method" data-stage-i="3" class="method">
+<section data-stage="method" data-stage-i="3" class="method" id="method">
   <div class="method-inner">
     <div class="section-label reveal">הגישה שלי</div>
     <h2 class="method-title reveal">קודם הראש, אחר כך הכסף.</h2>
@@ -4811,7 +5011,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 </section>
 
 <!-- ABOUT -->
-<section data-stage="about" data-stage-i="5" class="about">
+<section data-stage="about" data-stage-i="5" class="about" id="about">
   <div class="about-head">
     <!-- The ?v= on these two is the first eight characters of the file's own
        checksum. Both pictures have been replaced several times today while
@@ -4852,7 +5052,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 
      ‏התמלול ב-tm-sr אינו נראה בעין אבל נקרא בקורא מסך
      ‏ובמנועי חיפוש · תמונה שכולה טקסט היא שתיקה בלעדיהם. -->
-<section class="tm-section">
+<section class="tm-section" id="testimonials">
   <div class="tm-label reveal" id="tmLabel">המלצות</div>
   <h2 class="tm-title reveal" id="tmTitle">לקוחות ממליצים</h2>
 
@@ -4908,7 +5108,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 </section>
 
 <!-- PROCESS -->
-<section data-stage="process" data-stage-i="7" class="faq-section process-section">
+<section data-stage="process" data-stage-i="7" class="faq-section process-section" id="process">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">איך זה עובד</div>
     <h2 class="faq-title reveal" style="margin-bottom:56px;">התהליך, צעד אחר צעד.</h2>
@@ -4956,7 +5156,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
      ‏יישא את כל המחירון על גבו. כאן נשארה רצועה אחת: מי שקרא
      ‏את התהליך ורוצה לדעת כמה זה עולה מקבל את הדרך לשם בלי
      ‏לגלול עד הסוף. -->
-<section class="pr-gate reveal">
+<section class="pr-gate reveal" id="pricing">
   <div class="pr-gate-label" id="prGateLabel">המחירים</div>
   <h2 class="pr-gate-title" id="prGateTitle">אז כמה זה עולה?</h2>
   <p class="pr-gate-line" id="prGateLine">שלושת המסלולים, המחירים המלאים והקיזוז · הכל כתוב, בעמוד אחד, בלי להשאיר אתכם לנחש.</p>
@@ -4967,7 +5167,7 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 </section>
 
 <!-- FAQ -->
-<section data-stage="faq" data-stage-i="8" class="faq-section">
+<section data-stage="faq" data-stage-i="8" class="faq-section" id="faq">
   <div class="faq-inner">
     <div class="section-label reveal" style="text-align:center; margin-bottom:16px;">שאלות ותשובות</div>
     <h2 class="faq-title reveal">שאלות שכדאי לשאול.</h2>
@@ -6843,6 +7043,88 @@ function toggleWhatis(btn) {
     if (body.classList.contains('open')) body.style.maxHeight = 'none';
   });
 })();
+
+/* ── ‏תפריט הדף ──────────────────────────────────────────
+   ‏דיאלוג מודאלי לכל דבר · ‏Escape סוגר, הטאב לכוד בפנים,
+   ‏והמיקוד חוזר לכפתור שפתח. בלי זה מי שגולש במקלדת נופל
+   ‏מהתפריט אל הדף שמאחוריו בלי לדעת שיצא.
+
+   ‏גובה השורה העליונה נמדד ונכתב כמשתנה · ‏הוא 80 פיקסל
+   ‏במחשב ו-64 בטלפון, והלוח חייב להתחיל בדיוק מתחתיו. */
+(function () {
+  const btn   = document.getElementById('navMenuBtn');
+  const menu  = document.getElementById('navMenu');
+  const bar   = document.getElementById('navbar');
+  const label = document.getElementById('navMenuBtnText');
+  if (!btn || !menu || !bar) return;
+
+  function measure() {
+    document.documentElement.style.setProperty('--navh', Math.round(bar.getBoundingClientRect().height) + 'px');
+  }
+  measure();
+  window.addEventListener('resize', measure, { passive: true });
+
+  const focusable = () => [...menu.querySelectorAll('a[href], button:not([disabled])')]
+    .filter(el => el.offsetParent !== null);
+
+  function open() {
+    measure();
+    menu.classList.add('open');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('menu-open');
+    if (label && btn.dataset.close) label.textContent = btn.dataset.close;
+    /* ‏הנראות מתהפכת רק בפריים השני · ‏מיקוד לפני כן נופל
+       ‏על אלמנט שעדיין hidden ולא תופס. */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const first = focusable()[0];
+      if (first) first.focus();
+    }));
+  }
+
+  function close(returnFocus) {
+    menu.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.documentElement.classList.remove('menu-open');
+    if (label && btn.dataset.open) label.textContent = btn.dataset.open;
+    if (returnFocus) btn.focus();
+  }
+
+  window.toggleNavMenu = function () {
+    if (menu.classList.contains('open')) close(true); else open();
+  };
+
+  /* ‏סוגרים לפני הגלילה ולא אחריה · ‏כל עוד הדף נעול
+     ‏הדפדפן לא מזיז אותו, והקפיצה לעוגן פשוט לא קורית. */
+  menu.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    close(false);
+    if (!target) return;
+    requestAnimationFrame(() => {
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+      /* ‏יעד שאינו כפתור אינו ממוקד מעצמו · ‏בלי זה המיקוד
+         ‏נשאר בראש הדף וקורא מסך לא יודע שזזנו. */
+      target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!menu.classList.contains('open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
+    if (e.key !== 'Tab') return;
+    const items = focusable();
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+})();
 // ── NAVBAR SCROLL ──
 const navbar = document.getElementById('navbar');
 let navTicking = false;
@@ -6909,6 +7191,11 @@ const translations = {
     whatisLabel: 'לפני שמתחילים',
     whatisTitle: 'מה זה בכלל יועץ כלכלי,<br>והאם אני האדם שאתם צריכים?',
     whatisIntro: 'ניהול פיננסי הוא הרבה מעבר למספרים בבנק שלכם, הוא קשור להרגלים שלנו, לרגשות שלנו ולדרך שבה אנחנו מקבלים החלטות עם הכסף.<br><br>אני מלווה צעירים ומשפחות שרוצים לשפר את המצב הכלכלי שלהם, להתמודד עם אתגרים ולבנות תוכנית פיננסית שתעזור להם להתקדם לעבר המטרות שלהם.<br><br>אבל מבחינתי, זה לא מסתכם בלבנות תקציב או לצמצם הוצאות. חשוב לי להבין גם מה עומד מאחורי ההתנהלות הפיננסית שלכם: מה מלחיץ אתכם, מה עוצר אתכם, ואיך אפשר ליצור שינוי שמתאים לא רק למספרים, אלא גם לחיים שלכם.<br><br>המטרה שלי היא לא להגיד לכם על מה להוציא את הכסף שלכם, אלא לעזור לכם לקבל החלטות פיננסיות טובות יותר, ליהנות מההווה ולבנות לעצמכם עתיד כלכלי טוב יותר.',
+    navMenu: 'תפריט', navMenuClose: 'סגירה',
+    nm1: 'מה זה יועץ כלכלי', nm2: 'הגישה שלי', nm3: 'מי אני',
+    nm4: 'לקוחות ממליצים', nm5: 'איך זה עובד', nm6: 'כמה זה עולה',
+    nm7: 'שאלות ותשובות', nmCta: 'לשיחת היכרות',
+    navMenuTitle: 'תפריט הדף',
     whatisBtnOpen: 'לקרוא את התשובה',
     whatisBtnClose: 'לסגור',
     whatisQ1: 'למי אני עוזר?',
@@ -7010,6 +7297,11 @@ const translations = {
     whatisLabel: 'Before we begin',
     whatisTitle: "What is a financial advisor,<br>and am I the person you need?",
     whatisIntro: "Financial management is far more than the numbers in your bank account. It is tied to our habits, our emotions, and the way we make decisions with money.<br><br>I guide young people and young families who want to improve where they stand financially, deal with the challenges in front of them, and build a financial plan that moves them towards their goals.<br><br>But to me it does not stop at building a budget or cutting expenses. I want to understand what sits behind the way you handle money: what worries you, what holds you back, and how to create a change that fits not only the numbers but your life.<br><br>My goal is not to tell you what to spend your money on. It is to help you make better financial decisions, enjoy the present, and build yourself a better financial future.",
+    navMenu: 'Menu', navMenuClose: 'Close',
+    nm1: 'What a financial advisor is', nm2: 'My approach', nm3: 'About me',
+    nm4: 'Client reviews', nm5: 'How it works', nm6: 'What it costs',
+    nm7: 'Questions and answers', nmCta: 'Book an intro call',
+    navMenuTitle: 'Page menu',
     whatisBtnOpen: 'Read the answer',
     whatisBtnClose: 'Close',
     whatisQ1: 'Who do I help?',
@@ -7213,6 +7505,21 @@ function setLang(lang) {
   /* ‏innerHTML ולא textContent · יש תשובה שמחולקת לפסקאות.
      ‏כל המחרוזות כאן הן שלנו ואין בהן קלט משתמש. */
   as.forEach((k,i) => { if(faqAs[i]) faqAs[i].innerHTML = t[k]; });
+
+  /* ‏תפריט הדף · ‏שתי המילים של הכפתור נשמרות עליו כנתונים,
+     ‏כי הפונקציה שפותחת וסוגרת לא רואה את המילון. */
+  const navBtn = document.getElementById('navMenuBtn');
+  const navBtnText = document.getElementById('navMenuBtnText');
+  if (navBtn && navBtnText) {
+    navBtn.dataset.open = t.navMenu;
+    navBtn.dataset.close = t.navMenuClose;
+    navBtnText.textContent = navBtn.getAttribute('aria-expanded') === 'true'
+      ? t.navMenuClose : t.navMenu;
+  }
+  ['nm1','nm2','nm3','nm4','nm5','nm6','nm7','nmCta','navMenuTitle'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.textContent = t[k];
+  });
 
   // What-is section
   const whatis = document.querySelector('.whatis-section');
