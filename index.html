@@ -705,13 +705,15 @@ body::before {
 }
 
 /* ── OFF-SCREEN SECTIONS ──
-   Skip rendering work for sections not yet scrolled into view. The
-   intrinsic-size hint keeps scroll height stable so the bar doesn't jump. */
-.process-section,
-.cta-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 700px;
-}
+   ‏היה כאן content-visibility: auto ‏על שני הסקשנים האחרונים,
+   ‏כדי לחסוך ציור של מה שעוד לא נראה. ‏הרווח היה אפסי ‏· ‏שני
+   ‏סקשנים של כ-800 ‏פיקסל ‏· ‏והמחיר היה נראה לעין: ‏רמז הגובה
+   ‏הוא 700 ‏פיקסל, ‏וברגע שהסקשן באמת נמדד גובה המסמך קפץ.
+   ‏מדדתי גלילה מלאה מלמעלה למטה: ‏המסמך גדל שלוש פעמים תוך
+   ‏כדי גלילה, ‏האחרונה ב-209 ‏פיקסל, ‏בדיוק באזור התהליך.
+   ‏קפיצה כזאת באמצע תנועת אצבע היא ה"תקוע" ‏שהוא מרגיש ‏·
+   ‏הדפדפן מתקן את מיקום הגלילה תחת היד. ‏בלי זה נשארה
+   ‏קפיצה אחת בכל הדף במקום שלוש. */
 
 /* ── HEADING CONTRAST — clear separation from the starfield background ── */
 .pain-title,
@@ -5448,7 +5450,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     <p class="heart-body">וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.</p>
     <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
   </div>
-  <img decoding="async" src="assets/signature.webp" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy" />
+  <img decoding="async" src="assets/signature.webp" width="300" height="205" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy" />
 </section>
 
 <!-- TESTIMONIALS -->
@@ -5506,7 +5508,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     </div>
 
     <div class="mission-block reveal">
-      <img class="mission-logo" src="assets/mission-logo.webp" alt="מנפחים ת'כיס" loading="lazy" decoding="async">
+      <img class="mission-logo" src="assets/mission-logo.webp" width="195" height="200" alt="מנפחים ת'כיס" loading="lazy" decoding="async">
       <div class="mission-block-label">השליחות שלי</div>
       <p class="mission-block-text">הקמתי את מנפחים ת׳כיס, פלטפורמה חינמית שמלמדת בני נוער בישראל להתנהל עם כסף, עוד לפני המשכורת הראשונה. בניתי אותה כי בסיס פיננסי איתן מגיע לכל אחד מההתחלה, ולא רק למי שנולד לתוכו. היא באוויר, פתוחה לכולם, ואין בה שקל אחד לשלם.</p>
       <a href="https://minapchimtkis.github.io" target="_blank" rel="noopener" class="site-link">
@@ -6228,14 +6230,26 @@ reveals.forEach(el => observer.observe(el));
     setTimeout(() => host.remove(), longest * 1000 + 180);
   };
 
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) burst();
-      /* ‏יצא מהמסך לגמרי · ‏הפעם הבאה שייכנס תפוצץ שוב. */
-      else if (e.intersectionRatio === 0) live = false;
-    });
-  }, { threshold: [0, 0.55] });
-  io.observe(step);
+  /* ‏הרגע שבו זה נורה · ‏קודם היה כאן threshold ‏של אפס, כלומר
+     ‏הפרץ יצא ברגע שפיקסל אחד של השלב נכנס מתחתית המסך · ‏מסך
+     ‏שלם לפני שהוא באמת קורא את השלב הרביעי. ‏עד שהגיע לשם
+     ‏החגיגה כבר נגמרה, וזה מה שלא הסתדר לו עם הגלילה.
+
+     ‏עכשיו השורה התחתונה של אזור המדידה יושבת ב-58% ‏מגובה
+     ‏המסך · ‏שם הספרה מגיעה למלוא האור, ‏וזה הקו שלפיו גם מתמלא
+     ‏קו ההתקדמות ·
+     ‏הפרץ יוצא ברגע שהספרה 4 ‏נדלקת, ולא מסך שלם לפני כן. */
+  const lit = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) burst(); });
+  }, { rootMargin: '0px 0px -46% 0px', threshold: 0 });
+  lit.observe(step);
+
+  /* ‏המנעול נפתח רק כשהשלב יצא מהמסך לגמרי · ‏אחרת גלילה קטנה
+     ‏קדימה ואחורה מציתה אותו שוב ושוב. */
+  const gone = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (!e.isIntersecting) live = false; });
+  }, { threshold: 0 });
+  gone.observe(step);
 })();
 
 // ── עומק בכרטיסים ──
