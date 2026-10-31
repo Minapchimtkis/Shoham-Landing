@@ -1614,13 +1614,11 @@ section {
   animation: sigGlow 3s ease-in-out infinite;
 }
 
+/* ‏גם כאן · ‏הנפשת filter מציירת מחדש בכל פריים. אותה
+   ‏נשימה, על opacity, שעוברת דרך ה-GPU. */
 @keyframes sigGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 8px rgba(168,85,247,0.4)) drop-shadow(0 0 16px rgba(168,85,247,0.2));
-  }
-  50% {
-    filter: drop-shadow(0 0 18px rgba(168,85,247,0.8)) drop-shadow(0 0 36px rgba(168,85,247,0.45)) drop-shadow(0 0 60px rgba(192,132,252,0.25));
-  }
+  0%, 100% { opacity: 0.72; }
+  50%      { opacity: 1; }
 }
 
 .sig-stroke {
@@ -1783,10 +1781,19 @@ section {
   z-index: 1;
 }
 
+/* ‏זאת הייתה הסיבה שהדף נתקע · ‏האנימציה הזאת הניעה את
+   ‏left, שהיא תכונת פריסה, על שני אלמנטים שעליהם
+   ‏filter: blur(30px) ו-blur(40px), ברצף אינסופי. כל
+   ‏פריים: חישוב פריסה מחדש, ציור מחדש, וטשטוש מחדש של
+   ‏שטח גדול · ‏שמונה שניות בלולאה, גם כשאף אחד לא מסתכל.
+
+   ‏transform נותן בדיוק את אותה תנועה ועובר דרך ה-GPU.
+   ‏הרוחב הוא 80 אחוז מההורה, ולכן 120 אחוז מרוחב ההורה
+   ‏הם 150 אחוז מרוחב האלמנט עצמו · ‏אותו מרחק בדיוק. */
 @keyframes smokeFlow {
-  0%   { left: -50%; opacity: 0.5; }
-  50%  { left: 70%; opacity: 0.9; }
-  100% { left: -50%; opacity: 0.5; }
+  0%   { transform: translate(0, -50%); opacity: 0.5; }
+  50%  { transform: translate(150%, -50%); opacity: 0.9; }
+  100% { transform: translate(0, -50%); opacity: 0.5; }
 }
 
 .mission-section-label {
@@ -4607,17 +4614,22 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   transform: rotate(14deg) translateX(0);
   pointer-events: none;
   z-index: 2;
-  animation: licenseGlint 6s cubic-bezier(0.4,0,0.5,1) 2.4s infinite;
+  /* ‏פעם אחת · ‏לולאה אינסופית היא עוד שכבה שמתחזקת את
+     ‏עצמה לנצח. הברק נראה כשנכנסים לדף, וזה מספיק. */
+  animation: licenseGlint 2.4s cubic-bezier(0.4,0,0.5,1) 1.5s 1 both;
 }
 
+/* ‏האטימות נשארת מלאה כמעט עד הסוף · ‏קודם היא דעכה בזמן
+   ‏שהפס עוד היה על הכרטיסייה, וזה נראה כאילו הוא נחתך
+   ‏בחצי. המרחק גדל כדי שהוא יצא לגמרי מהצד השני. */
 @keyframes licenseGlint {
-  0%, 72%  { transform: rotate(14deg) translateX(0); opacity: 0; }
-  76%      { opacity: 1; }
-  96%      { opacity: 1; }
-  100%     { transform: rotate(14deg) translateX(var(--glint-to, 520px)); opacity: 0; }
+  0%   { transform: rotate(14deg) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: rotate(14deg) translateX(var(--glint-to, 640px)); opacity: 0; }
 }
 
-html[dir="rtl"] .license-badge::after { --glint-to: -520px; }
+html[dir="rtl"] .license-badge::after { --glint-to: -640px; }
 
 @media (prefers-reduced-motion: reduce) {
   .license-badge::after { display: none; }
