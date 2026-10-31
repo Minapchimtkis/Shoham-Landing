@@ -4516,16 +4516,43 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
 /* ‏הקו שמחבר בין הצעדים עובר לזהב איתם · ‏ארבע ספרות זהב
    ‏על חוט סגול נראות כמו שתי מערכות ולא כמו שרשרת אחת. */
 .process-line {
-  background: linear-gradient(180deg,
-    rgba(216,184,121,0.50) 0%,
-    rgba(216,184,121,0.50) calc(var(--fill) * 100%),
-    rgba(216,184,121,0.09) calc(var(--fill) * 100%),
-    rgba(216,184,121,0.09) 100%);
+  /* ‏המסילה הדהויה סטטית לגמרי · ‏קודם כאן היה גרדיאנט
+     ‏שנקודות העצירה שלו נגזרות מ---fill, כלומר הדפדפן צייר
+     ‏אותו מחדש בכל פריים של גלילה, על ארבעה קווים. */
+  background: rgba(216,184,121,0.09);
 }
 
 .process-line::after {
   background: linear-gradient(180deg, transparent, #e3c68d, #fbe9c4, #e3c68d, transparent);
   box-shadow: 0 0 12px rgba(216,184,121,0.85), 0 0 24px rgba(216,184,121,0.5);
+}
+
+/* ── ‏קו ההתקדמות · ‏מתיחה במקום ציור ──────────────────
+   ‏המילוי הוא עכשיו שכבה משלו שנמתחת מלמעלה למטה. scaleY
+   ‏עובר דרך ה-GPU · ‏אין ציור ואין פריסה · ‏ולכן הקו יכול
+   ‏לחזור גם לטלפון, שם כיביתי אותו יחד עם הפרלקסה. */
+.process-line::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(216,184,121,0.50);
+  transform-origin: top center;
+  /* ‏---fill ‏רשומה כלא-עוברת-בירושה, כדי שכתיבה שלה לא
+     ‏תחשב מחדש את כל תת-העץ. ‏פסאודו-אלמנט הוא בן לכל דבר,
+     ‏ולכן גם הוא קיבל את ערך הפתיחה 0 ‏והקו נמתח לאפס.
+     ‏אותה הצטרפות מפורשת שיש ל-.step > *. */
+  --fill: inherit;
+  transform: scaleY(var(--fill, 1));
+}
+
+/* ‏הנקודה הנעה · ‏הזיזה את top, שהיא תכונת פריסה, בכל
+   ‏פריים. עכשיו translateY · ‏ה-JS כותב את המרחק בפיקסלים
+   ‏כי אחוז ב-translateY נמדד מגובה האלמנט עצמו, שהוא 40
+   ‏פיקסל, ולא מגובה הקו. */
+.process-line::after {
+  --fill: inherit;
+  top: -40px;
+  transform: translateY(var(--fill-px, 0px));
 }
 
 /* ── ‏קונפטי בשלב הרביעי ────────────────────────────────
@@ -7306,16 +7333,22 @@ function closeIphone() {
         const seg = el.querySelector('.process-line');
         if (seg) {
           const s = seg.getBoundingClientRect();
-          writes.push([seg, '--fill', Math.min(1, Math.max(0, (line - s.top) / (s.height || 1)))]);
+          const fill = Math.min(1, Math.max(0, (line - s.top) / (s.height || 1)));
+          writes.push([seg, '--fill', fill]);
+          /* ‏למיקום הנקודה · ‏translateY באחוזים נמדד מגובה
+             ‏הנקודה ולא מגובה הקו, ולכן פיקסלים. */
+          writes.push([seg, '--fill-px', fill * s.height, 'px']);
         }
         // The number lights over the last 70px of the line's approach to it.
         writes.push([el, '--focus', Math.min(1, Math.max(0, (line - r.top + 30) / 70))]);
       }
     });
-    for (const [el, prop, raw] of writes) {
-      const v = raw.toFixed(2);
-      if (el.__lit === prop + v) continue;
-      el.__lit = prop + v;
+    for (const [el, prop, raw, unit] of writes) {
+      const v = raw.toFixed(2) + (unit || '');
+      /* ‏זיכרון נפרד לכל תכונה · ‏על אותו אלמנט נכתבות שתיים. */
+      const key = '__lit' + prop;
+      if (el[key] === v) continue;
+      el[key] = v;
       el.style.setProperty(prop, v);
     }
   }
@@ -7407,7 +7440,16 @@ function closeIphone() {
   const heroView = document.querySelector('.hero .hero-view-img');
 
   function applyParallax() {
-    if (narrow) { ticking = false; return; }
+    /* ‏במסך צר רצים רק הצעדים · ‏הם הפכו למתיחה ולהזזה
+       ‏שעוברות דרך ה-GPU, ולכן הם זולים. הפרלקסה של ההירו
+       ‏ומערכת העומק נשארות כבויות שם · ‏הן כותבות על אלמנטים
+       ‏שנושאים טשטוש וגרדיאנט על טקסט, וכל כתיבה כזאת היא
+       ‏ציור מחדש של המבנה כולו. */
+    if (narrow) {
+      if (!prefersStill) applySteps();
+      ticking = false;
+      return;
+    }
 
     const scrollY = window.scrollY;
 
@@ -7445,7 +7487,10 @@ function closeIphone() {
     ticking = false;
   }
 
-  if (!prefersStill && !narrow) { applyDepth(); applyExit(); applySteps(); }
+  if (!prefersStill) {
+    if (!narrow) { applyDepth(); applyExit(); }
+    applySteps();
+  }
 
   window.addEventListener('scroll', () => {
     if (!ticking) {
