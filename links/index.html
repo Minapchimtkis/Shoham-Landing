@@ -140,13 +140,12 @@ a { touch-action: manipulation; }
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-.logo, .name, .who, .row, .badge {
+.logo, .who, .row, .badge {
   opacity: 0;
   animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .logo  { animation-delay: 0.05s; }
-.name  { animation-delay: 0.13s; }
-.who   { animation-delay: 0.19s; }
+.who   { animation-delay: 0.15s; }
 .row:nth-child(1) { animation-delay: 0.27s; }
 .row:nth-child(2) { animation-delay: 0.35s; }
 .row:nth-child(3) { animation-delay: 0.43s; }
@@ -159,16 +158,12 @@ a { touch-action: manipulation; }
   margin: 0 auto 18px;
 }
 
-.name {
-  font-size: 25px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-}
+.brand { margin: 0; font-size: 0; line-height: 0; }
 
 /* ‏קו הקהל · ‏כולו זהב, ‏כמו בדף הנחיתה. */
 .who {
-  margin-top: 7px;
-  font-size: 14.5px;
+  margin-top: 4px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
   color: var(--gold);
@@ -335,7 +330,6 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 
 @media (max-width: 360px) {
   .logo { height: 88px; }
-  .name { font-size: 23px; }
   .link { min-height: 72px; gap: 12px; padding: 13px 14px; }
   .link-tile { width: 42px; height: 42px; border-radius: 12px; }
   .link-title { font-size: 15.5px; }
@@ -344,7 +338,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 /* ‏מי שביקש מהמערכת שלו פחות תנועה מקבל דף נייח · ‏כולל ביטול
    ‏אנימציית הכניסה, ‏שבלעדיו היה נשאר עם opacity ‏אפס ודף ריק. */
 @media (prefers-reduced-motion: reduce) {
-  .logo, .name, .who, .row, .badge {
+  .logo, .who, .row, .badge {
     opacity: 1;
     animation: none;
     transform: none;
@@ -359,12 +353,16 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 
 <main class="wrap">
 
-  <img class="logo" src="../assets/logo.webp?v=7ad752ae" width="600" height="415"
-       fetchpriority="high" decoding="async"
-       alt="שוהם אבו · ליווי וייעוץ פיננסי">
-
-  <h1 class="name">שוהם אבו</h1>
-  <p class="who">ליווי פיננסי אישי למשפחות צעירות ויחידים</p>
+  <!-- ‏הלוגו הוא הכותרת · ‏קודם הוא ישב כתמונה, ‏ומתחתיו היה
+       ‏כתוב שוב "שוהם אבו" ‏בטקסט. ‏השם הופיע פעמיים על אותו
+       ‏מסך, ‏וקורא מסך הקריא אותו פעמיים ברצף. ‏עכשיו התמונה
+       ‏עצמה היא ה-h1, ‏והטקסט החלופי שלה עושה את העבודה. -->
+  <h1 class="brand">
+    <img class="logo" src="../assets/logo.webp?v=7ad752ae" width="600" height="415"
+         fetchpriority="high" decoding="async"
+         alt="שוהם אבו · ליווי וייעוץ פיננסי">
+  </h1>
+  <p class="who">למשפחות צעירות וליחידים</p>
 
   <nav class="links" aria-label="הקישורים של שוהם אבו">
 
