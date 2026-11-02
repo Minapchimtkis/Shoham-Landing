@@ -11,10 +11,10 @@
      ‏דף נחיתה שלם. ‏חלק רוצים ישר לוואטסאפ. ‏ארבע אפשרויות, ‏בלי
      ‏גלילה, ‏בלי טופס, ‏ובלי שום דבר שצריך להחליט לגביו.
 
-     ‏אין כאן JavaScript ‏בכלל. ‏הוא נפתח בדפדפן שבתוך אינסטגרם, ‏לרוב
-     ‏ברשת סלולרית, ‏והמהירות היא כל הרעיון · ‏גם התנועה שבו היא CSS
-     ‏בלבד. ‏כל מה שזז כאן זז ב-transform ‏או ב-opacity, ‏שתיהן עוברות
-     ‏דרך ה-GPU ‏ואינן מחייבות את הדפדפן לצייר מחדש בכל פריים.
+     ‏כל התנועה שבדף היא CSS ‏בלבד · ‏כל מה שזז כאן זז ב-transform
+     ‏או ב-opacity, ‏שתיהן עוברות דרך ה-GPU ‏ואינן מחייבות את הדפדפן
+     ‏לצייר מחדש בכל פריים. ‏ה-JavaScript ‏היחיד בדף הוא הספירה
+     ‏שבתחתיתו, ‏והיא אינה נוגעת במה שנראה על המסך.
 
      ‏הדף עומד בפני עצמו לגמרי: ‏אינו נוגע בדף הנחיתה, ‏במחשבון
      ‏הביטחון הכלכלי או בכל עמוד אחר.
@@ -358,7 +358,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
   <nav class="links" aria-label="הקישורים של שוהם אבו">
 
     <div class="row">
-      <a class="link link-gold"
+      <a class="link link-gold" data-go="whatsapp"
          href="https://wa.me/972507228755?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%95%D7%94%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8.%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%90%D7%99%D7%9A%20%D7%90%D7%A4%D7%A9%D7%A8%20%D7%9C%D7%A9%D7%A0%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%94%D7%9E%D7%A1%D7%9C%D7%95%D7%9C%20%D7%94%D7%9B%D7%9C%D7%9B%D7%9C%D7%99%20%D7%A9%D7%9C%D7%99."
          target="_blank" rel="noopener">
         <img class="link-tile" src="img/wa.jpg" width="46" height="46" decoding="async" alt="שוהם אבו">
@@ -371,7 +371,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
     </div>
 
     <div class="row">
-      <a class="link" href="/">
+      <a class="link" data-go="landing" href="/">
         <img class="link-tile" src="img/site.jpg" width="46" height="46" decoding="async" alt="הסמל של שוהם אבו">
         <span class="link-copy">
           <span class="link-title">דף הנחיתה</span>
@@ -382,7 +382,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
     </div>
 
     <div class="row">
-      <a class="link" href="/financial-security/">
+      <a class="link" data-go="calculator" href="/financial-security/">
         <img class="link-tile" src="img/calc.jpg" width="46" height="46" decoding="async" alt="גרף עולה">
         <span class="link-copy">
           <span class="link-title">מחשבון הביטחון הכלכלי</span>
@@ -398,6 +398,92 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
   <p class="badge"><strong>יועץ כלכלי מוסמך מטעם חברת UNI פיננסים</strong><br>בפיקוח אוניברסיטת אריאל</p>
 
 </main>
+
+<!-- ‏ספירה אנונימית · ‏שורה אחת לכל ביקור לכל יעד
+     ==================================================================
+     ‏הדף הזה יושב בביו, ‏ובלי זה אי אפשר לדעת אם אנשים הולכים
+     ‏לדבר או ללמוד · ‏ולכן אי אפשר לדעת מה צריך לשבת ראשון.
+
+     ‏מה נשמר: ‏איזה כפתור נלחץ, ‏מאיזה אתר הגיעו ברמת שם האתר
+     ‏בלבד, ‏וטלפון או מחשב. ‏מה לא נשמר: ‏שם, ‏טלפון, ‏כתובת,
+     ‏עוגייה, ‏וכל מזהה ששורד סגירת לשונית · ‏המזהה נוצר אקראית
+     ‏לביקור ונמחק איתו.
+
+     ‏מי שהדפדפן שלו מבקש לא להיעקב אינו נספר כלל, ‏וכך גם מי
+     ‏שפתח פעם אחת עם ?notrack=1 · ‏אותו מנגנון בדיוק של דף
+     ‏הנחיתה, ‏כולל אותו מפתח בדפדפן, ‏כדי שביטול אחד יכסה את
+     ‏שני הדפים.
+
+     ‏כל הקובץ עטוף ב-try · ‏ספירה שנכשלת לא תשבור קישור. -->
+<script>
+(function () {
+  try {
+    var URL_ = 'https://vplqocqmlquajwwnyeby.supabase.co';
+    var KEY  = 'sb_publishable_R8cgR0cpcFP4RdTyS7IGWQ_925TH_KY';
+
+    if (navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
+        navigator.globalPrivacyControl === true) return;
+
+    if (!(function () {
+      try {
+        var q = new URLSearchParams(location.search).get('notrack');
+        if (q === '1') localStorage.setItem('shoham_notrack', '1');
+        else if (q === '0') localStorage.removeItem('shoham_notrack');
+        return localStorage.getItem('shoham_notrack') !== '1';
+      } catch (e) { return true; }
+    })()) return;
+
+    /* ‏מזהה לביקור · ‏ב-sessionStorage ‏כדי שרענון באותה לשונית
+       ‏יישאר אותו ביקור, ‏ונמחק כשסוגרים אותה. */
+    var visit;
+    try {
+      visit = sessionStorage.getItem('shoham_links_visit');
+      if (!visit) {
+        visit = (crypto.randomUUID ? crypto.randomUUID() :
+          'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+          }));
+        sessionStorage.setItem('shoham_links_visit', visit);
+      }
+    } catch (e) { visit = null; }
+
+    var ref = (function () {
+      try {
+        if (!document.referrer) return null;
+        var h = new URL(document.referrer).hostname.replace(/^www\./, '');
+        return h && h !== location.hostname ? h : null;
+      } catch (e) { return null; }
+    })();
+    var device = matchMedia('(max-width: 820px)').matches ? 'mobile' : 'desktop';
+
+    var send = function (target) {
+      try {
+        fetch(URL_ + '/rest/v1/rpc/links_click', {
+          method: 'POST', keepalive: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': KEY,
+            'Authorization': 'Bearer ' + KEY
+          },
+          body: JSON.stringify({ p_target: target, p_visit: visit,
+                                 p_ref: ref, p_device: device })
+        }).catch(function () {});
+      } catch (e) { /* ‏הספירה לעולם לא תשבור את הדף */ }
+    };
+
+    send('open');
+
+    /* ‏מאזין אחד על המכל · ‏לא שלושה. ‏pointerdown ‏ולא click,
+       ‏כי בטלפון הדפדפן מתחיל לעזוב את הדף לפני ש-click ‏נורה. */
+    var nav = document.querySelector('.links');
+    if (nav) nav.addEventListener('pointerdown', function (e) {
+      var a = e.target.closest('[data-go]');
+      if (a) send(a.getAttribute('data-go'));
+    }, { passive: true });
+  } catch (e) { /* ‏שקט · ‏זה רק מונה */ }
+})();
+</script>
 
 </body>
 </html>

@@ -384,6 +384,8 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
 .src-head,.src-row{display:grid;grid-template-columns:minmax(0,1fr) 52px 52px 52px;gap:6px;
   align-items:center;padding:9px 13px}
 .src-head{color:var(--muted2);font-size:9px;font-weight:800;border-bottom:1px solid var(--line)}
+/* דף הקישורים מראה שני מספרים ולא שלושה */
+.lk-src,.lk-row{grid-template-columns:minmax(0,1fr) 62px 62px}
 .src-row{border-bottom:1px solid var(--line);font-size:11px}
 .src-row:last-child{border-bottom:0}
 .src-name{font-weight:800;color:#cdd2dc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -449,6 +451,7 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
   <button id="tabLeads" class="tab on">לידים <span class="count" id="tabLeadsCount">0</span></button>
   <button id="tabQuiz" class="tab">שאלון <span class="count" id="tabQuizCount">0</span></button>
   <button id="tabPage" class="tab">דף הנחיתה <span class="count" id="tabPageCount">0</span></button>
+  <button id="tabLinks" class="tab">דף קישורים <span class="count" id="tabLinksCount">0</span></button>
   <button id="tabIntake" class="tab">שאלוני היכרות <span class="count" id="tabIntakeCount">0</span></button>
 </div>
 
@@ -553,6 +556,30 @@ button.alert:hover{border-color:var(--line2);background:rgba(255,255,255,.045)}
     <div class="src-head"><span>מאיפה הגיעו</span><span>כניסות</span><span>לטופס</span><span>פרטים</span></div>
     <div id="pgSrcEmpty" class="empty hidden">עדיין אין תנועה בטווח שנבחר</div>
     <div id="pgSources"></div>
+  </div>
+</div>
+
+<!-- ‏דף הקישורים · ‏האזור שלו בלבד. ‏הוא לא נוגע בשום פאנל אחר,
+     ‏ואם המיגרציה עוד לא רצה הוא אומר את זה ושאר הלוח ממשיך. -->
+<div id="linksPane" class="hidden">
+  <section class="stats">
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--blue)"></i>כניסות</div><b id="lkOpens">0</b><small>לדף הקישורים</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--green)"></i>וואטסאפ</div><b id="lkWa">0</b><small id="lkWaPct">—</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--purple)"></i>דף הנחיתה</div><b id="lkLanding">0</b><small id="lkLandingPct">—</small></div>
+    <div class="stat"><div class="stat-top"><i class="stat-dot" style="background:var(--amber)"></i>המחשבון</div><b id="lkCalc">0</b><small id="lkCalcPct">—</small></div>
+  </section>
+
+  <div class="fn-wrap">
+    <div class="fn-head"><strong>על מה לוחצים</strong><span id="lkRange">—</span></div>
+    <div id="lkRows"></div>
+  </div>
+
+  <p class="pane-note">שלושת הכפתורים הם בחירות מקבילות ולא שלבים, ולכן האחוז של כל אחד נמדד מתוך הכניסות לדף. מי שלחץ על אותו כפתור כמה פעמים נספר פעם אחת · זה אדם שהחליט, ולא כמה החלטות. מי שהדפדפן שלו מבקש לא להיעקב לא נספר כאן כלל.</p>
+
+  <div class="list-shell">
+    <div class="src-head lk-src"><span>מאיפה הגיעו</span><span>כניסות</span><span>לחיצות</span></div>
+    <div id="lkSrcEmpty" class="empty hidden">עדיין אין תנועה בטווח שנבחר</div>
+    <div id="lkSources"></div>
   </div>
 </div>
 
@@ -815,11 +842,11 @@ function setError(el,msg){if(!msg){hide(el);el.textContent='';return}el.textCont
 function parts(iso){if(!iso)return{date:'—',time:'—',full:'—'};const d=new Date(iso);const date=new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}).format(d).replace(/\s/g,'');const time=new Intl.DateTimeFormat('he-IL',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return{date,time,full:`${date} · ${time}`}}
 function statusLabel(s){return STATUS[s]?.label||'חדש'} function statusClass(s){return STATUS[s]?.cls||'status-new'}
 
-async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage(),loadIntake()]);markTabsLoaded();startRealtime();
+async function setLoggedIn(user){currentUser=user;$('adminEmail').textContent=user.email||'משתמש מורשה';hide($('loginView'));show($('appView'));show($('dashboardView'));hide($('detailView'));await Promise.all([loadLeads(),loadQuiz(),loadWa(),loadFunnel(),loadPage(),loadLinks(),loadIntake()]);markTabsLoaded();startRealtime();
   // Leads are the live part and realtime already pushes new ones; the rest
   // changes slowly and does not need a round trip every minute.
   if(!refreshTimer)refreshTimer=setInterval(loadLeads,60000);
-  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage();loadIntake();markTabsLoaded()},300000)}
+  if(!slowTimer)slowTimer=setInterval(()=>{loadQuiz();loadWa();loadFunnel();loadPage();loadLinks();loadIntake();markTabsLoaded()},300000)}
 function setLoggedOut(){currentUser=null;stopRealtime();hide($('appView'));show($('loginView'));if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}if(slowTimer){clearInterval(slowTimer);slowTimer=null}}
 async function bootstrap(){const{data:{session}}=await supabase.auth.getSession();if(session?.user)await setLoggedIn(session.user);else setLoggedOut()}
 
@@ -994,6 +1021,7 @@ const PAGE_STAGES=[
   {i:10,label:'השאירו פרטים'}
 ];
 let pageCounts=[], pageSources=[], pageRpcOk=true;
+let linkCounts={}, linkSources=[], linksRpcOk=true;
 
 // ‏הסרטון.
 //
@@ -1083,6 +1111,94 @@ function renderVideo(){
       : 'מי שצפה בסרטון משאיר פרטים <b>פחות</b> ממי שלא. שווה בדיקה.';
   } else gap.textContent='אין עדיין המרות אצל מי שלא צפה.';
   cmp.append(gap);
+}
+
+// ‏דף הקישורים · ‏שלוש אפשרויות מקבילות, ‏לא משפך. ‏אין כאן "עד
+// ‏לאן הגיעו" ‏אלא "במה בחרו", ‏ולכן כל אחוז נמדד מתוך הכניסות
+// ‏לדף ולא מתוך השורה שמעליו.
+const LK_TARGETS=[
+  {key:'whatsapp',  label:'שיחת היכרות בוואטסאפ'},
+  {key:'landing',   label:'דף הנחיתה'},
+  {key:'calculator',label:'מחשבון הביטחון הכלכלי'}
+];
+
+async function loadLinks(){
+  if(!currentUser||!linksRpcOk)return;
+  const{from,to}=dateRange();
+  const f=from?from.toISOString():null, t=to?to.toISOString():null;
+  const[c,s]=await Promise.all([
+    supabase.rpc('links_click_counts',{p_from:f,p_to:t}),
+    supabase.rpc('links_click_sources',{p_from:f,p_to:t})
+  ]);
+  if(c.error||s.error){
+    const e=c.error||s.error;
+    if(schemaMissing(e)){linksRpcOk=false;renderLinks();return}
+    console.error(e);return;
+  }
+  const m={};
+  for(const r of c.data||[])m[r.target]=Number(r.visits)||0;
+  linkCounts=m;
+  linkSources=(s.data||[]).map(r=>({ref:r.ref||'',visits:Number(r.visits),clicks:Number(r.clicks)}));
+  renderLinks();
+}
+
+function renderLinks(){
+  const opens=linkCounts.open||0;
+  const pct=n=>opens?Math.round(n/opens*100)+'% מהכניסות':'—';
+  $('tabLinksCount').textContent=opens;
+  $('lkOpens').textContent=opens;
+  $('lkWa').textContent=linkCounts.whatsapp||0;
+  $('lkWaPct').textContent=pct(linkCounts.whatsapp||0);
+  $('lkLanding').textContent=linkCounts.landing||0;
+  $('lkLandingPct').textContent=pct(linkCounts.landing||0);
+  $('lkCalc').textContent=linkCounts.calculator||0;
+  $('lkCalcPct').textContent=pct(linkCounts.calculator||0);
+
+  const box=$('lkRows');box.replaceChildren();
+  if(!linksRpcOk){
+    const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='המדידה עוד לא הופעלה. יש להריץ את קובץ ה־SQL האחרון בסופאבייס, ואז ללחוץ שוב על הטאב הזה.';
+    box.append(p);$('lkRange').textContent='—';
+    $('lkSrcEmpty').classList.remove('hidden');$('lkSources').replaceChildren();return;
+  }
+  if(!opens){
+    const p=document.createElement('div');p.className='fn-empty';
+    p.textContent='עדיין אין כניסות לדף הקישורים בטווח שנבחר.';
+    box.append(p);$('lkRange').textContent='—';
+  }else{
+    $('lkRange').textContent=opens+' כניסות';
+    // ‏הכי נלחץ למעלה · ‏זה גם הסדר שבו כדאי שהכפתורים יישבו בדף.
+    const rows=LK_TARGETS.map(t=>({...t,n:linkCounts[t.key]||0}))
+                         .sort((a,b)=>b.n-a.n);
+    for(const r of rows){
+      const row=document.createElement('div');row.className='fn-row';
+      const top=document.createElement('div');top.className='fn-top';
+      const nm=document.createElement('span');nm.className='fn-name';nm.textContent=r.label;
+      const num=document.createElement('span');num.className='fn-num';
+      const b=document.createElement('b');b.textContent=r.n;
+      num.append(b,document.createTextNode(' · '+Math.round(r.n/opens*100)+'%'));
+      top.append(nm,num);
+      const bar=document.createElement('div');bar.className='fn-bar';
+      const fill=document.createElement('div');fill.className='fn-fill';
+      fill.style.width=Math.round(r.n/opens*100)+'%';
+      bar.append(fill);row.append(top,bar);box.append(row);
+    }
+  }
+
+  const sbox=$('lkSources');sbox.replaceChildren();
+  const srcs=linkSources.filter(r=>r.visits>0||r.clicks>0);
+  $('lkSrcEmpty').classList.toggle('hidden',srcs.length>0);
+  for(const r of srcs){
+    const row=document.createElement('div');row.className='src-row lk-row';
+    const nm=document.createElement('span');nm.className='src-name';
+    nm.textContent=r.ref||'ישיר';
+    row.append(nm);
+    for(const v of [r.visits,r.clicks]){
+      const c=document.createElement('span');
+      c.className=v?'src-n':'src-zero';c.textContent=v;row.append(c);
+    }
+    sbox.append(row);
+  }
 }
 
 async function loadPage(){
@@ -1597,17 +1713,17 @@ document.querySelectorAll('#dateMenu [data-range]').forEach(btn=>btn.addEventLis
   document.querySelectorAll('#dateMenu [data-range]').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
   $('dateCustom').classList.toggle('show',r==='custom');
   if(r==='custom'){dateFilter='custom';syncDateBtn();return}
-  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();
+  dateFilter=r;syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();loadLinks();
   toast(r==='all'?'הסינון לפי תאריך בוטל':'מציג: '+RANGE_LABEL[r])
 }));
 $('dateApply').addEventListener('click',()=>{
   dateFromVal=$('dateFrom').value;dateToVal=$('dateTo').value;
   if(dateFromVal&&dateToVal&&dateFromVal>dateToVal){toast('תאריך ההתחלה מאוחר מתאריך הסיום','bad');return}
   if(!dateFromVal&&!dateToVal){toast('יש לבחור לפחות תאריך אחד','bad');return}
-  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();toast('הסינון הוחל')
+  dateFilter='custom';syncDateBtn();$('dateMenu').classList.remove('show');render();loadFunnel();loadPage();loadLinks();toast('הסינון הוחל')
 });
 document.addEventListener('click',()=>$('dateMenu').classList.remove('show'));
-$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true;loadLeads();loadQuiz();loadWa();loadFunnel();loadPage();markTabsLoaded()});$('backToDashboard').addEventListener('click',back);
+$('refreshBtn').addEventListener('click',()=>{quizAnswers.clear();pageRpcOk=true;linksRpcOk=true;loadLeads();loadQuiz();loadWa();loadFunnel();loadPage();loadLinks();markTabsLoaded()});$('backToDashboard').addEventListener('click',back);
 
 // The three tabs are the three stages of the same journey, read in order:
 // who came to the page, who answered the questionnaire, who is now a lead.
@@ -2125,23 +2241,24 @@ $('ikDelete').addEventListener('click',()=>{
   show($('deleteConfirmBackdrop'));document.body.classList.add('locked');
 });
 
-const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane',intake:'intakePane'};
-const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage',intake:'tabIntake'};
+const PANES={leads:'leadsPane',quiz:'quizPane',page:'pagePane',links:'linksPane',intake:'intakePane'};
+const TABS={leads:'tabLeads',quiz:'tabQuiz',page:'tabPage',links:'tabLinks',intake:'tabIntake'};
 // Realtime carries new leads and nothing else, so the panels behind the two
 // slower tabs are only refetched on login, on the refresh button, and once
 // every five minutes. Opening a tab is a request to see what is in it now,
 // not what it held when the timer last ran. The floor keeps flipping between
 // tabs from costing a query per tap.
-const tabLoaded={quiz:0,page:0,intake:0};
+const tabLoaded={quiz:0,page:0,links:0,intake:0};
 function freshenTab(which){
   if(!(which in tabLoaded))return;
   if(Date.now()-tabLoaded[which]<30000)return;
   tabLoaded[which]=Date.now();
   if(which==='quiz'){loadQuiz();loadFunnel()}
   else if(which==='intake'){loadIntake()}
+  else if(which==='links'){loadLinks()}
   else{loadPage()}
 }
-function markTabsLoaded(){const n=Date.now();tabLoaded.quiz=n;tabLoaded.page=n;tabLoaded.intake=n}
+function markTabsLoaded(){const n=Date.now();tabLoaded.quiz=n;tabLoaded.page=n;tabLoaded.links=n;tabLoaded.intake=n}
 
 function setTab(which){
   if(!PANES[which])which='leads';
@@ -2154,6 +2271,7 @@ function setTab(which){
   // nothing short of a full reload brings it back, so it asks again straight
   // away rather than waiting out the floor.
   if(which==='page'&&!pageRpcOk){pageRpcOk=true;tabLoaded.page=Date.now();loadPage();return}
+  if(which==='links'&&!linksRpcOk){linksRpcOk=true;tabLoaded.links=Date.now();loadLinks();return}
   freshenTab(which);
 }
 for(const k in TABS)$(TABS[k]).addEventListener('click',()=>setTab(k));
