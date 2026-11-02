@@ -85,7 +85,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px calc(32px + env(safe-area-inset-bottom, 0px));
+  /* ‏הריפוד אינו סימטרי בכוונה · ‏הוא מה שמושך את כל הגוש
+     ‏מעט מעל מרכז המסך, ‏בלי לוותר על המרכוז עצמו. */
+  padding: 26px 20px calc(86px + env(safe-area-inset-bottom, 0px));
   text-align: center;
   overflow-x: hidden;
 }
@@ -140,12 +142,11 @@ a { touch-action: manipulation; }
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-.logo, .who, .row, .badge {
+.logo, .row, .badge {
   opacity: 0;
   animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .logo  { animation-delay: 0.05s; }
-.who   { animation-delay: 0.15s; }
 .row:nth-child(1) { animation-delay: 0.27s; }
 .row:nth-child(2) { animation-delay: 0.35s; }
 .row:nth-child(3) { animation-delay: 0.43s; }
@@ -154,20 +155,11 @@ a { touch-action: manipulation; }
 .logo {
   display: block;
   width: auto;
-  height: 104px;
-  margin: 0 auto 18px;
+  height: 118px;
+  margin: 0 auto 26px;
 }
 
 .brand { margin: 0; font-size: 0; line-height: 0; }
-
-/* ‏קו הקהל · ‏כולו זהב, ‏כמו בדף הנחיתה. */
-.who {
-  margin-top: 4px;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--gold);
-}
 
 .links {
   margin-top: 30px;
@@ -329,7 +321,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 .badge strong { font-weight: 500; color: rgba(255,255,255,0.7); }
 
 @media (max-width: 360px) {
-  .logo { height: 88px; }
+  .logo { height: 100px; margin-bottom: 20px; }
   .link { min-height: 72px; gap: 12px; padding: 13px 14px; }
   .link-tile { width: 42px; height: 42px; border-radius: 12px; }
   .link-title { font-size: 15.5px; }
@@ -338,7 +330,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 /* ‏מי שביקש מהמערכת שלו פחות תנועה מקבל דף נייח · ‏כולל ביטול
    ‏אנימציית הכניסה, ‏שבלעדיו היה נשאר עם opacity ‏אפס ודף ריק. */
 @media (prefers-reduced-motion: reduce) {
-  .logo, .who, .row, .badge {
+  .logo, .row, .badge {
     opacity: 1;
     animation: none;
     transform: none;
@@ -362,7 +354,6 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
          fetchpriority="high" decoding="async"
          alt="שוהם אבו · ליווי וייעוץ פיננסי">
   </h1>
-  <p class="who">למשפחות צעירות וליחידים</p>
 
   <nav class="links" aria-label="הקישורים של שוהם אבו">
 
