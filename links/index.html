@@ -232,6 +232,19 @@ a { touch-action: manipulation; }
   display: block;
 }
 
+/* ‏אינסטגרם נשאר עם סמל ולא עם תמונה · ‏הלוגו של מנפחים
+   ‏ת'כיס הוא מותג אחר, ‏וב-46 ‏פיקסל הוא נקרא כרעש. ‏הסמל
+   ‏עצמו אומר "אינסטגרם" ‏מיד, ‏וזה כל מה שהשורה צריכה. */
+.link-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e3c6ff;
+  background: rgba(168,85,247,0.26);
+  border-color: rgba(216,180,254,0.40);
+}
+.link-tile-icon svg { width: 23px; height: 23px; }
+
 .link-copy { flex: 1 1 auto; min-width: 0; }
 
 .link-title {
@@ -405,7 +418,7 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
 
     <div class="row">
       <a class="link" href="https://www.instagram.com/minapchim_tkis" target="_blank" rel="noopener noreferrer">
-        <img class="link-tile" src="img/ig.jpg" width="46" height="46" decoding="async" alt="מנפחים ת'כיס">
+        <span class="link-tile link-tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.5" cy="6.5" r="1.15" fill="currentColor" stroke="none"/></svg></span>
         <span class="link-copy">
           <span class="link-title">אינסטגרם</span>
           <span class="link-sub">תוכן וטיפים פיננסיים</span>
