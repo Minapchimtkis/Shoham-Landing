@@ -349,6 +349,7 @@ button, input, select, textarea { font-family: inherit; }
    rises as the page is revealed rather than having played out behind it. */
 html.intro-open .hero-badge,
 html.intro-open .hero-title,
+html.intro-open .hero-audience,
 html.intro-open .hero-cta,
 html.intro-open .license-badge { animation-play-state: paused; }
 /* Those entrances were written with their own staggered delays, which would
@@ -357,6 +358,7 @@ html.intro-open .license-badge { animation-play-state: paused; }
    postponed: the moment the ground clears, they go. */
 html.intro-flying .hero-badge, html.intro-landed .hero-badge,
 html.intro-flying .hero-title, html.intro-landed .hero-title,
+html.intro-flying .hero-audience, html.intro-landed .hero-audience,
 html.intro-flying .hero-cta, html.intro-landed .hero-cta,
 html.intro-flying .license-badge, html.intro-landed .license-badge { animation-delay: 0s !important; }
 /* The hero's own logo is what the mark is flying towards, so it is not
@@ -1058,6 +1060,21 @@ section {
 .license-shield { flex: none; color: var(--p6); }
 .license-copy { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 
+/* ‏34 תווים ומשקל 700 התאימו לשורה אחת בת 49 תווים. הטקסט
+   ‏החדש ארוך פי שלושה, וברוחב הזה הוא היה חמש שורות של
+   ‏מודגש מתחת לכותרת. הרוחב והמשקל הותאמו לאורך, וזה
+   ‏השינוי היחיד בריווח ההירו. */
+.hero-audience {
+  margin: 18px auto 52px;
+  max-width: 52ch;
+  color: #c9a8ff;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.5s forwards;
+}
 
 /* The hero is one full screen tall, but its contents were a fixed height, so
    on a short phone they simply overflowed it. On an iPhone SE the call to
@@ -1075,6 +1092,7 @@ section {
      ‏והכותרת תישאר שתי שורות גם ב-320 וב-360. התקרה היא
      ‏הערך שהיה כאן קודם. */
   .hero-title { font-size: clamp(30px, 10.2vw, 42px); margin-bottom: 20px; }
+  .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 20px; }
 }
 
@@ -1082,6 +1100,7 @@ section {
   .hero { padding-top: calc(88px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 18px); }
   .hero-logo { height: 111px; margin-bottom: 11px; }
   .hero-title { font-size: clamp(30px, 10.2vw, 44px); margin-bottom: 22px; }
+  .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 22px; }
 }
 
@@ -1089,6 +1108,7 @@ section {
   .hero { --band: clamp(100px, 16vh, 150px); padding-top: calc(74px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 14px); }
   .hero-logo { height: 81px; margin-bottom: 5px; }
   .hero-title { font-size: clamp(24px, 8.4vw, 34px); margin-bottom: 14px; }
+  .hero-audience { font-size: 13px; margin-top: 9px; margin-bottom: 18px; }
   .license-badge { margin-top: 14px; }
 }
 
@@ -1101,10 +1121,6 @@ section {
 }
 
 .hero-cta {
-  /* ‏שורת הקהל שישבה כאן נשאה 18 ‏פיקסל מעליה ו-52 ‏מתחתיה.
-     ‏בלעדיה הכפתור נצמד לכותרת, ‏ולכן חלק מהאוויר שלה חוזר
-     ‏כאן · ‏מספיק כדי שהשניים לא ייגעו, ‏ולא יותר. */
-  margin-top: 16px;
   opacity: 0;
   animation: fadeUp 0.9s 0.8s forwards;
 }
@@ -4453,6 +4469,36 @@ html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
   .band, .band + * { margin-top: 40px; }
 }
 
+/* ── ‏למי זה מיועד ──────────────────────────────────────
+   ‏זה המשפט שעונה על השאלה הראשונה שכל מבקר שואל · ‏"האם
+   ‏זה בשבילי". הוא ישב ב-15 פיקסל במשקל 500, בין כותרת
+   ‏ענקית לכפתור בולט, ונקרא ככיתוב.
+
+   ‏שתי המילים שנושאות את התשובה עוברות לזהב · ‏אותו זהב של
+   ‏הכפתור, ולכן העין שכבר למדה שזהב פירושו "אותך זה נוגע"
+   ‏מוצאת אותן מיד. */
+.hero-audience {
+  font-size: 16.5px;
+  font-weight: 500;
+  /* ‏כל השורה בזהב · ‏חצי סגול וחצי זהב פיצל אותה לשני
+     ‏משפטים, ומי שקרא רק את הזהב קיבל "למשפחות צעירות
+     ‏ויחידים" בלי לדעת למה. ההדגשה נשארת, היא פשוט עוברת
+     ‏מצבע למשקל. */
+  color: var(--gold);
+  /* ‏ב-320 "ויחידים" נשארה לבדה בשורה · ‏רווח קשיח מצמיד
+     ‏אותה ל"צעירות", והאיזון מחלק את השאר שווה בשווה. */
+  text-wrap: balance;
+}
+
+.hero-audience strong {
+  font-weight: 800;
+  letter-spacing: 0.1px;
+}
+
+@media (max-width: 480px) {
+  .hero-audience { font-size: 15px; }
+}
+
 /* ── ‏מספרי התהליך בזהב ─────────────────────────────────
    ‏ארבעה עיגולים סגולים מלאים הם ארבעה כתמים באותו משקל של
    ‏הכפתור, והם גנבו ממנו את העין. מעגל פתוח עם ספרה בזהב
@@ -5015,7 +5061,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   function armHandover() {
     if (armed) return;
     armed = true;
-    ['.hero-badge', '.hero-title', '.hero-cta', '.license-badge']
+    ['.hero-badge', '.hero-title', '.hero-audience', '.hero-cta', '.license-badge']
       .forEach(function (sel) {
         var e = document.querySelector(sel);
         if (!e) return;
@@ -5191,6 +5237,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     <span class="line1">כסף שעובד למענך</span>
     <span class="line2">לא להפך</span>
   </h1>
+  <p class="hero-audience">ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong></p>
   <div class="hero-cta">
     <a href="#contact" class="btn-primary">לשיחת היכרות</a>
   </div>
@@ -7368,14 +7415,14 @@ function closeIphone() {
   function clearHero() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
-    hero.querySelectorAll('.hero-logo, .hero-title, .hero-cta, .license-badge')
+    hero.querySelectorAll('.hero-logo, .hero-title, .hero-audience, .hero-cta, .license-badge')
       .forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
     const v = hero.querySelector('.hero-view-img');
     if (v) v.style.transform = '';
   }
 
   /* ‏נשאל פעם אחת ולא בכל פריים. */
-  const heroEls = document.querySelectorAll('.hero .hero-logo, .hero .hero-title, .hero .hero-cta, .hero .license-badge');
+  const heroEls = document.querySelectorAll('.hero .hero-logo, .hero .hero-title, .hero .hero-audience, .hero .hero-cta, .hero .license-badge');
   const heroView = document.querySelector('.hero .hero-view-img');
 
   function applyParallax() {
@@ -7688,6 +7735,7 @@ const translations = {
     lblWaName: 'השם שלכם',
     lblWaPhone: 'מספר טלפון',
     heroLine2: 'לא להפך',
+    heroAudience: 'ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong>',
     heroCta: 'לשיחת היכרות',
     videoTitle: 'חצי דקה איתי',
     videoPlay: 'נגן את הסרטון',
@@ -7792,6 +7840,7 @@ const translations = {
     lblWaName: 'Your name',
     lblWaPhone: 'Phone number',
     heroLine2: 'not the other way round',
+    heroAudience: 'Personal financial guidance <strong>for young families and individuals</strong>',
     heroCta: 'Book an intro call',
     videoTitle: 'Half a minute with me, in Hebrew',
     videoPlay: 'Play the video',
@@ -7911,7 +7960,9 @@ function setLang(lang) {
 
   // Hero
   const heroTitle = document.querySelector('.hero-title');
+  const heroAud = document.querySelector('.hero-audience');
   heroTitle.dir = isEN ? 'ltr' : 'rtl';
+  if (heroAud) { heroAud.dir = isEN ? 'ltr' : 'rtl'; heroAud.innerHTML = t.heroAudience; }
   document.querySelector('.hero-title .line1').textContent = t.heroLine1;
   /* ‏השורה השנייה נושאת את מילת ההדגשה בתוכה, ולכן innerHTML
      ‏והמחרוזת מגיעה מהמילון ולא כתובה כאן פעמיים. */
