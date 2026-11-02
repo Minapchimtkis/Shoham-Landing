@@ -86,8 +86,8 @@ body {
   align-items: center;
   justify-content: center;
   /* ‏הריפוד אינו סימטרי בכוונה · ‏הוא מה שמושך את כל הגוש
-     ‏מעט מעל מרכז המסך, ‏בלי לוותר על המרכוז עצמו. */
-  padding: 26px 20px calc(86px + env(safe-area-inset-bottom, 0px));
+     ‏מעל מרכז המסך, ‏בלי לוותר על המרכוז עצמו. */
+  padding: 16px 20px calc(120px + env(safe-area-inset-bottom, 0px));
   text-align: center;
   overflow-x: hidden;
 }
@@ -319,6 +319,13 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
   color: rgba(255,255,255,0.52);
 }
 .badge strong { font-weight: 500; color: rgba(255,255,255,0.7); }
+
+/* ‏מסך נמוך · ‏שם אין מאיפה לקחת. ‏המשיכה כלפי מעלה הייתה
+   ‏דוחפת את תג ההסמכה מתחת לקו ומכניסה גלילה לדף שכל הרעיון
+   ‏שלו הוא שאין בו גלילה, ‏ולכן שם הריפוד חוזר לסימטרי יותר. */
+@media (max-height: 640px) {
+  body { padding-top: 22px; padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+}
 
 @media (max-width: 360px) {
   .logo { height: 100px; margin-bottom: 20px; }
