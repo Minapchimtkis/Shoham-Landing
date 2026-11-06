@@ -1,0 +1,10 @@
+scroll-craft
+
+מקור: https://github.com/nateherkai/scroll-craft
+רישיון: MIT · Nate Herk
+גרסת התוסף בזמן ההתקנה: 0.3.1
+קומיט: 75d81f74e83692add18cd7a8a8e078b8a887a579
+הותקן: 2026-11-06
+
+הועתק מתוך plugins/nateherk-design/skills/scroll-craft שבריפו.
+לעדכון: לשכפל מחדש ולהחליף את התיקייה הזאת.
