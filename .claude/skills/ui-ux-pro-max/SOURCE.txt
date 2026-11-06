@@ -1,0 +1,13 @@
+ui-ux-pro-max · חבילה של שבעה סקילים
+
+מקור: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+רישיון: MIT · Next Level Builder
+גרסת התוסף בזמן ההתקנה: 2.15.0
+קומיט: b7d5353e0130feb8c5574ef1251f8a1db1873ccb
+הותקן: 2026-11-06
+
+הסקילים שהגיעו יחד: banner-design, brand, design, design-system,
+slides, ui-styling, ui-ux-pro-max. כולם הועתקו מ-.claude/skills
+שבריפו, בלי שינוי.
+
+לעדכון: לשכפל מחדש ולהחליף את שבע התיקיות.
