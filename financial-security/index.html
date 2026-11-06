@@ -641,6 +641,165 @@ h1 .hl {
 .cell .v.gold { color: var(--gold); }
 .cell .v.lilac { color: var(--p6); }
 
+/* ── שלוש השורות המקופלות ──
+   הגובה מונפש ולא ה-display, אחרת אין מה להנפיש. max-height על
+   ערך מדוד ולא על מספר שרירותי גדול, כדי שהקצב לא ייראה שונה
+   בין שלוש שורות לשש. */
+.cell.more {
+  overflow: hidden;
+  max-height: 0;
+  padding-top: 0; padding-bottom: 0;
+  border-bottom-width: 0;
+  opacity: 0;
+  transition: max-height 0.32s cubic-bezier(0.16,1,0.3,1),
+              padding 0.32s cubic-bezier(0.16,1,0.3,1),
+              opacity 0.22s linear;
+}
+.grid.open .cell.more {
+  max-height: 64px;
+  padding-top: 13px; padding-bottom: 13px;
+  border-bottom-width: 1px;
+  opacity: 1;
+}
+
+.more-btn {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 2px;
+  padding: 12px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--p6);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+}
+.more-btn:focus-visible { outline: 2px solid var(--p6); outline-offset: -2px; }
+
+/* ── פס הדרך ──
+   המסילה מצוירת מיד במלוא רוחבה והמילוי נמתח ב-scaleX. הנפשת
+   width הייתה מחייבת חישוב פריסה בכל פריים, וזה בדיוק הדפוס
+   הנגדי שמזהירים ממנו. */
+.bar-wrap { margin-top: 20px; }
+.bar-top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 8px;
+  font-size: 12.5px; color: var(--text-2);
+}
+.bar-pct { font-weight: 800; color: var(--p6); font-variant-numeric: tabular-nums; }
+.bar-track {
+  height: 8px; border-radius: 99px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--p4), var(--p6));
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 1s cubic-bezier(0.16,1,0.3,1) 0.34s;
+}
+html[dir="ltr"] .bar-fill { transform-origin: left center; }
+
+/* ── מה אם ── */
+.whatif {
+  margin-top: 22px; padding: 16px 16px 14px;
+  border: 1px solid var(--rule); border-radius: 16px;
+  background: rgba(255,255,255,0.022);
+}
+.wi-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px;
+}
+.wi-head label { font-size: 13px; color: var(--text-2); }
+.wi-val {
+  font-size: 18px; font-weight: 800; color: var(--p6);
+  direction: ltr; font-variant-numeric: tabular-nums;
+}
+/* הידית 28 על 28 עם שטח נגיעה של 44 מסביבה · גרירה בעכבר
+   מדויקת, ואצבע לא צריכה לכוון. */
+.wi-range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 44px; margin: 0;
+  background: none; cursor: pointer;
+}
+.wi-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 99px; background: rgba(255,255,255,0.1);
+}
+.wi-range::-moz-range-track {
+  height: 6px; border-radius: 99px; background: rgba(255,255,255,0.1);
+}
+.wi-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 28px; height: 28px; margin-top: -11px;
+  border-radius: 50%; border: 2px solid #fff;
+  background: var(--p4);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.wi-range::-moz-range-thumb {
+  width: 28px; height: 28px;
+  border-radius: 50%; border: 2px solid #fff;
+  background: var(--p4);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.wi-range:focus-visible { outline: 2px solid var(--p6); outline-offset: 4px; }
+.wi-out {
+  margin-top: 6px; min-height: 19px;
+  font-size: 13px; line-height: 1.5; color: var(--text-2);
+}
+.wi-out b { color: #fff; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill { transition: none; }
+}
+
+/* ── התנועה במסך התוצאה ──
+   רק transform ו-opacity. שתיהן עוברות דרך ה-GPU ואינן מחייבות
+   את הדפדפן לחשב פריסה מחדש בכל פריים. */
+@keyframes rvUp {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* הכותרת, מילה אחרי מילה. inline-block כדי ש-transform יחול
+   עליה בכלל, ו-will-change לא נדרש כי זאת ריצה אחת קצרה. */
+.rv-w {
+  display: inline-block;
+  opacity: 0;
+  animation: rvUp 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* המשפט שמתחת נכנס אחרי שהכותרת כבר שם. */
+.res-sub.rv-in { animation: rvUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both; }
+
+/* שש השורות, בזו אחר זו. ההשהיה גדלה ב-70ms לשורה. */
+.grid.rv-in .cell { opacity: 0; animation: rvUp 0.46s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.rv-in .cell:nth-child(1) { animation-delay: 0.34s; }
+.grid.rv-in .cell:nth-child(2) { animation-delay: 0.41s; }
+.grid.rv-in .cell:nth-child(3) { animation-delay: 0.48s; }
+.grid.rv-in .cell:nth-child(4) { animation-delay: 0.55s; }
+.grid.rv-in .cell:nth-child(5) { animation-delay: 0.62s; }
+.grid.rv-in .cell:nth-child(6) { animation-delay: 0.69s; }
+/* מקופלת היא מקופלת, גם בזמן שהיא "נכנסת". */
+.grid.rv-in .cell.more { opacity: 0; animation: none; }
+.grid.rv-in.open .cell.more { opacity: 1; }
+
+/* הספרות ברוחב קבוע, אחרת השורה רוקדת בזמן שהמספר מטפס. */
+.cell .v, .res-big, .span-amt { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-w, .res-sub.rv-in, .grid.rv-in .cell { animation: none; opacity: 1; transform: none; }
+}
+@media (hover: hover) and (pointer: fine) { .more-btn:hover { color: #fff; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cell.more { transition: none; }
+}
+
 /* ── שער הליד ── */
 .gate {
   position: relative;
@@ -1508,13 +1667,38 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
     <p class="res-sub" id="resSub"></p>
   </div>
 
+  <!-- ‏שלושה מספרים ולא שישה · ‏הפער, ‏היעד, ‏ומה שיש היום הם
+       ‏הסיפור, ‏והשלושה האחרים הם הרקע שלו. ‏"הצפה מראש" ‏היא דפוס
+       ‏נגדי מוכר, ‏והשמות המלאים עברו לתוך ההסבר שנפתח בנגיעה. -->
   <div class="grid" id="resGrid">
-    <div class="cell"><div class="k" data-tip="capital">הון פיננסי נוכחי</div><div class="v" id="cCap"></div></div>
-    <div class="cell"><div class="k">שווי נקי</div><div class="v" id="cNet"></div></div>
-    <div class="cell"><div class="k">חיסכון חודשי</div><div class="v" id="cSave"></div></div>
-    <div class="cell"><div class="k">שיעור חיסכון</div><div class="v" id="cRate"></div></div>
-    <div class="cell"><div class="k" data-tip="target">יעד הון משוער</div><div class="v lilac" id="cTarget"></div></div>
-    <div class="cell"><div class="k">פער משוער</div><div class="v gold" id="cGap"></div></div>
+    <div class="cell"><div class="k">כמה חסר</div><div class="v gold" id="cGap"></div></div>
+    <div class="cell"><div class="k" data-tip="target">כמה צריך</div><div class="v lilac" id="cTarget"></div></div>
+    <div class="cell"><div class="k" data-tip="capital">מה שיש לכם היום</div><div class="v" id="cCap"></div></div>
+    <div class="cell more"><div class="k">נשאר בסוף החודש</div><div class="v" id="cSave"></div></div>
+    <div class="cell more"><div class="k">כמה אחוז מההכנסה</div><div class="v" id="cRate"></div></div>
+    <div class="cell more"><div class="k">כולל הדירה</div><div class="v" id="cNet"></div></div>
+  </div>
+  <button class="more-btn" id="btnMore" type="button" aria-expanded="false" aria-controls="resGrid">לראות את כל המספרים</button>
+
+  <!-- כמה מהדרך כבר נעשתה · הדבר הוויזואלי היחיד במסך, והוא
+       אומר בלי מילה אחת את מה שששת המספרים אומרים ביחד. -->
+  <div class="bar-wrap" id="barWrap">
+    <div class="bar-top"><span id="barLab"></span><span class="bar-pct" id="barPct"></span></div>
+    <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+
+  <!-- "מה אם" · הדבר היחיד במסך שאפשר לגעת בו. התוצאה מפסיקה
+       להיות פסק דין והופכת לכלי, ומי שמזיז את הידית מגלה לבד
+       שהמנוף הוא מה שנשאר בסוף החודש. הכל מקומי: שום נתון
+       אינו נשלח לשום מקום בזמן הגרירה. -->
+  <div class="whatif" id="whatIf">
+    <div class="wi-head">
+      <label for="wiSave">מה אם היינו מפנים בחודש</label>
+      <b class="wi-val" id="wiVal"></b>
+    </div>
+    <input type="range" class="wi-range" id="wiSave" min="0" max="100" step="250" value="0"
+           aria-describedby="wiOut">
+    <p class="wi-out" id="wiOut"></p>
   </div>
 
   <p class="disclaimer top" id="preDisc">
@@ -1524,15 +1708,11 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
   <!-- ─── שער הליד ─── -->
   <div class="gate" id="gate">
-    <h2>התוצאה שלך מוכנה</h2>
-    <p class="sub open">לפני שחולמים על פרישה, חשוב קודם לדעת להתנהל נכון כלכלית בהווה.</p>
+    <h2>רוצים לדעת מה להזיז?</h2>
+    <p class="sub open">הגרירה למעלה מראה כמה · אני עוזר להגיע לשם.</p>
     <p class="sub">
-      המספר שלמעלה נשען על דבר אחד: כמה נשאר לכם בסוף החודש.
-      אם הוא נראה רחוק, ברוב המקרים זו לא שאלה של איפה להשקיע אלא של איך מתנהלים.
-    </p>
-    <p class="sub">
-      קוראים לי שוהם, ואני מלווה משפחות צעירות ויחידים ועוזר להם להתנהל נכון כלכלית,
-      על מנת שהמספרים שאתם רואים פה במחשבון יהיו מציאותיים.
+      כל המספר הזה תלוי בדבר אחד: כמה נשאר בסוף החודש.
+      זאת בדרך כלל לא שאלה של איפה להשקיע, אלא של איך מתנהלים · וזה מה שאני עושה.
     </p>
     <p class="gate-legal">השירות אינו מהווה ייעוץ השקעות, ייעוץ פנסיוני או ייעוץ מס.</p>
 
@@ -1566,7 +1746,7 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
     <p class="err" id="gateErr" role="alert"></p>
 
-    <button class="btn btn-primary btn-wide" id="btnLead" type="button" style="margin-top:14px">קבלו את הניתוח שלי</button>
+    <button class="btn btn-primary btn-wide" id="btnLead" type="button" style="margin-top:14px">אני רוצה לדעת מה להזיז</button>
 
     <p class="privacy-note">
       הנתונים משמשים לצורך הפקת החישוב וליצירת קשר בהתאם לבקשתכם.
@@ -2057,42 +2237,100 @@ var NOW_YEAR = new Date().getFullYear();
 /* התוצאה נאמרת בזהירות מכוונת: ״סביב״, ״כ־״, ולא תאריך מדויק. */
 var REACH_YEARS = 25;
 
-function phrase(years, age, c) {
+function phrase(years, age, c, st) {
   if (years === null) {
-    var sub = 'במסלול הנוכחי ההון לא מגיע ליעד בתוך ' + ASSUME.maxYears +
-              ' שנה. זה לא אומר שאי אפשר. זה אומר שאחד הנתונים צריך לזוז.';
+    var sub = 'במסלול הזה לא מגיעים לשם, גם לא בעוד ' + ASSUME.maxYears +
+              ' שנה. לא נורא · פשוט צריך להזיז משהו.';
     /* המספר שהופך את התשובה הזו לשימושית: מה כן היה נדרש. */
     if (c) {
       var need = neededMonthly(c.freedomCapital, c.base.realReturn, c.base.target, REACH_YEARS * 12);
       if (need !== null && isFinite(need) && need > 0) {
-        sub += ' כדי להגיע תוך ' + REACH_YEARS + ' שנה בהנחות האלה נדרש בערך ' +
-               shekel(need) + ' בחודש.';
+        sub += ' כדי להגיע תוך ' + REACH_YEARS + ' שנה צריך להפנות בערך ' +
+               shekel(need) + ' בחודש' +
+               (st && st.saving > 0 ? ', במקום ' + shekel(st.saving) : '') + '.';
       }
     }
-    return { big: 'לא בטווח הנראה לעין', small: true, sub: sub };
+    return { big: 'לא בקצב הזה', small: true, sub: sub };
   }
   if (years === 0) {
     return { big: 'אתם כבר שם', small: true,
-             sub: 'לפי הנתונים שהזנתם, ההון הפיננסי שלכם כבר מכסה את היעד החודשי שהגדרתם.' };
+             sub: 'לפי מה שהזנתם, מה שכבר צברתם מכסה את הסכום החודשי שרציתם.' };
   }
   var y = Math.round(years);
   var atAge = Math.round(age + years);
   if (years < 1) {
     return { big: 'פחות משנה', small: true,
-             sub: 'לפי הנתונים שהזנתם, אתם קרובים מאוד ליעד שהגדרתם.' };
+             sub: 'אתם ממש על הגדר. עוד קצת.' };
   }
   return {
     big: String(NOW_YEAR + y), small: false,
-    sub: 'בערך ' + yearsWord(y) + ' מהיום, סביב גיל ' + atAge + '. זו הערכה ולא תאריך.'
+    sub: 'בערך ' + yearsWord(y) + ' מהיום, בגיל ' + atAge + '. זאת הערכה, לא תאריך בלוח שנה.'
   };
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   8א. התנועה במסך התוצאה
+       שלוש דרגות, לפי משכים ועקומות מדודים: עדין 300·400ms,
+       רגיל 400·600ms בהשהיה מדורגת, מורכב 400·700ms לכותרת.
+
+       הכל כאן CSS ו-rAF. לא נוספה שום ספריית אנימציה: הדף הזה
+       כבר סבל מגלילה תקועה, ו-70KB של מנוע תזמון בשביל שלוש
+       תנועות הם בדיוק מה שהחזיר אותה.
+
+       שתי מגבלות שנשמרות: לא מנפישים רוחב וגובה (רק transform
+       ו-opacity), ולא מדרגים יותר משמונה פריטים.
+   ══════════════════════════════════════════════════════════════════ */
+var STILL = (function () {
+  try { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch (e) { return false; }
+})();
+
+/* המספר מטפס מאפס. היציאה מהירה ומאטה לקראת הסוף, כך שהעין
+   קולטת את הסדר גודל מיד והספרה האחרונה רק מתיישבת. */
+function countUp(el, to, ms, fmt, delay) {
+  if (STILL || !to || !isFinite(to)) { el.textContent = fmt(to || 0); return; }
+  /* המספר מתחיל לטפס רק כשהשורה שלו כבר על המסך. בלי זה הוא
+     מסיים לספור מאחורי opacity אפס ואף אחד לא רואה כלום · נמדד:
+     בדגימה הראשונה אחרי החשיפה הוא כבר היה ב-96 אחוז. */
+  el.textContent = fmt(0);
+  var t0 = 0;
+  function frame(t) {
+    if (!t0) t0 = t;
+    var k = Math.min(1, (t - t0) / ms);
+    /* cubic.out ולא expo.out: expo מגיע ל-99 אחוז תוך חמישית
+       מהזמן, והעין לא רואה את הספרות מסתובבות בכלל. */
+    var e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmt(Math.round(to * (k === 1 ? 1 : e)));
+    if (k < 1) requestAnimationFrame(frame);
+  }
+  setTimeout(function () { requestAnimationFrame(frame); }, delay || 0);
+}
+
+/* הכותרת נחשפת מילה אחרי מילה. פיצול לאותיות, שהוא מה שמקובל
+   באנגלית, שובר בעברית את החיבור בין האותיות ואת סדר הכיוון,
+   ולכן כאן המילה היא היחידה הקטנה ביותר. */
+function revealWords(el, text) {
+  el.textContent = '';
+  if (STILL) { el.textContent = text; return; }
+  text.split(' ').forEach(function (w, i) {
+    var sp = document.createElement('span');
+    sp.className = 'rv-w';
+    sp.textContent = w;
+    sp.style.animationDelay = (0.04 + i * 0.07).toFixed(2) + 's';
+    el.appendChild(sp);
+    if (i < text.split(' ').length - 1) el.appendChild(document.createTextNode(' '));
+  });
+}
+
 function renderResult(st, c) {
-  var p = phrase(c.base.years, st.age, c);
+  var p = phrase(c.base.years, st.age, c, st);
   var big = $('resBig');
-  big.textContent = p.big;
   big.classList.toggle('small', !!p.small);
+  revealWords(big, p.big);
   $('resSub').textContent = p.sub;
+  $('resSub').classList.remove('rv-in');
+  void $('resSub').offsetWidth;
+  $('resSub').classList.add('rv-in');
 
   /* המרחק מצויר רק כשיש שנה בקצה השני. ״כבר שם״ ו״לא בטווח״
      מקבלים את הבמה לעצמם. */
@@ -2105,12 +2343,96 @@ function renderResult(st, c) {
     $('resAge').textContent  = 'גיל ' + Math.round(st.age + y);
   }
 
-  $('cCap').textContent    = shekel(c.freedomCapital);
-  $('cNet').textContent    = shekel(c.net);
-  $('cSave').textContent   = shekel(st.saving);
-  $('cRate').textContent   = st.income > 0 ? pct(c.rate, c.rate < 0.1 ? 1 : 0) : '';
-  $('cTarget').textContent = shekel(c.base.target);
-  $('cGap').textContent    = c.base.gap > 0 ? shekel(c.base.gap) : 'אין פער';
+  /* המשך תלוי בגודל ובמורכבות ולא קבוע לכולם: הסכומים הגדולים
+     מטפסים ארוך יותר מהאחוז, והפער נעצר אחרון. */
+  /* ההשהיה של כל מספר נעולה על ההשהיה של השורה שלו ב-CSS. */
+  if (c.base.gap > 0) countUp($('cGap'), c.base.gap, 1000, shekel, 340);
+  else $('cGap').textContent = 'אין פער';
+  countUp($('cTarget'), c.base.target, 900, shekel, 410);
+  countUp($('cCap'), c.freedomCapital, 780, shekel, 480);
+  countUp($('cSave'), st.saving, 620, shekel, 550);
+  $('cRate').textContent = st.income > 0 ? pct(c.rate, c.rate < 0.1 ? 1 : 0) : '';
+  countUp($('cNet'), c.net, 780, shekel, 690);
+
+  /* שש שורות, בדיוק בגבול של שמונה שמעבר לו הפריט האחרון כבר
+     מרגיש מאחר. ההשהיה על ה-CSS ולא על טיימר. */
+  var grid = $('resGrid');
+  grid.classList.remove('rv-in');
+  void grid.offsetWidth;
+  grid.classList.add('rv-in');
+
+  renderBar(c);
+  setupWhatIf(st, c);
+}
+
+/* כמה מהדרך כבר מאחוריהם. */
+function renderBar(c) {
+  var tgt = c.base.target;
+  var have = c.freedomCapital;
+  var k = tgt > 0 ? Math.max(0, Math.min(1, have / tgt)) : 1;
+  $('barLab').textContent = shekel(have) + ' מתוך ' + shekel(tgt);
+  $('barPct').textContent = (k >= 0.995 && k < 1 ? 99 : Math.round(k * 100)) + '%';
+  var fill = $('barFill');
+  fill.style.transform = 'scaleX(0)';
+  void fill.offsetWidth;
+  fill.style.transform = 'scaleX(' + k.toFixed(4) + ')';
+}
+
+/* ── מה אם ──
+   compute נקייה: אותו מצב בדיוק, רק עם סכום חודשי אחר, ואפשר
+   להריץ אותה שוב בכל גרירה בלי לגעת בכלום. */
+var wiBound = false;
+function setupWhatIf(st, c) {
+  var r = $('wiSave');
+  /* התקרה צריכה להגיע עד המספר שבאמת משנה את התשובה, אחרת כל
+     הגרירה היא קיר אחד של "עדיין לא". לכן היא מכסה גם את הסכום
+     שנדרש כדי להגיע תוך 25 שנה · ונעצרת בהכנסה, כי אי אפשר
+     להפנות יותר ממה שנכנס. */
+  var need = neededMonthly(c.freedomCapital, c.base.realReturn, c.base.target, REACH_YEARS * 12);
+  var top = Math.max(st.saving * 2, 2000);
+  if (need !== null && isFinite(need) && need > 0) top = Math.max(top, need * 1.1);
+  if (st.income > 0) top = Math.min(top, st.income);
+  top = Math.max(Math.ceil(top / 500) * 500, Math.ceil(st.saving / 500) * 500 + 500);
+  r.min = 0; r.max = String(top); r.step = '250';
+  r.value = String(Math.min(st.saving, top));
+  r.setAttribute('aria-label', 'כמה להפנות בחודש');
+
+  if (!wiBound) {
+    wiBound = true;
+    r.addEventListener('input', function () { applyWhatIf(+this.value); });
+  }
+  applyWhatIf(st.saving);
+}
+
+function applyWhatIf(saving) {
+  if (!baseState) return;
+  var st = Object.assign({}, baseState, { saving: saving });
+  var c  = compute(st);
+  var y  = c.base.years;
+
+  $('wiVal').textContent = shekel(saving);
+
+  var out = $('wiOut');
+  if (y === null) {
+    /* גם בקצה העליון אין תשובה · אז הבעיה אינה כמה מפנים אלא
+       כמה רוצים, וזה מנוף אחר לגמרי. עדיף להגיד את זה מאשר
+       להשאיר קיר של "לא". */
+    var atTop = baseState.income > 0 && saving >= baseState.income * 0.95;
+    out.textContent = atTop
+      ? 'גם ככה לא מגיעים · אולי הסכום החודשי שביקשתם גבוה מדי.'
+      : 'בקצב הזה עדיין לא מגיעים.';
+  } else if (y <= 0) {
+    out.innerHTML = 'כבר שם.';
+  } else if (y < 1) {
+    out.innerHTML = '<b>פחות משנה.</b>';
+  } else {
+    var yr = NOW_YEAR + Math.round(y);
+    var txt = '<b>' + yr + '</b> · בגיל ' + Math.round(st.age + y);
+    var d = baseYears === null ? null : Math.round(baseYears) - Math.round(y);
+    if (d > 0)      txt += ' · מקדים ב-' + yearsWord(d);
+    else if (d < 0) txt += ' · מאחר ב-' + yearsWord(-d);
+    out.innerHTML = txt;
+  }
 }
 
 function renderScenarios(st, c) {
@@ -3018,6 +3340,14 @@ $('btnNext').addEventListener('click', function () {
   renderResult(st, result);
   showScreen('scrResult');
   track('result_viewed');
+});
+
+/* שלוש השורות הנוספות. הכפתור מחליף גם את מה שכתוב בו, כדי
+   שהוא תמיד יתאר את מה שיקרה בלחיצה ולא את המצב הנוכחי. */
+$('btnMore').addEventListener('click', function () {
+  var open = $('resGrid').classList.toggle('open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  this.textContent = open ? 'פחות' : 'לראות את כל המספרים';
 });
 
 $('btnLead').addEventListener('click', submitLead);
