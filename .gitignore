@@ -3,3 +3,8 @@
 # The site's own images live in assets/ and are not covered by this.
 /*.png
 /*.jpg
+
+# ‏פייתון יוצר את אלה בכל פעם שסקיל מריץ סקריפט חיפוש · ‏פלט של
+# ‏הרצה, ‏לא קוד, ‏ואין לו מה לשבת בריפו שמגיש אתר.
+__pycache__/
+*.pyc
