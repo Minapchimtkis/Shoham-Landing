@@ -610,7 +610,10 @@ h1 .hl {
 .res-head.flat .span { display: block; }
 .res-head.flat .span-end,
 .res-head.flat .span-track { display: none; }
-.res-head.flat .span-end.to { display: block; text-align: start; }
+/* במצב הזה הכותרת היא כל מה שיש בשורה, ולכן היא במרכז ולא
+   נצמדת לקצה · הקצה הוא שריד מהמצב שבו ישבה שם שנה מול "היום"
+   בצד השני. */
+.res-head.flat .span-end.to { display: block; text-align: center; }
 .res-head.flat .span-end.to .span-lab { display: none; }
 
 .res-sub {
