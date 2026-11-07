@@ -5433,6 +5433,92 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     inset 0 2px 14px rgba(0,0,0,0.85);
 }
 
+/* ‏══ ‏הכרטיסייה ════════════════════════════════
+
+   ‏ברגע שהמחשב נפתח, נפתחת בו כרטיסייה והטקסט נכתב
+   ‏בתוכה. הרצועה מיוקמת מוחלטית בראש המסך ולכן
+   ‏אינה משנה את גובה המסך · ‏המחשב נשאר באותה צורה.
+
+   ‏הנקודות והכרטיסייה ממוקמות שמאלה פיזית ולא לוגית ·
+   ‏חלון דפדפן נראה אותו דבר בכל שפה, והוא חלק מהחפץ.
+   ══════════════════════════════════════════════ */
+.lap-chrome {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  direction: ltr;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 29px;
+  padding: 0 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  opacity: 0;
+  transform: translateY(-7px);
+  transition: opacity 0.34s ease, transform 0.44s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+}
+
+.lap[data-open="true"] .lap-chrome { opacity: 1; transform: none; }
+
+.lap-dots {
+  display: flex;
+  gap: 5px;
+  padding-bottom: 9px;
+}
+
+.lap-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.16);
+}
+
+.lap-dots i:first-child { background: rgba(255,106,97,0.70); }
+.lap-dots i:nth-child(2) { background: rgba(255,189,76,0.62); }
+.lap-dots i:last-child   { background: rgba(102,204,114,0.58); }
+
+/* ‏הכרטיסייה נפתחת אחרי הרצועה, כמו כרטיסייה שנפתחה */
+.lap-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 62%;
+  height: 22px;
+  padding: 0 11px;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.055));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+  opacity: 0;
+  transform: translateX(-12px) scale(0.92);
+  transform-origin: left bottom;
+  transition: opacity 0.3s ease 0.16s,
+              transform 0.46s cubic-bezier(0.22,1,0.36,1) 0.16s;
+}
+
+.lap[data-open="true"] .lap-tab { opacity: 1; transform: none; }
+
+.lap-fav {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex: none;
+  background: linear-gradient(135deg, #c084fc, #7c3aed);
+  box-shadow: 0 0 5px rgba(192,132,252,0.6);
+}
+
+.lap-tab-t {
+  direction: rtl;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: rgba(255,255,255,0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ‏החלון שבתוך המסך · ‏סגור השורה היחידה יושבת
    ‏במרכז; פתוח הטקסט מתחיל מלמעלה ונגלל עם הסמן,
    ‏כמו להסתכל על מישהו כותב. הגלילה הידנית נפתחת
@@ -5447,7 +5533,11 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   scrollbar-color: rgba(192,132,252,0.45) transparent;
 }
 
-.lap[data-open="true"] .lap-view { justify-content: flex-start; }
+.lap[data-open="true"] .lap-view {
+  justify-content: flex-start;
+  /* ‏מתחת לרצועת הכרטיסיות */
+  padding-top: 24px;
+}
 .lap[data-read="true"] .lap-view { overflow-y: auto; }
 
 .lap-view::-webkit-scrollbar { width: 5px; }
@@ -6073,6 +6163,10 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <div class="lap-lid">
         <span class="lap-cam" aria-hidden="true"></span>
         <div class="lap-screen">
+          <div class="lap-chrome" aria-hidden="true">
+            <span class="lap-dots"><i></i><i></i><i></i></span>
+            <span class="lap-tab"><i class="lap-fav"></i><span class="lap-tab-t">שוהם אבו</span></span>
+          </div>
           <div class="lap-view" id="lapView">
           <p class="heart-lead">ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.</p>
           <div class="lap-more" id="lapMore">
