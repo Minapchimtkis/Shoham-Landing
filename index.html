@@ -1857,7 +1857,9 @@ section {
   position: relative;
   max-width: 52ch;
   margin: 64px auto 0;
-  padding: 0 0 78px;
+  /* ‏כשהשער סגור הכפתור והעקומה שכנים · ‏הריווח הזה
+     ‏הוא מה שמונע מהעקומה להיראות כמו קו תחת הכפתור. */
+  padding: 0 0 106px;
   border: 0;
   background: none;
 }
@@ -1985,6 +1987,15 @@ section {
 
 .heart-body:nth-last-of-type(2) { margin-bottom: 0; }
 
+/* ‏השער · ‏אותו כפתור ואותה התנהגות כמו ב-"מה זה
+   ‏יועץ כלכלי" · ‏הדף כבר מכיר את הרכיב הזה, ולכן הוא
+   ‏אינו נקרא כהמצאה חדשה אלא כאותה שפה. */
+.heart-gate { margin-bottom: 2px; }
+
+/* ‏הריפוד יושב על הילד הראשון ולא על המיכל · ‏ריפוד
+   ‏על מיכל שגובהו 0 משאיר פס פתוח גם כשהוא סגור. */
+.heart-body-wrap .heart-lead { margin-top: 40px; }
+
 .heart-kicker {
   margin: 44px 0 0;
   text-align: center;
@@ -2007,7 +2018,8 @@ section {
 .heart-full { color: var(--p6); }
 
 @media (max-width: 480px) {
-  .heart-block { padding: 0 0 66px; margin-top: 52px; }
+  .heart-block { padding: 0 0 94px; margin-top: 52px; }
+  .heart-body-wrap .heart-lead { margin-top: 34px; }
   .heart-block::before { margin-bottom: 28px; }
   .heart-chart { height: 56px; }
   .heart-lead { font-size: 19px; margin-bottom: 26px; }
@@ -5882,11 +5894,25 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
        ‏והגוף מיושר להתחלה. שורה בת שלוש שורות במרכז היא מה
        ‏שסוחט את העין, לא האורך. -->
   <div class="heart-block reveal">
+    <div class="whatis-gate heart-gate">
+      <button class="whatis-btn" type="button" id="heartBtn"
+              data-open="משהו אישי שחשוב לי להגיד" data-close="לסגור"
+              aria-expanded="false" aria-controls="heartBody" onclick="toggleHeart(this)">
+        <span id="heartBtnText">משהו אישי שחשוב לי להגיד</span>
+        <svg class="whatis-chev" width="17" height="17" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="whatis-body heart-body-wrap" id="heartBody">
     <p class="heart-lead">ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.</p>
     <p class="heart-body">הכסף שאתם משלמים לי הוא לא מספר. הוא שעות, הוא חודש שעבדתם קשה, הוא דברים שוויתרתם עליהם.</p>
     <p class="heart-body">אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ולא מרשה לעצמי לתת פחות ממה שאני יכול.</p>
     <p class="heart-body">ואני לא נעלם כשהתוכנית מוכנה. שם העבודה מתחילה: בחודש שלא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר.</p>
     <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
+    </div>
+
     <svg class="heart-chart" viewBox="0 0 600 96" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="hcFill" x1="0" y1="0" x2="0" y2="1">
@@ -7982,6 +8008,44 @@ function toggleFaq(btn) {
    ‏  בפנים נחתכת בגובה שנמדד כשהיא הייתה סגורה.
    ‏· ‏מי שביקש פחות תנועה לא מקבל transitionend, ולכן יש גם
    ‏  מדידה מיידית וגם רשת ביטחון בזמן. */
+/* ‏השער של קטע הלב · ‏עותק מצומצם של toggleWhatis בלי
+   ‏טיפול בשאלות שבפנים, כי אין כאן כאלו. שכתוב בנפרד
+   ‏ולא כהכללה של הקיים · ‏הפונקציה ההיא עובדת, ואין
+   ‏סיבה לגעת בה בשביל שער שני. */
+function toggleHeart(btn) {
+  const body = document.getElementById('heartBody');
+  const label = document.getElementById('heartBtnText');
+  if (!body) return;
+
+  const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (wasOpen) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    void body.offsetHeight;
+    body.classList.remove('open');
+    body.style.maxHeight = '0px';
+  } else {
+    body.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    if (still) {
+      body.style.maxHeight = 'none';
+    } else {
+      clearTimeout(body._heartTimer);
+      body._heartTimer = setTimeout(() => {
+        if (body.classList.contains('open')) body.style.maxHeight = 'none';
+      }, 700);
+    }
+  }
+
+  btn.setAttribute('aria-expanded', wasOpen ? 'false' : 'true');
+  btn.classList.toggle('open', !wasOpen);
+  if (label) {
+    const next = wasOpen ? btn.dataset.open : btn.dataset.close;
+    if (next) label.textContent = next;
+  }
+}
+
 function toggleWhatis(btn) {
   const body = document.getElementById('whatisBody');
   const label = document.getElementById('whatisBtnText');
@@ -8196,6 +8260,8 @@ const translations = {
     navMenuTitle: 'תפריט הדף',
     whatisBtnOpen: 'לקרוא את התשובה',
     whatisBtnClose: 'לסגור',
+    heartBtnOpen: 'משהו אישי שחשוב לי להגיד',
+    heartBtnClose: 'לסגור',
     whatisQ1: 'למי אני עוזר?',
     whatisQ2: 'איך אני עוזר לכם בפועל?',
     whatisQ3: 'ומה לגבי ביטוח, מס ומשכנתא?',
@@ -8301,6 +8367,8 @@ const translations = {
     navMenuTitle: 'Page menu',
     whatisBtnOpen: 'Read the answer',
     whatisBtnClose: 'Close',
+    heartBtnOpen: 'Something personal I want to say',
+    heartBtnClose: 'Close',
     whatisQ1: 'Who do I help?',
     whatisQ2: 'How do I actually help you?',
     whatisQ3: 'What about insurance, tax and mortgages?',
@@ -8485,6 +8553,14 @@ function setLang(lang) {
   if (hB[2]) hB[2].textContent = t.heartBody3;
   /* ‏הסיום נושא שבירת שורה ו-span סביב המספר, ולכן innerHTML. */
   if (hK) hK.innerHTML = t.heartKicker;
+  const heBtn = document.getElementById('heartBtn');
+  const heBtnText = document.getElementById('heartBtnText');
+  if (heBtn && heBtnText) {
+    heBtn.dataset.open = t.heartBtnOpen;
+    heBtn.dataset.close = t.heartBtnClose;
+    heBtnText.textContent = heBtn.getAttribute('aria-expanded') === 'true'
+      ? t.heartBtnClose : t.heartBtnOpen;
+  }
   const aboutSigEl = document.querySelector('.about-sig');
   if (aboutSigEl) aboutSigEl.textContent = t.aboutSig;
 
