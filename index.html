@@ -1672,8 +1672,10 @@ section {
 
 /* ── MISSION BLOCK ── */
 .mission-block.bg-on {
+  /* ‏היה 0.80/0.90 והמילה "מנפחים" נקראה מאחורי
+     ‏הטקסט ומאחורי הכפתור · ‏מרקם שנקרא הוא לא מרקם. */
   background-image:
-    linear-gradient(158deg, rgba(22,5,48,0.80), rgba(11,2,28,0.90)),
+    linear-gradient(158deg, rgba(22,5,48,0.91), rgba(11,2,28,0.962)),
     url("assets/mission-texture.webp");
 }
 
@@ -1688,39 +1690,72 @@ section {
    ‏משנה. פסקה בת שלוש או ארבע שורות ממורכזות מזיזה לעין את
    ‏נקודת ההתחלה בכל שורה, והקריאה הופכת למאמץ. פתיחה וסיום,
    ‏ששתיהן שורה אחת או שתיים, נשארות במרכז. */
+/* ‏הבלוק הזה נכתב טוב ועוצב כקופסה · ‏שלוש פסקאות
+   ‏זהות במשקל, שלושה יישורים מתחלפים, קו מלא לרוחב
+   ‏הכרטיס לפני הסיום, ושום עוגן ויזואלי בין כולם.
+
+   ‏עכשיו זו הצהרה חתומה: משיחת מכחול פותחת, משפט
+   ‏פתיחה לבן וגדול שהשורות שלו מאוזנות, פסקה ראשונה
+   ‏שנושאת את המשקל ושתיים שתומכות בה, וקו קצר במרכז
+   ‏לפני הסיום במקום קו שחותך את הכרטיס לשניים.
+
+   ‏הגוף מיושר להתחלה וקצוב ב-46 תווים · ‏פסקה שרצה
+   ‏לרוחב הכרטיס המלא היא שורה שהעין מאבדת בה את הדרך. */
 .heart-block {
   max-width: 600px;
   margin: 44px auto 0;
-  padding: 30px 32px;
+  padding: 38px 32px 34px;
   border: 1px solid rgba(168,85,247,0.22);
   border-radius: 20px;
   background: linear-gradient(158deg, rgba(22,5,48,0.55), rgba(11,2,28,0.74));
 }
 
+/* ‏משיחת המכחול של המותג · ‏העוגן שחסר כאן */
+.heart-block::before {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 3px;
+  margin: 0 auto 22px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    rgba(168,85,247,0.15), #a855f7 50%, rgba(168,85,247,0.15));
+}
+
 .heart-lead {
-  margin: 0 0 18px;
+  margin: 0 auto 26px;
+  max-width: 28ch;
   text-align: center;
-  color: var(--p6);
-  font-size: 18px;
+  text-wrap: balance;
+  color: var(--white);
+  font-size: 20px;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.45;
+  letter-spacing: -0.2px;
 }
 
 .heart-body {
-  margin: 0 0 14px;
+  margin: 0 auto 16px;
+  max-width: 46ch;
   text-align: start;
-  color: rgba(255,255,255,0.80);
-  font-size: 15.5px;
+  color: rgba(255,255,255,0.74);
+  font-size: 15px;
   font-weight: 300;
-  line-height: 1.85;
+  line-height: 1.75;
 }
 
-.heart-body:last-of-type { margin-bottom: 0; }
+/* ‏הפסקה שנושאת את הטענה · ‏שתי האחרות תומכות בה */
+.heart-lead + .heart-body {
+  color: rgba(255,255,255,0.93);
+  font-size: 16.5px;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.heart-body:nth-last-of-type(2) { margin-bottom: 0; }
 
 .heart-kicker {
-  margin: 22px 0 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(168,85,247,0.18);
+  margin: 30px 0 0;
   text-align: center;
   color: var(--white);
   font-size: 19px;
@@ -1728,13 +1763,26 @@ section {
   line-height: 1.6;
 }
 
+/* ‏קו קצר במרכז · ‏קו לרוחב מלא חותך כרטיס לשניים */
+.heart-kicker::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  margin: 0 auto 26px;
+  background: rgba(168,85,247,0.40);
+}
+
 .heart-full { color: var(--p6); }
 
 @media (max-width: 480px) {
-  .heart-block { padding: 24px 20px; margin-top: 34px; }
-  .heart-lead { font-size: 16.5px; margin-bottom: 15px; }
+  .heart-block { padding: 32px 22px 30px; margin-top: 34px; }
+  .heart-block::before { margin-bottom: 20px; }
+  .heart-lead { font-size: 18px; margin-bottom: 22px; }
   .heart-body { font-size: 14.5px; }
-  .heart-kicker { font-size: 17px; padding-top: 17px; margin-top: 19px; }
+  .heart-lead + .heart-body { font-size: 15.5px; }
+  .heart-kicker { font-size: 17px; margin-top: 26px; }
+  .heart-kicker::before { margin-bottom: 22px; }
 }
 
 .mission-block {
@@ -1813,40 +1861,47 @@ section {
   margin: 80px 0 16px 0 !important;
 }
 
-/* מנפחים ת'כיס mark, corner of the mission card */
+/* ‏הסמל של מנפחים ת'כיס · ‏הוא ישב בפינה הימנית
+   ‏ונראה מודבק · ‏במרכז, מעל התווית, הוא סמל. */
 .mission-logo {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 68px;
+  display: block;
+  width: 64px;
   height: auto;
-  z-index: 1;
-  opacity: 0.92;
+  margin: 0 auto 18px;
+  opacity: 0.95;
   pointer-events: none;
 }
 
 @media (max-width: 640px) {
-  .mission-logo { width: 52px; top: 14px; right: 14px; }
+  .mission-logo { width: 56px; margin-bottom: 16px; }
+  /* ‏52/40 השאירו 262 פיקסל של טקסט בכרטיס של 342 */
+  .mission-block { padding: 36px 24px 32px; margin-top: 56px; }
 }
 
 .mission-block-label {
   font-size: 12px !important;
   font-weight: 700 !important;
   letter-spacing: 4px !important;
+  /* ‏רווח האותיות נוסף גם אחרי האות האחרונה, ובעברית
+     ‏היא השמאלית · ‏הכיתוב נראה מוזז ימינה מהמרכז. */
+  padding-inline-start: 4px;
   color: var(--p5) !important;
   text-transform: uppercase;
   text-align: center !important;
   display: block;
   width: 100%;
-  margin-bottom: 16px !important;
+  margin-bottom: 20px !important;
 }
 
+/* ‏שבע שורות ממורכזות · ‏העין מחפשת את תחילת כל
+   ‏שורה מחדש. אותו תיקון כמו בכרטיס שלמעלה. */
 .mission-block-text {
   font-size: 15px;
-  color: rgba(255,255,255,0.85);
-  line-height: 1.9;
-  margin-bottom: 24px;
-  max-width: 34em;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.78;
+  margin: 0 auto 28px;
+  max-width: 46ch;
+  text-align: start;
 }
 
 .mission-block-text strong {
@@ -2635,14 +2690,17 @@ section {
 /* The side column mirrors the text column: a marker on top, the arrow
    under it. Inside the sentence the word "חינם" interrupted the line and
    had to be read around; out here it is seen without being read. */
+/* ‏space-between על עמודה מתוחה הצמיד את התווית למעלה
+   ‏ואת החץ למטה, ושניהם נראו נטושים בקצות · ‏הם
+   ‏זוג, וזוג עומד במרכז. */
 .gift-side {
   flex: none;
-  align-self: stretch;
+  align-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: center;
+  gap: 9px;
 }
 
 .gift-text { flex: 1; min-width: 0; }
