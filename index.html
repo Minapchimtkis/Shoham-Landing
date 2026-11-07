@@ -1842,24 +1842,24 @@ section {
 
    ‏הגוף מיושר להתחלה וקצוב ב-46 תווים · ‏פסקה שרצה
    ‏לרוחב הכרטיס המלא היא שורה שהעין מאבדת בה את הדרך. */
+/* ‏══ ‏"אני נותן כאן את הלב" ════════════════════
+
+   ‏זו היתה קופסה עם מסגרת, רקע וריפוד משלה, בתוך
+   ‏סקשן שכולו טקסט זורם · ‏היא נקראה כדבר תקוע, כי
+   ‏היא היתה דבר תקוע. הטקסט גם היה מיושר להתחלה
+   ‏ובגודל 15, בעוד כל הסקשן ממורכז ובגודל 17.
+
+   ‏עכשיו זה המשך של אותה עמודה · ‏אותה מידה, אותו
+   ‏גודל ואותו יישור. מה שמפריד את הקטע הוא משיחת
+   ‏המכחול, האוויר מסביב ואור רך מאחור, ולא קופסה.
+   ══════════════════════════════════════════════ */
 .heart-block {
-  max-width: 600px;
-  margin: 44px auto 0;
   position: relative;
-  overflow: hidden;
-  padding: 38px 32px 64px;
-  border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 20px;
-  /* ‏רשת גרף דקה מתחת לכל · ‏היא מרקם ולא קישוט,
-     ‏וברגע שרואים אותה במפורש היא חזקה מדי. */
-  background:
-    repeating-linear-gradient(0deg,
-      rgba(168,85,247,0.028) 0px, rgba(168,85,247,0.028) 1px,
-      transparent 1px, transparent 46px),
-    repeating-linear-gradient(90deg,
-      rgba(168,85,247,0.028) 0px, rgba(168,85,247,0.028) 1px,
-      transparent 1px, transparent 46px),
-    linear-gradient(158deg, rgba(40,18,76,0.42), rgba(20,8,44,0.52));
+  max-width: 52ch;
+  margin: 64px auto 0;
+  padding: 0 0 78px;
+  border: 0;
+  background: none;
 }
 
 /* ‏משיחת המכחול של המותג · ‏העוגן של הכרטיס */
@@ -1868,10 +1868,27 @@ section {
   display: block;
   width: 46px;
   height: 3px;
-  margin: 0 auto 22px;
+  margin: 0 auto 34px;
   border-radius: 2px;
   background: linear-gradient(90deg,
     rgba(168,85,247,0.15), #a855f7 50%, rgba(168,85,247,0.15));
+}
+
+/* ‏אור רך מאחורי הקטע במקום מסגרת · ‏מסמן את השיא
+   ‏הרגשי בלי לחצוץ אותו מהטקסט שלפניו. */
+.heart-block::after {
+  content: '';
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  width: min(560px, 124%);
+  height: 60%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(124,58,237,0.17) 0%, rgba(88,28,135,0.07) 46%, transparent 74%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* ‏══ ‏העקומה שבתחתית הכרטיס ══════════════════
@@ -1941,39 +1958,35 @@ section {
 
 
 .heart-lead {
-  margin: 0 auto 26px;
-  max-width: 28ch;
+  margin: 0 auto 30px;
+  max-width: 27ch;
   text-align: center;
   text-wrap: balance;
   color: var(--white);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.45;
   letter-spacing: -0.2px;
 }
 
+/* ‏אותה מידה, אותו גודל ואותו יישור כמו פסקאות
+   ‏הסקשן · ‏שתי רמות טקסט באותה עמודה הן מה
+   ‏שעשה את הקטע לגוש זר בתוך הסקשן. */
 .heart-body {
-  margin: 0 auto 16px;
+  margin: 0 auto 24px;
   max-width: 46ch;
-  text-align: start;
-  color: rgba(255,255,255,0.74);
-  font-size: 15px;
+  text-align: center;
+  text-wrap: pretty;
+  color: rgba(255,255,255,0.85);
+  font-size: 17px;
   font-weight: 300;
-  line-height: 1.75;
-}
-
-/* ‏הפסקה שנושאת את הטענה · ‏שתי האחרות תומכות בה */
-.heart-lead + .heart-body {
-  color: rgba(255,255,255,0.93);
-  font-size: 16.5px;
-  font-weight: 400;
-  margin-bottom: 20px;
+  line-height: 1.9;
 }
 
 .heart-body:nth-last-of-type(2) { margin-bottom: 0; }
 
 .heart-kicker {
-  margin: 30px 0 0;
+  margin: 44px 0 0;
   text-align: center;
   color: var(--white);
   font-size: 19px;
@@ -1994,14 +2007,13 @@ section {
 .heart-full { color: var(--p6); }
 
 @media (max-width: 480px) {
-  .heart-block { padding: 32px 22px 56px; margin-top: 34px; }
-  .heart-block::before { margin-bottom: 20px; }
-  .heart-chart { height: 62px; }
-  .heart-lead { font-size: 18px; margin-bottom: 22px; }
-  .heart-body { font-size: 14.5px; }
-  .heart-lead + .heart-body { font-size: 15.5px; }
-  .heart-kicker { font-size: 17px; margin-top: 26px; }
-  .heart-kicker::before { margin-bottom: 22px; }
+  .heart-block { padding: 0 0 66px; margin-top: 52px; }
+  .heart-block::before { margin-bottom: 28px; }
+  .heart-chart { height: 56px; }
+  .heart-lead { font-size: 19px; margin-bottom: 26px; }
+  .heart-body { font-size: 15.5px; line-height: 1.8; margin-bottom: 22px; }
+  .heart-kicker { font-size: 17px; margin-top: 36px; }
+  .heart-kicker::before { margin-bottom: 24px; }
 }
 
 .mission-block {
@@ -5370,9 +5382,8 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
    ‏שבפנים נשארים כפי שהם. רק transform זז, ולכן זה רץ
    ‏על הכרטיס הגרפי ולא על המעבד.
    ══════════════════════════════════════════════ */
-.heart-block, .mission-block, .quiz-invite { position: relative; }
+.mission-block, .quiz-invite { position: relative; }
 
-.heart-block.visible::after,
 .mission-block.visible::after,
 .quiz-section.visible .quiz-invite::after {
   content: '';
@@ -5395,7 +5406,6 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heart-block.visible::after,
   .mission-block.visible::after,
   .quiz-section.visible .quiz-invite::after { display: none; }
 }
