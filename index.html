@@ -1191,8 +1191,11 @@ section {
   text-shadow: 0 0 18px rgba(168,85,247,0.5);
 }
 
+/* ‏שלוש מדרגות בלבד · ‏ישנות היו חמישה גדלים
+   ‏שכולם נדחסו ל-24 עד 32 בטלפון, ולכן לא היתה היררכיה.
+   ‏34 לסקשן ראשי, 26 למשני, 20 לכרטיס. */
 .pain-title {
-  font-size: clamp(28px, 4vw, 48px);
+  font-size: clamp(34px, 4.4vw, 48px);
   font-weight: 800;
   line-height: 1.25;
   margin-bottom: 64px;
@@ -1211,7 +1214,7 @@ section {
 .demon-card {
   background: var(--surface);
   border: 1px solid rgba(168,85,247,0.20);
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 28px 32px;
   position: relative;
   overflow: hidden;
@@ -1340,7 +1343,7 @@ section {
 }
 
 .method-title {
-  font-size: clamp(28px, 4vw, 48px);
+  font-size: clamp(34px, 4.4vw, 48px);
   font-weight: 800;
   margin-bottom: 20px;
 }
@@ -1690,7 +1693,7 @@ section {
   margin: 44px auto 0;
   padding: 30px 32px;
   border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 18px;
+  border-radius: 20px;
   background: linear-gradient(158deg, rgba(22,5,48,0.55), rgba(11,2,28,0.74));
 }
 
@@ -1745,7 +1748,7 @@ section {
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
   border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 52px 40px;
   /* It had no width of its own, so on a desktop it ran the whole way across —
      1392px, against the 620 to 720 every other box on this page keeps to, and
@@ -1895,7 +1898,7 @@ section {
 }
 
 .proof-title {
-  font-size: clamp(24px, 3.5vw, 40px);
+  font-size: clamp(26px, 3.6vw, 38px);
   font-weight: 900;
   color: #ffffff;
   text-align: center;
@@ -1925,7 +1928,7 @@ section {
 }
 
 .tm-title {
-  font-size: clamp(24px, 3.5vw, 40px);
+  font-size: clamp(26px, 3.6vw, 38px);
   font-weight: 900;
   color: #ffffff;
   margin-bottom: 36px;
@@ -1964,7 +1967,7 @@ section {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 18px;
+  border-radius: 20px;
   border: 1px solid rgba(168,85,247,0.28);
   box-shadow: 0 24px 60px -24px rgba(0,0,0,0.9);
 }
@@ -2001,7 +2004,7 @@ section {
 .testimonial {
   background: var(--surface);
   border: 1px solid rgba(168,85,247,0.12);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 32px 28px;
   position: relative;
   transition: transform 0.3s, border-color 0.3s;
@@ -2157,7 +2160,7 @@ section {
 .call-link svg { opacity: 0.75; flex: none; }
 
 .cta-title {
-  font-size: clamp(32px, 5vw, 64px);
+  font-size: clamp(34px, 4.8vw, 56px);
   font-weight: 900;
   line-height: 1.2;
   margin-bottom: 20px;
@@ -2490,7 +2493,7 @@ section {
   padding: 32px;
   background: rgba(168,85,247,0.1);
   border: 1px solid rgba(168,85,247,0.3);
-  border-radius: 16px;
+  border-radius: 14px;
   font-size: 18px;
   font-weight: 600;
   color: var(--p6);
@@ -2524,7 +2527,7 @@ section {
   padding: 30px 26px;
   background: linear-gradient(158deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
   border: 1px solid rgba(168,85,247,0.28);
-  border-radius: 16px;
+  border-radius: 20px;
   text-align: center;
 }
 
@@ -2604,7 +2607,7 @@ section {
   padding: 14px 16px;
   background: linear-gradient(158deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
   border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 18px;
+  border-radius: 20px;
   text-decoration: none;
   color: inherit;
   transition: border-color 0.3s, background 0.3s, transform 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -2957,11 +2960,25 @@ footer {
 }
 
 
+/* ‏══ ‏שלוש שכבות תנועה ═══════════════════
+   ‏46 מתוך 49 האלמנטים בדף נכנסו באותה דרך
+   ‏בדיוק · ‏אותו משך, אותו מרחק. זה מה שגורם לדף
+   ‏להיראות כתבנית: העין לא מקבלת סימן מה חשוב יותר.
+
+   ‏כותרת נוסעת רחוק ולאט · ‏היא ההצהרה. טקסט גוף
+   ‏נוסע קרוב ומהר · ‏הוא רק צריך להופיע. כרטיס באמצע.
+   ══════════════════════════════════════════════ */
 .reveal {
+  --rv-dur: 0.42s;
+  --rv-dist: 16px;
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  transform: translateY(var(--rv-dist));
+  transition: opacity var(--rv-dur) cubic-bezier(0.22,1,0.36,1), transform var(--rv-dur) cubic-bezier(0.22,1,0.36,1);
 }
+/* ‏כותרות סקשן · ‏השכבה האיטית */
+h2.reveal { --rv-dur: 0.5s; --rv-dist: 22px; }
+/* ‏תוויות וטקסט גוף · ‏השכבה המהירה */
+p.reveal, .section-label.reveal, .tm-label.reveal { --rv-dur: 0.34s; --rv-dist: 10px; }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
@@ -3480,7 +3497,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .faq-title {
   font-family: var(--font);
-  font-size: clamp(28px, 4vw, 44px);
+  font-size: clamp(26px, 3.6vw, 38px);
   font-weight: 800;
   color: var(--white);
   text-align: center;
@@ -3594,7 +3611,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 /* ‏הכותרת לבדה נושאת את הסקשן, ולכן היא גדולה וכבדה יותר
    ‏מכותרת שיש טקסט מתחתיה. צל הטקסט מגיע מ-.faq-title. */
 .whatis-title {
-  font-size: clamp(31px, 4.6vw, 50px);
+  font-size: clamp(34px, 4.4vw, 48px);
   font-weight: 900;
   margin-bottom: 30px;
 }
@@ -3738,7 +3755,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 
 .phil-photo {
   position: absolute;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   border: 3px solid transparent;
   background: linear-gradient(#0a0015, #0a0015) padding-box,
@@ -4195,7 +4212,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 .iv-title {
-  font-size: clamp(21px, 5.2vw, 30px);
+  font-size: clamp(20px, 3vw, 26px);
   font-weight: 800;
   letter-spacing: -0.4px;
   color: var(--white);
@@ -4208,7 +4225,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   max-width: 380px;
   margin: 0 auto;
   padding: 1px;
-  border-radius: 25px;
+  border-radius: 21px;
   background: linear-gradient(158deg,
     rgba(168,85,247,0.60),
     rgba(240,192,64,0.30) 44%,
@@ -4219,7 +4236,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 .iv-inner {
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
   background: var(--p1);
   line-height: 0;
@@ -4325,12 +4342,21 @@ html.faq-open .iphone-wrap.visible .iphone-close {
    ‏וכשהיא נשארה אחרונה הם הפכו ל-72 פיקסל של כלום. */
 .method-sub:last-child { margin-bottom: 0; }
 
+/* ‏שבעה מתוך ארבעה עשר הסקשנים קיבלו 72/72 · ‏קצב
+   ‏אחד לכל הדף, והוא קורא כרשימה ולא כפרקים. מי
+   ‏שפותח רעיון חדש מקבל 96 מלמעלה, מי שממשיך אותו
+   ‏נושם קצר ומקבל 56. הסגירה נשארת רחבה כשהייתה. */
 @media (max-width: 720px) {
-  .pain, .method, .about { padding-top: 72px; padding-bottom: 72px; }
   .tm-section { padding-bottom: 72px; }
-  .proof { padding-bottom: 72px; }
-  .faq-section { padding-top: 72px; padding-bottom: 72px; }
-  .process-section { padding-top: 56px; }
+  .intro-video { padding-bottom: 56px; }
+  .pain { padding-top: 96px; padding-bottom: 56px; }
+  .whatis-section { padding-top: 56px; padding-bottom: 56px; }
+  .method { padding-top: 56px; padding-bottom: 72px; }
+  .about { padding-top: 96px; padding-bottom: 56px; }
+  .proof { padding-bottom: 56px; }
+  .process-section { padding-top: 56px; padding-bottom: 72px; }
+  .pr-gate { padding-top: 64px; padding-bottom: 64px; }
+  #faq.faq-section { padding-top: 96px; padding-bottom: 56px; }
   .cta-section { padding-top: 88px; padding-bottom: 88px; }
 }
 
@@ -4366,7 +4392,7 @@ html.faq-open .iphone-wrap.visible .iphone-close {
    ‏שעונה על מחשבה קיימת נקראת, כותרת שמכריזה על משהו
    ‏נגללת. הגרדיאנט הוא זה של הכותרת הראשית. */
 .pr-gate-title {
-  font-size: clamp(30px, 5.2vw, 50px);
+  font-size: clamp(26px, 3.6vw, 38px);
   font-weight: 800;
   line-height: 1.15;
   margin: 0 0 18px;
@@ -5003,6 +5029,58 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       0 16px 40px -12px rgba(216,184,121,0.55),
       0 6px 18px rgba(0,0,0,0.40);
   }
+}
+
+/* ‏══ ‏שבירת התבנית ═════════════════════════
+
+   ‏חמישה סקשנים נבנו מאותה אנטומיה בדיוק: תווית קטנה,
+   ‏כותרת, גוף. בשניים מהם התווית אמרה בדיוק את מה
+   ‏שהכותרת מתחתיה אומרת · "שאלות ותשובות" מעל "שאלות
+   ‏שכדאי לשאול". היא מוסתרת ולא נמחקת: setLang מציב
+   ‏את שמונה התוויות לפי אינדקס, ומחיקה הייתה מזיזה
+   ‏את כל השאר במקום אחד.
+   ══════════════════════════════════════════════ */
+#philosophy > .proof-inner > .section-label,
+#faq > .faq-inner > .section-label { display: none; }
+
+/* ‏══ ‏פס אור על שלושה כרטיסים ═════════════════
+
+   ‏שלושה בלבד, וכל אחד מהם השיא של הסקשן שלו · ‏אם
+   ‏זה היה על כל כרטיס הוא היה חוזר להיות רעש.
+
+   ‏clip-path ולא overflow: hidden · ‏החיתוך חל על פס
+   ‏האור בלבד ולא על הכרטיס, כך שהזוהר והצללים
+   ‏שבפנים נשארים כפי שהם. רק transform זז, ולכן זה רץ
+   ‏על הכרטיס הגרפי ולא על המעבד.
+   ══════════════════════════════════════════════ */
+.heart-block, .mission-block, .quiz-invite { position: relative; }
+
+.heart-block.visible::after,
+.mission-block.visible::after,
+.quiz-section.visible .quiz-invite::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 round 20px);
+  background: linear-gradient(104deg,
+    transparent 36%,
+    rgba(255,255,255,0.065) 50%,
+    transparent 64%);
+  pointer-events: none;
+  z-index: 1;
+  transform: translateX(118%);
+  animation: cardShine 1150ms cubic-bezier(0.33,0,0.25,1) 300ms 1 forwards;
+}
+
+/* ‏מימין לשמאל · ‏כיוון הקריאה בעברית */
+@keyframes cardShine {
+  to { transform: translateX(-118%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-block.visible::after,
+  .mission-block.visible::after,
+  .quiz-section.visible .quiz-invite::after { display: none; }
 }
 
 </style>
