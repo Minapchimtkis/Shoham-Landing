@@ -772,7 +772,10 @@ section {
 .navbar-inner {
   max-width: none;
   margin: 0 auto;
-  padding: 0 clamp(16px, 2.5vw, 56px);
+  /* ‏התקרה הייתה 56 פיקסל · ‏על מסך רחב זה השאיר את הסמל,
+     ‏שהוא 93 פיקסל בלבד, רחוק מהפינה וצף בריק. הצד השמאלי
+     ‏מלא בתפריט ובמתג השפה, ולכן אי-האיזון נראה בצד אחד. */
+  padding: 0 clamp(14px, 1.6vw, 34px);
   height: 80px;
   display: flex;
   align-items: center;
@@ -807,7 +810,10 @@ section {
   display: block;
   /* The frame is 13px taller here and the mark sits where it did, so the
      margin gives back what the reflection took. */
-  margin: 0 auto 27px;
+  /* ‏הטור ממורכז אנכית, ולכן הגדלת המרווח מתחת לסמל
+     ‏מרימה אותו ומורידה את הכותרת · ‏שתי הבעיות בתנועה
+     ‏אחת. לתמונה יש גם כ-6 פיקסל שקופים בתחתית שלה. */
+  margin: 0 auto 36px;
   opacity: 0;
   animation: fadeUp 0.9s 0.15s forwards;
 }
@@ -820,7 +826,7 @@ section {
   .navbar-inner { height: 64px; padding: 0 16px; }
   .navbar-logo { height: 49px; }
   .hero { padding: 88px 20px calc(var(--band) + 22px); }
-  .hero-logo { height: 132px; margin-bottom: 18px; }
+  .hero-logo { height: 132px; margin-bottom: 30px; }
 }
 
 
@@ -1090,7 +1096,7 @@ section {
    of this would apply. */
 @media (max-width: 820px) and (max-height: 960px) {
   .hero { --band: clamp(120px, 18vh, 175px); padding-top: calc(80px + env(safe-area-inset-top, 0px)); }
-  .hero-logo { height: 94px; margin-bottom: 8px; }
+  .hero-logo { height: 94px; margin-bottom: 24px; }
   /* ‏נגזר מרוחב המסך, כדי שהשורה הראשונה תיכנס בשלמותה
      ‏והכותרת תישאר שתי שורות גם ב-320 וב-360. התקרה היא
      ‏הערך שהיה כאן קודם. */
@@ -1101,7 +1107,7 @@ section {
 
 @media (max-width: 820px) and (max-height: 820px) {
   .hero { padding-top: calc(88px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 18px); }
-  .hero-logo { height: 111px; margin-bottom: 11px; }
+  .hero-logo { height: 111px; margin-bottom: 26px; }
   .hero-title { font-size: clamp(30px, 10.2vw, 44px); margin-bottom: 22px; }
   .hero-audience { margin-bottom: 30px; }
   .license-badge { margin-top: 22px; }
@@ -1109,7 +1115,7 @@ section {
 
 @media (max-width: 820px) and (max-height: 700px) {
   .hero { --band: clamp(100px, 16vh, 150px); padding-top: calc(74px + env(safe-area-inset-top, 0px)); padding-bottom: calc(var(--band) + 14px); }
-  .hero-logo { height: 81px; margin-bottom: 5px; }
+  .hero-logo { height: 81px; margin-bottom: 16px; }
   .hero-title { font-size: clamp(24px, 8.4vw, 34px); margin-bottom: 14px; }
   .hero-audience { font-size: 13px; margin-top: 9px; margin-bottom: 18px; }
   .license-badge { margin-top: 14px; }
@@ -1857,9 +1863,7 @@ section {
   position: relative;
   max-width: 52ch;
   margin: 64px auto 0;
-  /* ‏כשהשער סגור הכפתור והעקומה שכנים · ‏הריווח הזה
-     ‏הוא מה שמונע מהעקומה להיראות כמו קו תחת הכפתור. */
-  padding: 0 0 106px;
+  padding: 0;
   border: 0;
   background: none;
 }
@@ -1892,72 +1896,6 @@ section {
   pointer-events: none;
   z-index: -1;
 }
-
-/* ‏══ ‏העקומה שבתחתית הכרטיס ══════════════════
-
-   ‏קו עולה שמצייר את עצמו פעם אחת כשהכרטיס מגיע למסך,
-   ‏ונקודה שנדלקת בקצה שלו כשהוא מגיע. אין עליו מספרים
-   ‏ואין לו צירים · ‏הוא אינו טוען להציג נתון, ולא ייתכן
-   ‏שייראה כהבטחת תשואה.
-   ══════════════════════════════════════════════ */
-.heart-chart {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  width: 100%;
-  height: 74px;
-  pointer-events: none;
-}
-
-.hc-grid line {
-  stroke: rgba(168,85,247,0.10);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-.hc-area {
-  fill: url(#hcFill);
-  opacity: 0;
-  transition: opacity 0.9s ease 0.75s;
-}
-
-.hc-line {
-  fill: none;
-  stroke: #b47cf0;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 4px rgba(192,132,252,0.40));
-  stroke-dasharray: 700;
-  stroke-dashoffset: 700;
-  transition: stroke-dashoffset 1.5s cubic-bezier(0.33,0,0.2,1) 0.2s;
-}
-
-.hc-dot {
-  fill: #e9d5ff;
-  opacity: 0;
-  transition: opacity 0.4s ease 1.55s;
-}
-
-.heart-block.visible .hc-line { stroke-dashoffset: 0; }
-.heart-block.visible .hc-area { opacity: 1; }
-.heart-block.visible .hc-dot  { opacity: 1; animation: hcBlip 3.4s ease-in-out 2.1s infinite; }
-
-/* ‏נשימה על opacity ולא על r · ‏r היא גיאומטריה, ושינוי
-   ‏שלה מחשב את הצורה מחדש בכל פריים. */
-@keyframes hcBlip {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hc-line { transition: none; stroke-dashoffset: 0; }
-  .hc-area { transition: none; opacity: 1; }
-  .hc-dot  { transition: none; opacity: 1; }
-  .heart-block.visible .hc-dot { animation: none; }
-}
-
 
 .heart-lead {
   margin: 0 auto 30px;
@@ -1996,6 +1934,10 @@ section {
    ‏על מיכל שגובהו 0 משאיר פס פתוח גם כשהוא סגור. */
 .heart-body-wrap .heart-lead { margin-top: 40px; }
 
+/* ‏החתימה נכנסה לתוך מה שנפתח · ‏היא חותמת על מה
+   ‏שנאמר בפנים, ולכן היא שייכת לשם. */
+.heart-body-wrap .signature-svg { margin: 34px auto 4px; }
+
 .heart-kicker {
   margin: 44px 0 0;
   text-align: center;
@@ -2018,10 +1960,9 @@ section {
 .heart-full { color: var(--p6); }
 
 @media (max-width: 480px) {
-  .heart-block { padding: 0 0 94px; margin-top: 52px; }
+  .heart-block { padding: 0; margin-top: 52px; }
   .heart-body-wrap .heart-lead { margin-top: 34px; }
   .heart-block::before { margin-bottom: 28px; }
-  .heart-chart { height: 56px; }
   .heart-lead { font-size: 19px; margin-bottom: 26px; }
   .heart-body { font-size: 15.5px; line-height: 1.8; margin-bottom: 22px; }
   .heart-kicker { font-size: 17px; margin-top: 36px; }
@@ -5911,26 +5852,10 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     <p class="heart-body">אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ולא מרשה לעצמי לתת פחות ממה שאני יכול.</p>
     <p class="heart-body">ואני לא נעלם כשהתוכנית מוכנה. שם העבודה מתחילה: בחודש שלא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר.</p>
     <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
+      <img decoding="async" src="assets/signature.webp" width="300" height="205" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy">
     </div>
 
-    <svg class="heart-chart" viewBox="0 0 600 96" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="hcFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#a855f7" stop-opacity="0.26"/>
-          <stop offset="1" stop-color="#a855f7" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <g class="hc-grid">
-        <line x1="0" y1="24" x2="600" y2="24"/>
-        <line x1="0" y1="52" x2="600" y2="52"/>
-        <line x1="0" y1="80" x2="600" y2="80"/>
-      </g>
-      <path class="hc-area" d="M4,80 L62,74 L116,80 L172,66 L226,70 L282,54 L336,58 L392,42 L446,46 L504,28 L556,32 L596,14 L596,96 L4,96 Z"/>
-      <path class="hc-line" d="M4,80 L62,74 L116,80 L172,66 L226,70 L282,54 L336,58 L392,42 L446,46 L504,28 L556,32 L596,14"/>
-      <circle class="hc-dot" cx="596" cy="14" r="3.4"/>
-    </svg>
   </div>
-  <img decoding="async" src="assets/signature.webp" width="300" height="205" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy">
 </section>
 
 <!-- TESTIMONIALS -->
