@@ -5287,6 +5287,21 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 
 .lap[data-open="true"] .lap-sig { opacity: 0.5; }
 
+/* ‏פתוח השורה הראשונה היא כותרת של טקסט ולא כל המסך */
+.lap[data-open="true"] .heart-lead {
+  font-size: 17px;
+  margin-bottom: 18px;
+}
+
+/* ‏במסך רחב המחשב מקבל יחס של מחשב נייד אמיתי · ‏הסלקטור
+   ‏כולל את .lap כדי להיות ספציפי יותר מהגדרת 4/3
+   ‏שנכתבת אחריו בגיליון · ‏שאילתת מדיה אינה מוסיפה
+   ‏ספציפיות, ולכן בלעדיה היא היתה מפסידה. */
+@media (min-width: 720px) {
+  .lap .lap-screen { aspect-ratio: 16 / 10; }
+  .lap[data-open="true"] .heart-lead { font-size: 18.5px; }
+}
+
 /* ‏══ ‏הקלדה בזמן אמת ════════════════════════
 
    ‏המילים עטופות ב-span ומופיעות אחת אחרי השנייה,
@@ -5390,8 +5405,13 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
    ‏לחיצה היה לאבד אותו לכל מי שלא לוחץ. */
 .lap-screen {
   position: relative;
+  /* ‏מסך של מחשב הוא רחב מגובהו · ‏בלי יחס קבוע הוא
+     ‏היה נמתח לטור בגובה 614 פיקסל ברגע שנפתח,
+     ‏והפסיק להיראות כמחשב. הטקסט נגלל בתוך המסך
+     ‏במקום שהמסך יגדל סביב הטקסט. */
+  aspect-ratio: 4 / 3;
   border-radius: 9px;
-  padding: 26px 22px 20px;
+  padding: 22px 20px 34px;
   /* ‏מסך כבוי הוא שחור כחול, לא סגול · ‏ההבהרה
      ‏העליונה היא הבזק של הזכוכית. */
   background:
@@ -5413,33 +5433,41 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
     inset 0 2px 14px rgba(0,0,0,0.85);
 }
 
-/* ‏ההמשך · ‏הגובה נפתח מ-0fr ל-1fr */
-.lap-more {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.72s cubic-bezier(0.22,1,0.36,1);
-}
-
-.lap[data-open="true"] .lap-more { grid-template-rows: 1fr; }
-
-.lap-inner {
+/* ‏החלון שבתוך המסך · ‏סגור השורה היחידה יושבת
+   ‏במרכז; פתוח הטקסט מתחיל מלמעלה ונגלל עם הסמן,
+   ‏כמו להסתכל על מישהו כותב. הגלילה הידנית נפתחת
+   ‏רק כשההקלדה נגמרה, כדי שהיד לא תילחם בסמן. */
+.lap-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   overflow: hidden;
-  min-height: 0;
-  opacity: 0;
-  transition: opacity 0.42s ease 0.10s;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(192,132,252,0.45) transparent;
 }
 
-.lap[data-open="true"] .lap-inner {
-  opacity: 1;
-  transition: opacity 0.5s ease 0.26s;
+.lap[data-open="true"] .lap-view { justify-content: flex-start; }
+.lap[data-read="true"] .lap-view { overflow-y: auto; }
+
+.lap-view::-webkit-scrollbar { width: 5px; }
+.lap-view::-webkit-scrollbar-thumb {
+  background: rgba(192,132,252,0.45);
+  border-radius: 5px;
 }
+
+.lap-more { display: none; }
+.lap[data-open="true"] .lap-more { display: block; }
 
 /* ‏החץ · ‏הסימן היחיד שאומר שיש עוד, והוא מסתובב */
 .lap-chev {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 9px;
   display: block;
   width: 22px;
   height: 22px;
-  margin: 14px auto 0;
+  margin: 0 auto;
   color: rgba(192,132,252,0.60);
   transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), color 0.3s ease;
 }
@@ -5497,7 +5525,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
 
 @media (max-width: 480px) {
   .lap-lid { padding: 12px 8px 8px; }
-  .lap-screen { padding: 24px 16px 17px; }
+  .lap-screen { padding: 20px 15px 32px; }
   .lap-sig { width: 48px; inset-inline-start: 11px; bottom: 9px; }
   .lap-ring { inset: -11px -9px -7px; }
 }
@@ -6045,6 +6073,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <div class="lap-lid">
         <span class="lap-cam" aria-hidden="true"></span>
         <div class="lap-screen">
+          <div class="lap-view" id="lapView">
           <p class="heart-lead">ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.</p>
           <div class="lap-more" id="lapMore">
             <div class="lap-inner">
@@ -6053,6 +6082,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
               <p class="heart-body">וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.</p>
               <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
             </div>
+          </div>
           </div>
           <img class="signature-svg lap-sig" decoding="async" src="assets/signature.webp"
                width="300" height="205" alt="חתימת שוהם אבו" loading="lazy">
@@ -8338,7 +8368,15 @@ window.addEventListener('scroll', () => {
   if (!lap) return;
   const deck = document.getElementById('lapDeck');
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (still) { lap.setAttribute('data-open', 'true'); deck.setAttribute('aria-expanded', 'true'); return; }
+  if (still) {
+    /* ‏פתוח מההתחלה, וגם ניתן לגלילה · ‏המסך שומר על
+       ‏צורת מחשב, ובלי data-read הטקסט שמתחת לקצה
+       ‏היה חסום לגמרי למי שביקש פחות תנועה. */
+    lap.setAttribute('data-open', 'true');
+    lap.setAttribute('data-read', 'true');
+    deck.setAttribute('aria-expanded', 'true');
+    return;
+  }
 
   function set(open) {
     lap.setAttribute('data-open', String(open));
@@ -8388,14 +8426,25 @@ window.addEventListener('scroll', () => {
   }
 
   let typing = null;
+  const view = document.getElementById('lapView');
+
+  /* ‏החלון נגלל אחרי הסמן · ‏היעד נקבע כשמילה חדשה
+     ‏יורדת מתחת לקצה, והגלילה עצמה מתחלקת באותה
+     ‏לולאה · ‏קפיצה של שורה בכל פעם נראית כמו תקלה. */
+  let scrollTarget = 0;
 
   function type(root, perWord, done) {
     const words = wrapWords(root);
     if (!words.length) { if (done) done(); return; }
     let i = 0, acc = 0, last = 0;
+    /* ‏יעד הגלילה מתאפס בכל קריאה · ‏אחרת היעד שנשאר
+       ‏מהשורה הראשונה גולל את הטקסט החוצה ברגע שהגוף
+       ‏מתחיל להופיע, והמסך נראה ריק. */
+    if (view) scrollTarget = view.scrollTop;
     function finish() {
       words.forEach(function (w) { w.classList.add('on'); w.classList.remove('cur'); });
       typing = null;
+      if (view) { scrollTarget = view.scrollHeight; view.scrollTop = view.scrollHeight; }
       if (done) done();
     }
     typing = finish;
@@ -8409,6 +8458,13 @@ window.addEventListener('scroll', () => {
         if (i > 0) words[i - 1].classList.remove('cur');
         words[i].classList.add('on', 'cur');
         i++;
+      }
+      if (view && i > 0) {
+        const w = words[i - 1];
+        const want = w.offsetTop + w.offsetHeight - view.clientHeight + 26;
+        if (want > scrollTarget) scrollTarget = want;
+        const d = scrollTarget - view.scrollTop;
+        if (Math.abs(d) > 0.5) view.scrollTop += d * 0.16;
       }
       if (i < words.length) requestAnimationFrame(frame);
       else finish();
@@ -8429,7 +8485,9 @@ window.addEventListener('scroll', () => {
     if (bodyStarted) return;
     bodyStarted = true;
     /* ‏מחכים שהמכסה יסיים לעלות לפני שמתחילים להקליד */
-    setTimeout(function () { type(more, 40); }, 560);
+    setTimeout(function () {
+      type(more, 40, function () { lap.setAttribute('data-read', 'true'); });
+    }, 560);
   }
 
   /* ‏הטבעת מסתובבת רק כשהמחשב על המסך · ‏אנימציה
