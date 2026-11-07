@@ -1802,23 +1802,13 @@ section {
 .heart-block {
   max-width: 600px;
   margin: 44px auto 0;
-  padding: 38px 32px 34px;
-  border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 20px;
-  background: linear-gradient(158deg, rgba(22,5,48,0.55), rgba(11,2,28,0.74));
+  /* ‏הכרטיס הופך לעטיפה שקופה · ‏המשטח הוא המחשב,
+     ‏ומסגרת בתוך מסגרת היא כרטיס בתוך כרטיס. */
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
-/* ‏משיחת המכחול של המותג · ‏העוגן שחסר כאן */
-.heart-block::before {
-  content: '';
-  display: block;
-  width: 46px;
-  height: 3px;
-  margin: 0 auto 22px;
-  border-radius: 2px;
-  background: linear-gradient(90deg,
-    rgba(168,85,247,0.15), #a855f7 50%, rgba(168,85,247,0.15));
-}
 
 .heart-lead {
   margin: 0 auto 26px;
@@ -1874,8 +1864,7 @@ section {
 .heart-full { color: var(--p6); }
 
 @media (max-width: 480px) {
-  .heart-block { padding: 32px 22px 30px; margin-top: 34px; }
-  .heart-block::before { margin-bottom: 20px; }
+  .heart-block { margin-top: 34px; }
   .heart-lead { font-size: 18px; margin-bottom: 22px; }
   .heart-body { font-size: 14.5px; }
   .heart-lead + .heart-body { font-size: 15.5px; }
@@ -5227,6 +5216,306 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   }
 }
 
+/* ‏══ ‏המחשב הנייד של כרטיס הלב ════════════════
+
+   ‏שוהם ביקש שהטקסט ישב בתוך מחשב נייד קטן שלוחצים
+   ‏עליו, עם אורות מסביב. סגור הוא שתי לוחיות זו על זו;
+   ‏נגיעה מרימה את המכסה והמסך נדלק.
+
+   ‏הגובה נפתח דרך grid-template-rows מ-0fr ל-1fr · ‏זו הדרך
+   ‏היחידה להנפיש גובה לא ידוע בלי למדוד אותו ב-JS,
+   ‏והיא רצה פעם אחת על לחיצה ולא בכל פריים של גלילה.
+
+   ‏הטבעת מסתובבת ב-transform בלבד, בלי filter · ‏הדף הזה
+   ‏כבר נתקע פעם מטשטוש מונפש, והמעברים הרכים של
+   ‏conic-gradient עושים את אותה עבודה בלי לצייר מחדש.
+   ══════════════════════════════════════════════ */
+.lap {
+  position: relative;
+  max-width: 560px;
+  margin-inline: auto;
+  isolation: isolate;
+  cursor: pointer;
+}
+
+.lap[data-open="true"] { cursor: default; }
+
+/* ‏האורות שמסביב */
+.lap-ring {
+  position: absolute;
+  inset: -14px -12px -8px;
+  border-radius: 26px;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.38;
+  background: conic-gradient(from 0deg,
+    rgba(168,85,247,0.00)  0deg,
+    rgba(192,132,252,0.75) 44deg,
+    rgba(168,85,247,0.00) 110deg,
+    rgba(216,184,121,0.45) 168deg,
+    rgba(168,85,247,0.00) 228deg,
+    rgba(147,51,234,0.70) 292deg,
+    rgba(168,85,247,0.00) 360deg);
+  /* ‏בלי טשטוש הגרדיאנט הקוני מראה את הגיאומטריה שלו ·
+     ‏טריזים קשים בפינות במקום אור. הטשטוש הוא על שכבה
+     ‏קטנה שרק מסתובבת, ולכן הדפדפן מרסטר אותה פעם אחת
+     ‏ואחר כך רק מסובב · ‏זה לא המקרה שהתקיע כאן פעם את
+     ‏הגלילה, שם הונעה left שהיא תכונת פריסה. */
+  filter: blur(13px);
+  animation: lapRing 11s linear infinite;
+  will-change: transform;
+  transition: opacity 0.6s ease;
+}
+
+@keyframes lapRing { to { transform: rotate(360deg); } }
+
+/* ‏החתימה עברה מתחת לכרטיס אל תוך המסך · ‏פינה
+   ‏תחתונה, קטנה ושקופה למחצה, כמו סימן בממשק ולא
+   ‏כאלמנט שהונח מעליו. הנשימה של sigGlow מבוטלת כאן. */
+.lap-sig {
+  position: absolute;
+  inset-inline-start: 15px;
+  bottom: 11px;
+  width: 56px;
+  height: auto;
+  margin: 0;
+  opacity: 0.34;
+  pointer-events: none;
+  animation: none;
+  transition: opacity 0.6s ease;
+}
+
+.lap[data-open="true"] .lap-sig { opacity: 0.5; }
+
+/* ‏══ ‏הקלדה בזמן אמת ════════════════════════
+
+   ‏המילים עטופות ב-span ומופיעות אחת אחרי השנייה,
+   ‏ולא נכתבות לתוך האלמנט תו אחר תו · ‏כתיבת טקסט
+   ‏מגדילה את האלמנט בכל תו, וכל הדף מתחת קופץ. כך
+   ‏הפריסה נקבעת מראש ורק opacity משתנה.
+
+   ‏הסמן מיוקם מוחלטית ולכן אינו תופס רוחב · ‏סמן
+   ‏בשורת הטקסט היה דוחף את המילה הבאה לשורה חדשה
+   ‏ובחזרה · ‏ריצוד של שורות בכל מילה.
+   ══════════════════════════════════════════════ */
+.tw {
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.14s linear;
+}
+
+.tw.on { opacity: 1; }
+
+.tw.cur::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -5px;
+  top: 0.16em;
+  width: 2px;
+  height: 0.95em;
+  background: #c084fc;
+  box-shadow: 0 0 6px rgba(192,132,252,0.8);
+  animation: twBlink 0.85s step-end infinite;
+}
+
+@keyframes twBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.lap[data-open="true"] .lap-ring { opacity: 0.72; }
+
+/* ‏ההילה הרכה מתחת להם · ‏סטטית לגמרי */
+.lap-halo {
+  position: absolute;
+  inset: -34px -26px -18px;
+  border-radius: 40px;
+  z-index: -3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    rgba(124,58,237,0.26) 0%, rgba(88,28,135,0.10) 45%, transparent 72%);
+}
+
+/* ‏המכסה */
+.lap-lid {
+  position: relative;
+  z-index: 1;
+  /* ‏סגול על סגול הוא גרפיקה, לא חפץ · ‏המכסה הוא עכשיו
+     ‏אלומיניום מבוקע: גרדיאנט קר-חם שרץ לרוחב כמו אור
+     ‏על מתכת מברשת, קו בהיר בקצה העליון וקו כהה למטה.
+     ‏הניגודיות מול הרקע הסגול היא מה שהופך אותו לאובייקט. */
+  border: 1px solid rgba(214,220,233,0.30);
+  border-radius: 15px 15px 4px 4px;
+  background:
+    linear-gradient(176deg, #9aa1b2 0%, #6d7384 10%, #4c5160 34%,
+                            #3b3f4c 62%, #2c2f3a 86%, #22242d 100%);
+  padding: 13px 11px 11px;
+  /* ‏האור שחובק את הצורה עצמה · ‏נשאר גם כשהטבעת
+     ‏עוצרת, ולכן המחשב אף פעם אינו יושב בחושך. */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.42),
+    inset 0 -1px 0 rgba(0,0,0,0.55),
+    inset 1px 0 0 rgba(255,255,255,0.10),
+    inset -1px 0 0 rgba(255,255,255,0.10),
+    0 0 26px -4px rgba(168,85,247,0.34),
+    0 0 64px -14px rgba(192,132,252,0.28),
+    0 22px 48px -18px rgba(0,0,0,0.92);
+  transform-origin: bottom center;
+  transform: perspective(1100px) rotateX(-7deg);
+  transition: transform 0.72s cubic-bezier(0.22,1,0.36,1),
+              border-color 0.6s ease;
+}
+
+.lap[data-open="true"] .lap-lid {
+  transform: perspective(1100px) rotateX(0deg);
+  border-color: rgba(226,232,245,0.44);
+}
+
+/* ‏המצלמה */
+.lap-cam {
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: rgba(18,20,26,0.9);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.14);
+  transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.lap[data-open="true"] .lap-cam {
+  background: #c084fc;
+  box-shadow: 0 0 7px rgba(192,132,252,0.9);
+}
+
+/* ‏המסך · ‏השורה הראשונה גלויה תמיד, גם כשסגור ·
+   ‏המשפט הזה הוא הווו של הכרטיס, ולהסתיר אותו מאחורי
+   ‏לחיצה היה לאבד אותו לכל מי שלא לוחץ. */
+.lap-screen {
+  position: relative;
+  border-radius: 9px;
+  padding: 26px 22px 20px;
+  /* ‏מסך כבוי הוא שחור כחול, לא סגול · ‏ההבהרה
+     ‏העליונה היא הבזק של הזכוכית. */
+  background:
+    linear-gradient(168deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0) 26%),
+    linear-gradient(180deg, #0c0d14 0%, #07080d 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.07),
+    inset 0 2px 14px rgba(0,0,0,0.85);
+  transition: background 0.6s ease, box-shadow 0.6s ease;
+}
+
+.lap[data-open="true"] .lap-screen {
+  background:
+    linear-gradient(168deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 26%),
+    radial-gradient(ellipse 120% 70% at 50% 0%, rgba(124,58,237,0.16), transparent 70%),
+    linear-gradient(180deg, #0d0e17 0%, #08090f 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(192,132,252,0.16),
+    inset 0 2px 14px rgba(0,0,0,0.85);
+}
+
+/* ‏ההמשך · ‏הגובה נפתח מ-0fr ל-1fr */
+.lap-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.72s cubic-bezier(0.22,1,0.36,1);
+}
+
+.lap[data-open="true"] .lap-more { grid-template-rows: 1fr; }
+
+.lap-inner {
+  overflow: hidden;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 0.42s ease 0.10s;
+}
+
+.lap[data-open="true"] .lap-inner {
+  opacity: 1;
+  transition: opacity 0.5s ease 0.26s;
+}
+
+/* ‏החץ · ‏הסימן היחיד שאומר שיש עוד, והוא מסתובב */
+.lap-chev {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: 14px auto 0;
+  color: rgba(192,132,252,0.60);
+  transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), color 0.3s ease;
+}
+
+.lap-chev svg { width: 100%; height: 100%; display: block; }
+.lap[data-open="true"] .lap-chev { transform: rotate(180deg); color: rgba(192,132,252,0.34); }
+
+/* ‏הבסיס · ‏הוא גם הכפתור */
+.lap-deck {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: calc(100% + 26px);
+  margin-inline-start: -13px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgba(214,220,233,0.26);
+  border-top: 0;
+  border-radius: 3px 3px 11px 11px;
+  /* ‏אותה מתכת, אבל האור נופל עליה מלמעלה ולכן היא
+     ‏בהירה בקצה העליון והולכת וכהה עד השולחן. */
+  background: linear-gradient(180deg, #aeb4c4 0%, #777d8d 22%, #4a4e5b 70%, #2b2e38 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 0 rgba(0,0,0,0.5),
+    0 18px 28px -14px rgba(0,0,0,0.95);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.16s ease;
+}
+
+/* ‏החריץ שפותחים בו את המכסה */
+.lap-notch {
+  display: block;
+  width: 58px;
+  height: 3px;
+  margin: 5px auto 0;
+  border-radius: 3px;
+  background: rgba(16,18,24,0.55);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.22);
+  transition: background 0.3s ease, width 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* ‏רק כשסגור · ‏אחרת כלל הריחוף גובר על כלל הפתיחה
+     ‏(אותה ספציפיות, והוא נכתב אחריו) והאורות מתעמעים. */
+  .lap:not([data-open="true"]):hover .lap-notch { background: rgba(192,132,252,0.75); }
+  .lap:not([data-open="true"]):hover .lap-ring { opacity: 0.56; }
+}
+
+.lap-deck:active { transform: translateY(1px); }
+.lap-deck:focus-visible {
+  outline: 2px solid var(--p6);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .lap-lid { padding: 12px 8px 8px; }
+  .lap-screen { padding: 24px 16px 17px; }
+  .lap-sig { width: 48px; inset-inline-start: 11px; bottom: 9px; }
+  .lap-ring { inset: -11px -9px -7px; }
+}
+
+/* ‏מי שביקש פחות תנועה · ‏המחשב פתוח מההתחלה,
+   ‏הטבעת עומדת, ושום דבר לא נפתח ונסגר. */
+@media (prefers-reduced-motion: reduce) {
+  .lap-ring { animation: none; opacity: 0.45; }
+  .lap-lid { transform: none; transition: none; }
+  .lap-more { grid-template-rows: 1fr; transition: none; }
+  .lap-inner { opacity: 1; transition: none; }
+  .lap-chev { display: none; }
+  .tw { opacity: 1 !important; transition: none; }
+  .tw.cur::after { display: none; }
+  .lap-deck { cursor: default; }
+  .lap { cursor: default; }
+}
+
 /* ‏══ ‏שבירת התבנית ═════════════════════════
 
    ‏חמישה סקשנים נבנו מאותה אנטומיה בדיוק: תווית קטנה,
@@ -5750,13 +6039,34 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
        ‏והגוף מיושר להתחלה. שורה בת שלוש שורות במרכז היא מה
        ‏שסוחט את העין, לא האורך. -->
   <div class="heart-block reveal">
-    <p class="heart-lead">ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.</p>
-    <p class="heart-body">הכסף שאתם משלמים לי הוא לא עוד מספר שזז בחשבון הבנק שלכם, הוא החיים שלכם, השעות, החודש שעבדתם בשבילו קשה, הדברים שוויתרתם עליהם בדרך.</p>
-    <p class="heart-body">אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ובגלל זה אני לא מרשה לעצמי לתת לכם פחות ממה שאני מסוגל לתת.</p>
-    <p class="heart-body">וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.</p>
-    <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
+    <div class="lap" id="lapHeart" data-open="false">
+      <span class="lap-ring" aria-hidden="true"></span>
+      <span class="lap-halo" aria-hidden="true"></span>
+      <div class="lap-lid">
+        <span class="lap-cam" aria-hidden="true"></span>
+        <div class="lap-screen">
+          <p class="heart-lead">ואני אומר את זה בלי להתבייש, אני נותן כאן את הלב.</p>
+          <div class="lap-more" id="lapMore">
+            <div class="lap-inner">
+              <p class="heart-body">הכסף שאתם משלמים לי הוא לא עוד מספר שזז בחשבון הבנק שלכם, הוא החיים שלכם, השעות, החודש שעבדתם בשבילו קשה, הדברים שוויתרתם עליהם בדרך.</p>
+              <p class="heart-body">אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ובגלל זה אני לא מרשה לעצמי לתת לכם פחות ממה שאני מסוגל לתת.</p>
+              <p class="heart-body">וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.</p>
+              <p class="heart-kicker">אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!</p>
+            </div>
+          </div>
+          <img class="signature-svg lap-sig" decoding="async" src="assets/signature.webp"
+               width="300" height="205" alt="חתימת שוהם אבו" loading="lazy">
+          <span class="lap-chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+      </div>
+      <button class="lap-deck" type="button" id="lapDeck"
+              aria-expanded="false" aria-controls="lapMore" aria-label="לפתוח">
+        <span class="lap-notch" aria-hidden="true"></span>
+      </button>
+    </div>
   </div>
-  <img decoding="async" src="assets/signature.webp" width="300" height="205" alt="חתימת שוהם אבו" class="signature-svg" loading="lazy" />
 </section>
 
 <!-- TESTIMONIALS -->
@@ -8019,6 +8329,128 @@ window.addEventListener('scroll', () => {
   rail.querySelectorAll('img').forEach(i => i.addEventListener('load', check, { once: true }));
 })();
 
+// ── ‏המחשב הנייד של כרטיס הלב ──
+// ‏כל המחשב פותח, כי לזה אנשים מכוונים כשהם נוגעים
+// ‏במחשב סגור. סוגר רק הבסיס, כדי שלחיצה על טקסט
+// ‏שמישהו קורא לא תסגור לו אותו באמצע.
+(function () {
+  const lap = document.getElementById('lapHeart');
+  if (!lap) return;
+  const deck = document.getElementById('lapDeck');
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (still) { lap.setAttribute('data-open', 'true'); deck.setAttribute('aria-expanded', 'true'); return; }
+
+  function set(open) {
+    lap.setAttribute('data-open', String(open));
+    deck.setAttribute('aria-expanded', String(open));
+    const lbl = open ? deck.dataset.close : deck.dataset.open;
+    if (lbl) deck.setAttribute('aria-label', lbl);
+  }
+  deck.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (lap.getAttribute('data-open') === 'true') { skip(); set(false); }
+    else openUp();
+  });
+  lap.addEventListener('click', function () {
+    if (lap.getAttribute('data-open') !== 'true') openUp();
+    else skip();
+  });
+
+  /* ‏══ ‏הקלדה ═══════════════════════════════════
+
+     ‏כל מילה נעטפת ב-span פעם אחת · ‏הליכה על צומתי
+     ‏הטקסט בלבד, כך ש-<br> וה-span של "100%" שורדים.
+     ‏אחר כך רק opacity משתנה, והפריסה קבועה מהרגע
+     ‏הראשון · ‏אין קפיצות גובה ואין חישוב פריסה בכל מילה.
+     ════════════════════════════════════════════ */
+  function wrapWords(root) {
+    if (root.dataset.tw === '1') return [...root.querySelectorAll('.tw')];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const texts = [];
+    let n;
+    while ((n = walker.nextNode())) if (n.nodeValue.trim()) texts.push(n);
+    const out = [];
+    texts.forEach(function (tn) {
+      const frag = document.createDocumentFragment();
+      tn.nodeValue.split(/(\s+)/).forEach(function (part) {
+        if (!part) return;
+        if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
+        const sp = document.createElement('span');
+        sp.className = 'tw';
+        sp.textContent = part;
+        frag.appendChild(sp);
+        out.push(sp);
+      });
+      tn.parentNode.replaceChild(frag, tn);
+    });
+    root.dataset.tw = '1';
+    return out;
+  }
+
+  let typing = null;
+
+  function type(root, perWord, done) {
+    const words = wrapWords(root);
+    if (!words.length) { if (done) done(); return; }
+    let i = 0, acc = 0, last = 0;
+    function finish() {
+      words.forEach(function (w) { w.classList.add('on'); w.classList.remove('cur'); });
+      typing = null;
+      if (done) done();
+    }
+    typing = finish;
+    function frame(t) {
+      if (typing !== finish) return;              /* ‏מישהו דילג קדימה */
+      if (!last) last = t;
+      acc += t - last;
+      last = t;
+      while (acc >= perWord && i < words.length) {
+        acc -= perWord;
+        if (i > 0) words[i - 1].classList.remove('cur');
+        words[i].classList.add('on', 'cur');
+        i++;
+      }
+      if (i < words.length) requestAnimationFrame(frame);
+      else finish();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ‏לחיצה באמצע ההקלדה מסיימת אותה מיד · ‏מי שכבר
+     ‏רוצה לקרוא לא אמור לחכות לאנימציה. */
+  function skip() { if (typing) typing(); }
+
+  const lead = lap.querySelector('.heart-lead');
+  const more = document.getElementById('lapMore');
+  let leadDone = false, bodyStarted = false;
+
+  function openUp() {
+    set(true);
+    if (bodyStarted) return;
+    bodyStarted = true;
+    /* ‏מחכים שהמכסה יסיים לעלות לפני שמתחילים להקליד */
+    setTimeout(function () { type(more, 40); }, 560);
+  }
+
+  /* ‏הטבעת מסתובבת רק כשהמחשב על המסך · ‏אנימציה
+     ‏אינסופית שרצה ברקע לאורך כל הדף היא בדיוק
+     ‏מה שהוריד כאן פעם את קצב הגלילה. */
+  const ring = lap.querySelector('.lap-ring');
+  if (ring && 'IntersectionObserver' in window) {
+    ring.style.animationPlayState = 'paused';
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        ring.style.animationPlayState = e.isIntersecting ? 'running' : 'paused';
+        /* ‏השורה הראשונה מוקלדת כשהמחשב מגיע למסך */
+        if (e.isIntersecting && !leadDone && lead) {
+          leadDone = true;
+          type(lead, 58);
+        }
+      });
+    }, { rootMargin: '15% 0px' }).observe(lap);
+  }
+})();
+
 // ── LANGUAGE TOGGLE ──
 const translations = {
   he: {
@@ -8067,6 +8499,8 @@ const translations = {
     heartBody2: 'אני יודע מה עמד מאחורי כל שקל כזה. בגלל זה אני מעריך אתכם, ובגלל זה אני לא מרשה לעצמי לתת לכם פחות ממה שאני מסוגל לתת.',
     heartBody3: 'וזו הסיבה שאני גם לא נעלם כשהתוכנית מוכנה, שם בדיוק מתחילה העבודה, בחודש שבו זה לא הלך, בהחלטה שמתלבטים עליה בלילה, ברגע שבא לכם לוותר ולהרים ידיים.',
     heartKicker: 'אני לא יודע לעשות חצי עבודה.<br>אצלי זה <span class="heart-full">100%</span> או כלום!',
+    lapOpen: 'לפתוח',
+    lapClose: 'לסגור',
     aboutBody: 'נעים מאוד, אני שוהם אבו. בן 23, נולדתי וגדלתי בטבריה, ואני כאן כדי להוכיח שהמקום שבו התחלת לא קובע לאן תגיע.<br><br>עבורי, ייעוץ פיננסי הוא לא עוד מקצוע, זו שליחות.<br><br>אני מאמין שהתנהלות כלכלית טובה מתחילה הרבה לפני המספרים. היא מתחילה בהבנה של ההרגלים שלנו, של הדברים שחשובים לנו ושל העתיד שאנחנו רוצים לבנות.<br><br>את הגישה הזאת אני מביא לתהליך הליווי שלי: הקשבה אמיתית, מיפוי מסודר ותוכנית כלכלית שמותאמת לאדם שמולי, ולא לתבנית קבועה.<br><br>המטרה שלי היא לעזור לכם לקבל החלטות מתוך הבנה וביטחון, ליהנות מהכסף שלכם בהווה ולבנות בסיס כלכלי להמשך.',
     aboutSig: 'שוהם אבו | יועץ כלכלי',
     philLabel: 'הפילוסופיה שלי', philTitle: 'צמיחה בונים מהיסודות',
@@ -8172,6 +8606,8 @@ const translations = {
     heartBody2: "I know what stood behind every one of those shekels. That is why I respect you, and why I do not allow myself to give you less than everything I am capable of.",
     heartBody3: "And that is why I do not disappear once the plan is ready. That is exactly where the work begins: in the month it did not go well, in the decision you lie awake over, in the moment you want to give up and throw in the towel.",
     heartKicker: 'I do not do half a job.<br>With me it is <span class="heart-full">100%</span> or nothing!',
+    lapOpen: 'Open',
+    lapClose: 'Close',
     aboutBody: "Good to meet you, I am Shoham Abo. I am 23, born and raised in Tiberias, and I am here to prove that where you started does not decide where you end up.<br><br>Financial guidance is not just another profession to me, it is a calling.<br><br>I believe that managing money well starts long before the numbers. It starts with understanding our habits, the things that matter to us, and the future we want to build.<br><br>That is the approach I bring to the guidance itself: real listening, orderly mapping, and a financial plan fitted to the person in front of me rather than to a fixed template.<br><br>My goal is to help you make decisions out of understanding and confidence, enjoy your money in the present, and build a financial base for what comes next.",
     aboutSig: 'Shoham Abo | Financial Coach',
     philLabel: 'My Philosophy', philTitle: 'Growth is built from the ground up.',
@@ -8328,6 +8764,15 @@ function setLang(lang) {
   if (hB[2]) hB[2].textContent = t.heartBody3;
   /* ‏הסיום נושא שבירת שורה ו-span סביב המספר, ולכן innerHTML. */
   if (hK) hK.innerHTML = t.heartKicker;
+  /* ‏שם הכפתור של המחשב · ‏אינו נראה, ולכן הוא הדבר
+     ‏היחיד שקורא המסך שומע עליו. */
+  const lapD = document.getElementById('lapDeck');
+  if (lapD) {
+    lapD.dataset.open = t.lapOpen;
+    lapD.dataset.close = t.lapClose;
+    lapD.setAttribute('aria-label',
+      lapD.getAttribute('aria-expanded') === 'true' ? t.lapClose : t.lapOpen);
+  }
   const aboutSigEl = document.querySelector('.about-sig');
   if (aboutSigEl) aboutSigEl.textContent = t.aboutSig;
 
