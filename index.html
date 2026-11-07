@@ -1861,7 +1861,10 @@ section {
   color: var(--p6);
   font-size: 13px;
   font-weight: 600;
-  padding: 10px 22px;
+  /* ‏38 ‏פיקסל · ‏שש חסרות, ‏והן באות מהריפוד ולא מגובה קשיח,
+     ‏כדי שהכפתור יישאר באותו גודל גם כשהטקסט מתחלף באנגלית. */
+  min-height: 44px;
+  padding: 12px 22px;
   border-radius: 100px;
   text-decoration: none;
   transition: background 0.3s, border-color 0.3s, transform 0.25s;
@@ -2414,13 +2417,16 @@ section {
 
 .privacy-overlay.open .privacy-modal { transform: none; }
 
+/* ‏הדרך היחידה לצאת מחלון שתופס את כל המסך ישבה על 32 ‏פיקסל.
+   ‏44 ‏הוא הרצפה באייפון, ‏וזה המקום האחרון בדף שבו כדאי
+   ‏להתווכח איתה · ‏מי שלא מצליח לסגור נתקע. */
 .privacy-close {
   font-family: var(--font);
   position: absolute;
-  top: 14px;
-  inset-inline-end: 14px;
-  width: 32px;
-  height: 32px;
+  top: 10px;
+  inset-inline-end: 10px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(168,85,247,0.12);
   border: 1px solid rgba(168,85,247,0.3);
@@ -2748,9 +2754,12 @@ section {
   margin-bottom: 18px;
 }
 
+/* ‏גובה 31 · ‏זאת האפשרות השנייה בחלון, ‏והיא הייתה קשה
+   ‏יותר לפגיעה מהראשונה. */
 .wa-skip {
   display: block;
   width: 100%;
+  min-height: 44px;
   margin-top: 13px;
   background: none;
   border: none;
