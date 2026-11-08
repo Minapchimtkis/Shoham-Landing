@@ -123,6 +123,7 @@ footer { border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 32px 24px cal
 .pr-price { margin-top: 16px; font-size: 38px; font-weight: 800; line-height: 1.05; background: linear-gradient(118deg, rgb(255, 255, 255) 0%, rgb(233, 213, 255) 42%, rgb(230, 207, 150) 100%) text; -webkit-text-fill-color: transparent; font-variant-numeric: tabular-nums; }
 .pr-after { margin-top: 7px; font-size: 13px; font-weight: 500; line-height: 1.5; color: rgba(216, 180, 254, 0.9); font-variant-numeric: tabular-nums; }
 .pr-after-plain { color: rgba(255, 255, 255, 0.52); font-weight: 500; }
+.pr-total { margin-top: 5px; font-size: 12.5px; font-weight: 400; line-height: 1.55; color: rgba(255, 255, 255, 0.46); font-variant-numeric: tabular-nums; }
 .pr-sub { margin-top: 10px; font-size: 13.5px; font-weight: 400; color: rgba(255, 255, 255, 0.52); line-height: 1.5; }
 .pr-rule { height: 1px; margin: 24px 0px 22px; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.28) 22%, rgba(168, 85, 247, 0.28) 78%, transparent); }
 .pr-list { list-style: none; margin: 0px; padding: 0px; display: flex; flex-direction: column; gap: 16px; }
@@ -373,15 +374,16 @@ html[dir="rtl"] .pg-back svg { transform: scaleX(-1); }
 
       <div class="pr-card pr-main reveal">
         <div class="pr-name" id="pr2n">ליווי אישי</div>
-        <div class="pr-price" id="prP2">3,990 ₪</div>
-        <div class="pr-after" id="prA2">3,300 ₪ בפועל, אחרי קיזוז המיפוי</div>
-        <div class="pr-sub" id="pr2s">ליחידים ולזוגות צעירים</div>
+        <div class="pr-price" id="prP2">1,247.50 ₪</div>
+        <div class="pr-after" id="prA2">לחודש · ארבעה תשלומים שווים, בסנכרון עם חודשי העבודה</div>
+        <div class="pr-total" id="prT2">4,990 ₪ בסך הכל · 4,300 ₪ אחרי קיזוז המיפוי</div>
+        <div class="pr-sub" id="pr2s">ליחידים ולצעירים</div>
         <div class="pr-rule" aria-hidden="true"></div>
         <ul class="pr-list">
-          <li id="prG1">4 פגישות של שעה או שעה וחצי · פרונטלי או בזום, לבחירתכם</li>
-          <li id="prG2">ליווי טלפוני מלא ביניהן · זמינות שוטפת לאורך התהליך</li>
-          <li id="prG3">תוכנית שנבנית עליכם ומתעדכנת לאורך הדרך</li>
-          <li class="pr-key" id="prG4">ה־690 של המיפוי מתקזזים במלואם</li>
+          <li id="prG1">ארבעה חודשים של ליווי · ארבעה מפגשי עומק של שעה עד שעה וחצי</li>
+          <li id="prG2">זמינות מלאה בוואטסאפ ובטלפון בשעות העבודה, לאורך כל הדרך</li>
+          <li id="prG3">תוכנית שנבנית עליכם ומתעדכנת תוך כדי</li>
+          <li class="pr-key" id="prG4">פגישת מיקוד נוספת במתנה, אם תרצו · בחצי השנה שאחרי הסיום</li>
         </ul>
         <div class="pr-act">
           <a class="pr-btn" href="#contact" id="pr2cta">לשיחת היכרות</a>
@@ -391,14 +393,15 @@ html[dir="rtl"] .pg-back svg { transform: scaleX(-1); }
       <div class="pr-card pr-main reveal">
         <div class="pr-name" id="pr3n">ליווי למשפחות</div>
         <div class="pr-price" id="prP3">5,990 ₪</div>
-        <div class="pr-after" id="prA3">5,300 ₪ בפועל · 2,995 ₪ לכל אחד מכם</div>
-        <div class="pr-sub" id="pr3s">כשהכסף של שניכם הוא כסף אחד</div>
+        <div class="pr-after" id="prA3">עד ארבעה תשלומים, לנוחותכם</div>
+        <div class="pr-total" id="prT3">2,995 ₪ לכל אחד מכם · 5,300 ₪ אחרי קיזוז המיפוי</div>
+        <div class="pr-sub" id="pr3s">למשפחות ולמאורסים</div>
         <div class="pr-rule" aria-hidden="true"></div>
         <ul class="pr-list">
-          <li id="prH1">אותן 4 פגישות ואותו ליווי טלפוני מלא ביניהן</li>
-          <li id="prH2">הדינמיקה בין שניכם סביב כסף, ולא רק המספרים</li>
-          <li id="prH3">הכנסות, הוצאות והתחייבויות של בית שלם, ותוכנית פעולה שבנויה לזה</li>
-          <li class="pr-key" id="prH4">2,995 ₪ לאדם · פחות ממה שיחיד משלם על אותו ליווי</li>
+          <li id="prH1">תהליך שמותאם לשניכם · מפגשים של שעה עד שעה וחצי</li>
+          <li id="prH2">שפה כלכלית משותפת, וחיבור בין היעדים של שניכם</li>
+          <li id="prH3">מעטפת ליווי שוטפת, ומניעת טעויות בזמן אמת</li>
+          <li class="pr-key" id="prH4">פגישת מיקוד נוספת במתנה, אם תרצו · בחצי השנה שאחרי הסיום</li>
         </ul>
         <div class="pr-act">
           <a class="pr-btn" href="#contact" id="pr3cta">לשיחת היכרות</a>
@@ -474,25 +477,27 @@ const translations = {
     pr1cta: 'לשיחת היכרות',
     pr1more: 'מה בדיוק כלול',
     pr2n: 'ליווי אישי',
-    pr2s: 'ליחידים ולזוגות צעירים',
+    pr2s: 'ליחידים ולצעירים',
     pr2cta: 'לשיחת היכרות',
-    prG1: '4 פגישות של שעה או שעה וחצי · פרונטלי או בזום, לבחירתכם',
-    prG2: 'ליווי טלפוני מלא ביניהן · זמינות שוטפת לאורך התהליך',
-    prG3: 'תוכנית שנבנית עליכם ומתעדכנת לאורך הדרך',
-    prG4: 'ה־690 של המיפוי מתקזזים במלואם',
+    prG1: 'ארבעה חודשים של ליווי · ארבעה מפגשי עומק של שעה עד שעה וחצי',
+    prG2: 'זמינות מלאה בוואטסאפ ובטלפון בשעות העבודה, לאורך כל הדרך',
+    prG3: 'תוכנית שנבנית עליכם ומתעדכנת תוך כדי',
+    prG4: 'פגישת מיקוד נוספת במתנה, אם תרצו · בחצי השנה שאחרי הסיום',
     pr3n: 'ליווי למשפחות',
-    pr3s: 'כשהכסף של שניכם הוא כסף אחד',
+    pr3s: 'למשפחות ולמאורסים',
     pr3cta: 'לשיחת היכרות',
-    prH1: 'אותן 4 פגישות ואותו ליווי טלפוני מלא ביניהן',
-    prH2: 'הדינמיקה בין שניכם סביב כסף, ולא רק המספרים',
-    prH3: 'הכנסות, הוצאות והתחייבויות של בית שלם, ותוכנית פעולה שבנויה לזה',
-    prH4: '2,995 ₪ לאדם · פחות ממה שיחיד משלם על אותו ליווי',
+    prH1: 'תהליך שמותאם לשניכם · מפגשים של שעה עד שעה וחצי',
+    prH2: 'שפה כלכלית משותפת, וחיבור בין היעדים של שניכם',
+    prH3: 'מעטפת ליווי שוטפת, ומניעת טעויות בזמן אמת',
+    prH4: 'פגישת מיקוד נוספת במתנה, אם תרצו · בחצי השנה שאחרי הסיום',
     prP1: '690 ₪',
-    prP2: '3,990 ₪',
+    prP2: '1,247.50 ₪',
     prP3: '5,990 ₪',
     prA1: 'תשלום אחד',
-    prA2: '3,300 ₪ בפועל, אחרי קיזוז המיפוי',
-    prA3: '5,300 ₪ בפועל · 2,995 ₪ לכל אחד מכם',
+    prA2: 'לחודש · ארבעה תשלומים שווים, בסנכרון עם חודשי העבודה',
+    prA3: 'עד ארבעה תשלומים, לנוחותכם',
+    prT2: '4,990 ₪ בסך הכל · 4,300 ₪ אחרי קיזוז המיפוי',
+    prT3: '2,995 ₪ לכל אחד מכם · 5,300 ₪ אחרי קיזוז המיפוי',
     prM1Name: 'מיפוי כלכלי',
     prM1Title: '690 ₪',
     pr2av: '<strong>למה ליווי ולא פגישה אחת:</strong> ניהול כסף הוא 90% התנהגות והרגלים ו־10% ידע טכני. את ה־10% עושים במיפוי, ואת ה־90% בחודשים שאחריו.',
@@ -520,25 +525,27 @@ const translations = {
     pr1cta: 'Book an intro call',
     pr1more: 'See what is included',
     pr2n: 'Personal guidance',
-    pr2s: 'For individuals and young couples',
+    pr2s: 'For individuals and young people',
     pr2cta: 'Book an intro call',
-    prG1: '4 sessions of an hour or an hour and a half · in person or on Zoom, your choice',
-    prG2: 'Full phone support between them · ongoing availability throughout',
+    prG1: 'Four months of guidance · four deep sessions of an hour to an hour and a half',
+    prG2: 'Full availability on WhatsApp and by phone during working hours, the whole way',
     prG3: 'A plan built around you, updated as you go',
-    prG4: 'The ₪690 from the mapping comes off in full',
+    prG4: 'A bonus focus session, free, if you want it · in the six months after we finish',
     pr3n: 'Family guidance',
-    pr3s: 'When the money of both of you is one pot',
+    pr3s: 'For families and engaged couples',
     pr3cta: 'Book an intro call',
-    prH1: 'The same 4 sessions and the same full phone support between them',
-    prH2: 'The dynamic between the two of you around money, not only the numbers',
-    prH3: 'The income, spending and obligations of a whole household, and a plan built for that',
-    prH4: '₪2,995 per person · less than an individual pays for the same guidance',
+    prH1: 'A process shaped for the two of you · sessions of an hour to an hour and a half',
+    prH2: 'A shared financial language, and your goals brought together',
+    prH3: 'Ongoing support, and mistakes caught in real time',
+    prH4: 'A bonus focus session, free, if you want it · in the six months after we finish',
     prP1: '₪690',
-    prP2: '₪3,990',
+    prP2: '₪1,247.50',
     prP3: '₪5,990',
     prA1: 'One payment',
-    prA2: '₪3,300 in practice, after the mapping comes off',
-    prA3: '₪5,300 in practice · ₪2,995 each',
+    prA2: 'a month · four equal payments, in step with the months we work',
+    prA3: 'Up to four payments, at your convenience',
+    prT2: '₪4,990 in total · ₪4,300 after the mapping comes off',
+    prT3: '₪2,995 each · ₪5,300 after the mapping comes off',
     prM1Name: "Financial mapping",
     prM1Title: "₪690",
     pr2av: '<strong>Why guidance and not one session:</strong> managing money is 90% behaviour and habits and 10% technical knowledge. The mapping covers the 10%. The months that follow cover the 90%.',
@@ -552,7 +559,7 @@ const translations = {
   },
 };
 
-const TEXT_KEYS = ["prLabel", "prTitle", "prLead", "prGuarantee", "prCapacity", "prNote", "pr1n", "pr1s", "pr1a", "pr1b", "pr1c", "prNoGuide", "pr1cta", "pr1more", "pr2n", "pr2s", "pr2cta", "prG1", "prG2", "prG3", "prG4", "pr3n", "pr3s", "pr3cta", "prH1", "prH2", "prH3", "prH4", "prP1", "prP2", "prP3", "prA1", "prA2", "prA3", "prM1Name", "prM1Title"];
+const TEXT_KEYS = ["prLabel", "prTitle", "prLead", "prGuarantee", "prCapacity", "prNote", "pr1n", "pr1s", "pr1a", "pr1b", "pr1c", "prNoGuide", "pr1cta", "pr1more", "pr2n", "pr2s", "pr2cta", "prG1", "prG2", "prG3", "prG4", "pr3n", "pr3s", "pr3cta", "prH1", "prH2", "prH3", "prH4", "prP1", "prP2", "prP3", "prA1", "prA2", "prA3", "prT2", "prT3", "prM1Name", "prM1Title"];
 const HTML_KEYS = ["pr2av", "prM1Body"];
 
 function setLang(lang) {
