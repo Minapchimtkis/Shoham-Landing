@@ -1126,6 +1126,37 @@ section {
   animation: fadeUp 0.9s 0.8s forwards;
 }
 
+/* ‏הצעד הראשון הוא השאלון ולא שיחה · ‏שתי דקות בלי למסור טלפון
+   ‏הן "כן" קל בהרבה מבקשה להתקשר, והשורה מתחת אומרת בדיוק מה
+   ‏מקבלים כדי שאיש לא ילחץ בלי לדעת לאן. */
+.hero-cta-note {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.6);
+}
+.hero-cta-alt {
+  /* ‏44 פיקסל גובה · ‏זה קישור טקסט אבל עדיין יעד לאצבע */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.72);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(255,255,255,0.3);
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hero-cta-alt:hover {
+    color: #ffffff;
+    text-decoration-color: rgba(255,255,255,0.7);
+  }
+}
+
 .btn-primary {
   display: inline-block;
   background: linear-gradient(135deg, var(--p4), var(--p5));
@@ -2490,6 +2521,39 @@ section {
   max-height: 80px;
   opacity: 1;
 }
+
+/* ‏מוצא שקט למי שבדיקת האבטחה נחסמה אצלו · ‏שורה אחת וכפתור קטן,
+   ‏ולא גוש · ‏הוא מופיע רק בתקלה ואסור לו להשתלט על סוף הטופס. */
+.form-fallback {
+  margin: 12px 0 0;
+  text-align: center;
+}
+.form-fallback[hidden] { display: none; }
+.form-fallback p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.58);
+}
+.fb-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: #25d366;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 11px 28px;
+  border-radius: 100px;
+  transition: transform 0.25s, background 0.25s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .fb-wa:hover { background: #20bc5a; transform: scale(1.02); }
+}
+.fb-wa:active { transform: scale(0.98); }
 
 .form-field input[aria-invalid="true"],
 .form-field textarea[aria-invalid="true"] {
@@ -4465,9 +4529,14 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 /* ‏תיבת הסימון עצמה קטנה, והתווית שעוטפת אותה כבר גדולה ולוחצת
-   עליה. ההרחבה כאן היא כדי שגם נגיעה שמחטיאה את הריבוע תיתפס. */
+   עליה. ההרחבה כאן היא כדי שגם נגיעה שמחטיאה את הריבוע תיתפס.
+
+   ‏היא יושבת על ::before ולא על ::after, כי ::after הוא הווי עצמו.
+   ‏כששניהם ישבו על אותו פסאודו, ה-inset הוסיף right ו-bottom לצד
+   ‏ה-left וה-top של הווי · ‏מיקום סותר, וב-RTL הדפדפן מכבד את
+   ‏right ומתעלם מ-left, אז הווי נחת 11 פיקסל מחוץ לריבוע. */
 .consent-row input[type="checkbox"] { position: relative; }
-.consent-row input[type="checkbox"]::after {
+.consent-row input[type="checkbox"]::before {
   content: '';
   position: absolute;
   inset: -11px;
@@ -5598,7 +5667,9 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   </h1>
   <p class="hero-audience">ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong></p>
   <div class="hero-cta">
-    <a href="#contact" class="btn-primary">לשיחת היכרות</a>
+    <a href="/quiz.html" class="btn-primary" id="heroCtaBtn">לבדוק איפה אני עומד ←</a>
+    <p class="hero-cta-note" id="heroCtaNote">חמש שאלות, שתי דקות, בלי להשאיר טלפון</p>
+    <a href="#contact" class="hero-cta-alt" id="heroCtaAlt">או לדבר איתי ישירות</a>
   </div>
 
   <div class="license-badge">
@@ -6055,6 +6126,12 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
         מתחילים לצמוח ←
       </button>
       <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+      <!-- ‏מוצא למי שבדיקת האבטחה נחסמה אצלו · ‏הטקסט והקישור נכתבים
+           ‏מתוך הסקריפט לפי שפת הדף, כדי לא להוסיף מפתחות למילונים. -->
+      <div class="form-fallback" id="formFallback" hidden>
+        <p id="formFallbackText"></p>
+        <a class="fb-wa" id="formFallbackBtn" href="#" target="_blank" rel="noopener"></a>
+      </div>
       <p class="form-note">הפרטים משמשים אך ורק ליצירת קשר אתכם, ולא יימסרו לצד שלישי למטרות שיווק.</p>
     </div>
     <div class="success-msg" id="successMsg">
@@ -6866,8 +6943,20 @@ document.addEventListener('keydown', e => {
 
 let turnstileToken = '';
 
+/* ‏הבדיקה הזאת נטענת מספק חיצוני, ואצל חלק מהגולשים היא לא מגיעה · ‏חוסם
+   ‏פרסומות, דפדפן שחוסם מעקב, או רשת איטית. במצב הזה הווידג'ט מתכווץ
+   ‏לאפס ונעלם מהמסך, כך שאין שום סימן שמשהו חסר, והטופס נחסם לשליחה.
+   ‏הדגל הזה מאפשר להגיד לאדם את האמת במקום לבקש ממנו לחכות. */
+let turnstileFailed = false;
+
+function markTurnstileFailed() {
+  turnstileFailed = true;
+  turnstileToken = '';
+}
+
 function onTurnstileSuccess(token) {
   turnstileToken = token || '';
+  turnstileFailed = false;
 }
 
 function onTurnstileExpired() {
@@ -6875,8 +6964,35 @@ function onTurnstileExpired() {
 }
 
 function onTurnstileError() {
-  turnstileToken = '';
+  markTurnstileFailed();
 }
+
+/* ‏אם הסקריפט עצמו נחסם, אף אחת מהפונקציות שלמעלה לא תיקרא לעולם,
+   ‏ולכן צריך לבדוק בנפרד שהוא בכלל הגיע. שמונה שניות הן הרבה מעבר
+   ‏למה שהוא לוקח כשהוא עובד. */
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    if (!window.turnstile) markTurnstileFailed();
+  }, 8000);
+});
+
+function showTurnstileFallback() {
+  const en = document.documentElement.dir === 'ltr';
+  const box = document.getElementById('formFallback');
+  const txt = document.getElementById('formFallbackText');
+  const btn = document.getElementById('formFallbackBtn');
+  if (!box || !txt || !btn) return;
+  txt.textContent = en
+    ? 'Something in your browser is blocking the send. You can message me\u00a0here:'
+    : '\u200fמשהו בדפדפן שלכם חוסם את השליחה. אפשר לשלוח לי\u00a0כאן:';
+  btn.textContent = en ? 'WhatsApp' : '\u200fלוואטסאפ';
+  btn.setAttribute('href', en ? WA_FALLBACK_EN : WA_FALLBACK_HE);
+  box.hidden = false;
+  box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+const WA_FALLBACK_HE = 'https://wa.me/972507228755?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%95%D7%94%D7%9D%2C%20%D7%A0%D7%99%D7%A1%D7%99%D7%AA%D7%99%20%D7%9C%D7%A9%D7%9C%D7%95%D7%97%20%D7%98%D7%95%D7%A4%D7%A1%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%95%D7%94%D7%95%D7%90%20%D7%9C%D7%90%20%D7%A0%D7%A9%D7%9C%D7%97.%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%A9%D7%A0%D7%93%D7%91%D7%A8.';
+const WA_FALLBACK_EN = 'https://wa.me/972507228755?text=Hi%20Shoham%2C%20I%20tried%20to%20send%20the%20form%20on%20your%20site%20and%20it%20would%20not%20go%20through.%20I%27d%20like%20to%20talk.';
 
 function submitForm() {
   const name = document.getElementById('fname').value.trim();
@@ -6909,8 +7025,23 @@ function submitForm() {
   }
 
   if (!turnstileToken) {
-    showFormError(en ? 'Just a moment — the security check has not finished.'
+    /* ‏אם כבר ידוע שהבדיקה נכשלה, אין שום טעם לבקש מהאדם לחכות. */
+    if (turnstileFailed) {
+      showFormError(en ? 'The form cannot be sent right now.'
+                       : 'אי אפשר לשלוח את הטופס כרגע.');
+      showTurnstileFallback();
+      return;
+    }
+    showFormError(en ? 'Just a moment, the security check has not finished.'
                      : 'רגע אחד, בדיקת האבטחה עוד לא הסתיימה.');
+    /* ‏ואם גם אחרי שש שניות נוספות היא לא הגיעה, היא כבר לא תגיע. */
+    setTimeout(function () {
+      if (turnstileToken) return;
+      markTurnstileFailed();
+      showFormError(en ? 'The form cannot be sent right now.'
+                       : 'אי אפשר לשלוח את הטופס כרגע.');
+      showTurnstileFallback();
+    }, 6000);
     return;
   }
 
@@ -8153,7 +8284,9 @@ const translations = {
     lblWaPhone: 'מספר טלפון',
     heroLine2: 'לא להפך',
     heroAudience: 'ליווי פיננסי אישי <strong>למשפחות צעירות ויחידים</strong>',
-    heroCta: 'לשיחת היכרות',
+    heroCta: 'לבדוק איפה אני עומד ←',
+    heroCtaNote: 'חמש שאלות, שתי דקות, בלי להשאיר טלפון',
+    heroCtaAlt: 'או לדבר איתי ישירות',
     videoTitle: 'חצי דקה איתי',
     videoPlay: 'נגן את הסרטון',
     licenseTitle: 'יועץ כלכלי מוסמך מטעם חברת UNI פיננסים',
@@ -8259,7 +8392,9 @@ const translations = {
     lblWaPhone: 'Phone number',
     heroLine2: 'not the other way round',
     heroAudience: 'Personal financial guidance <strong>for young families and individuals</strong>',
-    heroCta: 'Book an intro call',
+    heroCta: 'See where I stand →',
+    heroCtaNote: 'Five questions, two minutes, no phone number needed',
+    heroCtaAlt: 'Or talk to me directly',
     videoTitle: 'Half a minute with me, in Hebrew',
     videoPlay: 'Play the video',
     licenseTitle: 'Certified Family Finance Advisor · UNI Finance',
@@ -8386,7 +8521,9 @@ function setLang(lang) {
   /* ‏השורה השנייה נושאת את מילת ההדגשה בתוכה, ולכן innerHTML
      ‏והמחרוזת מגיעה מהמילון ולא כתובה כאן פעמיים. */
   document.querySelector('.hero-title .line2').innerHTML = t.heroLine2;
-  document.querySelector('.hero-cta a').textContent = t.heroCta;
+  document.getElementById('heroCtaBtn').textContent = t.heroCta;
+  document.getElementById('heroCtaNote').textContent = t.heroCtaNote;
+  document.getElementById('heroCtaAlt').textContent = t.heroCtaAlt;
   /* ‏תוויות השדות אינן נראות בעין אבל כן נקראות, ולכן הן
      ‏צריכות להתחלף בשפה כמו כל טקסט אחר. */
   ['lblFname','lblFphone','lblFmsg','lblWaName','lblWaPhone'].forEach(k => {
