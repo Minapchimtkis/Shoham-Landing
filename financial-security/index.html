@@ -1153,6 +1153,50 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
   max-width: 560px; margin: 0 auto 28px;
 }
 
+/* ‏שער השאלות · ‏הכפתור הוא השורה היחידה שנראית עד שלוחצים */
+.faq-gate { margin-top: 4px; }
+.faq-gate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 16px 2px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: rgba(255,255,255,0.9);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .faq-gate-btn:hover { color: var(--p6); }
+}
+.faq-gate-btn:active { opacity: 0.72; transition-duration: 0.1s; }
+.faq-gate-btn.open { color: var(--p6); border-bottom-color: transparent; }
+.faq-gate-icon {
+  flex-shrink: 0;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--p6);
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.faq-gate-btn.open .faq-gate-icon { transform: rotate(45deg); }
+.faq-gate-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease;
+}
+.faq-gate-body.open { opacity: 1; }
+
 .faq-list { border-top: 1px solid var(--line); }
 .faq-item { border-bottom: 1px solid var(--line); }
 
@@ -1332,9 +1376,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
 
   <div class="card intro">
     <p style="font-size:15px;color:rgba(255,255,255,0.78);font-weight:300">
-      השאלות הן על ההכנסה, ההוצאות, מה שכבר נצבר ומה שעדיין חייבים.
-      בסוף תקבלו הערכה של כמה זמן לוקח מכאן ליעד שהגדרתם, ומה בפועל
-      מזיז את המספר הזה.
+      השאלות נוגעות לכמה כסף נכנס, כמה יוצא, כמה כבר הצלחתם לחסוך
+      ומה עוד נשאר לכם לשלם. בסוף תקבלו תמונה ברורה של כמה זמן ייקח
+      לכם להגיע ליעד הכלכלי שלכם ומה יכול לעזור לכם להגיע.
     </p>
     <button class="btn btn-primary btn-wide" id="btnStart" style="margin-top:20px">מתחילים</button>
   </div>
@@ -1354,6 +1398,17 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
       אתם כבר לא תלויים במשכורת הבאה. המחשבון מראה מתי הם נפגשים אצלכם,
       ומה מזיז את התאריך.
     </p>
+
+    <!-- ‏השאלות והתשובות סגורות כברירת מחדל · ‏הן למי שרוצה להבין
+         ‏לעומק, ומי שבא לחשב לא צריך לגלול מעליהן בדרך לכפתור. -->
+    <div class="faq-gate">
+      <button class="faq-gate-btn" type="button" id="faqGateBtn"
+              aria-expanded="false" aria-controls="faqBody"
+              onclick="toggleFaqGate(this)">
+        <span class="faq-gate-label">שאלות ותשובות</span>
+        <span class="faq-gate-icon" aria-hidden="true">+</span>
+      </button>
+      <div class="faq-gate-body" id="faqBody">
 
     <div class="faq-list">
 
@@ -1446,6 +1501,9 @@ input[type=range]:active::-webkit-slider-thumb { cursor: grabbing; }
         </div>
       </div>
 
+    </div>
+
+      </div>
     </div>
   </section>
 </section>
@@ -3306,6 +3364,40 @@ document.addEventListener('keydown', function (e) {
 });
 
 /* האקורדיון של השאלות, באותה התנהגות של דף הנחיתה: אחת פתוחה בכל רגע. */
+/* ‏פתיחה וסגירה של כל גוש השאלות · ‏אחרי שהמעבר נגמר התקרה
+   ‏מוסרת לגמרי, אחרת פתיחה של שאלה בודדת בפנים הייתה נחתכת
+   ‏בגובה שנמדד ברגע הפתיחה. בסגירה מחזירים גובה מספרי לפני
+   ‏האיפוס, כי אין ממה להנפיש כשהערך הוא none. */
+window.toggleFaqGate = function (btn) {
+  var body = document.getElementById('faqBody');
+  if (!body) return;
+  var open = !btn.classList.contains('open');
+  btn.classList.toggle('open', open);
+  body.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+  if (open) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    body.addEventListener('transitionend', function lift(e) {
+      if (e.target !== body || e.propertyName !== 'max-height') return;
+      body.removeEventListener('transitionend', lift);
+      if (btn.classList.contains('open')) body.style.maxHeight = 'none';
+    });
+    return;
+  }
+
+  /* ‏שאלה שנשארה פתוחה בפנים תיפתח שוב בפעם הבאה בלי סיבה. */
+  Array.prototype.forEach.call(body.querySelectorAll('.faq-q.open'), function (b) {
+    b.classList.remove('open');
+    b.setAttribute('aria-expanded', 'false');
+    b.nextElementSibling.classList.remove('open');
+    b.nextElementSibling.style.maxHeight = null;
+  });
+  body.style.maxHeight = body.scrollHeight + 'px';
+  void body.offsetHeight;
+  body.style.maxHeight = '0px';
+};
+
 window.toggleFaq = function (btn) {
   var answer = btn.nextElementSibling;
   var wasOpen = btn.classList.contains('open');
