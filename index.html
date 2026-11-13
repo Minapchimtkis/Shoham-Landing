@@ -88,7 +88,7 @@
           "name": "כמה זה עולה?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "הכל כתוב, בלי להסתיר, בעמוד המחירים. המיפוי הכלכלי הוא 690 ₪ והוא הצעד הראשון. הליווי האישי ליחידים ולצעירים הוא 1,247.50 ₪ בחודש, בארבעה תשלומים שווים · 4,990 ₪ בסך הכל. הליווי למשפחות ולזוגות הוא 5,990 ₪, עד ארבעה תשלומים. בשני מסלולי הליווי ה־690 של המיפוי מתקזזים במלואם אם ממשיכים תוך 30 יום, כך שבפועל אלה 4,300 ₪ ו-5,300 ₪. בשני המסלולים יש גם פגישת מיקוד נוספת במתנה, אם תרצו, בחצי השנה שאחרי הסיום. שיחת ההיכרות חינם ובלי התחייבות."
+            "text": "זה תלוי במסלול ובמה שאתם צריכים, ולכן אני מעדיף להגיד לכם את המספר בשיחה ולא לפני שהבנתי מה עומד על הפרק. בשיחת ההיכרות נעבור על המצב שלכם, ואם זה מתאים אפרט בדיוק מה המסלול כולל וכמה הוא עולה. השיחה עצמה חינם ובלי התחייבות."
           }
         },
         {
@@ -403,7 +403,6 @@ button,
 }
 
 a, input, textarea, label, summary { touch-action: manipulation; }
-
 
 
 body {
@@ -1328,7 +1327,6 @@ section {
 }
 
 
-
 .demon-icon-img {
   width: 84px;
   height: 84px;
@@ -1756,9 +1754,6 @@ section {
 }
 
 
-
-
-
 .phil-intro-text {
   position: relative;
   z-index: 2;
@@ -1815,7 +1810,6 @@ section {
 }
 
 
-
 @media (hover: hover) and (pointer: fine) {
 }
 
@@ -1837,7 +1831,6 @@ section {
   line-height: 1.7;
   opacity: 0.92;
 }
-
 
 
 /* ── MISSION BLOCK ── */
@@ -4004,8 +3997,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
 }
 
 
-
-
 .lang-btn {
   background: none;
   border: none;
@@ -4041,7 +4032,6 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   margin-bottom: 64px;
   position: relative;
 }
-
 
 
 .phil-photos {
@@ -4698,103 +4688,10 @@ html.faq-open .iphone-wrap.visible .iphone-close {
   .about { padding-top: 96px; padding-bottom: 56px; }
   .proof { padding-bottom: 56px; }
   .process-section { padding-top: 56px; padding-bottom: 72px; }
-  .pr-gate { padding-top: 64px; padding-bottom: 64px; }
   #faq.faq-section { padding-top: 96px; padding-bottom: 56px; }
   .cta-section { padding-top: 88px; padding-bottom: 88px; }
 }
 
-/* ══ ‏הרצועה שמובילה לעמוד המחירים ════════════════════════
-
-   ‏כאן ישב סקשן המחירים המלא, והוא עבר ל-/pricing/. מה
-   ‏שנשאר הוא שורה אחת וכפתור · אם זה היה גדול מזה, היה
-   ‏עדיף להשאיר את הסקשן עצמו.
-   ══════════════════════════════════════════════════════ */
-
-.pr-gate {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 88px 24px;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-/* ‏תווית משלה ולא section-label · setLang מחלק את תוויות
-   ‏הסקשנים לפי אינדקס, ותווית נוספת באמצע הדף הייתה מערבבת
-   ‏את כל הגרסה האנגלית. התרגום כאן לפי מזהה. */
-.pr-gate-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: var(--p6);
-  margin-bottom: 14px;
-}
-
-/* ‏השאלה שהקורא כבר שואל את עצמו בנקודה הזאת בדף · כותרת
-   ‏שעונה על מחשבה קיימת נקראת, כותרת שמכריזה על משהו
-   ‏נגללת. הגרדיאנט הוא זה של הכותרת הראשית. */
-.pr-gate-title {
-  font-size: clamp(26px, 3.6vw, 38px);
-  font-weight: 800;
-  line-height: 1.15;
-  margin: 0 0 18px;
-  background: linear-gradient(118deg, #ffffff 0%, #e9d5ff 46%, #e6cf96 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
-}
-
-.pr-gate-line {
-  max-width: 46ch;
-  margin: 0 0 30px;
-  font-size: 16.5px;
-  font-weight: 300;
-  line-height: 1.85;
-  text-wrap: balance;
-  color: rgba(255,255,255,0.74);
-}
-
-.pr-gate-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 58px;
-  padding: 17px 38px;
-  border-radius: 100px;
-  background: linear-gradient(135deg, #7c3aed, #9d4edd);
-  color: #fff;
-  font-family: var(--font);
-  font-size: 16.5px;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 14px 34px -16px rgba(124,58,237,0.85);
-  transition: background 0.25s, transform 0.25s;
-}
-
-/* ‏החץ מצביע לכיוון הקריאה · ב-RTL שמאלה. */
-html[dir="rtl"] .pr-gate-btn svg { transform: scaleX(-1); }
-
-@media (hover: hover) and (pointer: fine) {
-  .pr-gate-btn:hover { background: linear-gradient(135deg, #9d4edd, #7c3aed); transform: translateY(-2px); }
-}
-
-.pr-gate-btn:active { transform: translateY(0); opacity: 0.88; }
-.pr-gate-btn:focus-visible { outline: 2px solid var(--p6); outline-offset: 3px; }
-
-@media (max-width: 720px) {
-  .pr-gate { padding: 64px 20px; }
-  .pr-gate-line { font-size: 15.5px; margin-bottom: 26px; }
-  .pr-gate-label { letter-spacing: 3px; }
-  .pr-gate-btn { width: 100%; max-width: 360px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pr-gate-btn { transition: none; }
-  .pr-gate-btn:hover { transform: none; }
-}
 
 /* ── ‏רצועה וגל ──────────────────────────────────────────
    ‏שי כלכלי מחלק את הדף לשדות צבע, והמעבר ביניהם הוא קשת
@@ -5647,7 +5544,6 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
       <a href="#method"      id="nm3">הגישה שלי</a>
       <a href="#about"       id="nm4">מי אני</a>
       <a href="#process"     id="nm5">איך זה עובד</a>
-      <a href="#pricing"     id="nm6">כמה זה עולה</a>
       <a href="#faq"         id="nm7">שאלות ותשובות</a>
     </nav>
 
@@ -5996,20 +5892,6 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
   </div>
 </section>
 
-<!-- ‏סקשן המחירים עבר לעמוד משלו, /pricing/, כדי שהדף הזה לא
-     ‏יישא את כל המחירון על גבו. כאן נשארה רצועה אחת: מי שקרא
-     ‏את התהליך ורוצה לדעת כמה זה עולה מקבל את הדרך לשם בלי
-     ‏לגלול עד הסוף. -->
-<section class="pr-gate reveal" id="pricing">
-  <div class="pr-gate-label" id="prGateLabel">המחירים</div>
-  <h2 class="pr-gate-title" id="prGateTitle">אז כמה זה עולה?</h2>
-  <p class="pr-gate-line" id="prGateLine">שלושת המסלולים, המחירים המלאים והקיזוז · הכל כתוב, בעמוד אחד, בלי להשאיר אתכם לנחש.</p>
-  <a class="pr-gate-btn" href="/pricing/" id="prGateBtn">
-    <span>לראות את המחירים</span>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-  </a>
-</section>
-
 <!-- FAQ -->
 <section data-stage="faq" data-stage-i="8" class="faq-section band" id="faq">
   <span class="wave wave-top" aria-hidden="true"></span>
@@ -6056,7 +5938,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
           <span>כמה זה עולה?</span>
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a">הכל כתוב, בלי להסתיר, בעמוד המחירים. המיפוי הכלכלי הוא 690 ₪ והוא הצעד הראשון. הליווי האישי ליחידים ולצעירים הוא 1,247.50 ₪ בחודש, בארבעה תשלומים שווים · 4,990 ₪ בסך הכל. הליווי למשפחות ולזוגות הוא 5,990 ₪, עד ארבעה תשלומים. בשני מסלולי הליווי ה־690 של המיפוי מתקזזים במלואם אם ממשיכים תוך 30 יום, כך שבפועל אלה 4,300 ₪ ו-5,300 ₪. בשני המסלולים יש גם פגישת מיקוד נוספת במתנה, אם תרצו, בחצי השנה שאחרי הסיום. שיחת ההיכרות חינם ובלי התחייבות.</div>
+        <div class="faq-a">זה תלוי במסלול ובמה שאתם צריכים, ולכן אני מעדיף להגיד לכם את המספר בשיחה ולא לפני שהבנתי מה עומד על הפרק. בשיחת ההיכרות נעבור על המצב שלכם, ואם זה מתאים אפרט בדיוק מה המסלול כולל וכמה הוא עולה. השיחה עצמה חינם ובלי התחייבות.</div>
       </div>
 
       <div class="faq-item reveal">
@@ -6160,7 +6042,7 @@ html.menu-open .sticky-cta { opacity: 0; pointer-events: none; }
        ‏מכולן · ‏שם הקישור אומר את עצמו, ‏וההסבר שהיה כאן ישב
        ‏מתחת לטופס ומתחת לטלפון, ‏במקום שבו כבר לא קוראים. -->
   <div class="intake-row reveal">
-    <a class="intake-link" id="intakeLink" href="/intake.html">שאלון ההיכרות</a><span class="intake-sep" aria-hidden="true">·</span><a class="intake-link" id="priceLink" href="/pricing/">המחירים המלאים</a>
+    <a class="intake-link" id="intakeLink" href="/intake.html">שאלון ההיכרות</a>
   </div>
 </section>
 
@@ -8297,7 +8179,7 @@ const translations = {
     whatisIntro: 'ניהול פיננסי הוא הרבה מעבר למספרים בבנק שלכם, הוא קשור להרגלים שלנו, לרגשות שלנו ולדרך שבה אנחנו מקבלים החלטות עם הכסף.<br><br>אני מלווה צעירים ומשפחות שרוצים לשפר את המצב הכלכלי שלהם, להתמודד עם אתגרים ולבנות תוכנית פיננסית שתעזור להם להתקדם לעבר המטרות שלהם.<br><br>אבל מבחינתי, זה לא מסתכם בלבנות תקציב או לצמצם הוצאות. חשוב לי להבין גם מה עומד מאחורי ההתנהלות הפיננסית שלכם: מה מלחיץ אתכם, מה עוצר אתכם, ואיך אפשר ליצור שינוי שמתאים לא רק למספרים, אלא גם לחיים שלכם.<br><br>המטרה שלי היא לא להגיד לכם על מה להוציא את הכסף שלכם, אלא לעזור לכם לקבל החלטות פיננסיות טובות יותר, ליהנות מההווה ולבנות לעצמכם עתיד כלכלי טוב יותר.',
     navMenu: 'תפריט', navMenuClose: 'סגירה',
     nm1: 'לקוחות ממליצים', nm2: 'מה זה יועץ פיננסי', nm3: 'הגישה שלי',
-    nm4: 'מי אני', nm5: 'איך זה עובד', nm6: 'כמה זה עולה',
+    nm4: 'מי אני', nm5: 'איך זה עובד',
     nm7: 'שאלות ותשובות',
     navMenuTitle: 'תפריט הדף',
     whatisBtnOpen: 'לקרוא את התשובה',
@@ -8345,7 +8227,6 @@ const translations = {
     ctaLabel: 'בואו נדבר', ctaTitle: 'מוכנים לשנות מסלול?',
     callOr: 'או פשוט תרימו טלפון',
     intakeLink: 'שאלון ההיכרות',
-    priceLink: 'המחירים המלאים',
     ctaSub: 'השאירו פרטים ואחזור אליכם בהקדם האפשרי. שיחת ההיכרות חינם, ללא התחייבות.',
     ctaBtn: 'מתחילים לצמוח ←',
     namePh: 'מה השם שלך?', phonePh: 'מה מספר הטלפון שלך?', msgPh: 'ספרו לי במשפט אחד מה הכי מעיק עליכם כלכלית (לא חובה)',
@@ -8367,16 +8248,12 @@ const translations = {
     quizCta: 'לשאלון האישי ←',
     waName: 'שוהם אבו',
     qPrice: 'כמה זה עולה?',
-    prGateLabel: 'המחירים',
-    prGateTitle: 'אז כמה זה עולה?',
-    prGateLine: 'שלושת המסלולים, המחירים המלאים והקיזוז · הכל כתוב, בעמוד אחד, בלי להשאיר אתכם לנחש.',
-    prGateBtn: 'לראות את המחירים',
     giftRule: 'מתנה ממני אליכם',
     giftTitle: 'מחשבון ביטחון כלכלי',
     giftText: 'מתי הכסף יתחיל לעבוד במקומכם',
     giftFree: 'חינם',
     stickyCtaText: 'לדבר איתי בוואטסאפ',
-    aPrice: 'הכל כתוב, בלי להסתיר, בעמוד המחירים. המיפוי הכלכלי הוא 690 ₪ והוא הצעד הראשון. הליווי האישי ליחידים ולצעירים הוא 1,247.50 ₪ בחודש, בארבעה תשלומים שווים · 4,990 ₪ בסך הכל. הליווי למשפחות ולזוגות הוא 5,990 ₪, עד ארבעה תשלומים. בשני מסלולי הליווי ה־690 של המיפוי מתקזזים במלואם אם ממשיכים תוך 30 יום, כך שבפועל אלה 4,300 ₪ ו-5,300 ₪. בשני המסלולים יש גם פגישת מיקוד נוספת במתנה, אם תרצו, בחצי השנה שאחרי הסיום. שיחת ההיכרות חינם ובלי התחייבות.',
+    aPrice: 'זה תלוי במסלול ובמה שאתם צריכים, ולכן אני מעדיף להגיד לכם את המספר בשיחה ולא לפני שהבנתי מה עומד על הפרק. בשיחת ההיכרות נעבור על המצב שלכם, ואם זה מתאים אפרט בדיוק מה המסלול כולל וכמה הוא עולה. השיחה עצמה חינם ובלי התחייבות.',
     q6: 'מה קורה ביום שאחרי?',
     a6: 'המטרה שלי היא להביא אתכם לעצמאות ולביטחון מלא בניהול הכסף שלכם. לצד היכולת להמשיך לבד, רשת הביטחון נשארת גם בסיום התהליך ותהיה לכם האפשרות לפנות, לשאול ולהתייעץ בכל נקודה שבה תצטרכו עזרה, אני פה למענכם.',
     dir: 'rtl'
@@ -8405,7 +8282,7 @@ const translations = {
     whatisIntro: "Financial management is far more than the numbers in your bank account. It is tied to our habits, our emotions, and the way we make decisions with money.<br><br>I guide young people and young families who want to improve where they stand financially, deal with the challenges in front of them, and build a financial plan that moves them towards their goals.<br><br>But to me it does not stop at building a budget or cutting expenses. I want to understand what sits behind the way you handle money: what worries you, what holds you back, and how to create a change that fits not only the numbers but your life.<br><br>My goal is not to tell you what to spend your money on. It is to help you make better financial decisions, enjoy the present, and build yourself a better financial future.",
     navMenu: 'Menu', navMenuClose: 'Close',
     nm1: 'Client reviews', nm2: 'What a financial advisor is', nm3: 'My approach',
-    nm4: 'About me', nm5: 'How it works', nm6: 'What it costs',
+    nm4: 'About me', nm5: 'How it works',
     nm7: 'Questions and answers',
     navMenuTitle: 'Page menu',
     whatisBtnOpen: 'Read the answer',
@@ -8453,7 +8330,6 @@ const translations = {
     ctaLabel: "Let's talk", ctaTitle: 'Ready to change direction?',
     callOr: 'Or simply pick up the phone',
     intakeLink: 'Intake questionnaire',
-    priceLink: 'Full prices',
     ctaSub: "Leave your details and I'll get back to you as soon as possible. The first call is free, with no commitment.",
     ctaBtn: 'Start Growing →',
     namePh: 'Your name', phonePh: 'Phone', msgPh: 'Tell me in one sentence what worries you most financially (optional)',
@@ -8475,16 +8351,12 @@ const translations = {
     quizCta: 'Take the quiz →',
     waName: 'Shoham Abu',
     qPrice: 'How much does it cost?',
-    prGateLabel: 'Pricing',
-    prGateTitle: 'So what does it cost?',
-    prGateLine: 'All three tracks, the full prices and the credit · written out on one page, with nothing left for you to guess.',
-    prGateBtn: 'See the prices',
     giftRule: 'A gift from me to you',
     giftTitle: 'Financial security calculator',
     giftText: 'When your money starts working for you',
     giftFree: 'Free',
     stickyCtaText: 'Message me on WhatsApp',
-    aPrice: "It is all written out on the pricing page, with nothing hidden. The financial mapping is ₪690 and it is the first step. Personal guidance for individuals and young people is ₪1,247.50 a month in four equal payments · ₪4,990 in total. Guidance for families and couples is ₪5,990, in up to four payments. On both tracks the ₪690 from the mapping comes off in full if you continue within 30 days, so in practice that is ₪4,300 and ₪5,300. Both tracks also include a bonus focus session, free, if you want it, in the six months after we finish. The intro call is free and carries no obligation.",
+    aPrice: "It depends on the track and on what you actually need, so I would rather give you the number in a conversation than before I understand what we are dealing with. In the intro call we will go over your situation, and if it is a fit I will lay out exactly what the track includes and what it costs. The call itself is free and with no obligation.",
     q6: 'What happens the day after?',
     a6: 'My aim is to bring you to independence and complete confidence in managing your own money. Alongside being able to carry on by yourself, the safety net stays in place once the process ends: you can reach out, ask and talk it through at any point you need help. I am here for you.',
     dir: 'ltr'
@@ -8650,7 +8522,7 @@ function setLang(lang) {
     navBtnText.textContent = navBtn.getAttribute('aria-expanded') === 'true'
       ? t.navMenuClose : t.navMenu;
   }
-  ['nm1','nm2','nm3','nm4','nm5','nm6','nm7','navMenuTitle'].forEach(k => {
+  ['nm1','nm2','nm3','nm4','nm5','nm7','navMenuTitle'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
@@ -8683,8 +8555,7 @@ function setLang(lang) {
 
   /* ‏לפי מזהה ולא לפי אינדקס · רשימות שמתחלקות לפי מיקום
      ‏נשברות ברגע שמישהו מוסיף אלמנט באמצע. */
-  ['prGateLabel','prGateTitle','prGateLine','prGateBtn',
-   'giftRule','giftTitle','giftText','giftFree','stickyCtaText'].forEach(k => {
+  ['giftRule','giftTitle','giftText','giftFree','stickyCtaText'].forEach(k => {
     const el = document.getElementById(k);
     if (el) el.textContent = t[k];
   });
@@ -8695,8 +8566,6 @@ function setLang(lang) {
   /* ‏שני קישורים ולא שני משפטים · ‏textContent ‏מספיק. */
   const intakeLinkEl = document.getElementById('intakeLink');
   if (intakeLinkEl) intakeLinkEl.textContent = t.intakeLink;
-  const priceLinkEl = document.getElementById('priceLink');
-  if (priceLinkEl) priceLinkEl.textContent = t.priceLink;
   const callOr = document.getElementById('callOr');
   if (callOr) callOr.textContent = t.callOr;
   const callLink = document.getElementById('callLink');
@@ -8835,8 +8704,6 @@ function setLang(lang) {
 
 <!-- ‏שלושת חלונות הפירוט · אותה מעטפת בדיוק של מדיניות הפרטיות
      ‏ושל הצהרת הנגישות, כדי שלא יהיו באתר שלושה סוגי חלונות. -->
-
-
 
 
 <div class="privacy-overlay" id="a11yOverlay" onclick="closeA11yOutside(event)">
