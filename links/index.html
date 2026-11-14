@@ -207,6 +207,14 @@ a { touch-action: manipulation; }
 
    ‏ארבעתן יחד שוקלות 36KB · ‏חתוכות ל-224 ‏פיקסל ושמורות
    ‏כ-JPEG, ‏כי לכולן רקע אטום ואין בהן שקיפות לשמור. */
+/* ‏האריח של השאלון מצויר ולא מצולם · ‏object-fit לא נוגע ב-SVG,
+   ‏ולכן הריפוד הוא מה שמרחיק את הציור מהמסגרת. */
+.link-tile-glyph {
+  padding: 11px;
+  color: #d8b4fe;
+  object-fit: initial;
+}
+
 .link-tile {
   flex: none;
   width: 46px;
@@ -363,6 +371,22 @@ html[dir="rtl"] .link-gold::after { --shine-to: -620px; }
   </h1>
 
   <nav class="links" aria-label="הקישורים של שוהם אבו">
+
+    <div class="row">
+      <a class="link" data-go="quiz" href="/quiz.html">
+        <svg class="link-tile link-tile-glyph" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v14A1.5 1.5 0 0 1 16 20.5H8A1.5 1.5 0 0 1 6.5 19V5A1.5 1.5 0 0 1 8 3.5z"/>
+          <path d="M9.5 8.5h5"/><path d="M9.5 12h5"/><path d="M9.5 15.5h3"/>
+        </svg>
+        <span class="link-copy">
+          <span class="link-title">איפה אתם עומדים?</span>
+          <span class="link-sub">חמש שאלות, שתי דקות, בלי להשאיר טלפון</span>
+        </span>
+        <svg class="link-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </a>
+    </div>
 
     <div class="row">
       <a class="link link-gold" data-go="whatsapp"
