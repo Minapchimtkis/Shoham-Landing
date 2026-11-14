@@ -6601,6 +6601,27 @@ function showFormError(msg, focusId) {
   }
 }
 
+// ── ‏העתקה ללוח, עם הודעה קצרה ──
+// ‏שני מקומות בדף צריכים בדיוק את זה · ‏כתובת המייל, והטלפון
+// ‏במחשב. היה כאן עותק יחיד בתוך הבלוק של המייל, והוא נשלף החוצה
+// ‏כדי שלא יהיו שניים שנפרדים זה מזה עם הזמן.
+const isDesktopPointer = () =>
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+let copyToastTimer;
+function showCopyToast(msg, ms) {
+  // The toast sits further down the page than this script does, so it does
+  // not exist yet while this runs. Looking it up here rather than up there
+  // is what makes any of this work: the old lookup found nothing, the guard
+  // beside it returned, and the click was never wired up at all.
+  const toast = document.getElementById('copyToast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(copyToastTimer);
+  copyToastTimer = setTimeout(() => toast.classList.remove('show'), ms || 2800);
+}
+
 // ── EMAIL: desktop clipboard fallback ──
 // A browser can't tell us whether the visitor has a mail client configured,
 // so instead of guessing we cover both outcomes: mailto still fires, and the
@@ -6610,23 +6631,9 @@ function showFormError(msg, focusId) {
   const EMAIL = 'shohamfinance23@gmail.com';
   const link = document.getElementById('mailLink');
   if (!link) return;
+  if (!isDesktopPointer()) return;
 
-  const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (!isDesktop) return;
-
-  let toastTimer;
-  function showToast(msg) {
-    // The toast sits further down the page than this script does, so it does
-    // not exist yet while this runs. Looking it up here rather than up there
-    // is what makes any of this work: the old lookup found nothing, the guard
-    // beside it returned, and the click was never wired up at all.
-    const toast = document.getElementById('copyToast');
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
-  }
+  const showToast = showCopyToast;
 
   function copy(text) {
     // The async clipboard API needs a secure context; fall back to the old
@@ -6658,6 +6665,55 @@ function showFormError(msg, focusId) {
       .then(() => showToast(isEN ? 'Address copied: ' + EMAIL : 'הכתובת הועתקה: ' + EMAIL))
       .catch(() => showToast(isEN ? 'Write to: ' + EMAIL : 'ניתן לכתוב אל: ' + EMAIL));
   });
+})();
+
+// ── ‏וואטסאפ וטלפון במחשב ──
+// ‏במחשב שתי הדרכים האלה נשברות בשקט. wa.me ‏פותח את וואטסאפ ווב,
+// ‏שמבקש לסרוק קוד מהטלפון, ו-tel: ‏לא עושה כלום בלי אפליקציית
+// ‏חיוג מותקנת. בשני המקרים האדם לוחץ, לא קורה מה שציפה, והוא נשאר
+// ‏בלי המספר · ‏והמספר הוא כל מה שהוא בא בשבילו.
+//
+// ‏אותה גישה בדיוק של המייל, ומאותה סיבה: אי אפשר לדעת מהדפדפן אם
+// ‏וואטסאפ מותקן, ולכן לא מנחשים. הקישור ממשיך כרגיל, ובמקביל המספר
+// ‏נוחת על הלוח וההודעה מסבירה למה.
+(function () {
+  const PHONE = '050-722-8755';
+  if (!isDesktopPointer()) return;
+
+  const targets = [...document.querySelectorAll('.iphone-wa-btn, .sticky-main, #callLink')];
+  if (!targets.length) return;
+
+  function copyPhone() {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(PHONE);
+    }
+    return new Promise((resolve, reject) => {
+      const ta = document.createElement('textarea');
+      ta.value = PHONE;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy') ? resolve() : reject(); }
+      catch (e) { reject(e); }
+      finally { document.body.removeChild(ta); }
+    });
+  }
+
+  targets.forEach(el => el.addEventListener('click', () => {
+    // No preventDefault: whatever the browser can do, it should still do.
+    const isEN = document.documentElement.dir === 'ltr';
+    const isWa = el.id !== 'callLink';
+    const said = isEN
+      ? (isWa ? 'Opening WhatsApp. If it asks you to scan a code, the number is already on your clipboard: ' + PHONE
+              : 'Number copied: ' + PHONE)
+      : (isWa ? 'פותח וואטסאפ. אם הוא מבקש לסרוק קוד, המספר כבר הועתק לכם: ' + PHONE
+              : 'המספר הועתק: ' + PHONE);
+    const fallback = isEN ? 'Call or message: ' + PHONE
+                          : 'אפשר להתקשר או לכתוב: ' + PHONE;
+    copyPhone().then(() => showCopyToast(said, 5200))
+               .catch(() => showCopyToast(fallback, 5200));
+  }));
 })();
 
 // ── PRIVACY MODAL ──
